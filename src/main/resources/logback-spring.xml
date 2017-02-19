@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <jmxConfigurator/>
+    <include resource="logback-appenders-stdout.xml"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="DEBUG"/>
+
+
+</configuration>
+

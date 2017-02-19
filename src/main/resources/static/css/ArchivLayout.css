@@ -1,0 +1,794 @@
+.css_right {
+    float: right;
+}
+
+#example_wrapper .fg-toolbar {
+    font-size: 0.8em
+}
+
+#theme_links span {
+    float: left;
+    padding: 2px 10px;
+}
+
+.alignRight {
+    text-align: right;
+}
+
+.alignLeft {
+    text-align: left;
+}
+
+.alignCenter {
+    text-align: center;
+}
+
+.ui-widget-content {
+    color:inherit;
+}
+
+/*td {
+    font-size: 0.7em;
+}
+
+th {
+    font-size: 0.7em;
+}*/
+
+td.folder-control:before  {
+    content: "\f115";
+    /* fa-folder-open-o */
+    font-family: FontAwesome;
+    font-size: 1.5em;
+}
+
+ td.details-control:before  {
+    content: "\f0a4";
+    font-family: FontAwesome;
+    font-size: 1.5em;
+}
+
+td.shown.details-control:before {
+    content: "\f0a6";
+    font-family: FontAwesome;
+    font-size: 1.5em;
+}
+
+/* remove padding & scrolling from panes that are 'containers' for nested layouts */
+.ui-layout-pane {
+    border: 0; /* cosmetic */
+    padding: 0;
+    overflow: hidden;
+}
+
+#alfrescoWest {
+    overflow: auto !important;
+}
+
+label, input {
+    display: block;
+}
+
+input.text {
+    margin-bottom: 12px;
+    width: 90%;
+    padding: .4em;
+}
+
+fieldset {
+    padding: 0;
+    border: 0;
+    margin-top: 25px;
+}
+
+h1 {
+    font-size: 1.2em;
+    margin: .6em 0;
+}
+
+
+.ui-icon-seek-first, .ui-icon-seek-prev, .ui-icon-seek-next, .ui-icon-seek-end {
+    zoom: 3.0;
+    margin-top: -0.3em;
+}
+
+.ui-dialog .ui-state-error {
+    padding: .3em;
+}
+
+.validateTips {
+    border: 1px solid transparent;
+    padding: 0.3em;
+}
+
+.ui-progressbar {
+    height: 2em;
+    text-align: left;
+}
+
+.ui-progressbar .ui-progressbar-value {
+    margin: -1px;
+    height: 100%;
+}
+
+.progress-label {
+    float: left;
+    margin-left: 50%;
+    margin-top: 0px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+#progressbar {
+    width: 300px;
+    height: 20px;
+}
+
+input.search {
+    background-color: transparent;
+    background-image: url(../images/search.png);
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.search:disabled {
+    background-image: url(../images/search-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.save {
+    background-image: url(../images/save.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer
+}
+
+input.save:disabled {
+    background-image: url(../images/save-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.play {
+    background-image: url(../images/play.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.play:disabled {
+    background-image: url(../images/play-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.maximize {
+    background-image: url(../images/maximize.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.maximize:disabled {
+    background-image: url(../images/maximize-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.minimize {
+    background-image: url(../images/minimize.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.minimize:disabled {
+    background-image: url(../images/minimize-bw.png);
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.upload {
+    background-image: url(../images/upload.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.upload:disabled {
+    background-image: url(../images/upload-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.download {
+    background-image: url(../images/download.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.download:disabled {
+    background-image: url(../images/download-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.beautify {
+    background-image: url(../images/beautify.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.beautify:disabled {
+    background-image: url(../images/beautify-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.pdf {
+    background-image: url(../images/file_pdf.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.pdf:disabled {
+    background-image: url(../images/file_pdf-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.close {
+    background-image: url(../images/exit.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.test {
+    background-image: url(../images/tabicon_pipette.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.reload {
+    background-image: url(../images/refresh.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.docAlfresco {
+    background-image: url(../images/alfresco.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.docAlfresco:disabled {
+    background-image: url(../images/alfresco-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.edit {
+    background-image: url(../images/file_edit.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.edit:disabled {
+    background-image: url(../images/file_edit-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+input.settings {
+    background-image: url(../images/settings.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.themes {
+    background-image: url(../images/themes.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.sendToInbox {
+    background-image: url(../images/inbox_icon.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: pointer;
+}
+
+input.sendToInbox:disabled {
+    background-image: url(../images/inbox_icon-bw.png);
+    background-color: transparent;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    cursor: text;
+    disabled: true;
+}
+
+/* add padding and min/max sizes to BODY */
+html {
+    /* allow scrolling if layout hits min-width/height */
+    overflow: auto !important; /* override Layout default of 'hidden' to allow scrollbars */
+}
+
+body {
+    padding: 0 0px !important; /* override Layout default of '0' */
+    /* set min dimensions for layout - window will scroll if smaller than this */
+    min-width: 950px;
+    min-height: 600px;
+    font-size: 62.5%;
+    /* max-width works for left-aligned layout - need a container-div to 'center' the layout */
+    /*max-width:		1000px;*/
+}
+
+p {
+    margin: 0 0 1ex;
+}
+
+/*
+*	HELPER CLASSES
+*/
+.container {
+    /* used for elements that should not have padding or scrollbars */
+    padding: 0;
+    overflow: hidden;
+}
+
+.hidden {
+    /* used to HIDE layout-panes until Layout initializes */
+    display: none;
+}
+
+.ace_gutter {
+    opacity: 0.3;
+}
+
+
+button.ui-dialog-titlebar-close span.ui-icon {
+    margin-left: -8px !important;
+    margin-top: -8px !important;
+}
+
+.header {
+    border-bottom: 1px solid #777;
+    font-weight: bold;
+    text-align: center;
+    padding: 2px 0 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer {
+    background: #d6d6d6 url(../images/d6d6d6_40x100_textures_02_glass_80.png) 0 50% repeat-x;
+    padding: 3px 10px;
+    font-size: 0.85em;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.subhead {
+    border-bottom: 1px solid #777;
+    background-color: white;
+}
+.footer  { border-top: 1px solid #777; }
+
+/*
+ *	TAB CLASSES - STRUCTURAL, REQUIRED
+ */
+DIV#tabs {
+    /* page-wrapper - used ONLY to 'wrap' tabButtons and tabPanels */
+    position: relative !important; /* overide UI Theme - prevent from becoming a positional wrapper */
+}
+
+UL#tabButtons,
+DIV#tabPanels {
+    margin: 0 !important; /* layout-panes should never have margins */
+
+}
+
+.tabPanel {
+    /* container for tabLayout */
+    height: 100%; /* need to 'fill' the tabPanels - layout container must have 'height' */
+    padding: 0 !important;
+    background-color: wheat;
+/ / DO NOT set top- or bottom-padding because height = 100 %
+}
+
+DIV#verteilungSouth {
+    background: none !important;
+}
+
+/*
+ *	DEBUG - add colored padding & borders to show what is possible
+ */
+
+.ui-layout-north {
+    overflow: visible;
+}
+
+/*
+ *	add some padding and set overflow
+ */
+/*   .ui-widget-header {
+       padding:	2px 1em 3px;
+       overflow:	hidden;
+   }
+*/
+
+/*.ui-widget-content {
+
+    overflow: auto;
+}*/
+
+
+#tabButtons {
+    padding: 0 0.2em 0;
+}
+
+/*
+.jstree-icon {
+    background:url("./images/d.png") -90px 0px no-repeat !important;
+}
+
+.jstree-leaf > ins {
+    background:url("./images/d.png") -36px 0px no-repeat !important;
+}
+
+.ui-icon-triangle-1-e {
+    background:url("./images/d.png") -54px 0px no-repeat !important;
+}
+
+*//*li[rel="root"] ins.ui-icon-triangle-1-se  {
+    background:url("./images/d.png") -54px -54px no-repeat !important;
+}*//*
+
+.ui-icon-triangle-1-se {
+    background:url("./images/d.png") -72px 0px no-repeat !important;
+}
+
+.ui-icon-folder-collapsed {
+    background:url("./images/d.png") -54px -18px no-repeat !important;
+}
+
+.ui-icon-folder-open {
+    background:url("./images/d.png") -54px -36px no-repeat !important;
+}
+
+.ui-icon-document {
+    background:url("./images/file18x18.gif") no-repeat !important;
+}
+a.ui-state-default  {
+    background: none !important ;
+    color: inherit !important;
+    border: none !important;
+}*/
+
+.grid-pad {
+    padding: 0px 0px 0px 0px;
+}
+
+.alpaca-form {
+    margin-top: 5px;
+    margin-left: 0px;
+}
+
+.droppable {
+    width: 150px;
+    height: 150px;
+    padding: 0.5em;
+    float: left;
+    margin: 10px;
+}
+
+.draggable {
+    width: 100px;
+    height: 100px;
+    padding: 0.5em;
+    float: left;
+    margin: 10px;
+    cursor: hand;
+    cursor: pointer;
+    border: 1px solid #000;
+}
+
+.grid {
+    max-width: 100%;
+    min-width: 100%
+}
+
+input {
+    width: 100%
+}
+
+.ui-widget textarea {
+    width: 100%
+}
+
+select {
+    max-width: 100%;
+    min-width: 10%;
+    background-color: white;
+}
+
+.alpaca-controlfield-checkbox input {
+    margin-top: -1px
+}
+
+input[type='checkbox'] {
+    width: 10px;
+    float: left
+}
+
+h2 {
+    background-color: transparent;
+    background-image: url("./../images/alfresco.png");
+    background-repeat: no-repeat;
+    background-position: left;
+    height: 24px;
+    border: 0;
+    padding-left: 28px;
+    padding-top: 4px
+}
+
+#alfrescoTableFooter {
+    position: absolute;
+    bottom: 0px;
+    height: 25px;
+    background-color: #ebebeb;
+    width: 100%;
+}
+
+#alfrescoFolderTableFooter {
+    position: absolute;
+    bottom: 0px;
+    height: 25px;
+    background-color: #ebebeb;
+    width: 100%;
+}
+
+#alfrescoSearchTableFooter {
+    position: absolute;
+    bottom: 0px;
+    height: 25px;
+    background-color: #ebebeb;
+    width: 100%;
+}
+
+div.dataTables_paginate {
+    float: right;
+}
+
+table.dataTable thead th {
+    position: relative;
+    background-image: none !important; /* Remove the DataTables bootstrap integration styling */
+}
+
+table.dataTable thead th.sorting:after,
+table.dataTable thead th.sorting_asc:after,
+table.dataTable thead th.sorting_desc:after {
+    position: absolute;
+    top: 12px;
+    right: 8px;
+    display: block;
+    font-family: FontAwesome;
+}
+
+table.dataTable thead th.sorting:after {
+    content: "\f0dc";
+    color: #ddd;
+    font-size: 0.9em;
+    padding-top: 0.12em;
+}
+table.dataTable thead th.sorting_asc:after {
+    content: "\f0de";
+}
+table.dataTable thead th.sorting_desc:after {
+    content: "\f0dd";
+}
+
+div.dataTables_scrollBody table.dataTable thead th.sorting:after,
+div.dataTables_scrollBody table.dataTable thead th.sorting_asc:after,
+div.dataTables_scrollBody table.dataTable thead th.sorting_desc:after {
+    content: "";
+}
+
+/* In Bootstrap and Foundation the padding top is a little different from the DataTables stylesheet */
+table.table thead th.sorting:after,
+table.table thead th.sorting_asc:after,
+table.table thead th.sorting_desc:after {
+    top: 8px;
+}
+
+div.dataTables_paginate a.paginate_button.first,
+div.dataTables_paginate a.paginate_button.previous {
+    padding-left: 30px;
+}
+
+div.dataTables_paginate a.paginate_button.next,
+div.dataTables_paginate a.paginate_button.last {
+    padding-left: 30px;
+}
+
+div.dataTables_paginate a.first:before,
+div.dataTables_paginate a.previous:before {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    display: block;
+    font-family: FontAwesome;
+}
+
+div.dataTables_paginate a.next:after,
+div.dataTables_paginate a.last:after {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    display: block;
+    font-family: FontAwesome;
+}
+
+div.dataTables_paginate a.first:before {
+    content: "\f100";
+}
+
+div.dataTables_paginate a.previous:before {
+    content: "\f104";
+}
+
+div.dataTables_paginate a.next:after {
+    content: "\f105";
+}
+
+div.dataTables_paginate a.last:after {
+    content: "\f101";
+    padding-right: 24px;
+}
+
+.dataTables_info {
+    float: left;
+}
+
+.alpaca-form-buttons-container.ui-dialog-buttonpane.ui-widget-content {
+    margin-top: 96%;
+}
+
+.alpaca-control {
+    background-color: white;
+}
+
+
+.awesomeEntity, .awesomeAction {
+    color:inherit;
+}
+
+.awesomeEntity {
+    /*text-shadow: 1px 2px 3px black;*/
+}
+.awesomeAction {
+    font-size: 120%;
+    margin: 40% 0px 0px 50%;
+    text-shadow: -1px 0 black, 0 1px 2px black, 1px 0 2px black, 0 -1px black;
+}
+
+/* awesomeBlue */
+span.awesomeBlue i {
+    color: #2E5888;
+}
+span.awesomeBlue i.awesomeAction {
+    text-shadow: -1px 0 white, 0 2px 3px black, 2px 0 3px black, 0 -1px white;
+}
+
+.fa-13x {
+    font-size: 1.3em;
+}
+
+.fa-15x {
+    font-size: 1.5em;
+}
+
+.fa-09x {
+    font-size: 0.9em;
+}
+
+.jstree-icon:empty {
+    padding-right: 25px;
+}
+
+.sf-with-ul {
+    padding-left: 5px;
+}
+
+.dataTables_paginate {
+    padding-right:40px;
+}

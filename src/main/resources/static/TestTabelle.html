@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Table Example</title>
+
+
+    <script type="text/javascript" src="./js/jquery/jquery-1.12.1.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/ace/ace.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/ace/theme-chrome.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/ace/theme-eclipse.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/ace/mode-xml.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/ace/mode-javascript.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/ace/mode-text.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/alfrescoClient.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/dialoge.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/util.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/recognition.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/verteilung.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery-ui/jquery-ui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.tmpl.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.layout.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.layout.resizeTabLayout-1.3.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.cookie.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.hotkeys.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jstree/jstree.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/dataTables/dataTables.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/dataTables/dataTables.paging_with_jqui_icons.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/moment/moment-with-locales.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/bootstrap/bootstrap-datetimepicker.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/bootstrap/typeahead.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/dataTables/datetime-moment.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.jeditable.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/dataTables/dataTables.rowShow.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/dataTables/dataTables.select.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/dataTables/dataTables.editable.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.jeditable.datepicker.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.price-format.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.easing.1.3.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.jBreadCrumb.1.1.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.formatDateTime.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.format-1.3.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jquery/jquery.wysiwyg.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/superfish.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/hoverIntent.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/alpaca/handlebars.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/alpaca/alpaca.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/vkbeautify.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jsbeautify.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/Base64.js" charset="utf-8"></script>
+
+
+    <link type="text/css" href="./css/jquery-ui-custom.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/bootstrap-datetimepicker.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/dataTables.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/Base.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/BreadCrumb.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/select.jqueryui.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/superfish.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/superfish-navbar.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/superfish-vertical.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/jquery.wysiwyg.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/alpaca.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/style.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/ArchivLayout.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/simplegrid.css" rel="stylesheet"/>
+    <link type="text/css" href="./css/font-awesome.css" rel="stylesheet"/>
+
+    <script type="text/javascript" charset="utf-8">
+        var tabelle;
+        var obj;
+
+        /**
+         * führt einen Service aus
+         * die Methode prüft dabei im Appletzweig, ob ein String Parameter zu lang ist und überträgt ihn dann häppchenweise.
+         * der entsprechende Parameter wird dann nicht mehr übergeben und muss dann in der entsprechenden Servicemethode im
+         * Applet aus dem internenen Spreicher besorgt werden. Bislang funktioniert dieses Verfahren aber nur mit einem
+         * Parameter.
+         * @param service           der Name des Service
+         * @param done              Funktion, die ausgeführt werden soll, wenn der Aufruf asynchron erfolgen soll. Funktioniert
+         *                          nur beim Servlet
+         * @param params            die Parameter als JSON Objekt
+         *                          name:  der Name des Parameters ( wird nur für das Servlet gebraucht)
+         *                          value: der Inhalt des Paramaters
+         *                          type: der Typ des Parameters
+         * @param messages          Array mit Meldungen. Die erste ist die Fehlermeldung, der zweite Eintrag ist eine Erfolgsmeldung
+         * @param ignoreError       Flag, ob ein Fehler ignoriert werden soll
+         * @return das Ergebnis als JSON Objekt
+         * TODO Diese Methode ist nur deswegen hier definiert weil der Minifier noch kein ECMA6 kann und deshalb aussteigt.
+         * Diese methode kann nicht aufgerufen werdeb bevor die abhängigen Bibliotheken geladen werden weil diese auch von der Methode
+         * benutzt werden. Dies ist unter anderem jQuery.
+         * Wenn der Minifier aktualisiert worden ist sollte diese methode wieder nach util.js wandern!
+         */
+        function executeService(service, done, params, messages, ignoreError) {
+            var json;
+            var index;
+            var errorMessage;
+            var successMessage;
+            var longParameter = false;
+            var times = [];
+            try {
+                if (exist(messages)) {
+                    if (typeof messages == "object") {
+                        if (messages.length == 2) {
+                            errorMessage = messages[0];
+                            successMessage = messages[1];
+                        } else {
+                            errorMessage = messages[0];
+                        }
+                    } else if (typeof messages == "string") {
+                        errorMessage = messages;
+                    }
+                }
+                REC.log(DEBUG, "Execute: " + service);
+                times.push(new Date().getTime());
+                var asynchron = true;
+                if (!done) {
+                    asynchron = false;
+                    done = function (data) {
+                        json = data;
+                    }
+                }
+                if (isLocal()) {
+                    // Aufruf über Applet
+                    var maxLen = 1100000;
+                    var paramValues = [];
+                    if (exist(params)) {
+                        for (  index = params.length; index--;) {
+                            // falls Bytecode übertragen werden soll, dann Umwandlung damit es nicht zu Konvertierungsproblemen kommt
+                            if (exist(params[index].type) && params[index].type == "byte")
+                            // params[index].value = base64EncArr(strToUTF8Arr(params[index].value));
+                                params[index].value = btoa(params[index].value);
+                            // prüfen, ob Parameter zu lang ist
+                            if (typeof params[index].value == "String" && params[index].value.length > maxLen) {
+                                // den derInhalt häppchenweise übertragen
+                                longParameter = true;
+                                for (var k = 0; k < Math.ceil(params[index].value.length / maxLen); k++)
+                                    document.reader.fillParameter(params[index].value.substr(k * maxLen, maxLen), k == 0);
+                                // Parameter entfernen
+                                params.splice(index, 1);
+                            } else
+                                paramValues.push(params[index].value);
+                        }
+                    }
+                    var obj = document.reader[service]( ...paramValues.reverse());
+                    done(jQuery.parseJSON(obj));
+                    times.push(new Date().getTime());
+                } else {
+                    // Aufruf über Servlet
+                    var dataString = {};
+                    if (exist(params)) {
+                        for (index = 0; index < params.length; ++index) {
+                            // falls Bytecode übertragen werden soll, dann Umwandlung damit es nicht zu Konvertierungsproblemen kommt
+                            if (exist(params[index].type) && params[index].type == "byte")
+                                params[index].value = btoa(params[index].value);
+                            dataString[params[index].name] = params[index].value;
+                        }
+                    }
+                    $.ajax({
+                        type: "POST",
+                        contentType : 'application/json; charset=utf-8',
+                        data: JSON.stringify(dataString),
+                        datatype: "json",
+                        cache: false,
+                        async: asynchron,
+                        url: "/Archiv/" + service,
+                        error: function (response) {
+                            try {
+                                var r = jQuery.parseJSON(response.responseText);
+                                message("Fehler", "Path: " + r.path + "<br>Exception: " + r.exception + "<br>" + r.error +": " + r.message);
+                            } catch (e) {
+                                var str = "FEHLER:\n";
+                                str = str + e.toString() + "\n";
+                                for (var prop in e)
+                                    str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
+                                message("Fehler", str + "<br>" + response.responseText);
+                            }
+                        },
+                        success: function(data) {
+                            if (!data.success) {
+                                if (exist(errorMessage))
+                                    errorString = errorMessage + "<br>" + data.data;
+                                else
+                                    errorString = data.data;
+                                // gibt es eine Fehlermeldung aus dem Service?
+                                if (data.error && !ignoreError) {
+                                    errorString = errorString + "<br>" + data.error;
+                                    REC.log(ERROR, data.error);
+                                }
+                                if (!ignoreError) {
+                                    REC.log(ERROR, data.data);
+                                    fillMessageBox(true);
+                                } else
+                                    data.error = errorString;
+                                json = data;
+                            } else {
+                                if (exist(successMessage)) {
+                                    REC.log(INFORMATIONAL, successMessage);
+                                    fillMessageBox(true);
+                                }
+                                done(data);
+                            }
+
+                        }
+                    });
+                }
+                times.push(new Date().getTime());
+                REC.log(INFORMATIONAL, "Execution of Service: " + service + " duration "+ (times[1] -times[0]) + " ms");
+                fillMessageBox(true);
+                return json;
+            } catch (e) {
+                var p = "Service: " + service + "<br>";
+                if (exist(params)) {
+                    for (index = 0; index < params.length; ++index) {
+                        p = p + "Parameter: " + params[index].name;
+                        if (exist(params[index].value) && typeof params[index].value =="string")
+                            p = p + " : " + params[index].value.substr(0, 40) + "<br>";
+                        else
+                            p = p + " : Parameter Value fehlt!<br>";
+                    }
+                }
+                if (exist(errorMessage))
+                    p = errorMessage + "<br>" + e.toString() + "<br>" + p;
+                else
+                    p = errorMessage + "<br>" + e.toString();
+                if (!ignoreError)
+                    errorHandler(e, p);
+                return {result: e, success: false};
+            }
+        }
+
+        function change(){
+            obj = executeService("getNodeId", null, [
+                {"name": "filePath", "value": "/Archiv/Fehler"}
+            ], "Archiv konnte nicht gefunden werden:");
+            tabelle.ajax.url("/Archiv/listFolderWithPagination&filePath=" + obj.data + "&withFolder=1&itemsToSkip=0").load( null, true );
+        }
+
+        function length(){
+            tabelle.page.len( 4 ).draw("page");
+         }
+
+
+    $(document).ready(function() {
+        obj = executeService("getNodeId", null, [
+            {"name": "filePath", "value": "/Archiv/Unbekannt"}
+        ], "Archiv konnte nicht gefunden werden:");
+        $('#dynamic').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
+        tabelle = $('#example').DataTable( {
+            "pagingType": "paging_with_jqui_icons",
+            "processing": true,
+            "serverSide": true,
+            "pageLength": 5,
+            "order": [[3,'asc']],
+            "displayStart":0,
+            "ajax": {
+                "url": "/Archiv/listFolderWithPagination",
+                type: "POST",
+                data: function (data) {
+                    data.filePath = obj.data;
+                    data.withFolder = 1;
+                    data.itemsToSkip = 0;
+                    return JSON.stringify(data);
+                },
+                dataType: "json",
+                processData: false,
+                contentType: 'application/json;charset=UTF-8'
+            },
+            "language": {
+                "info": "Zeigt Einträge _START_ bis _END_ von insgesamt _TOTAL_ \f",
+                    "emptyTable": "",
+                    "zeroRecords": "Keine Einträge!",
+                    "infoEmpty":    "",
+                    "paginate": {
+                "first": "Erste ",
+                        "last":  "Letzte ",
+                        "next":  "Nächste ",
+                        "previous": "Vorherige "
+            },
+            "select": {
+                "rows": {
+                    "_": " %d Zeilen markiert",
+                            "1": " 1 Zeile markiert",
+                            "0": ""
+                }
+            }
+        },
+            "columns": [
+                {
+                    "class": 'alignCenter details-control awesomeEntity',
+                    "orderable": false,
+                    "data": null,
+                    "defaultContent": '',
+                    "width": "12px"
+                },
+                {
+                    "data": "contentStreamMimeType",
+                    "title": "Typ",
+                    "defaultContent": '',
+                    "type": "string",
+                    "class": "alignCenter",
+                    "width": "43px"
+                },
+                {
+                    "data": null,
+                    "title": "Vorschau",
+                    "orderable": false,
+                    "defaultContent": '',
+                    "type": "string",
+                    "class": "alignCenter",
+                    "width": "120px"
+                },
+                {
+                    "data": "title",
+                    "name": "cm:title",
+                    "title": "Titel",
+                    "defaultContent": '',
+                    "type": "string",
+                    "class": "alignLeft"
+                },
+                {
+                    "data": "documentDateDisplay",
+                    "title": "Datum",
+                    "name": "my:documentDate",
+                    "defaultContent": '',
+                    "type": "string",
+                    "class": "alignLeft"
+                },
+                {
+                    "data": "person",
+                    "title": "Person",
+                    "name": "d.my:person",
+                    "defaultContent": '',
+                    "type": "string",
+                    "class": "alignLeft"
+                },
+                {
+                    "data": "amountDisplay",
+                    "title": "Betrag",
+                    "name": "my:amount",
+                    "defaultContent": '',
+                    "type": "string",
+                    "class": "alignLeft"
+                },
+                {
+                    "data": "idvalue",
+                    "title": "Schlüssel",
+                    "name": "my:idvalue",
+                    "defaultContent": '',
+                    "type": "string",
+                    "class": "alignLeft"
+                },
+                {
+                    "data": null,
+                    "title": "Aktion",
+                    "width": "102px",
+                    "class": "alignLeft"
+                },
+                {
+                    "data": "objectID"
+                }
+            ],
+            "columnDefs": [
+                {
+                    "targets": [5, 6],
+                    "visible": true
+                },
+
+                {   "targets": [9],
+                    "visible": false
+                },
+                {
+                    "targets": [3],
+                    "render": function (data, type, row) {
+                        if (exist(data))
+                            return data;
+                        else if (exist(row.name))
+                            return row.name;
+                        else
+                            return "";
+                    },
+                    "visible": true
+                },
+                {
+                    "targets": [4],
+                    "render": function (data, type, row) {
+                        if (row.documentDate) {
+                            row.documentDateDisplay = $.datepicker.formatDate("dd.mm.yy", new Date(Number(row.documentDate)));
+                        }  else if (row.creationDate)
+                            row.documentDateDisplay = $.datepicker.formatDate("dd.mm.yy", new Date(Number(row.creationDate)));
+                        else
+                            row.documentDateDisplay = "";
+                        return row.documentDateDisplay;
+                    },
+                    "visible": true
+                }
+                ]
+
+        });
+        $.fn.dataTable.makeEditable( tabelle,  {
+            sUpdateURL: function(value, settings)
+            {
+                alert(value);
+            }
+        } );
+
+
+
+
+    } );
+</script>
+</head>
+<body id="dt_example">
+
+<div id="dynamic"></div>
+<button onclick="change()">Push</button>
+<button onclick="length()">Length</button>
+</body>
+</html>

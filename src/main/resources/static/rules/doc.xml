@@ -1,0 +1,971 @@
+<documentTypes
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:cm="http://www.alfresco.org/model/content/1.0"
+        xmlns:my="http://www.schulte.local/archiv" xsi:noNamespaceSchemaLocation="doc.xsd" archivRoot="Archiv/" inBox="Inbox" mandatory="cm:title,my:documentDate,my:person" unknownBox="Unbekannt" errorBox="Fehler" duplicateBox="Fehler/Doppelte" debugLevel="informational" maxDebugLength="40">
+    <!-- LVM Gehaltsabrechnung -->
+    <archivTyp name="LVMGehalt" searchString="Verdienstabrechnung">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Gehalt/Gehalt LVM/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <archivPosition link="true" folder="Dokumente/LVM/Gehalt LVM/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Gehalt" />
+        <tags name="LVM" />
+        <category name="Gehalt/Gehalt Klaus" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <archivTyp name="Rückrechnung" searchString="Rückrechnungsdifferenz">
+            <tags name="Rückrechnung" />
+            <searchItem name="titel" text="Abrechnungsmonat" word="2,2"  />
+            <searchItem name="title" fix="Rückrechnung {titel}" target="cm:title"/>
+            <searchItem name="datum" text="Abrechnungsmonat" word="2,2" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2005" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="betrag" text="Rückrechnungsdifferenz" objectTyp="float" target="my:amount">
+                <check lowerValue="-200" upperValue="200" />
+                <delimitter typ="start" text="&#0032;" count="1" removeBlanks="after" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Verdienstabrechnung" searchString="" unique="error">
+            <searchItem name="title" text="Abrechnungsmonat" word="1,2" target="cm:title" />
+            <searchItem name="datum" value="title" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2005" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="betrag" text="0000459022" objectTyp="float" target="my:amount">
+                <check lowerValue="3000" upperValue="15000" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- Rechnung Zauberfrau -->
+    <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Rechnung" />
+        <tags name="Zauberfrau" />
+        <tags name="Steuerrelevant" />
+        <category name="Rechnung/Rechnung Zauberfrau" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="title" eval="new Date(new Date('{datum}').setMonth(new Date('{datum}').getMonth()-1))" target="cm:title">
+            <format formatString="MMMM YYYY" />
+        </searchItem>
+        <searchItem name="datum" text="Datum" objectTyp="date" target="my:documentDate">
+            <delimitter typ="start" text="&#0032;" count="1" />
+            <check lowerValue="01/01/2005" upperValue="01/01/2020" />
+        </searchItem>
+        <searchItem name="betrag" text="Gesamtbetrag" word="1" objectTyp="float" target="my:amount">
+            <check lowerValue="0" upperValue="250" />
+            <archivZiel aspect="my:amountable" />
+        </searchItem>
+        <searchItem name="id" text="Rechnung Nr" word="1" objectTyp="int" target="my:idvalue">
+            <check lowerValue="1000" upperValue="15000" />
+            <archivZiel aspect="my:idable" />
+            <format formatString="00000" />
+        </searchItem>
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+    </archivTyp>
+    <!-- Rechnung Cafe Fausto -->
+    <archivTyp name="Caffe Fausto" searchString="Fausto" unique="error">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Cafe Fausto" />
+        <category name="Rechnung/Rechnung Cafe Fausto" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="id" text="30133" dir="left" word="1" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <searchItem name="title" fix="Cafe Fausto" target="cm:title" />
+        <searchItem name="datum" kind="date" target="my:documentDate" />
+        <searchItem name="betrag" text="Endbetrag" objectTyp="float" target="my:amount">
+            <check lowerValue="30" upperValue="250" debugLevel="trace" />
+            <delimitter typ="start" text="&#0032;" count="2" />
+            <archivZiel aspect="my:amountable" />
+        </searchItem>
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+    </archivTyp>
+    <!-- Rechnung Solar Direct -->
+    <archivTyp name="Solar Direct" searchString="SOLAR DIRECT">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Rechnungen/Rechnungen Haus">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Heizung" />
+        <tags name="Steuerrelevant" />
+        <tags name="Rechnung" />
+        <category name="Rechnung/Solar Direct" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="id" text="Nummer" readOverReturn="true" word="1" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <searchItem name="title" fix="Rechnung Solar Direct" target="cm:title" />
+        <searchItem name="datum" text="Datum" objectTyp="date" readOverReturn="true" word="1" target="my:documentDate">
+            <check lowerValue="01/01/2005" upperValue="01/01/2020" />
+        </searchItem>
+        <searchItem name="betrag" text="Gesamt" completeWord="true" objectTyp="float" backwards="true" target="my:amount">
+            <check lowerValue="0" upperValue="1000" />
+            <archivZiel aspect="my:amountable" />
+        </searchItem>
+    </archivTyp>
+    <!-- Rechnung O2 -->
+    <archivTyp name="Rechnung O2" searchString="O2 Germany">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Kommunikation/O2/Rechnungen O2/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <archivPosition link="true" folder="Dokumente/Rechnungen/Telefon/Rechnungen O2">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Telefon" />
+        <tags name="Handy" />
+        <category name="Rechnung/Rechnung O2" />
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <archivTyp name="Rechnung O2 alt" searchString="O2 Germany">
+            <searchItem name="datum" text="Ihre Kundennummer" objectTyp="date" target="my:documentDate">
+                <delimitter typ="start" text="&#0010;" count="1" />
+                <delimitter typ="end" text="&#0032;" count="10" />
+                <check lowerValue="01/01/2000" upperValue="01/10/2012" />
+            </searchItem>
+            <searchItem name="title" value="datum" objectTyp="date" target="cm:title">
+                <format formatString="MMMM YYYY" />
+            </searchItem>
+            <searchItem name="betrag" text="Gesamtbetrag (inkl. MwSt.)" objectTyp="float" target="my:amount">
+                <check lowerValue="0" upperValue="50" />
+                <delimitter typ="start" text="&#0032;" count="3" />
+                <delimitter typ="end" text="&#0032;" count="1" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Rechnung O2 neu" searchString="Telefónica">
+            <searchItem name="datum" text="Rechnungsdatum" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2000" upperValue="01/10/2012" />
+            </searchItem>
+            <searchItem name="title" value="datum" objectTyp="date" target="cm:title">
+                <format formatString="MMMM YYYY" />
+            </searchItem>
+            <searchItem name="betrag" text="Gesamtbetrag" word="1" objectTyp="float" target="my:amount">
+                <check lowerValue="0" upperValue="50" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- Renteninformation -->
+    <archivTyp name="Renteninformation" searchString="Ihre Renteninformation">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Gehalt/BVA">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Rente" />
+        <category name="Rente/Klaus" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="datum" text="Datum" objectTyp="date" target="my:documentDate">
+            <delimitter typ="start" text="&#0032;" count="1" />
+            <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+        </searchItem>
+        <searchItem name="title" value="datum" objectTyp="date" target="cm:title">
+            <format formatString="MMMM YYYY" />
+        </searchItem>
+        <searchItem name="id" text="Versicherungsnummer:" target="my:idvalue">
+            <delimitter typ="start" text="&#0010;" count="1" />
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+    </archivTyp>
+    <!-- Rechnung Kortenbrede -->
+    <archivTyp name="Kortenbrede" searchString="Robert Kortenbrede">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <category name="Rechnung/Rechnung Kortenbrede" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="title" fix="Robert Kortenbrede" target="cm:title" />
+        <searchItem name="datum" kind="date,2" objectTyp="date" target="my:documentDate">
+            <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+        </searchItem>
+        <searchItem name="id" text="Kasse" word="1" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+            <check lowerValue="0" upperValue="99999" />
+        </searchItem>
+        <searchItem name="betrag" text="erhalten" readOverReturn="true" objectTyp="float" target="my:amount">
+            <check lowerValue="0" upperValue="150" />
+            <archivZiel aspect="my:amountable" />
+        </searchItem>
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+    </archivTyp>
+    <!-- Landesamt für Besoldung -->
+    <archivTyp name="Landesamt für Besoldung" searchString="BESOLDUNG">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Gehalt/Landesamt für Besoldung/Bezügemitteilungen/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Gehalt" />
+        <tags name="Landesamt für Besoldung" />
+        <category name="Gehalt/Gehalt Katja" />
+        <searchItem name="person" fix="Katja" target="my:person" />
+        <searchItem name="id" fix="C 8005335" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <archivTyp name="Bezügemitteilung" searchString="Bezügemitteilung">
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="tmp1" objectTyp="date" value="datum">
+                <format formatString="MMMM YYYY" />
+            </searchItem>
+            <archivTyp name="Bezügemitteilung neu" searchString="Behörde">
+                <searchItem name="datum" text="Westfalen" word="1" objectTyp="date" target="my:documentDate">
+                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+                </searchItem>
+                <searchItem name="title" value="tmp1" target="cm:title" />
+                <searchItem name="betrag" text="1735934" word="1" objectTyp="float" target="my:amount">
+                    <check lowerValue="0" upperValue="3500" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+            <archivTyp name="Bezügemitteilung alt" searchString="Personal">
+                <searchItem name="datum" text="ab:" removeBlanks="after" objectTyp="date" target="my:documentDate">
+                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+                </searchItem>
+                <searchItem name="nachzahlung" text="Nachzahlung" word="1" objectTyp="float" required="false" />
+                <searchItem name="auszahlung" text="Auszahlungsbetrag" word="2" objectTyp="float" required="false" />
+                <searchItem name="title" eval="(REC.exist({auszahlung}) ? '{tmp1}' : '{tmp1} Nachzahlung')" target="cm:title" />
+                <searchItem name="betrag" eval="{auszahlung}||{nachzahlung}" objectTyp="float" target="my:amount">
+                    <check lowerValue="0" upperValue="2500" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- Rechnung Telekom -->
+    <archivTyp name="Rechnung Telekom" searchString="Telekom">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Kommunikation/Telekom/Rechnungen Telekom/{tmp}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <archivPosition link="true" folder="Dokumente/Rechnungen/Telefon/Rechnungen Telekom">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Telefon" />
+        <tags name="Festnetz" />
+        <tags name="Rechnung" />
+        <category name="Rechnung/Telekom" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="datum" text="Datum" word="1" objectTyp="date" target="my:documentDate">
+            <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+        </searchItem>
+        <searchItem name="title" text="Rechnung für" target="cm:title" />
+        <searchItem name="betrag" text="Rechnungsbetrag" readOverReturn="true" word="1" objectTyp="float" target="my:amount">
+            <check lowerValue="0" upperValue="100" />
+            <archivZiel aspect="my:amountable" />
+        </searchItem>
+        <searchItem name="id" text="961|960|959|950" included="true" word="0,3" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <searchItem name="tmp" word="1" value="title" />
+    </archivTyp>
+    <!--Continentale -->
+    <archivTyp name="Continentale" searchString="Continentale">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Versicherungen/Continentale">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <category name="Versicherung/Unfall" />
+        <archivTyp name="Unfallversicherung" searchString="051703981">
+            <searchItem name="person" fix="Katja" target="my:person" />
+            <searchItem name="id" fix="051703981" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Lastschriftbenachrichtigung" searchString="Lastschriftbenachrichtigung">
+                <searchItem name="datum" text="Datum" kind="date" target="my:documentDate">
+                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+                </searchItem>
+                <searchItem name="tmp" objectTyp="date" value="datum">
+                    <format formatString="YYYY" />
+                </searchItem>
+                <searchItem name="title" fix="Lastschriftbenachrichtigung {tmp}" target="cm:title" />
+                <searchItem name="betrag" kind="amount" dir="left" target="my:amount">
+                    <check lowerValue="200" upperValue="400" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+            <archivTyp name="Nachtrag" searchString="Nachtrag">
+                <searchItem name="datum" kind="date" target="my:documentDate">
+                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+                </searchItem>
+                <searchItem name="tmp" objectTyp="date" value="datum">
+                    <format formatString="YYYY" />
+                </searchItem>
+                <searchItem name="title" fix="Nachtrag {tmp}" target="cm:title" />
+                <searchItem name="bet" text="jährlicher Gesamtbeitrag" readOverReturn="true" />
+                <searchItem name="betrag" value="bet" kind="amount" target="my:amount">
+                    <check lowerValue="200" upperValue="400" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- Rechnung Musikschule Roxel -->
+    <archivTyp name="Musikschule Roxel" searchString="Musikschule Roxel">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp2}">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <archivPosition link="true" folder="Dokumente/Kinder/Rechnung Musikschule Roxel">
+            <archivZiel type="my:archivFolder" />
+        </archivPosition>
+        <tags name="Musikschule" />
+        <category name="Rechnung/Rechnung Musikschule Roxel" />
+        <searchItem name="person" fix="Katja" target="my:person" />
+        <searchItem name="datum" text="1530" objectTyp="date" target="my:documentDate">
+            <delimitter typ="start" text="&#0032;" count="1" />
+            <check lowerValue="01/01/2007" upperValue="01/01/2020" />
+        </searchItem>
+        <searchItem name="tmp2" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <searchItem name="desc" fix="Rechnung {tmp2}" target="cm:description" />
+        <searchItem name="title" fix="Musikschule Roxel" target="cm:title" />
+        <searchItem name="id" fix="1530" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <searchItem name="betrag" text="fällig:" objectTyp="float" target="my:amount">
+            <delimitter typ="start" text="&#0032;" count="1" />
+            <check lowerValue="0" upperValue="950" />
+            <archivZiel aspect="my:amountable" />
+        </searchItem>
+    </archivTyp>
+    <!-- Finanzamt -->
+    <archivTyp name="Finanzamt" searchString="Finanzamt Münster-Außenstadt">
+        <archivTyp name="Kraftfahrzeugsteuer" searchString="Kraftfahrzeugsteuer">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Auto/KFZ Steuern">
+                <archivZiel type="my:archivFolder" />
+            </archivPosition>
+            <archivPosition link="true" folder="Dokumente/Steuern">
+                <archivZiel type="my:archivFolder" />
+            </archivPosition>
+            <tags name="Auto" />
+            <tags name="Steuern" />
+            <category name="Steuern/KFZ Steuer" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="datum" text="Kontos" objectTyp="date" readOverReturn="true" word="1" target="my:documentDate">
+                <check lowerValue="01/01/2007" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="title" fix="Zahlungshinweis Kraftfahrzeugsteuer" target="cm:title" />
+            <searchItem name="id" text="KraftSt-Nummer" target="my:idvalue">
+                <delimitter typ="start" text="&#0032;" count="2" />
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="betrag" text="Gesamtbetrag" objectTyp="float" target="my:amount">
+                <delimitter typ="start" text="&#0032;" count="1" />
+                <check lowerValue="100" upperValue="300" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Einkommensteuer" searchString="Einkommensteuer">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Steuern/Einkommenssteuern">
+                <archivZiel type="my:archivFolder" />
+            </archivPosition>
+            <tags name="Steuern" />
+            <category name="Steuern/Einkommen" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="tmp" text="Bescheid" word="2" />
+            <searchItem name="title" fix="Einkommenssteuerbescheid {tmp}" target="cm:title" />
+            <searchItem name="id" fix="336/2528/1452" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="betrag" text="Guthaben von" word="1" objectTyp="float" target="my:amount">
+                <check lowerValue="100" upperValue="2000" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!--Gewinnschuldverschreibung -->
+    <archivTyp name="LVM Gewinnschuldverschreibung" searchString="Gewinnschuldverschreibung" unique="error">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/LVM/Gewinnschuldverschreibungen/Gewinnschuldverschreibung {tmp2}" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="tmp2" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <archivTyp name="Dokument" searchString="KOPIE">
+            <searchItem name="betrag" text="81302" objectTyp="float" target="my:amount" word="1">
+                <check lowerValue="200" upperValue="500" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+            <searchItem name="title" fix="Gewinnschuldverschreibung {tmp2}" target="cm:title" />
+            <searchItem name="datum" kind="date" objectTyp="date" dir="left" target="my:documentDate">
+                <check lowerValue="01/01/1996" upperValue="01/01/2020" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Zinsbescheinigung" searchString="Zinsbescheinigung">
+            <tags name="Zinsen" />
+            <searchItem name="title" fix="Zinsbescheinigung {tmp2}" target="cm:title" />
+            <searchItem name="datum" text="Münster, den" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/1996" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="betrag" text="betragen" objectTyp="float" target="my:amount" word="1">
+                <check lowerValue="1" upperValue="50" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+            <searchItem name="tmp3" kind="date">
+                <check lowerValue="01/01/1996" upperValue="01/01/2020" />
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="description" text="Hinweise" readOverReturn="true" dir="left" target="cm:description">
+                <delimitter typ="start" text="&#0010;" count="-3" />
+                <delimitter typ="end" text="&#0010;" count="-2" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- BW-Bank -->
+    <archivTyp name="BW Bank" searchString="KUSA" unique="error">
+        <archivTyp name="Zinsbescheinigung" searchString="Zinsbescheinigung">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Banken/LBBW/Konto {id}" />
+            <tags name="Zinsen" />
+            <category name="Haus/Kredit" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2005" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="tmp1" eval="{tmp} - 1" />
+            <searchItem name="title" fix="Zinsbescheinigung {tmp1}" target="cm:title" />
+            <searchItem name="id" text="Darlehenskontonummer" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="betrag" text="H " objectTyp="float" readOverReturn="true" word="1" dir="left" backwards="true" target="my:amount">
+                <check lowerValue="400" upperValue="10000" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- HUK-Coburg -->
+    <archivTyp name="HUK-Coburg" searchString="HUK-COBURG">
+        <archivTyp name="Beitragsrechnung" searchString="Beitragsrechnung" unique="error">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Versicherungen/HUK-Coburg/830074295-T" />
+            <tags name="Haftpflichht" />
+            <category name="Versicherung/Haftpflicht" />
+            <searchItem name="person" fix="Katja" target="my:person" />
+            <searchItem name="datum" text="Coburg" objectTyp="date" target="my:documentDate">
+                <delimitter typ="start" text="&#0032;" count="1" />
+                <check lowerValue="01/01/2005" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="title" fix="'Beitragsrechnung {tmp}" target="cm:title" />
+            <searchItem name="id" fix="830/074295-T" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="bet" text="Fälligkeit" readOverReturn="true" />
+            <searchItem name="betrag" value="bet" kind="float" target="my:amount">
+                <check lowerValue="40" upperValue="80" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- Nürnberger -->
+    <archivTyp name="Nürnberger" searchString="NÜRNBERGER">
+        <archivPosition folder="Dokumente/Versicherungen/Nürnberger/{id}" />
+        <searchItem name="datum" text="Nürnberg," objectTyp="date" target="my:documentDate">
+            <check lowerValue="01/01/2005" upperValue="01/01/2020" />
+        </searchItem>
+        <searchItem name="jahr" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <archivTyp name="Risiko-Leben Klaus" searchString="050565405012">
+            <category name="Versicherung/Risikolebensversicherung" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="id" fix="L 050565 405 022" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Beitragsbestätigung" searchString="Beitragsbestätigung">
+                <searchItem name="title" fix="Beitragsbestätigung {jahr}" target="cm:title" />
+                <searchItem name="betrag" text="Risiko-Lebensversicherung" word="1" objectTyp="float" target="my:amount">
+                    <check lowerValue="500" upperValue="700" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+        <archivTyp name="BUZ Klaus" removeBlanks="before" searchString="050565405022">
+            <archivZiel type="my:archivContent" />
+            <category name="Versicherung/BUZ" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="id" fix="L 050565 405 022" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Information zur Überschussbeteiligung Klaus" searchString="Information zur Überschussbeteiligung">
+                <searchItem name="title" fix="Information zur Überschussbeteiligung" target="cm:title" />
+            </archivTyp>
+            <archivTyp name="Erhöhung BUZ Klaus" searchString="Erhöhung">
+                <searchItem name="title" fix="Erhöhung" target="cm:title" />
+                <searchItem name="tmp" eval="{betrag} * 12" target="my:amount">
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+                <searchItem name="betrag" text="Beitrag monatlich" objectTyp="float">
+                    <check lowerValue="100" upperValue="200" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+        <archivTyp name="Rentenversicherung Katja" searchString="241269">
+            <archivZiel type="my:archivContent" />
+            <category name="Versicherung/Rentenversicherung" />
+            <searchItem name="person" fix="Katja" target="my:person" />
+            <searchItem name="id" fix="L 241269 099 013" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Information zur Überschussbeteiligung Rente Katja" searchString="Überschussbeteiligung">
+                <searchItem name="title" fix="Information zur Überschussbeteiligung" target="cm:title" />
+            </archivTyp>
+            <archivTyp name="Erhöhung Rente Katja" searchString="Erhöhung">
+                <searchItem name="title" fix="Erhöhung" target="cm:title" />
+                <searchItem name="betrag" text="monatlich" objectTyp="float" word="5" target="my:amount">
+                    <check lowerValue="80" upperValue="200" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- Deka Fonds -->
+    <archivTyp name="Deka Fonds" searchString="Deka">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Banken/Deka/{fol}" />
+        <tags name="Wertpapier" />
+        <category name="Kinder/Till/Geldanlage Opa Otto" />
+        <searchItem name="person" fix="Till" target="my:person" />
+        <searchItem name="id" fix="0182490938" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <archivTyp name="Zielreport" searchString="Report">
+            <searchItem name="fol" fix="" />
+            <searchItem name="title" fix="ZielReport zum {tmp1}" target="cm:title" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2003" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="tmp1" objectTyp="date" value="datum">
+                <format formatString="d.MM.YYYY" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Wertpapierabrechnung" searchString="Wertpapierabrechnung">
+            <searchItem name="datum" text="Abrechnungstag" objectTyp="date" word="1" target="my:documentDate">
+                <check lowerValue="01/01/2003" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="fol" fix="Abrechnungen/{tmp}/" />
+            <searchItem name="nummer" text="Auszug:" word="1" />
+            <searchItem name="title" fix="Wertpapierabrechnung {nummer}" target="cm:title" />
+        </archivTyp>
+        <archivTyp name="Jahresdepotauszug" searchString="Jahresdepotauszug per">
+            <searchItem name="fol" fix="Jahresdepotauszüge/" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2003" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="bet1" text="Wertentwicklung in EUR" word="1" objectTyp="float" required="false" />
+            <searchItem name="bet2" text="Gesamt in EUR" word="2" objectTyp="float" required="false" />
+            <searchItem name="bet3" fix="0" required="false" />
+            <searchItem name="betrag" eval="{bet1}||{bet2}||{bet3}" objectTyp="float" target="my:amount">
+                <check lowerValue="-2000" upperValue="2000" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+            <searchItem name="title" fix="Jahresdepotauszug {tmp}" target="cm:title" />
+        </archivTyp>
+        <archivTyp name="Depotübersicht" searchString="Depotübersicht">
+            <searchItem name="fol" fix="" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2003" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="bet" text="Gesamt" />
+            <searchItem name="betrag" value="bet" kind="amount" target="my:amount">
+                <check lowerValue="50" upperValue="2000" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+            <searchItem name="title" fix="Depotübersicht {tmp}" target="cm:title" />
+        </archivTyp>
+    </archivTyp>
+    <!-- LVM Versicherungen -->
+    <archivTyp name="LVM Versicherungen" searchString="LVM ">
+        <archivTyp name="Krankenversicherung" searchString="77.228.294.0">
+            <archivPosition folder="Dokumente/Versicherungen/LVM/Kranken/" />
+            <category name="Versicherung/Kranken" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="id" fix="77.228.294.0" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Arbeitgeberbescheinigung für Zuschuss" searchString="§ 257">
+                <searchItem name="datum" text="Münster," objectTyp="date" readOverReturn="true" word="1" target="my:documentDate">
+                    <check lowerValue="01/01/2003" upperValue="01/01/2013" />
+                </searchItem>
+                <searchItem name="title" fix="Bescheinigung für den Arbeitgeber zur Erlangung des Zuschusses zum Beitrag für eine private Krankenversicherung"          target="cm:title" />
+            </archivTyp>
+            <archivTyp name="Beitragsanpassung" searchString="Änderungs">
+                <searchItem name="datum" text="Ausfertigung" objectTyp="date" word="1" target="my:documentDate">
+                    <check lowerValue="01/01/2003" upperValue="01/01/2012" />
+                </searchItem>
+                <searchItem name="tmp" text="gültig ab" objectTyp="date" word="1">
+                    <format formatString="YYYY" />
+                </searchItem>
+                <searchItem name="title" fix="Beitragsanpassung {datum}" target="cm:title" />
+                <searchItem name="betrag" text="monatliche Beitragsrate" objectTyp="float" word="1" target="my:amount">
+                    <check lowerValue="400" upperValue="650" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+        <archivTyp name="Kraftfahrtversicherung" searchString="Kraftfahrtversicherung">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Versicherungen/LVM/Kraftfahrt/" />
+            <category name="Versicherung/Kraftfahrt" />
+            <searchItem name="person" fix="Katja" target="my:person" />
+            <searchItem name="datum" text="Münster," objectTyp="date" readOverReturn="true" word="2,2" target="my:documentDate">
+                <check lowerValue="01/01/2010" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="tmp1" eval="{tmp} +1" />
+            <searchItem name="title" fix="Beitragsrechnung {tmp1}" target="cm:title" />
+            <searchItem name="id" fix="26.954.800.2" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="betrag" text="jährlicher Beitrag" objectTyp="float" word="1" target="my:amount">
+                <check lowerValue="300" upperValue="400" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Wohngebäude" searchString="Verbundene Wohngebäudeversicherung">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Versicherungen/LVM/Wohngebäude/" />
+            <category name="Haus/Versicherung/Wohngebäude" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2006" />
+            </searchItem>
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="tmp1" eval="{tmp} + 1" />
+            <searchItem name="title" fix="Beitragsrechnung {tmp1}" target="cm:title" />
+            <searchItem name="id" fix="91.011.179.5" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="betrag" text="Rechnungsbetrag" objectTyp="float" target="my:amount" readOverReturn="true" dir="left">
+                <delimitter typ="start" text="&#0010;" count="-3" />
+                <check lowerValue="150" upperValue="250" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Hausrat" searchString="99.233.620.0">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Versicherungen/LVM/Hausrat/{fol}" />
+            <category name="Haus/Versicherung/Hausrat" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2006" />
+            </searchItem>
+            <searchItem name="id" fix="99.233.620.0" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <archivTyp name="Beitragsrechnung" searchString="Beitragsrechnung">
+                <searchItem name="fol" fix="Beitragsrechnungen" />
+                <searchItem name="title" fix="Beitragsrechnung {tmp}" target="cm:title" />
+                <searchItem name="txt" text="Rechnungsbetrag" />
+                <searchItem name="betrag" value="txt" kind="amount" target="my:amount">
+                    <check lowerValue="150" upperValue="200" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- DKV -->
+    <archivTyp name="DKV" searchString="Deutsche Krankenversicherung">
+        <archivZiel type="my:archivContent" />
+        <searchItem name="id" fix="KV 201328522" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <searchItem name="person" fix="Katja" target="my:person" />
+        <archivTyp name="Beitragsanpassung" searchString="Beitragsänderung">
+            <archivPosition folder="Dokumente/Versicherungen/DKV/" />
+            <searchItem name="datum" text="Mobilfunknetz" objectTyp="date" word="1,2" target="my:documentDate">
+                <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="tmp1" eval="{tmp}+1" />
+            <searchItem name="title" fix="Beitragsanpassung {tmp1}" target="cm:title" />
+            <searchItem name="betrag" text="alle Versicherungen" objectTyp="float" target="my:amount" word="1">
+                <check lowerValue="250" upperValue="400" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Leistungsabrechnung" searchString="Leistungsabrechnung">
+            <archivPosition folder="Dokumente/Versicherungen/DKV/Leistungsabrechnungen/" />
+            <category name="Gesundheit/Leistungsabrechnung" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="title" fix="Leistungsabrechnung" target="cm:title" />
+            <searchItem name="id" fix="KV 201328522" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="betrag" text="Gesamtsumme" objectTyp="float" target="my:amount" removeReturns="after" readOverReturn="true">
+                <check lowerValue="10" upperValue="1500" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Bescheinigung nach $10" searchString="nach § 10">
+            <archivPosition folder="Dokumente/Versicherungen/DKV/" />
+            <searchItem name="datum" kind="date" objectTyp="date" target="my:documentDate">
+                <check lowerValue="01/01/2000" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="title" fix="Bescheinigung der Vorsorgeaufwendungen nach § 10 Abs. 1 Nr. 3 EStG" target="cm:title" />
+        </archivTyp>
+    </archivTyp>
+    <!-- Stadtwerke -->
+    <archivTyp name="Stadtwerke" searchString="stadtwerke">
+        <archivTyp name="Jahresrechnung" searchString="Abschlag">
+            <archivZiel type="my:archivContent" />
+            <archivPosition folder="Dokumente/Rechnungen/Rechnungen Stadtwerke/Konto 9000330068/" />
+            <tags name="Stadtwerke" />
+            <category name="Haus/Verbrauch" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="datum" text="Münster, den" objectTyp="date" removeBlanks="after" target="my:documentDate">
+                <check lowerValue="01/01/2006" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="title" fix="Jahresrrechnung {tmp}" target="cm:title" />
+            <searchItem name="tmp" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="id" fix="9000330068" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="betrag" text="Gesamt" backwards="true" objectTyp="float" target="my:amount" word="1" readOverReturn="true">
+                <check lowerValue="300" upperValue="1500" />
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- DWS -->
+    <archivTyp name="DWS" searchString="DWS">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Banken/DWS/Depot T460753901/" />
+        <tags name="Riester" />
+        <category name="Versicherung/Riester" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="id" fix="T460753901" target="my:idvalue">
+            <archivZiel aspect="my:idable" />
+        </searchItem>
+        <archivTyp name="Jahresmitteilung" searchString="Fondsbestände">
+            <searchItem name="datum" text="Frankfurt, im" objectTyp="date" removeBlanks="after" target="my:documentDate">
+                <check lowerValue="01/01/2006" upperValue="01/01/2020" />
+            </searchItem>
+            <searchItem name="title" fix="Jahresabrechnung {tmp3}" target="cm:title" />
+            <searchItem name="tmp3" eval="{tmp2} -1" />
+            <searchItem name="tmp2" objectTyp="date" value="datum">
+                <format formatString="YYYY" />
+            </searchItem>
+            <searchItem name="tmp" text="Gesamtanlage" objectTyp="float" word="1">
+                <check lowerValue="300" upperValue="10000" />
+            </searchItem>
+            <searchItem name="tmp1" text="Mindestbeitragsgarantie" objectTyp="float" word="1">
+                <check lowerValue="300" upperValue="10000" />
+            </searchItem>
+            <searchItem name="tmp1" eval="Math.max({tmp},{tmp1})" target="my:amount">
+                <archivZiel aspect="my:amountable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Abrechnung" searchString="Abrechnung">
+            <searchItem name="nr" text="Abrechnung" objectTyp="int" word="1">
+                <check lowerValue="1" upperValue="10" />
+            </searchItem>
+            <searchItem name="title" fix="Abrechnung Nummer {nr}" target="cm:title" />
+            <searchItem name="datum" text="Datum" objectTyp="date" word="1" target="my:documentDate">
+                <check lowerValue="01/01/2006" upperValue="01/01/2020" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- Deutscher Ring -->
+    <archivTyp name="Deutscher Ring" searchString="Deutscher Ring">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Versicherungen/Deutscher Ring/{id}" />
+        <category name="Versicherung/Kranken" />
+        <searchItem name="person" fix="Klaus" target="my:person" />
+        <searchItem name="datum" kind="date" target="my:documentDate">
+            <check lowerValue="01/01/2011" upperValue="01/01/2020" />
+        </searchItem>
+        <archivTyp name="Krankenversicherung" searchString="5.174.556">
+            <archivZiel type="my:archivContent" />
+            <searchItem name="id" fix="K 5.174.556" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Pflegeversicherung" searchString="5.793.183">
+            <searchItem name="id" fix="K 5.793.183" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Bescheinigung § 10" searchString="EStG § 10">
+                <searchItem name="title" fix="Bescheinigung der Vorsorgeaufwendungen nach § 10 Abs. 1 Nr. 3 EStG" target="cm:title" />
+            </archivTyp>
+            <archivTyp name="Bescheinigung § 61" searchString="§ 61 SGB">
+                <searchItem name="title" fix="Bescheinigung zur Erlangung des Arbeitgeberzuschusses für die private Pflegepflichtversicherung nach § 61 SGB Xl"          target="cm:title" />
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- Volkswohlbund -->
+    <archivTyp name="Volkswohlbund" searchString="VOLKSWOHL">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Versicherungen/Volkswohlbund/{id}" />
+        <searchItem name="datum" kind="date" target="my:documentDate">
+            <check lowerValue="01/01/2003" />
+        </searchItem>
+        <archivTyp name="Riesterrente Katja" searchString="33661563">
+            <archivZiel type="my:archivContent" />
+            <category name="Versicherung/Riester" />
+            <searchItem name="person" fix="Katja" target="my:person" />
+            <searchItem name="id" fix="33661563" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="vermögenswirksame Leistungen" searchString="8989376">
+            <archivZiel type="my:archivContent" />
+            <category name="vermögenswirksame Leistungen" />
+            <searchItem name="person" fix="Klaus" target="my:person" />
+            <searchItem name="id" fix="898376" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="jährlicher Kontoauszug" searchString="jährlicher Kontoauszug">
+                <searchItem name="tmp" objectTyp="date" value="datum">
+                    <format formatString="YYYY" />
+                </searchItem>
+                <searchItem name="title" fix="Kontoauszug {tmp}" target="cm:title" />
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- Provinzial -->
+    <archivTyp name="Provinzial" searchString="Provinzial">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Versicherungen/Provinzial/" />
+        <searchItem name="datum" kind="date" target="my:documentDate">
+            <check lowerValue="01/01/2002" upperValue="01/04/2010" />
+        </searchItem>
+        <archivTyp name="KFZVersicherung" searchString="44291789/5330">
+            <archivZiel type="my:archivContent" />
+            <category name="Versicherung/Auto" />
+            <searchItem name="person" fix="Katja" target="my:person" />
+            <searchItem name="id" fix="K 44291789/5330" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Beitragsrechnung" searchString="Beitragsrechnung">
+                <archivPosition folder="Dokumente/Versicherungen/Provinzial/Rechnungen Provinzial" />
+                <tags name="Rechnung" />
+                <searchItem name="bet" text="incl" word="1" objectTyp="float" />
+                <searchItem name="betrag" eval="Math.round(({bet}/19)*11900)/100" objectTyp="float" target="my:amount">
+                    <check lowerValue="200" upperValue="400" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+                <searchItem name="title" fix="Beitragsrechnung {tmp1}" target="cm:title" />
+                <searchItem name="tmp1" eval="{tmp} + 1" />
+                <searchItem name="tmp" objectTyp="date" value="datum">
+                    <format formatString="YYYY" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- Gothaer -->
+    <archivTyp name="Gothaer" searchString="Gothaer">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Versicherungen/Gothaer/{id}" />
+        <category name="Versicherung/Unfall" />
+        <searchItem name="person" fix="Katja" target="my:person" />
+        <searchItem name="datum" kind="date" target="my:documentDate">
+            <check lowerValue="01/11/2010" />
+        </searchItem>
+        <archivTyp name="Unfallversicherung" searchString="53.100.411638">
+            <archivZiel type="my:archivContent" />
+            <searchItem name="id" fix="53.100.411638" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+        </archivTyp>
+    </archivTyp>
+    <!-- Allianz -->
+    <archivTyp name="Allianz" searchString="Allianz">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Versicherungen/Allianz/{id}" />
+        <searchItem name="datum" kind="date" target="my:documentDate" />
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <archivTyp name="Lebensversicherung Katja" searchString="27 872 324 3">
+            <archivZiel type="my:archivContent" />
+            <category name="Versicherung/Kapitallebensversicherung" />
+            <searchItem name="id" fix="27 872 324 3" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <searchItem name="person" fix="Katja" target="my:person" />
+        </archivTyp>
+    </archivTyp>
+    <!-- DBV -->
+    <archivTyp name="DBV" searchString="DBV">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Versicherungen/DBV/{id}" />
+        <searchItem name="person" fix="Katja" target="my:person" />
+        <searchItem name="datum" kind="date" target="my:documentDate">
+            <check lowerValue="01/10/2011" />
+        </searchItem>
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <archivTyp name="BUZ" searchString="4026903039">
+            <category name="Versicherung/BUZ" />
+            <searchItem name="id" fix="4026903039" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+        </archivTyp>
+        <archivTyp name="Haftpflichtversicherung" searchString="10240531995/8P">
+            <category name="Versicherung/Haftpflicht" />
+            <searchItem name="id" fix="10240531995/8P" target="my:idvalue">
+                <archivZiel aspect="my:idable" />
+            </searchItem>
+            <archivTyp name="Beitragsrechnung" searchString="Beitragsrechnung">
+                <searchItem name="title" fix="Beitragsrechnung {tmp}" target="cm:title" />
+                <searchItem name="betrag" text="Kontonummer" dir="left" objectTyp="float" target="my:amount" word="1">
+                    <check lowerValue="50" upperValue="80" />
+                    <archivZiel aspect="my:amountable" />
+                </searchItem>
+            </archivTyp>
+        </archivTyp>
+    </archivTyp>
+    <!-- Sparda Bank -->
+    <!-- <archivTyp name="Sparda" searchString="Sparda-Bank"><archivZiel type="my:archivContent" /><archivPosition folder="Dokumente/Banken/Sparda Bank/{ordner}" /><category     name="Banken/Aktien" /><archivTyp name="Jahresbescheinigung für Kapitalerträge" searchString="24c EStG"><archivZiel type="my:archivContent" /><searchItem name="person"     fix="Klaus" target="my:person" /><searchItem name="ordner" fix="Aktiendepot"/><searchItem name="tmp" text="Seite"/><searchItem name="datum" value="tmp" kind="date"     target="my:documentDate"><check lowerValue="01/01/2002" /><check upperValue="01/01/2007" /></searchItem><searchItem name="tmp1" objectTyp="date" value="datum"><format     formatString="YYYY" /></searchItem><searchItem name="tmp2" eval="{tmp1} - 1" /><searchItem name="title" fix="Jahresbescheinigung über Kapitalerträge und Veräußerungsgeschäfte     aus Finanzanlagen {tmp2}" target="cm:title" /></archivTyp></archivTyp> -->.
+</documentTypes>

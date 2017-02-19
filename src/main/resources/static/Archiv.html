@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Archiv</title>
+    <script type="text/javascript" charset="utf-8">
+
+        // <![CDATA[
+
+
+        var rulesEditor;
+        var textEditor;
+        var propsEditor;
+        var outputEditor;
+        var alfrescoMode = false;
+        var scriptID = null;
+        var rulesID = null;
+        var inboxFolderId;
+        var documentFolderId;
+        var scriptFolderId;
+        var archivFolderId;
+        var fehlerFolderId;
+        var unknownFolderId;
+        var doubleFolderId;
+        var alfrescoRootFolderId;
+        var currentRules = null;
+        var scriptMode = false;
+        var testMode = false;
+        var runLocal = false;
+        var REC;
+        var tabelle;
+        var alfrescoTabelle;
+        var alfrescoFolderTabelle;
+        var alfrescoSearchTabelle;
+        var viewMenuNormal;
+        var viewMenuSearch;
+        var viewMode = 0;
+        var workDocument = null;
+        var multiMode = false;
+        var currentPDF = false;
+        var showMulti = false;
+        var currentFile = null;
+        var currentContent = false;
+        var currentText = false;
+        var currentContainer = null;
+        var jsMode;
+        var txtMode;
+        var panelSizeReminder;
+        var settings;
+        var alfrescoServerAvailable = false;
+        var alfrescoLayout;
+        var searchLayout;
+        var verteilungLayout;
+        var tabLayout;
+        var globalLayout;
+        var anOpen = [];
+
+        window.onload = function() {
+
+            var ajax = new XMLHttpRequest();
+            if (ajax != null) {
+                //Caching verhindern
+                var timestamp = new Date();
+                var uniqueURI = "./templates/resource.template?" + "timestamp=" + timestamp.getTime();
+
+                ajax.open("GET", uniqueURI, true);
+                ajax.setRequestHeader("X-Test", "test1");
+                ajax.onreadystatechange = function () {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            loadResources(this.responseText);
+                        }
+                        else {
+                            alert(this.statusText);
+                        }
+                    }
+                };
+                ajax.send(null);
+            }
+            else {
+                alert("Ihr Browser unterstützt kein Ajax!");
+            }
+
+
+            /**
+             * lädt die Resourcen
+             * @param  resources    die Resourcen als String
+             * */
+            function loadResources(resources) {
+                var fileref;
+                var lines = resources.split('\n');
+                var cssEntries = [];
+                var jsEntries = [];
+                for (var line in lines) {
+                    var element = lines[line].trim();
+                    if (element.length) {
+                        if (!element.startsWith("//") && !element.startsWith("#")) {
+                            if (element.endsWith(".js")) { //if filename is a external JavaScript file
+                                jsEntries.push(element);
+                            }
+                            else if (element.endsWith(".css")) { //if filename is an external CSS file
+                                cssEntries.push(element);
+
+                            }
+                            if (typeof fileref != "undefined")
+                                document.getElementsByTagName("head")[0].appendChild(fileref);
+                        }
+                    }
+                }
+                loadCssEntries(cssEntries);
+                loadJsEntries(jsEntries, function() {
+                    start();
+                });
+            }
+
+            /**
+             * lädt die JavaScript Resourcen
+             * @param files    ein Array mit den File Namen
+             * @param fn       Callback Funktion
+             **/
+            function loadJsEntries(files, fn) {
+                if (!files.length) {
+                    files = [];
+                }
+                var head = document.head || document.getElementsByTagName('head')[0];
+
+                function loadJsEntry(index) {
+                    if (files.length > index) {
+                        var fileref = document.createElement('script');
+                        fileref.setAttribute("type", "text/javascript");
+                        fileref.setAttribute("charset", "utf-8");
+                        fileref.setAttribute("src", files[index]);
+                        head.appendChild(fileref);
+                        index = index + 1;
+                        // Used to call a callback function
+                        fileref.onload = function () {
+                            loadJsEntry(index);
+                        }
+                    } else if(fn){
+                        fn();
+                    }
+                }
+                loadJsEntry(0);
+            }
+
+            /**
+             * lädt die CSS Resourcen
+             * @param entries     Array mit den File Namen
+             **/
+            function loadCssEntries(entries) {
+                for (var entry in entries) {
+                    var fileref = document.createElement("link");
+                    fileref.setAttribute("rel", "stylesheet");
+                    fileref.setAttribute("type", "text/css");
+                    fileref.setAttribute("href", entries[entry]);
+                    document.getElementsByTagName("head")[0].appendChild(fileref);
+                }
+            }
+
+        };
+        // ]]>
+
+    </script>
+
+</head>
+
+<body>
+
+<!--Seite-->
+<div id="clientPage" >
+    <!--Tab Bereich-->
+    <div id="tabs" class="container">
+        <div id="tabNorth" class="ui-layout-north ui-widget">
+            <!--Tabulatoren-->
+            <div id="tabNorthInnerCenter" class="inner-center container">
+                <ul id="tabButtons" class="container" style="width: 90%; float: left">
+                    <li id="tabArchiv"><a href="#tab1">Archiv</a></li>
+                    <li id="tabSuche"><a href="#tab2">Suche</a></li>
+                    <li id="tabVerteilung"><a href="#tab3">Verteilung</a></li>
+                </ul>
+                <div style="float:right; padding-right:10px;" id="settings" onclick="startSettingsDialog();" class="fa fa-cogs fa-2x" title="Einstellungen"></div>
+            </div>
+         </div>
+        <!--Tab Panels-->
+        <div id="tabPanels" class="tabPanel">
+            <!--Tab Archiv-->
+            <div id="tab1" class="tabPanel hidden">
+                <div id="alfrescoNorth" onmouseover="alfrescoLayout.allowOverflow(this);"
+                     class="inner-north container tabPanel hidden">
+                    <div id="alfrescoNorthCenter"
+                         class="inner-center container tabPanel hidden">
+                        <div class="breadCrumbHolder module">
+                            <div id="breadcrumb" class="breadCrumb module">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="alfrescoNorthEast"
+                         class="inner-center container tabPanel hidden">
+                        <ul id="menu-1" class="sf-menu" onmouseover="alfrescoLayout.allowOverflow(this);">
+                            <li class="current">
+                                <a href="#ansicht" class="fa fa-eye fa-2x" ></a>
+                                <ul class="tabPanel">
+                                    <li>
+                                        <a href="#normal" class="fa fa-file-text-o fa-2x" onclick="showAlfrescoNormalView();"></a>
+                                    </li>
+                                    <li>
+                                        <a href="#icons" class="fa fa-photo fa-2x" onclick="showAlfrescoIconView();"></a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="alfrescoWest" class="inner-west container  hidden">
+                    <div id="alfrescoHeaderWest" class="header  ui-widget-header">Archiv</div>
+                    <div >
+                        <div id="tree"></div>
+                    </div>
+                </div>
+                <div id="alfrescoCenter" class="inner-center container hidden">
+                    <div id="alfrescoCenterCenter" class="inner-center container hidden">
+                        <div id="alfrescoCenterCenterNorth" class="inner-center container hidden">
+                            <div class="header ui-widget-header" id="alfrescoFolderTabelleHeader">Ordner</div>
+                            <div class="ui-widget-content">
+                                <div id="dtable3">
+                                    <table cellpadding="0" cellspacing="0" border="0" class="display"
+                                           id="alfrescoFolderTabelle"></table>
+                                </div>
+                                <div class="header ui-widget-header" id="alfrescoFolderTableFooter"></div>
+                            </div>
+                        </div>
+                        <div id="alfrescoCenterCenterCenter" class="inner-center container  hidden">
+                            <div class="header ui-widget-header" id="alfrescoTabelleHeader">Dokumente</div>
+                            <div  class="ui-widget-content" >
+                                <div id="dtable2">
+                                    <table cellpadding="0" cellspacing="0" border="0" class="display"
+                                           id="alfrescoTabelle"></table>
+                                </div>
+                                <div class="header ui-widget-header" id="alfrescoTableFooter"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Tab Suche-->
+            <div id="tab2" class="tabPanel hidden">
+                <div id="searchNorth" onmouseover="searchLayout.allowOverflow(this);" class="inner-north container ui-widget-header hidden" >
+                    <div id="searchNorthCenter" class="inner-center tabPanel hidden">
+                        <label for="alfrescoSearch" style="float:left;margin: 20px 5px 5px 5px;">Suche </label>
+                        <input id="alfrescoSearch" style="width:400px;height:auto;float:left;margin: 20px 5px 5px 5px;"
+                               class="ui-autocomplete-input" autocomplete="off"/>
+                        <div id="alfrescoSearchButton" onclick="startSearch($('#alfrescoSearch').val());"
+                             style="margin: 18px 5px 5px 5px;">Suche
+                        </div>
+                    </div>
+                    <div id="searchNorthEast"
+                         class="inner-east tabPanel hidden">
+                        <ul id="menu-2" style="float: right;" class="sf-menu"
+                            onmouseover="searchLayout.allowOverflow(this);">
+                            <li class="current">
+                                <a href="#ansicht">Ansicht</a>
+                                <ul class="ui-widget-header">
+                                    <li>
+                                        <a href="#normal" onclick="showAlfrescoSearchNormalView();">Normal</a>
+                                    </li>
+                                    <li>
+                                        <a href="#icons" onclick="showAlfrescoSearchIconView();">Icons</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="searchCenter" class="inner-center container hidden">
+                    <div class="header ui-widget-header" id="searchTabelleHeader">Ergebnisse</div>
+                    <div class="ui-widget-content">
+                        <div id="dtable4">
+                            <table cellpadding="0" cellspacing="0" border="0" class="display"
+                                   id="alfrescoSearchTabelle"></table>
+                        </div>
+                        <div class="header ui-widget-header" id="alfrescoSearchTableFooter"></div>
+                    </div>
+                </div>
+            </div>
+            <!--Tab Verteilung-->
+            <div id="tab3" class="tabPanel hidden">
+                <!--Dokument-->
+                <div id="verteilungWest" class="ui-tab-layout-west container ui-widget-header hidden">
+                    <div id="headerWest" class="header">Dokument</div>
+                    <div id="subHeaderWest" class="subhead">
+                        <table >
+                            <tr>
+                                <td width="70%"><input id="filesinput" name="filesinput"
+                                                       type="file" multiple="multiple" size="50"/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="work();"
+                                                                       name="play" id="play" type="submit" class="play"
+                                                                       title="Recognize"
+                                                                       value=""/>
+                                </td>
+                                <td width="60px" align="center"><input
+                                        onclick="openPDF(currentFile);" id="pdf"
+                                        type="submit" class="pdf" title="PDF" value="" style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="openScript();"
+                                                                       name="openScript" id="openScript" type="submit"
+                                                                       class="edit" title="Öffnet den Skript Editor"
+                                                                       value=""/>
+                                </td>
+                                <td width="60px" align="center"><input
+                                        onclick="var needle = prompt('Find:', textEditor.getCopyText());textEditor.find(needle);"
+                                        name="searchCont" id="searchCont" type="submit" class="search"
+                                        title="Search" value=""/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="sendToInbox();"
+                                                                       name="sendToInbox" id="sendToInbox" type="submit"
+                                                                       class="sendToInbox"
+                                                                       title="sendToInbox"
+                                                                       value="" style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="formatScript();"
+                                                                       name="beautifyScript" id="beautifyScript" type="submit"
+                                                                       class="fa fa-magic fa-2x" title="Format" value=""
+                                                                       style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="doBack();"
+                                                                       id="back" value="" type="submit" title="Close" class="close"
+                                                                       style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input
+                                        onclick="activateScriptToContext();" name="activateScriptToContext" id="activateScriptToContext"
+                                        type="submit" class="reload" title="Skript im Kontext aktualisieren" value=""
+                                        style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input
+                                        onclick="save(this.workDocument, textEditor.getSession().getValue());modifiedScript=null;"
+                                        name="saveScript" id="saveScript" type="submit" class="save"
+                                        title="Save" value="" style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="getScript();"
+                                                                       name="getScript" id="getScript" type="submit"
+                                                                       class="download"
+                                                                       title="Download"
+                                                                       value="" style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="sendScript();"
+                                                                       name="sendScript" id="sendScript" type="submit"
+                                                                       class="upload"
+                                                                       title="Upload"
+                                                                       value="" style="display: none"/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="closeScript();"
+                                                                       name="closeScript" id="closeScript" type="submit"
+                                                                       class="close" title="Close"
+                                                                       value="" style="display: none"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="ui-widget-content" style="overflow:auto;">
+                        <div id="dtable"></div>
+                        <div id="inTxt" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
+                        <div class="header ui-widget-header" id="verteilungTableFooter"></div>
+                    </div>
+                </div>
+
+                <!--Regeln-->
+                <div id="verteilungCenter" class="ui-tab-layout-center container ui-widget-header hidden">
+                    <div id="headerCenter" class="header">Regeln</div>
+                    <div id="subHeaderCenter" class="subhead">
+                        <table>
+                            <tr>
+                                <td width="60px" align="center"><input onclick="format();"
+                                                                       name="beautifyRules" id="beautifyRules" type="submit"
+                                                                       class="fa fa-magic fa-2x"
+                                                                       title="Format" value=""/>
+                                </td>
+
+                                <td width="60px" align="center"><input
+                                        onclick="var needle = prompt('Find:', rulesEditor.getCopyText());rulesEditor.find(needle);"
+                                        name="searchRules" id="searchRules" type="submit" class="search"
+                                        title="Search" value=""/>
+                                </td>
+                                <td width="60px" align="center"><input
+                                        onclick="rulesEditor.getSession().foldAll(1);"
+                                        name="foldAll" id="foldAll" type="submit" class="minimize"
+                                        title="Fold All" value=""/>
+                                </td>
+                                <td width="60px" align="center"><input
+                                        onclick="rulesEditor.getSession().unfold();"
+                                        name="unfoldAll" id="unfoldAll" type="submit" class="maximize"
+                                        title="Unfold All" value=""/></td>
+                                <td width="60px" align="center"><input
+                                        onclick="getRules(window.parent.rulesID, false);" name="getRules"
+                                        id="getRules" type="submit" class="download" title="Download Regeln" value=""/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="sendRules();"
+                                                                       name="sendRules" id="sendRules" type="submit" class="upload"
+                                                                       title="Sende Regeln" value=""/>
+                                </td>
+                                <td width="60px" align="center"><input
+                                        onclick="save(currentRules, vkbeautify.xml(rulesEditor.getSession().getValue()));"
+                                        name="saveRules" id="saveRules" type="submit" class="save" title="Save"
+                                        value=""/>
+                                </td>
+
+                            </tr>
+                        </table>
+                        </div>
+                    <div class="ui-widget-content">
+                        <div id="inRules" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
+                    </div>
+                </div>
+                <!--Ergebnis-->
+                <div id="verteilungEast" class="ui-tab-layout-east container ui-widget-header hidden">
+                    <div class="header">Ergebnis</div>
+                    <div id="subHeaderEast" class="subhead">
+                        <table>
+                            <tr>
+                                <td width="60px" align="center"><input onclick="doTest();"
+                                                                       name="test" id="test" type="submit" class="test" title="Test"
+                                                                       value=""/>
+                                </td>
+                                <td width="60px" align="center"><input onclick="closeTest();"
+                                                                       name="closeTest" id="closeTest" type="submit" class="close"
+                                                                       title="Close"
+                                                                       value="" style="display: none"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="ui-widget-content">
+                        <div id="inProps" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Ausgabe-->
+    <div id="contentSouth" class="ui-layout-south ui-widget-header container hidden">
+        <div id="headerSouth" class="header">Ausgabe</div>
+        <div class="ui-widget-content">
+            <div id="inOutput" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

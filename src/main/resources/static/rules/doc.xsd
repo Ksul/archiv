@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:include schemaLocation=""></xsd:include>
+    <xsd:element name="searchItem">
+        <xsd:annotation>
+            <xsd:documentation>Sucht nach bestimmten Datentypen: Datum oder Betrag</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>findet Attribute für die Dokumentspezifikation</xsd:documentation>
+            </xsd:annotation>
+            <xsd:choice maxOccurs="unbounded" minOccurs="0">
+                <xsd:element ref="check" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="format" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element maxOccurs="unbounded" ref="delimitter" minOccurs="0"/>
+                <xsd:element ref="archivZiel" minOccurs="0" maxOccurs="1"/>
+            </xsd:choice>
+            <xsd:attribute name="backwards" type="xsd:boolean" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>sucht den Suchstring rückwärts im Dokument</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+
+            <xsd:attribute name="value" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Übernimmt das Ergebnis einer anderen Suche in diesem Element.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="target" use="optional" type="xsd:QName">
+                <xsd:annotation>
+                    <xsd:documentation>Das Zielelement für dieses Attribut.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="kind">
+                <xsd:annotation>
+                    <xsd:documentation>Sucht nach einem bestimmten Ergebnistyp. Die möglichen Typen sind:
+                        Datum [date]
+                        Währungsbetrag [amount]
+                        Zahl [float]
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="[date|amount|float]+(,+[0-9])?"></xsd:pattern>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="word" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Sucht nach ganzen Wörtern. Der Parameter kann aus 2 Komponenten bestehen, die
+                        durch ein KOmma getrennt werden
+                        Der erste Wert beschreibt di Anzahl Wörter bis zum gesuchten Ergebnis
+                        Der zweite (optionale) Wert gibt die Anzahl Wörter an, die in das Ergebnis übernommen werden
+                        sollen (Default: 1)
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="eval" type="evalType"></xsd:attribute>
+            <xsd:attribute name="fix" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Übernimmt einen fixen Wert als Ergebnis für dieses Attribut</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>Der interne Name für dieses Element. Mit diesm Namen kann das Ergebnis
+                        referenziert werden.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="objectTyp" use="optional">
+                <xsd:simpleType>
+                    <xsd:annotation>
+                        <xsd:documentation>spezifiziert den Typ eines Objektes</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="string"/>
+                        <xsd:enumeration value="int"/>
+                        <xsd:enumeration value="float"/>
+                        <xsd:enumeration value="date"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="text" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Der Suchtext, mit dem das Element im Inhalt des Dokumentes gefunden werden kann. Der Suchtext
+                        kann auch eine regular Expression
+                        enthalten.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="included" type="xsd:boolean" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Legt fest, ob der Suchtext mit zum Ergebnis gehören soll.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="completeWord" type="xsd:boolean" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Es wird nur nach ganzen Wörtern gesucht.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="caseSensitive" type="xsd:boolean" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Groß/Kleinschreibung wird bei der Suche berücksichtigt.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="dir" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation></xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:annotation>
+                        <xsd:documentation>legt die Suchrichtung fest</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="left">
+                            <xsd:annotation>
+                                <xsd:documentation>das Ergebnis wir aus dem Text vor der gefundenen Position
+                                    ermittelt.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="right">
+                            <xsd:annotation>
+                                <xsd:documentation>das Ergebnis wir aus dem Text nach der gefundenen Position
+                                    ermittelt.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:enumeration>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="readOverReturn" type="xsd:boolean" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        standardmäßig wir nur der Text von der aktuellen Sucposition bis zum nächsten CR geprüft. Mit
+                        diesem Attribut (Wert=true) kann
+                        dieses übersteuert
+                        werden.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="removeBlanks" type="removeBlanksType"/>
+            <xsd:attribute name="removeReturns" type="removeReturnsType"/>
+            <xsd:attribute name="required" type="xsd:boolean" use="optional" default="true">
+                <xsd:annotation>
+                    <xsd:documentation>Beschreibt, ob dieser Wert notwendig ist. Wenn dem so ist wird bei
+                        Nichtvorhandensein ein Fehler geworfen.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="expected" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Für Testzwecke. Hier kann ein festgelegtes Ergebnis für die Suche hinterlegt
+                        werden.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="delimitter">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>
+                    Ermittelt die Grenzen im Suchtext für das zu findende Element
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="typ" use="required">
+                <xsd:simpleType>
+                    <xsd:annotation>
+                        <xsd:documentation>spezifieziert die Art der Begrenzung.</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="start">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    legt den Start des Ausschnittes im Text fest
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:enumeration>
+                        <xsd:enumeration value="end">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    legt das Ende des Ausschnittes im Text fest
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:enumeration>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="text" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Der Suchtext im Textauschnitt. Nach diesem Text wird ab der aktuellen Position
+                        gesucht.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="count" type="xsd:int" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Die Anzahl der Fundstellen, die berücksichtigt werden sollen. Falls ein negativer Wert
+                        eingetragen ist wird rückwärts gesucht.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+            <xsd:attribute name="removeBlanks" type="removeBlanksType"></xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="format">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>Formatiert das gefundene Element.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="formatString" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>beschreibt die durchzuführende Formatierung
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="check">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>Prüft einen gefundenen Wert auf die in diesem
+                    Element festgelegte Gültigkeit.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="lowerValue" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Der unterere Wert, der spezifiziert das das
+                        gefundene Element nur dann gültig ist wenn es größer als dieser
+                        Wert ist. Die Prüfung
+                        wird typabhängig durchgeführt.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="upperValue" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Der obere Wert, der spezifiziert das das
+                        gefundene Element nur dann gültig ist wenn es kleiner als dieser
+                        Wert ist. Die Prüfung wird
+                        typabhängig durchgeführt.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="archivTyp">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="archivZiel" maxOccurs="1" minOccurs="0"/>
+                <xsd:element ref="archivPosition" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="tags" maxOccurs="unbounded" minOccurs="0"/>
+                <xsd:element ref="category" maxOccurs="unbounded" minOccurs="0"/>
+                <xsd:element ref="searchItem" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element ref="archivTyp" maxOccurs="unbounded" minOccurs="0"/>
+            </xsd:sequence>
+            <xsd:attribute name="searchString" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>Suchstring für diesen Dokumententyp. Mit diesem String wird das Dokument einer
+                        Regel zugeordnet. Der Suchtext kann auch eine
+                        regular Expression beinhalten.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>Beschreibender Name des Dokuments</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="removeBlanks" type="removeBlanksType" use="optional"/>
+            <xsd:attribute name="completeWord" type="xsd:boolean" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Es wird nur nach ganzen Wörtern gesucht.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="caseSensitive" type="xsd:boolean" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Groß/Kleinschreibung wird bei der Suche berücksichtigt.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="unique" default="error" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Beschreibt, ob ein Dokument nur einmal in einem Ordner vorkommen darf. Folgende Auswahl besteht:
+                        [error] ein Fehler wird geworfen
+                        [nothing] das neue Dokument wird ignoriert und gelöscht
+                        [newVersion] eine neue Version des Dokumentes wird erstellt
+                        [overWrite] das Dokument wird überschrieben
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="newVersion"></xsd:enumeration>
+                        <xsd:enumeration value="error"></xsd:enumeration>
+                        <xsd:enumeration value="overWrite"></xsd:enumeration>
+                        <xsd:enumeration value="nothing"></xsd:enumeration>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType">
+                <xsd:annotation>
+                    <xsd:documentation>spezifiziert den Debuglevel</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="archivZiel">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>spezifiziert die Art des Dokumentes im Ordner.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="aspect" type="xsd:QName" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>fügt dem Dokument den angegeben Aspect hinzu.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="type" type="xsd:QName">
+                <xsd:annotation>
+                    <xsd:documentation>spezifiziert den Dokumenttyp</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="archivPosition">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>legt die Speicherposition für das Dokument im
+                    Archiv fest.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:sequence>
+                <xsd:element ref="archivZiel" maxOccurs="1" minOccurs="0"/>
+            </xsd:sequence>
+            <xsd:attribute name="link" type="xsd:boolean">
+                <xsd:annotation>
+                    <xsd:documentation>legt fest, ob das Dokument an dieser weiteren
+                        Position verlinkt werden soll. Dieses geht nur, wenn bereits eine
+                        andere nicht
+                        verlinkte Position festgelegt worden ist.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="folder" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>Name des Ordners, in dem das Dokument
+                        gespeichert werden soll.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="tags">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>spezifiziert die Tags für das Dokument
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="name" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>Name des Tags</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="category">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>Legt die Kategorien für das Dokument fest.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:attribute name="name" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>Name der Kategorie.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"></xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="documentTypes">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element maxOccurs="unbounded" ref="archivTyp">
+                    <xsd:annotation>
+                        <xsd:documentation>spezifiziert den Dokumententyp. Die Spezifikation kann auch verschachtelt
+                            sein.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+
+            </xsd:sequence>
+            <xsd:attribute name="errorBox" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>legt den Ort für Dokumente, bei deren Verteilung ein Fehler aufgetreten ist,
+                        fest
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="duplicateBox" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation>legt den Ort für Dokumente, bei deren Verteilung festgestellt wurde, das das
+                        Dokument schon vorhanden ist.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="unknownBox" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>legt den Ort für Dokumente, die keine Regel definiert haben fest.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="archivRoot" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>Beschreibt den Wurzelknoten des Archiv. Alle Dokumente werden unterhalb dieses
+                        Knotens plaziert.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="inBox" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>Die Inbox des Archivs. Von diesem Knoten werden die Dokumente verteilt.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="debugLevel" type="debugLevelType">
+                <xsd:annotation>
+                    <xsd:documentation>spezifiziert den Debuglevel</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="maxDebugLength">
+                <xsd:annotation>
+                    <xsd:documentation>legt die maximale Länge der einzelnen Debugausgaben fest</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:annotation>
+                        <xsd:documentation>legt die maximale Länge der einzelnen Debugausgaben fest</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:restriction base="xsd:integer">
+                        <xsd:minExclusive value="10"></xsd:minExclusive>
+                        <xsd:maxExclusive value="200"></xsd:maxExclusive>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
+            <xsd:attribute name="mandatory" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Liste der Felder die mit gültigen Werten gefüllt sein müssen, damit ein valider Archiveitrag
+                        erzeugt werden kann.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:simpleType name="debugLevelType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="none"/>
+            <xsd:enumeration value="error"/>
+            <xsd:enumeration value="warn"/>
+            <xsd:enumeration value="informational"/>
+            <xsd:enumeration value="error"/>
+            <xsd:enumeration value="debug"/>
+            <xsd:enumeration value="trace"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="removeBlanksType">
+        <xsd:annotation>
+            <xsd:documentation>Spezifiziert, ob Blanks aus dem Dokumententext zur
+                Erkennung entfernt werden sollen. Das kann vor der Suche oder auch
+                nachher geschehen.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="before">
+                <xsd:annotation>
+                    <xsd:documentation>Die Blanks werden vor dem nächsten Schritt
+                        entfernt.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="after">
+                <xsd:annotation>
+                    <xsd:documentation>Die Blanks werden nach dem nächsten Schritt
+                        entfernt.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="evalType">
+        <xsd:restriction base="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Baut das Ergebnis aus dieser Eingabe zusammen.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="removeReturnsType">
+        <xsd:annotation>
+            <xsd:documentation>Spezifiziert, ob Retturns aus dem Dokumententext
+                zur Erkennung entfernt werden sollen. Das kann vor der Suche oder
+                auch nachher
+                geschehen.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="before">
+                <xsd:annotation>
+                    <xsd:documentation>Die Returns werden vor dem nächsten Schritt
+                        entfernt.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="after">
+                <xsd:annotation>
+                    <xsd:documentation>Die Returns werden nach dem nächsten Schritt
+                        entfernt.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+</xsd:schema>
