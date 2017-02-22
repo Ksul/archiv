@@ -184,8 +184,7 @@ public class ArchivController {
      *                                                          data              der Inhalt als JSON Object
      */
     @RequestMapping(value = "/openDocument")
-    public @ResponseBody
-    ContentResponse openDocument(@RequestBody @Valid final RestRequest model) {
+    public @ResponseBody ContentResponse openDocument(@RequestBody @Valid final RestRequest model) {
 
         ContentResponse obj = new ContentResponse();
         try {
@@ -1376,44 +1375,29 @@ public class ArchivController {
 
     /**
      * öffnet ein PDF im Browser
-     * @param fileName           der Filename des PDF Dokumentes
-     * @param resp               der Response zum Öffnen des PDFs
+     * @param model      das Requestmodel
+     * @return obj
      */
     @RequestMapping(value = "/openPDF")
-    protected void openPDF(String fileName,
-                           HttpServletResponse resp) {
+    public
+    @ResponseBody ContentResponse openPDF(@RequestBody @Valid final RestRequest model) {
 
-        ServletOutputStream sout = null;
+        ContentResponse obj = new ContentResponse();
         try {
             for (FileEntry entry : getEntries()) {
-                if (entry.getName().equalsIgnoreCase(fileName)) {
-                    final byte[] bytes = entry.getData();
-                    final String name = entry.getName();
-                    resp.reset();
-                    resp.resetBuffer();
-                    resp.setContentType("application/pdf");
-                    resp.setHeader("Content-Disposition", "inline; filename=" + name + "\"");
-                    resp.setHeader("Cache-Control", "max-age=0");
-                    resp.setContentLength(bytes.length);
-                    sout = resp.getOutputStream();
-                    sout.write(bytes, 0, bytes.length);
-                    sout.flush();
-                    sout.close();
+                if (entry.getName().equalsIgnoreCase(model.getFileName())) {
+                    obj.setData(Base64.encodeBase64(entry.getData()));
+                    obj.setName(entry.getName());
+                    obj.setMimeType("application/pdf");
                     break;
                 }
             }
-        } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (sout != null)
-                    sout.close();
-            } catch (IOException io) {
-                logger.error(io.getLocalizedMessage());
-                io.printStackTrace();
-            }
+            obj.setSuccess(true);
+        } catch (Throwable t) {
+            obj.setSuccess(false);
+            obj.setError(t);
         }
+        return obj;
     }
 
 

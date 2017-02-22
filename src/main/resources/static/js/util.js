@@ -322,13 +322,6 @@ function getUrlParam(name) {
         return decodeURIComponent(results[1]);
 }
 
-/**
- * Prüft, ob die Anwendung lokal mit Applet läuft
- * @returns {*}
- */
-function isLocal() {
-    return (location.href.startsWith("file"));
-}
 
 /**
  * Prüft, ob ein URL Parameter vorhanden ist

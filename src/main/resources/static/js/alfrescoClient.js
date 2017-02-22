@@ -2489,11 +2489,13 @@ function handleVerteilungImageClicks() {
             var tr = $(this).closest('tr');
             var row = tabelle.row(tr).data();
             var name = row[1];
-            if (typeof daten[name]["container"] != "undefined" && daten[name]["container"] != null) {
-                openPDF(daten[name]["container"], true);
-            } else {
-                openPDF(daten[name]["file"]);
-
+            var erg = executeService("openPDF", null, [
+                {"name": "fileName", "value": daten[name].file}
+            ], ["Dokument konnte nicht geöffnet werden!"]);
+            if (erg.success) {
+                var file = new Blob([base64DecToArr(erg.data)], {type: erg.mimeType});
+                var fileURL = URL.createObjectURL(file);
+                window.open(fileURL);
             }
         } catch (e) {
             errorHandler(e);

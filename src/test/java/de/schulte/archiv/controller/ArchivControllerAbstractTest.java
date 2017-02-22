@@ -199,7 +199,7 @@ public class ArchivControllerAbstractTest extends AlfrescoTest {
     @Test
     public void testGetDocumentContent() throws Exception {
         RestRequest request = new RestRequest();
-        request.setFilePath("/Archiv/Fehler/000003ea.pdf");
+        request.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
         String id = (String) services.getNodeId(request).getData();
         request.setDocumentId(id);
         request.setExtract(false);
@@ -735,23 +735,5 @@ public class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj.getData(), notNullValue());
     }
 
-    @Test
-    public void testGetComments() throws Exception {
-        CmisObject folder = buildTestFolder("TestFolder", null);
-        CmisObject document = buildDocument("TestDocument", folder);
-        RestRequest request = new RestRequest();
-        request.setDocumentId(document.getId());
-        request.setComment("Testkommentar");
-        RestResponse obj = services.addComment(request);
-        assertThat(obj, notNullValue());
-        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
-        assertThat(obj.getData(), notNullValue());
-
-        obj = services.getComments(request);
-        Map<String, Object> comment = (Map) obj.getData();
-        assertThat(((Map) ((ArrayList) comment.get("items")).get(0)).get("content"), is("Testkommentar"));
-
-        document.delete();
-    }
 
 }

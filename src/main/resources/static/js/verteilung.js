@@ -74,10 +74,6 @@ function manageControls() {
 */
     if (textEditor.getSession().getValue().length == 0)
         document.getElementById('searchCont').setAttribute("disabled", true);
-    if (isLocal()) {
-        document.getElementById('saveRules').removeAttribute("disabled");
-        document.getElementById('saveScript').removeAttribute("disabled");
-    }
     if (multiMode) {
         document.getElementById('inTxt').style.display = 'none';
         document.getElementById('dtable').style.display = 'block';
@@ -128,37 +124,31 @@ function manageControls() {
 function openPDF(name, fromServer) {
     try {
         if (fromServer) {
-            if (isLocal()) {
-                var ticket = document.reader.getTicket(getSettings("server"), getSettings("user"), getSettings("password"), getSettings("proxy"), getSettings("port"), null);
-                window.open(name + "?alf_ticket=" + ticket);
-            }
-            else {
-                var dataString = {
-                    "function": "getTicket",
-                    "server": getSettings("server"),
-                    "username": getSettings("user"),
-                    "password": getSettings("password"),
-                    "proxyHost": getSettings("proxy"),
-                    "proxyPort": getSettings("port")
-                };
-                $.ajax({
-                    type: "POST",
-                    data: dataString,
-                    datatype: "json",
-                    url: "/TestVerteilung/VerteilungServlet",
-                    error: function (response) {
-                        try {
-                            var r = jQuery.parseJSON(response.responseText);
-                            message("Fehler", "Fehler: " + r.Message + "<br>StackTrace: " + r.StackTrace + "<br>ExceptionType: " + r.ExceptionType);
-                        } catch (e) {
-                            errorHandler(e);
-                        }
-                    },
-                    success: function (data) {
-                        window.open(name + "?alf_ticket=" + data.data.toString());
+            var dataString = {
+                "function": "getTicket",
+                "server": getSettings("server"),
+                "username": getSettings("user"),
+                "password": getSettings("password"),
+                "proxyHost": getSettings("proxy"),
+                "proxyPort": getSettings("port")
+            };
+            $.ajax({
+                type: "POST",
+                data: dataString,
+                datatype: "json",
+                url: "/TestVerteilung/VerteilungServlet",
+                error: function (response) {
+                    try {
+                        var r = jQuery.parseJSON(response.responseText);
+                        message("Fehler", "Fehler: " + r.Message + "<br>StackTrace: " + r.StackTrace + "<br>ExceptionType: " + r.ExceptionType);
+                    } catch (e) {
+                        errorHandler(e);
                     }
-                });
-            }
+                },
+                success: function (data) {
+                    window.open(name + "?alf_ticket=" + data.data.toString());
+                }
+            });
         }
         else {
             if (isLocal())
@@ -540,71 +530,47 @@ function doBack() {
  */
 function doTest() {
     try {
-        if (isLocal()) {
-            var open = openFile("test.txt");
-            var content = open;
-            REC.init();
-            REC.currentDocument.properties.content.write(new Content(content));
-            REC.currentDocument.name = "TEST";
-            document.getElementById('headerWest').textContent = "TEST";
-            removeMarkers(markers, textEditor);
-            textEditor.getSession().setValue(content);
-            if (!currentRules.endsWith("test.xml")) {
-                open = openFile("test.xml");
-                currentRules = open;
-                rulesEditor.getSession().setValue(open);
-                document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
-            }
-            REC.testRules(rulesEditor.getSession().getValue());
-            setXMLPosition(REC.currXMLName);
-            markers = setMarkers(REC.positions, textEditor);
-            propsEditor.getSession().setValue(printResults(REC.results));
-            fillMessageBox(true);
-            testMode = true;
-            manageControls();
-        } else {
-            var dataString = {
-                "function": "doTest",
-                "fileName": "test.txt",
-                "filePath": "test.xml"
-            };
-            $.ajax({
-                type: "POST",
-                data: dataString,
-                datatype: "json",
-                url: "/TestVerteilung/VerteilungServlet",
-                error: function (response) {
-                    try {
-                        var r = jQuery.parseJSON(response.responseText);
-                        message("Fehler", "Fehler: " + r.Message + "<br>StackTrace: " + r.StackTrace + "<br>ExceptionType: " + r.ExceptionType);
-                    } catch (e) {
-                        var str = "FEHLER:\n";
-                        str = str + e.toString() + "\n";
-                        for (var prop in e)
-                            str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
-                        message("Fehler", str + "<br>" + response.responseText);
-                    }
-                },
-                success: function (data) {
-                    if (data.success[0]) {
-                        REC.currentDocument.setContent(data.result[0].text.toString());
-                        removeMarkers(markers, textEditor);
-                        textEditor.getSession().setValue(data.result[0].text.toString());
-                        currentRules = "test.xml";
-                        document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
-                        rulesEditor.getSession().setValue(data.result[0].xml.toString());
-                        REC.testRules(rulesEditor.getSession().getValue());
-                        setXMLPosition(REC.currXMLName);
-                        markers = setMarkers(REC.positions, textEditor);
-                        propsEditor.getSession().setValue(printResults(REC.results));
-                        fillMessageBox(true);
-                        testMode = true;
-                        manageControls();
-                    } else
-                        message("Fehler", "Fehler: " + data.result[0]);
+        var dataString = {
+            "function": "doTest",
+            "fileName": "test.txt",
+            "filePath": "test.xml"
+        };
+        $.ajax({
+            type: "POST",
+            data: dataString,
+            datatype: "json",
+            url: "/TestVerteilung/VerteilungServlet",
+            error: function (response) {
+                try {
+                    var r = jQuery.parseJSON(response.responseText);
+                    message("Fehler", "Fehler: " + r.Message + "<br>StackTrace: " + r.StackTrace + "<br>ExceptionType: " + r.ExceptionType);
+                } catch (e) {
+                    var str = "FEHLER:\n";
+                    str = str + e.toString() + "\n";
+                    for (var prop in e)
+                        str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
+                    message("Fehler", str + "<br>" + response.responseText);
                 }
-            });
-        }
+            },
+            success: function (data) {
+                if (data.success[0]) {
+                    REC.currentDocument.setContent(data.result[0].text.toString());
+                    removeMarkers(markers, textEditor);
+                    textEditor.getSession().setValue(data.result[0].text.toString());
+                    currentRules = "test.xml";
+                    document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
+                    rulesEditor.getSession().setValue(data.result[0].xml.toString());
+                    REC.testRules(rulesEditor.getSession().getValue());
+                    setXMLPosition(REC.currXMLName);
+                    markers = setMarkers(REC.positions, textEditor);
+                    propsEditor.getSession().setValue(printResults(REC.results));
+                    fillMessageBox(true);
+                    testMode = true;
+                    manageControls();
+                } else
+                    message("Fehler", "Fehler: " + data.result[0]);
+            }
+        });
     } catch (e) {
         errorHandler(e);
     }
@@ -805,21 +771,16 @@ function getRules(rulesId, loadLocal) {
 function openRules() {
     var id;
     try {
-        if (rulesID != null && typeof rulesID =="string") {
+        if (rulesID != null && typeof rulesID == "string") {
             id = rulesID.substring(rulesID.lastIndexOf('/') + 1);
-            getRules(id, isLocal());
+            getRules(id, false);
             document.getElementById('headerCenter').textContent = "Regeln (Server: doc.xml)";
         } else {
-            if (isLocal()) {
-                //TODO Muss hier nicht eine ID übergeben werden?
-                getRules("doc.xml", true);
-            } else {
-                $.get('./rules/doc.xml', function (msg) {
-                    rulesEditor.getSession().setValue(new XMLSerializer().serializeToString(msg));
-                    rulesEditor.getSession().foldAll(1);
-                    currentRules = "doc.xml";
-                });
-            }
+            $.get('./rules/doc.xml', function (msg) {
+                rulesEditor.getSession().setValue(new XMLSerializer().serializeToString(msg));
+                rulesEditor.getSession().foldAll(1);
+                currentRules = "doc.xml";
+            });
             document.getElementById('headerCenter').textContent = "Regeln (doc.xml)";
             //	window.parent.frames.rules.rulesEditor.getSession().setValue("Regeln konnten nicht geladen werden!");
         }
@@ -1003,21 +964,16 @@ function openScript() {
                 }
             }
             else {
-                // SkriptID ist nicht vorhanden. Bei Applet kann das dann lokal geöffnet werden
-                if (isLocal())
-                    script = openFile('src/main/webapp/resources/js/recognition.js');
-                else {
-                    // wir laufen im Servlet und versuchen das Skript vom Server zu bekommen weil kein Alfresco Server da ist.
-                    script = $.ajax({
-                        url: "./js/recognition.js",
-                        async: false
-                    }).responseText;
-                }
-                if (script && script.length > 0) {
-                    content = script;
-                    read = true;
-                    REC.log(INFORMATIONAL, "Script erfolgreich gelesen!");
-                }
+                // wir laufen im Servlet und versuchen das Skript vom Server zu bekommen weil kein Alfresco Server da ist.
+                script = $.ajax({
+                    url: "./js/recognition.js",
+                    async: false
+                }).responseText;
+            }
+            if (script && script.length > 0) {
+                content = script;
+                read = true;
+                REC.log(INFORMATIONAL, "Script erfolgreich gelesen!");
             }
         }
         if (read) {

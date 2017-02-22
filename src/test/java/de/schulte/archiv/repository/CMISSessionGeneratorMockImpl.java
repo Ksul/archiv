@@ -658,6 +658,14 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                 return cmisObject;
             }
         });
+        when(session.getObjectByPath(any(String.class), any(OperationContext.class))).thenAnswer(new Answer<FileableCmisObject>() {
+            public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
+                FileableCmisObject cmisObject = repository.getByPath((String) invocation.getArguments()[0]);
+                if (cmisObject == null)
+                    throw new CmisObjectNotFoundException((String) invocation.getArguments()[0] + " not found!");
+                return cmisObject;
+            }
+        });
         when(session.getContentStream(any(ObjectId.class), any(String.class), any(BigInteger.class), any(BigInteger.class))).thenAnswer(new Answer<ContentStream>() {
             public ContentStream answer(InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
