@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ArchivTestConfiguration.class, ArchivConfiguration.class})
-public class CMISSessionGeneratorTest {
+public class CMISSessionGeneratorITest {
 
     @Autowired
     ArchivProperties properties;

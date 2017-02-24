@@ -27,7 +27,7 @@ import static org.junit.Assert.assertThat;
  * Date: 13.01.14
  * Time: 16:05
  */
-public class AlfrescoTest {
+public abstract class AlfrescoTest {
 
 
     private AlfrescoConnector con;
@@ -56,6 +56,11 @@ public class AlfrescoTest {
             if (((Document) cmisObject).isVersionSeriesCheckedOut())
                 ((Document) cmisObject).cancelCheckOut();
             cmisObject.delete(true);
+        }
+        cmisObject = con.getNode("/Datenverzeichnis/Skripte/backup.js.sample");
+        if (cmisObject != null && cmisObject instanceof Document) {
+            if (((Document) cmisObject).isVersionSeriesCheckedOut())
+                ((Document) cmisObject).cancelCheckOut();
         }
         cmisObject = con.getNode("/TestFolder/TestDocument.txt");
         if (cmisObject != null && ((Document) cmisObject).isVersionSeriesCheckedOut())

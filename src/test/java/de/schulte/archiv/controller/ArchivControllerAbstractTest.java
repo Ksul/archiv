@@ -41,7 +41,7 @@ import static org.junit.Assert.assertThat;
  * To change this template use File | Settings | File Templates.
  */
 
-public class ArchivControllerAbstractTest extends AlfrescoTest {
+public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
 
     protected ArchivController services;
@@ -51,9 +51,6 @@ public class ArchivControllerAbstractTest extends AlfrescoTest {
     protected String fileTxt;
 
     protected String fileZip;
-
-
-
 
 
     @Test

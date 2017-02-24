@@ -26,6 +26,7 @@ import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -64,7 +65,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         ConcurrentIndexedCollection<FileableCmisObject> sqlStore = new ConcurrentIndexedCollection<FileableCmisObject>();
         Map<String, FileableCmisObject> pathStore = new HashMap<>();
         Map<ObjectId, FileableCmisObject> idStore = new HashMap<>();
-        Map<Document, ContentStream> contentStore = new HashMap<>();
+        Map<ObjectId, ContentStream> contentStore = new HashMap<>();
 
 
         public List<FileableCmisObject> query(String query) {
@@ -101,16 +102,16 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             if (pathStore.containsKey(cmisObject.getName()))
                 pathStore.remove(cmisObject.getName());
             pathStore.put(cmisObjectNew.getName(), cmisObjectNew);
-            if (contentStore.containsKey(cmisObject))
-                contentStore.replace((Document) cmisObjectNew, contentStore.get(cmisObject));
+            if (contentStore.containsKey(new ObjectIdImpl(cmisObject.getId())))
+                contentStore.replace(new ObjectIdImpl(cmisObjectNew.getId()), contentStore.get(new ObjectIdImpl(cmisObject.getId())));
         }
 
         public void delete(FileableCmisObject cmisObject) {
             sqlStore.remove(cmisObject);
             idStore.remove(cmisObject.getId());
             pathStore.remove(cmisObject.getName());
-            if (contentStore.containsKey(cmisObject))
-                contentStore.remove(cmisObject);
+            if (contentStore.containsKey(new ObjectIdImpl(cmisObject.getId())))
+                contentStore.remove(new ObjectIdImpl(cmisObject.getId()));
         }
 
         public void insert(FileableCmisObject cmisObject) {
@@ -123,7 +124,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
 
         public void insert(FileableCmisObject cmisObject, ContentStream contentStream) {
             insert(cmisObject);
-            contentStore.put((Document) cmisObject, contentStream);
+            contentStore.put(new ObjectIdImpl(cmisObject.getId()), contentStream);
         }
 
         public boolean contains(String name) {
@@ -171,13 +172,11 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         }
 
         public ContentStream getContent(FileableCmisObject cmisObject) {
-            return contentStore.get(cmisObject);
+            return getContent(new ObjectIdImpl(cmisObject.getId()));
         }
 
         public ContentStream getContent(ObjectId id) {
-            if (idStore.containsKey(id))
-                return contentStore.get(idStore.get(id));
-            else return null;
+            return contentStore.get(id);
         }
     }
 
@@ -583,8 +582,9 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         when(session.getRepositoryInfo()).thenReturn(repositoryInfo);
 
         when(session.getObjectFactory()).thenReturn(objectFactory);
-        when(session.createOperationContext()).thenReturn(new OperationContextImpl());
-        when(session.getDefaultContext()).thenReturn(new OperationContextImpl());
+        when(session.createOperationContext()).thenCallRealMethod();
+        when(session.getDefaultContext()).thenReturn(new OperationContextImpl(null, false, true, false,
+                IncludeRelationships.NONE, null, true, null, true, 100));
 
         when(session.createQueryStatement(any(String.class))).then(new Answer<QueryStatement>() {
             public QueryStatement answer(InvocationOnMock invocation) throws Throwable {
@@ -593,6 +593,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         });
         when(session.query(any(String.class), any(Boolean.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.query(any(String.class), any(Boolean.class))).thenCallRealMethod();
+        when(session.queryObjects(anyString(), anyString(), anyBoolean(),any(OperationContext.class))).thenCallRealMethod();
 
         when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class))).thenAnswer(new Answer<ObjectId>() {
 
@@ -781,6 +782,15 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                             objectInFolderData.setPathSegment(cmisObject.getPropertyValue("cmis:path"));
                             folderDatas.add(objectInFolderData);
                         }
+                        if (invocation.getArguments()[3] != null) {
+                            final int sort = ((String) invocation.getArguments()[3]).contains("DESC") ? -1 : 1;
+                            Collections.sort(folderDatas, new Comparator<ObjectInFolderData>() {
+                                @Override
+                                public int compare(ObjectInFolderData o1, ObjectInFolderData o2) {
+                                    return o1.getObject().getProperties().getPropertyList().get(1).getFirstValue().toString().compareTo(o2.getObject().getProperties().getPropertyList().get(1).getFirstValue().toString()) * sort;
+                                }
+                            });
+                        }
                         objectInFolderList.setObjects(folderDatas);
                         return objectInFolderList;
                     }
@@ -798,7 +808,6 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                         Object[] args = invocation.getArguments();
                         String statement = (String) args[1];
                         String[] parts = statement.split(" ");
-                        final int sort = parts[parts.length - 1].equalsIgnoreCase("DESC") ? -1 : 1;
                         List<ObjectData> list = new ArrayList<>();
                         final String search = statement.substring(statement.indexOf("'") + 1, statement.indexOf("'", statement.indexOf("'") + 1));
                         if (statement.contains("IN_FOLDER")) {
@@ -819,14 +828,30 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                             if (repository.contains(search))
                                 list.add(getObjectDataFromCmisObject(repository.get(search)));
                         }
+                        final int sort = parts[parts.length - 1].equalsIgnoreCase("DESC") ? -1 : 1;
+                        final String sortColumn = parts[parts.length - 2];
                         Collections.sort(list, new Comparator<ObjectData>() {
                             @Override
                             public int compare(ObjectData o1, ObjectData o2) {
-                                return o1.getProperties().getPropertyList().get(1).getFirstValue().toString().compareTo(o2.getProperties().getPropertyList().get(1).getFirstValue().toString()) * sort;
+                                String valA = "", valB = "";
+                                for (int i = 0; i < o1.getProperties().getPropertyList().size(); i++) {
+                                    if (((AbstractPropertyData) o1.getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(sortColumn)) {
+                                        valA = o1.getProperties().getPropertyList().get(i).getFirstValue().toString();
+                                        break;
+                                    }
+                                }
+                                for (int i = 0; i < o2.getProperties().getPropertyList().size(); i++) {
+                                    if (((AbstractPropertyData) o2.getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(sortColumn)) {
+                                        valB = o2.getProperties().getPropertyList().get(i).getFirstValue().toString();
+                                        break;
+                                    }
+                                }
+                                return valA.compareTo(valB) * sort;
                             }
                         });
 
                         objectList.setObjects(list);
+                        objectList.setNumItems(BigInteger.valueOf(list.size()));
                         return objectList;
                     }
                 });
@@ -865,9 +890,9 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                         }
                         ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(false);
                         if (major)
-                            ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(Double.toString(Double.valueOf(document.getProperty("cmis:versionLabel").getValueAsString()) + 1));
+                            ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("1")).toString());
                         else
-                            ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(Double.toString(Double.valueOf(document.getProperty("cmis:versionLabel").getValueAsString()) + 0.1));
+                            ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString());
                         if (checkinComment != null && !checkinComment.isEmpty())
                             ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);
                         return null;

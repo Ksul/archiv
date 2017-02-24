@@ -1386,7 +1386,7 @@ public class ArchivController {
         try {
             for (FileEntry entry : getEntries()) {
                 if (entry.getName().equalsIgnoreCase(model.getFileName())) {
-                    obj.setData(Base64.encodeBase64(entry.getData()));
+                    obj.setData(Base64.encodeBase64String(entry.getData()));
                     obj.setName(entry.getName());
                     obj.setMimeType("application/pdf");
                     break;
