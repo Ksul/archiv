@@ -34,6 +34,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 
 
@@ -594,7 +595,9 @@ public class AlfrescoConnector {
 
             obj = checkOutDocument((Document) obj);
             if (obj != null) {
-
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {}
                 obj = checkInDocument((Document) obj, versionState.equals(VersioningState.MAJOR), properties, contentStream, versionComment);
                 session.clear();
 
@@ -693,7 +696,7 @@ public class AlfrescoConnector {
     }
 
     /**
-     * canceld den Chckout eines Dokumentes
+     * cancel den Chckout eines Dokumentes
      * @param document                  das Dokument
      */
     public void cancelCheckout(Document document) {

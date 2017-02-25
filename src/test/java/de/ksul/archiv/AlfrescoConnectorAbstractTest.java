@@ -309,8 +309,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         byte[] cont = con.getDocumentContent(document );
         assertThat(cont, Matchers.notNullValue());
         assertThat(cont, Matchers.instanceOf(byte[].class));
-        assertThat(content, Matchers.equalTo(new String(cont)));
-
+        assertThat(new String(cont, "UTF-8"), Matchers.equalTo(content));
         assertThat(document.getVersionLabel(), Matchers.equalTo("0.2"));
         properties.clear();
         properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
@@ -331,7 +330,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         cont = con.getDocumentContent(document );
         assertThat(cont, Matchers.notNullValue());
         assertThat(cont, Matchers.instanceOf(byte[].class));
-        assertThat(new String(cont), Matchers.equalTo(content));
+        assertThat(new String(cont, "UTF-8"), Matchers.equalTo(content));
         assertThat(document.getVersionLabel(), Matchers.equalTo("2.0"));
         assertThat(document.getCheckinComment(), Matchers.equalTo("neuer Versionskommentar"));
         properties.clear();
@@ -358,7 +357,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         cont = con.getDocumentContent(document );
         assertThat(cont, Matchers.notNullValue());
         assertThat(cont, Matchers.instanceOf(byte[].class));
-        assertThat(new String(cont), Matchers.equalTo(content));
+        assertThat(new String(cont, "UTF-8"), Matchers.equalTo(content));
         document.delete(true);
     }
 
