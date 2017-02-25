@@ -240,7 +240,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         aspects.add("P:cm:titled");
         properties.put("cm:description","Testdokument");
         properties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
-        Document document = con.createDocument((Folder) folder, "TestDocument.txt", content.getBytes(), VerteilungConstants.DOCUMENT_TYPE_TEXT, properties, VersioningState.MINOR);
+        Document document = con.createDocument((Folder) folder, "TestDocument.txt", content.getBytes("UTF-8"), VerteilungConstants.DOCUMENT_TYPE_TEXT, properties, VersioningState.MINOR);
         assertThat(document, Matchers.notNullValue());
         assertThat(document, Matchers.instanceOf( Document.class));
         assertThat(document.getName(), Matchers.equalTo("TestDocument.txt"));
@@ -262,7 +262,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         aspects.add("P:cm:titled");
         aspects.add("P:my:amountable");
         properties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
-        Document document = con.createDocument((Folder) folder, "TestDocument.txt", content.getBytes(), VerteilungConstants.DOCUMENT_TYPE_TEXT, properties, VersioningState.MINOR);
+        Document document = con.createDocument((Folder) folder, "TestDocument.txt", content.getBytes("UTF-8"), VerteilungConstants.DOCUMENT_TYPE_TEXT, properties, VersioningState.MINOR);
         assertThat(document, Matchers.notNullValue());
         assertThat(document, Matchers.instanceOf( Document.class));
         assertThat(document.getName(), Matchers.equalTo("TestDocument.txt"));
@@ -305,7 +305,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         properties.put("my:amount", 24.33);
         aspects.add("P:my:amountable");
         properties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
-        document = con.updateDocument(document, content.getBytes(), VerteilungConstants.DOCUMENT_TYPE_TEXT,  properties, VersioningState.MINOR, null);
+        document = con.updateDocument(document, content.getBytes("UTF-8"), VerteilungConstants.DOCUMENT_TYPE_TEXT,  properties, VersioningState.MINOR, null);
         byte[] cont = con.getDocumentContent(document );
         assertThat(cont, Matchers.notNullValue());
         assertThat(cont, Matchers.instanceOf(byte[].class));
@@ -316,18 +316,18 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
         properties.put("my:amount", 23.33);
 
-        document = con.updateDocument(document, content.getBytes(), VerteilungConstants.DOCUMENT_TYPE_TEXT,  properties, VersioningState.MINOR, null);
+        document = con.updateDocument(document, content.getBytes("UTF-8"), VerteilungConstants.DOCUMENT_TYPE_TEXT,  properties, VersioningState.MINOR, null);
         // wegen einer zusätzlichen Version durch die Aspekte
         assertThat(document.getVersionLabel(), Matchers.equalTo("0.3"));
         assertThat(((BigDecimal) document.getProperty("my:amount").getValue()).doubleValue(), Matchers.equalTo(new BigDecimal(23.33).doubleValue()));
         document.delete(true);
 
-        document = con.createDocument((Folder) folder, "TestDocument.txt", content.getBytes(), VerteilungConstants.DOCUMENT_TYPE_TEXT, null, VersioningState.MAJOR);
+        document = con.createDocument((Folder) folder, "TestDocument.txt", content.getBytes("UTF-8"), VerteilungConstants.DOCUMENT_TYPE_TEXT, null, VersioningState.MAJOR);
         assertThat(document.getVersionLabel(), Matchers.equalTo("1.0"));
         assertThat(document.getCheckinComment(), Matchers.equalTo("Initial Version"));
         content = "Dies ist ein neuer Inhalt";
 
-        document = con.updateDocument(document, content.getBytes(), VerteilungConstants.DOCUMENT_TYPE_TEXT,  null, VersioningState.MAJOR, "neuer Versionskommentar");
+        document = con.updateDocument(document, content.getBytes("UTF-8"), VerteilungConstants.DOCUMENT_TYPE_TEXT,  null, VersioningState.MAJOR, "neuer Versionskommentar");
         cont = con.getDocumentContent(document );
         assertThat(cont, Matchers.notNullValue());
         assertThat(cont, Matchers.instanceOf(byte[].class));

@@ -226,7 +226,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         RestRequest request = new RestRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
-        request.setContent(Base64.encodeBase64String(content.getBytes()));
+        request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
         request.setMimeType(VerteilungConstants.DOCUMENT_TYPE_TEXT);
         request.setExtraProperties(extraProperties);
         request.setVersionState(VersioningState.MINOR.value());
@@ -261,7 +261,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         RestRequest request = new RestRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
-        request.setContent(Base64.encodeBase64String(content.getBytes()));
+        request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
         request.setMimeType(VerteilungConstants.DOCUMENT_TYPE_TEXT);
         request.setExtraProperties(extraProperties);
         request.setVersionState(VersioningState.MINOR.value());
@@ -324,7 +324,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         String content = "Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?";
         RestRequest request = new RestRequest();
         request.setDocumentId(document.getId());
-        request.setContent(Base64.encodeBase64String(content.getBytes()));
+        request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
         request.setMimeType(VerteilungConstants.DOCUMENT_TYPE_TEXT);
         request.setVersionState(VersioningState.MINOR.value());
 
@@ -348,7 +348,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         extraProperties = "{\"D:my:archivContent\":{\"my:person\":\"Katja\", \"my:documentDate\":\"" + new Date().getTime() + "\"}}";
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
-        request.setContent(Base64.encodeBase64String(content.getBytes()));
+        request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
         request.setMimeType(VerteilungConstants.DOCUMENT_TYPE_TEXT);
         request.setExtraProperties(extraProperties);
         request.setVersionState(VersioningState.MAJOR.value());
@@ -362,7 +362,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(doc.get("checkinComment"), Matchers.equalTo("Initial Version"));
         content = "Dies ist ein neuer Inhalt";
         request.setDocumentId((String) doc.get("objectId"));
-        request.setContent(Base64.encodeBase64String(content.getBytes()));
+        request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
         request.setExtraProperties(null);
         request.setVersionComment("neuer Versionskommentar");
         obj = services.updateDocument(request);
