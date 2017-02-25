@@ -46,13 +46,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         super.setCon(con);
     }
 
-
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-
-    @Test
+   @Test
     public void testListFolder() throws Exception {
 
         CmisObject folder = buildTestFolder("TestFolder", null);
