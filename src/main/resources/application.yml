@@ -1,0 +1,14 @@
+ksul:
+  archiv:
+    server: http://localhost:9080/alfresco/
+    binding: http://localhost:9080/alfresco/api/-default-/public/cmis/versions/1.1/atom
+    user: admin
+    password: admin
+
+server:
+  contextPath: /Archiv
+  port: 8080
+
+management:
+  security:
+    enabled: false
