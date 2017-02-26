@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = ArchivProperties.PREFIX)
 public class ArchivProperties {
 
-    public static final String PREFIX = "schulte.archiv";
+    public static final String PREFIX = "ksul.archiv";
 
     private String user;
 
