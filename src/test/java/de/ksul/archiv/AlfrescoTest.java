@@ -159,4 +159,20 @@ public abstract class AlfrescoTest {
         assertThat(document.getName(), Matchers.is(name));
         return document;
     }
+
+    /**
+     * liefert einen Vergleichsstring mit dem Inhalt aus dem TestPDF
+     * @return  der Vergleichsstring
+     */
+    public String getPDFCompareString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Herr");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("Klaus Schulte");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("Bredeheide 33");
+        stringBuilder.append(System.getProperty("line.separator"));
+        stringBuilder.append("48161 Münster");
+        return stringBuilder.toString();
+    }
 }

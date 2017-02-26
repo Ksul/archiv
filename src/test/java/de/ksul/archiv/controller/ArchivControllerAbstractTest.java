@@ -526,7 +526,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(entry.getName(), Matchers.equalTo(filePdf));
         assertThat(entry.getData().length, Matchers.greaterThan(0));
         assertThat(entry.getExtractedData().length(), Matchers.greaterThan(0));
-        assertThat(entry.getExtractedData(), startsWith("Herr\nKlaus Schulte\nBredeheide 33\n48161 Münster"));
+        assertThat(entry.getExtractedData(), startsWith(getPDFCompareString()));
     }
 
     @Test
@@ -540,7 +540,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        assertThat((String) obj.getData(), startsWith("Herr\nKlaus Schulte\nBredeheide 33\n48161 Münster"));
+        assertThat((String) obj.getData(), startsWith(getPDFCompareString()));
     }
 
     @Test
@@ -553,7 +553,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        assertThat((String) obj.getData(), startsWith("Herr\nKlaus Schulte\nBredeheide 33\n48161 Münster"));
+        assertThat((String) obj.getData(), startsWith(getPDFCompareString()));
     }
 
     @Test
@@ -720,7 +720,6 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         obj = services.isURLAvailable(request);
         assertThat(obj, notNullValue());
         assertThat(obj.isSuccess(), Matchers.is(false));
-        assertThat(obj.getData(), notNullValue());
     }
 
 
