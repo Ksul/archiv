@@ -198,7 +198,6 @@
 					<skipTests>false</skipTests>
 					<karmaFailureIgnore>false</karmaFailureIgnore>
 					<reporters>dots,junit</reporters>
-					<workingDirectory>/u/m500288/.npm-global/lib/node_modules</workingDirectory>
 				</configuration>
 			</plugin>
 		</plugins>
