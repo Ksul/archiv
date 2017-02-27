@@ -12,3 +12,6 @@ server:
 management:
   security:
     enabled: false
+
+logging:
+  file: archiv.log

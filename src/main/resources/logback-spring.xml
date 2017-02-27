@@ -2,10 +2,12 @@
 <configuration debug="false">
 
     <jmxConfigurator/>
-    <include resource="logback-appenders-stdout.xml"/>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
 
     <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="DEBUG"/>
