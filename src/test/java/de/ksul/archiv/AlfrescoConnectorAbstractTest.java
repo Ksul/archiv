@@ -47,123 +47,175 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     }
 
    @Test
-    public void testListFolder() throws Exception {
+   public void testListFolder() throws Exception {
 
-        CmisObject folder = buildTestFolder("TestFolder", null);
-        Map<String, Object> properties = new HashMap<>();
-        buildTestFolder("Folder", folder);
+       CmisObject folder = buildTestFolder("TestFolder", null);
+       Map<String, Object> properties = new HashMap<>();
+       buildTestFolder("Folder", folder);
 
-        CmisObject cmisObject = buildDocument("ADocument", folder);
-        properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
-        properties.put("cm:title", "ATitel");
-        con.updateProperties(cmisObject,  properties);
+       CmisObject cmisObject = buildDocument("ADocument", folder);
+       properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
+       properties.put("cm:title", "ATitel");
+       con.updateProperties(cmisObject, properties);
 
-        cmisObject= buildDocument("BDocument", folder);
-        properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
-        properties.put("cm:title", "BTitel");
-        con.updateProperties(cmisObject,  properties);
+       cmisObject = buildDocument("BDocument", folder);
+       properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
+       properties.put("cm:title", "BTitel");
+       con.updateProperties(cmisObject, properties);
 
-        buildDocument("CDocument", folder);
-        List<Order> orders = new ArrayList();
-        orders.add(new Order(0, "ASC"));
-        List<Column> columns = new ArrayList();
-        columns.add(new Column(null, "cmis:name", false, false, null, false));
-        ItemIterable<CmisObject> list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_ALL);
-        assertThat(list, Matchers.notNullValue());
-        int count = 0;
-        for (CmisObject obj : list) {
-            switch (count) {
-                case 0:
-                    assertThat(obj.getName(), Matchers.is("ADocument"));
-                    break;
-                case 1:
-                    assertThat(obj.getName(), Matchers.is("BDocument"));
-                    break;
-                case 2:
-                    assertThat(obj.getName(), Matchers.is("CDocument"));
-                    break;
-                case 3:
-                    assertThat(obj.getName(), Matchers.is("Folder"));
-                    break;
-            }
-            count++;
-        }
-        assertThat(count, Matchers.is(4));
-        orders.get(0).setDir("DESC");
-        list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_ALL);
-        assertThat(list, Matchers.notNullValue());
-        count = 0;
-        for (CmisObject obj : list) {
-            switch (count) {
-                case 0:
-                    assertThat(obj.getName(), Matchers.is("Folder"));
-                    break;
-                case 1:
-                    assertThat(obj.getName(), Matchers.is("CDocument"));
-                    break;
-                case 2:
-                    assertThat(obj.getName(), Matchers.is("BDocument"));
-                    break;
-                case 3:
-                    assertThat(obj.getName(), Matchers.is("ADocument"));
-                    break;
-            }
-            count++;
-        }
-        assertThat(count, Matchers.is(4));
-        list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_DOCUMENTS);
-        assertThat(list, Matchers.notNullValue());
-        count = 0;
-        for (CmisObject obj : list) {
-            switch (count) {
-                case 0:
-                    assertThat(obj.getName(), Matchers.is("CDocument"));
-                    break;
-                case 1:
-                    assertThat(obj.getName(), Matchers.is("BDocument"));
-                    break;
-                case 2:
-                    assertThat(obj.getName(), Matchers.is("ADocument"));
-                    break;
-            }
-            count++;
-        }
-        assertThat(count, Matchers.is(3));
-        columns.get(0).setName("cm:title");
-        list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_DOCUMENTS);
-        assertThat(list, Matchers.notNullValue());
-        count = 0;
-        for (CmisObject obj : list) {
-            switch (count) {
-                case 0:
-                    assertThat(obj.getName(), Matchers.is("BDocument"));
-                    break;
-                case 1:
-                    assertThat(obj.getName(), Matchers.is("ADocument"));
-                    break;
-                case 2:
-                    assertThat(obj.getName(), Matchers.is("CDocument"));
-                    break;
-            }
-            count++;
-        }
-        assertThat(count, Matchers.is(3));
-        columns.get(0).setName("cmis:name");
-        list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_FOLDER);
-        assertThat(list, Matchers.notNullValue());
-        count = 0;
-        for (CmisObject obj : list) {
-            switch (count) {
-                case 0:
-                    assertThat(obj.getName(), Matchers.is("Folder"));
-                    break;
-            }
-            count++;
-        }
-        assertThat(count, Matchers.is(1));
-
-        ((Folder) folder).deleteTree(true, UnfileObject.DELETE, true);
-    }
+       buildDocument("CDocument", folder);
+       List<Order> orders = new ArrayList();
+       orders.add(new Order(0, "ASC"));
+       List<Column> columns = new ArrayList();
+       columns.add(new Column(null, "cmis:name", false, false, null, false));
+       columns.add(new Column(null, "cm:title", false, false, null, false));
+       columns.add(new Column(null, "my:documentDate", false, false, null, false));
+       columns.add(new Column(null, "cmis:creationDate", false, false, null, false));
+       ItemIterable<CmisObject> list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_ALL);
+       assertThat(list, Matchers.notNullValue());
+       int count = 0;
+       for (CmisObject obj : list) {
+           switch (count) {
+               case 0:
+                   assertThat(obj.getName(), Matchers.is("ADocument"));
+                   break;
+               case 1:
+                   assertThat(obj.getName(), Matchers.is("BDocument"));
+                   break;
+               case 2:
+                   assertThat(obj.getName(), Matchers.is("CDocument"));
+                   break;
+               case 3:
+                   assertThat(obj.getName(), Matchers.is("Folder"));
+                   break;
+           }
+           count++;
+       }
+       assertThat(count, Matchers.is(4));
+       orders.get(0).setDir("DESC");
+       list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_ALL);
+       assertThat(list, Matchers.notNullValue());
+       count = 0;
+       for (CmisObject obj : list) {
+           switch (count) {
+               case 0:
+                   assertThat(obj.getName(), Matchers.is("Folder"));
+                   break;
+               case 1:
+                   assertThat(obj.getName(), Matchers.is("CDocument"));
+                   break;
+               case 2:
+                   assertThat(obj.getName(), Matchers.is("BDocument"));
+                   break;
+               case 3:
+                   assertThat(obj.getName(), Matchers.is("ADocument"));
+                   break;
+           }
+           count++;
+       }
+       assertThat(count, Matchers.is(4));
+       list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_DOCUMENTS);
+       assertThat(list, Matchers.notNullValue());
+       count = 0;
+       for (CmisObject obj : list) {
+           switch (count) {
+               case 0:
+                   assertThat(obj.getName(), Matchers.is("CDocument"));
+                   break;
+               case 1:
+                   assertThat(obj.getName(), Matchers.is("BDocument"));
+                   break;
+               case 2:
+                   assertThat(obj.getName(), Matchers.is("ADocument"));
+                   break;
+           }
+           count++;
+       }
+       assertThat(count, Matchers.is(3));
+       orders.clear();
+       orders.add(new Order(1, "DESC"));
+       list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_DOCUMENTS);
+       assertThat(list, Matchers.notNullValue());
+       count = 0;
+       for (CmisObject obj : list) {
+           switch (count) {
+               case 0:
+                   assertThat(obj.getName(), Matchers.is("BDocument"));
+                   break;
+               case 1:
+                   assertThat(obj.getName(), Matchers.is("ADocument"));
+                   break;
+               case 2:
+                   assertThat(obj.getName(), Matchers.is("CDocument"));
+                   break;
+           }
+           count++;
+       }
+       assertThat(count, Matchers.is(3));
+       orders.clear();
+       list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_FOLDER);
+       assertThat(list, Matchers.notNullValue());
+       count = 0;
+       for (CmisObject obj : list) {
+           switch (count) {
+               case 0:
+                   assertThat(obj.getName(), Matchers.is("Folder"));
+                   break;
+           }
+           count++;
+       }
+       assertThat(count, Matchers.is(1));
+       orders.clear();
+       orders.add(new Order(2, "ASC"));
+       orders.add(new Order(3, "ASC"));
+       list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_DOCUMENTS);
+       assertThat(list, Matchers.notNullValue());
+       count = 0;
+       for (CmisObject obj : list) {
+           switch (count) {
+               case 0:
+                   assertThat(obj.getName(), Matchers.is("ADocument"));
+                   break;
+               case 1:
+                   assertThat(obj.getName(), Matchers.is("BDocument"));
+                   break;
+               case 2:
+                   assertThat(obj.getName(), Matchers.is("CDocument"));
+                   break;
+           }
+           count++;
+       }
+       assertThat(count, Matchers.is(3));
+       orders.clear();
+       orders.add(new Order(2, "ASC"));
+       orders.add(new Order(3, "ASC"));
+       cmisObject = buildDocument("DDocument", folder);
+       properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
+       properties.put("my:documentDate", Long.toString(new Date(100).getTime()));
+       con.updateProperties(cmisObject, properties);
+       list = con.listFolder(folder.getId(), orders, columns, VerteilungConstants.LIST_MODUS_DOCUMENTS);
+       assertThat(list, Matchers.notNullValue());
+       count = 0;
+       for (CmisObject obj : list) {
+           switch (count) {
+               case 0:
+                   assertThat(obj.getName(), Matchers.is("DDocument"));
+                   break;
+               case 1:
+                   assertThat(obj.getName(), Matchers.is("ADocument"));
+                   break;
+               case 2:
+                   assertThat(obj.getName(), Matchers.is("BDocument"));
+                   break;
+               case 3:
+                   assertThat(obj.getName(), Matchers.is("CDocument"));
+                   break;
+           }
+           count++;
+       }
+       assertThat(count, Matchers.is(4));
+       ((Folder) folder).deleteTree(true, UnfileObject.DELETE, true);
+   }
 
 
 

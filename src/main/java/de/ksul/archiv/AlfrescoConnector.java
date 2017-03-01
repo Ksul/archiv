@@ -296,10 +296,12 @@ public class AlfrescoConnector {
                                                    final OperationContext operationContext) {
         ItemIterable<CmisObject> result;
 
-        ItemIterable<QueryResult> cntResult = session.query(stmt.toString(), false, operationContext).skipTo(Long.MAX_VALUE).getPage(Integer.MAX_VALUE);
-        final long totalNumItems = cntResult.getTotalNumItems();
         final DiscoveryService discoveryService = this.session.getBinding().getDiscoveryService();
         final ObjectFactory of = this.session.getObjectFactory();
+        final long totalNumItems =  discoveryService.query(session.getRepositoryInfo().getId(), stmt.toString(),
+                false, operationContext.isIncludeAllowableActions(), operationContext.getIncludeRelationships(),
+                operationContext.getRenditionFilterString(), BigInteger.valueOf(Integer.MAX_VALUE),
+                BigInteger.valueOf(Long.MAX_VALUE), null).getNumItems().longValue();
 
         result = new CollectionIterable<CmisObject>(new AbstractPageFetcher<CmisObject>(operationContext.getMaxItemsPerPage()) {
 

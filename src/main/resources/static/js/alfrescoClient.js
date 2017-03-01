@@ -629,7 +629,7 @@ function loadAlfrescoTable() {
                 {
                     "data": "title",
                     "title": "Titel",
-                    "name": "cm:title",
+                    "name": "cm:title, cmis:name",
                     "defaultContent": '',
                     "type": "string",
                     "class": "alignLeft alfrescoTableDragable"
@@ -637,7 +637,7 @@ function loadAlfrescoTable() {
                 {
                     "data": "documentDateDisplay",
                     "title": "Datum",
-                    "name": "my:documentDate",
+                    "name": "my:documentDate, cmis:creationDate",
                     "defaultContent": '',
                     "type": "string",
                     "class": "alignLeft"
@@ -1119,7 +1119,7 @@ function loadAlfrescoSearchTable() {
                 {
                     "data": "title",
                     "title": "Titel",
-                    "name": "cm:title",
+                    "name": "cm:title, cmis:name",
                     "defaultContent": '',
                     "type": "string",
                     "class": "alignLeft"
@@ -1127,7 +1127,7 @@ function loadAlfrescoSearchTable() {
                 {
                     "data": "documentDateDisplay",
                     "title": "Datum",
-                    "name": "my:documentDate",
+                    "name": "my:documentDate, cmis:creationDate",
                     "defaultContent": '',
                     "type": "string",
                     "class": "alignLeft"

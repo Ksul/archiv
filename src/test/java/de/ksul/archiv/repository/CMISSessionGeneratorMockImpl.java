@@ -322,15 +322,6 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         propertyIdValueDefinition.setPropertyType(PropertyType.STRING);
         propertyIdValueDefinition.setUpdatability(Updatability.READWRITE);
         map.put("my:idvalue", propertyIdValueDefinition);
-        PropertyDateTimeDefinitionImpl propertyDocumentDateDefinition = new PropertyDateTimeDefinitionImpl();
-        propertyDocumentDateDefinition.setId("my:documentDate");
-        propertyDocumentDateDefinition.setDisplayName("Documentdate");
-        propertyDocumentDateDefinition.setQueryName("my:documentDate");
-        propertyDocumentDateDefinition.setLocalName("documentDate");
-        propertyDocumentDateDefinition.setCardinality(Cardinality.SINGLE);
-        propertyDocumentDateDefinition.setPropertyType(PropertyType.DATETIME);
-        propertyDocumentDateDefinition.setUpdatability(Updatability.READWRITE);
-        map.put("my:documentDate", propertyDocumentDateDefinition);
         PropertyStringDefinitionImpl propertyDescriptionDefinition = new PropertyStringDefinitionImpl();
         propertyDescriptionDefinition.setId("cm:description");
         propertyDescriptionDefinition.setDisplayName("Description");
@@ -453,6 +444,24 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         propertySecondaryObjectTypeIdDefinition.setPropertyType(PropertyType.ID);
         propertySecondaryObjectTypeIdDefinition.setUpdatability(Updatability.READWRITE);
         map.put("cmis:secondaryObjectTypeIds", propertySecondaryObjectTypeIdDefinition);
+        PropertyDateTimeDefinitionImpl propertyDocumentDateDefinition = new PropertyDateTimeDefinitionImpl();
+        propertyDocumentDateDefinition.setId("my:documentDate");
+        propertyDocumentDateDefinition.setDisplayName("Documentdate");
+        propertyDocumentDateDefinition.setQueryName("my:documentDate");
+        propertyDocumentDateDefinition.setLocalName("documentDate");
+        propertyDocumentDateDefinition.setCardinality(Cardinality.SINGLE);
+        propertyDocumentDateDefinition.setPropertyType(PropertyType.DATETIME);
+        propertyDocumentDateDefinition.setUpdatability(Updatability.READWRITE);
+        map.put("my:documentDate", propertyDocumentDateDefinition);
+        PropertyDateTimeDefinitionImpl propertyCreateDateDefinition = new PropertyDateTimeDefinitionImpl();
+        propertyCreateDateDefinition.setId("cmis:creationDate");
+        propertyCreateDateDefinition.setDisplayName("Creation Date");
+        propertyCreateDateDefinition.setQueryName("cmis:creationDate");
+        propertyCreateDateDefinition.setLocalName("creationDate");
+        propertyCreateDateDefinition.setCardinality(Cardinality.SINGLE);
+        propertyCreateDateDefinition.setPropertyType(PropertyType.DATETIME);
+        propertyCreateDateDefinition.setUpdatability(Updatability.READONLY);
+        map.put("cmis:creationDate", propertyCreateDateDefinition);
         return map;
     }
 
@@ -504,7 +513,6 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         propertyObjectType.setValue(folder ? "cmis:folder" : "cmis:document");
         properties.addProperty(propertyObjectType);
 
-
         if (folder) {
             objectData.setProperties(properties);
             objectType = new FolderTypeImpl(sessionImpl, folderType);
@@ -553,6 +561,15 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             secondaryObjectTypeIds.add("P:cm:emailed");
             propertySecondaryObjectTypeIds.setValues(secondaryObjectTypeIds);
             properties.addProperty(propertySecondaryObjectTypeIds);
+            PropertyDateTimeImpl propertyCreationDate = new PropertyDateTimeImpl();
+            propertyCreationDate.setId("cmis:creationDate");
+            propertyCreationDate.setLocalName("creationDate");
+            propertyCreationDate.setQueryName("cmis:objectTypeId");
+            propertyCreationDate.setDisplayName("Creation Date ");
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTime(new Date());
+            propertyCreationDate.setValue(cal);
+            properties.addProperty(propertyCreationDate);
             objectData.setProperties(properties);
             objectType = new DocumentTypeImpl(sessionImpl, documentType);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
@@ -782,11 +799,41 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                             folderDatas.add(objectInFolderData);
                         }
                         if (invocation.getArguments()[3] != null) {
-                            final int sort = ((String) invocation.getArguments()[3]).contains("DESC") ? -1 : 1;
+                            String[] order = new String[2];
+                            String[] sortColumns = invocation.getArguments()[3].toString().split(",");
                             Collections.sort(folderDatas, new Comparator<ObjectInFolderData>() {
                                 @Override
                                 public int compare(ObjectInFolderData o1, ObjectInFolderData o2) {
-                                    return o1.getObject().getProperties().getPropertyList().get(1).getFirstValue().toString().compareTo(o2.getObject().getProperties().getPropertyList().get(1).getFirstValue().toString()) * sort;
+                                    int ret = 0;
+                                    for (int j = 0; j < sortColumns.length; j++) {
+                                        String[] column = sortColumns[j].trim().split(" ");
+                                        order[0] = column[0];
+                                        order[1] = column.length > 1 ? !column[1].isEmpty() ? column[1] : "ASC" : "ASC";
+                                        Comparable valA = null, valB = null;
+                                        for (int i = 0; i < o1.getObject().getProperties().getPropertyList().size(); i++) {
+                                            if (((AbstractPropertyData) o1.getObject().getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(order[0])) {
+                                                valA = (Comparable) o1.getObject().getProperties().getPropertyList().get(i).getFirstValue();
+                                                break;
+                                            }
+                                        }
+                                        for (int i = 0; i < o2.getObject().getProperties().getPropertyList().size(); i++) {
+                                            if (((AbstractPropertyData) o2.getObject().getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(order[0])) {
+                                                valB = (Comparable) o2.getObject().getProperties().getPropertyList().get(i).getFirstValue();
+                                                break;
+                                            }
+                                        }
+                                        if (valA != null && valB != null)
+                                            ret = valA.compareTo(valB) * (order[1].equalsIgnoreCase("ASC") ? 1 : -1);
+                                        else if (valA == null && valB == null)
+                                            ret = 0;
+                                        else if (valA == null)
+                                            ret = order[1].equalsIgnoreCase("ASC") ? 1 : 1;
+                                        else if (valB == null)
+                                            ret = order[1].equalsIgnoreCase("ASC") ? -1 : -1 ;
+                                        if (ret != 0)
+                                            break;
+                                    }
+                                    return ret;
                                 }
                             });
                         }
@@ -806,7 +853,6 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                         ObjectListImpl objectList = new ObjectListImpl();
                         Object[] args = invocation.getArguments();
                         String statement = (String) args[1];
-                        String[] parts = statement.split(" ");
                         List<ObjectData> list = new ArrayList<>();
                         final String search = statement.substring(statement.indexOf("'") + 1, statement.indexOf("'", statement.indexOf("'") + 1));
                         if (statement.contains("IN_FOLDER")) {
@@ -827,28 +873,46 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                             if (repository.contains(search))
                                 list.add(getObjectDataFromCmisObject(repository.get(search)));
                         }
-                        final int sort = parts[parts.length - 1].equalsIgnoreCase("DESC") ? -1 : 1;
-                        final String sortColumn = parts[parts.length - 2];
-                        Collections.sort(list, new Comparator<ObjectData>() {
-                            @Override
-                            public int compare(ObjectData o1, ObjectData o2) {
-                                String valA = "", valB = "";
-                                for (int i = 0; i < o1.getProperties().getPropertyList().size(); i++) {
-                                    if (((AbstractPropertyData) o1.getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(sortColumn)) {
-                                        valA = o1.getProperties().getPropertyList().get(i).getFirstValue().toString();
-                                        break;
+                        if (statement.contains("ORDER BY")) {
+                            String[] order = new String[2];
+                            String parts = statement.substring(statement.indexOf("ORDER BY") + 9);
+                            final String[] sortColumns = parts.split(",");
+                            Collections.sort(list, new Comparator<ObjectData>() {
+                                @Override
+                                public int compare(ObjectData o1, ObjectData o2) {
+                                    int ret = 0;
+                                    for (int j = 0; j < sortColumns.length; j++) {
+                                        String[] column = sortColumns[j].trim().split(" ");
+                                        order[0] = column[0];
+                                        order[1] = column.length > 1 ? !column[1].isEmpty() ? column[1] : "ASC" : "ASC";
+                                        Comparable valA = null, valB = null;
+                                        for (int i = 0; i < o1.getProperties().getPropertyList().size(); i++) {
+                                            if (((AbstractPropertyData) o1.getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(order[0])) {
+                                                valA = (Comparable) o1.getProperties().getPropertyList().get(i).getFirstValue();
+                                                break;
+                                            }
+                                        }
+                                        for (int i = 0; i < o2.getProperties().getPropertyList().size(); i++) {
+                                            if (((AbstractPropertyData) o2.getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(order[0])) {
+                                                valB = (Comparable) o2.getProperties().getPropertyList().get(i).getFirstValue();
+                                                break;
+                                            }
+                                        }
+                                        if (valA != null && valB != null)
+                                            ret = valA.compareTo(valB) * (order[1].equalsIgnoreCase("ASC") ? 1 : -1);
+                                        else if (valA == null && valB == null)
+                                            ret = 0;
+                                        else if (valA == null)
+                                            ret = order[1].equalsIgnoreCase("ASC") ? 1 : 1;
+                                        else if (valB == null)
+                                            ret = order[1].equalsIgnoreCase("ASC") ? -1 : -1 ;
+                                        if (ret != 0)
+                                            break;
                                     }
+                                    return ret;
                                 }
-                                for (int i = 0; i < o2.getProperties().getPropertyList().size(); i++) {
-                                    if (((AbstractPropertyData) o2.getProperties().getPropertyList().get(i)).getId().equalsIgnoreCase(sortColumn)) {
-                                        valB = o2.getProperties().getPropertyList().get(i).getFirstValue().toString();
-                                        break;
-                                    }
-                                }
-                                return valA.compareTo(valB) * sort;
-                            }
-                        });
-
+                            });
+                        }
                         objectList.setObjects(list);
                         objectList.setNumItems(BigInteger.valueOf(list.size()));
                         return objectList;
