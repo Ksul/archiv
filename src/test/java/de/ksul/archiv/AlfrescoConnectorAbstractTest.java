@@ -46,6 +46,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         super.setCon(con);
     }
 
+
    @Test
    public void testListFolder() throws Exception {
 
@@ -217,6 +218,15 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
        ((Folder) folder).deleteTree(true, UnfileObject.DELETE, true);
    }
 
+
+    @Test
+    public void testHasChildFolder() throws Exception {
+        CmisObject folder = buildTestFolder("TestFolder", null);
+        assertThat(con.hasChildFolder(folder), Matchers.is(false));
+        buildTestFolder("TestFolder", folder);
+        assertThat(con.hasChildFolder(folder), Matchers.is(true));
+        ((Folder) folder).deleteTree(true, UnfileObject.DELETE, true);
+    }
 
 
     @Test

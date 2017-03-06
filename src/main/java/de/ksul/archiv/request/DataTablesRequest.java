@@ -82,18 +82,38 @@ public class DataTablesRequest  {
         this.draw = draw;
     }
 
+    /**
+     * Gets the Paging first record indicator. This is the start point in the current data set (0 index based - i.e. 0 is the first record).
+     * @return int the indicator
+     */
     public int getStart() {
         return start;
     }
 
+    /**
+     * Sets the start point in the current data set (0 index based - i.e. 0 is the first record).
+     * @param start  start point
+     */
     public void setStart(int start) {
         this.start = start;
     }
 
+    /**
+     * Gets the number of records that the table can display in the current draw. It is expected that the number of records returned will be equal to this number, unless
+     * the server has fewer records to return. Note that this can be -1 to indicate that all records should be returned (although that negates any benefits of
+     * server-side processing!)
+     * @return int length
+     */
     public int getLength() {
         return length;
     }
 
+    /**
+     * Sets the number of records that the table can display in the current draw. It is expected that the number of records returned will be equal to this number, unless
+     * the server has fewer records to return. Note that this can be -1 to indicate that all records should be returned (although that negates any benefits of
+     * server-side processing!)
+     * @param length  the length
+     */
     public void setLength(int length) {
         this.length = length;
     }

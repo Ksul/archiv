@@ -790,6 +790,8 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                 when(navigationService.getChildren(anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), any(BigInteger.class), any(BigInteger.class), any(ExtensionsData.class))).then(new Answer<ObjectInFolderList>() {
                     public ObjectInFolderList answer(InvocationOnMock invocation) throws Throwable {
                         ObjectInFolderListImpl objectInFolderList = new ObjectInFolderListImpl();
+                        BigInteger skip = (BigInteger) invocation.getArguments()[9];
+                        BigInteger maxItems = (BigInteger) invocation.getArguments()[8];
                         List<ObjectInFolderData> folderDatas = new ArrayList<>();
                         List<FileableCmisObject> results = repository.getChildren((String) invocation.getArguments()[1], ((BigInteger) invocation.getArguments()[9]).intValue(), ((BigInteger) invocation.getArguments()[8]).intValue());
                         for (FileableCmisObject cmisObject : results) {
@@ -837,7 +839,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                                 }
                             });
                         }
-                        objectInFolderList.setObjects(folderDatas);
+                        objectInFolderList.setObjects(folderDatas.subList(skip.intValue(), skip.intValue() + maxItems.intValue() > folderDatas.size() ? folderDatas.size() :  skip.intValue() + maxItems.intValue()));
                         return objectInFolderList;
                     }
                 });
@@ -853,6 +855,8 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                         ObjectListImpl objectList = new ObjectListImpl();
                         Object[] args = invocation.getArguments();
                         String statement = (String) args[1];
+                        BigInteger skip = (BigInteger) args[7];
+                        BigInteger maxItems = (BigInteger) args[6];
                         List<ObjectData> list = new ArrayList<>();
                         final String search = statement.substring(statement.indexOf("'") + 1, statement.indexOf("'", statement.indexOf("'") + 1));
                         if (statement.contains("IN_FOLDER")) {
@@ -913,7 +917,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                                 }
                             });
                         }
-                        objectList.setObjects(list);
+                        objectList.setObjects(list.subList(skip.intValue(), skip.intValue() + maxItems.intValue() > list.size() ? list.size() :  skip.intValue() + maxItems.intValue()));
                         objectList.setNumItems(BigInteger.valueOf(list.size()));
                         return objectList;
                     }

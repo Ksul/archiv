@@ -11,6 +11,8 @@ import de.ksul.archiv.response.MoveResponse;
 import de.ksul.archiv.response.RestResponse;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.commons.codec.binary.Base64;
 import org.hamcrest.Matchers;
@@ -43,6 +45,38 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     protected String fileZip;
 
+
+    @Test
+    public void testListFolderWithPagination() throws Exception {
+        CmisObject folder = buildTestFolder("TestFolder", null);
+        buildDocument("ADocument", folder);
+        buildDocument("BDocument", folder);
+        buildDocument("CDocument", folder);
+        buildDocument("DDocument", folder);
+        DataTablesRequest dataTablesRequest = new DataTablesRequest();
+        dataTablesRequest.setFilePath(folder.getId());
+        dataTablesRequest.setWithFolder(VerteilungConstants.LIST_MODUS_DOCUMENTS);
+        dataTablesRequest.setLength(2);
+        dataTablesRequest.setStart(0);
+        DataTablesResponse obj = services.listFolderWithPagination(dataTablesRequest);
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
+        assertThat(obj.getData(), notNullValue());
+        assertThat(obj.getData(), instanceOf(ArrayList.class));
+        assertThat(((ArrayList) obj.getData()).size(), is(2));
+        assertThat(((Map) ((ArrayList) obj.getData()).get(0)).get("name"), is("DDocument"));
+        assertThat(((Map) ((ArrayList) obj.getData()).get(1)).get("name"), is("CDocument"));
+        dataTablesRequest.setStart(2);
+        obj = services.listFolderWithPagination(dataTablesRequest);
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
+        assertThat(obj.getData(), notNullValue());
+        assertThat(obj.getData(), instanceOf(ArrayList.class));
+        assertThat(((ArrayList) obj.getData()).size(), is(2));
+        assertThat(((Map) ((ArrayList) obj.getData()).get(0)).get("name"), is("BDocument"));
+        assertThat(((Map) ((ArrayList) obj.getData()).get(1)).get("name"), is("ADocument"));
+        ((Folder) folder).deleteTree(true, UnfileObject.DELETE, true);
+    }
 
     @Test
     public void testListFolder() throws Exception {

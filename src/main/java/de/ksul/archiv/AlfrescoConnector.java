@@ -70,6 +70,14 @@ public class AlfrescoConnector {
             return this.name;
         }
     }
+    private final static String DOCUMENT_SQL_STRING = "select d.*, o.*, c.*, i.* from my:archivContent as d " +
+            "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
+            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
+            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
+            "WHERE IN_FOLDER(d, ?) ";
+    private final static String FOLDER_SQL_STRING = "select d.*, o.* from cmis:folder as d " +
+            "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
+            "WHERE IN_FOLDER(d, ?) AND d.cmis:objectTypeId<>'F:cm:systemfolder'";
 
     private class IdHelper implements ObjectId {
         String id;
@@ -202,6 +210,24 @@ public class AlfrescoConnector {
         return sb.toString();
     }
 
+    /**
+     * prüft ob ein Folder Child Folder besitzt
+     * @param cmisObject
+     * @return boolean
+     */
+    public boolean hasChildFolder(CmisObject cmisObject ) {
+        if (cmisObject instanceof Document)
+            throw new IllegalArgumentException("Object must be of Folder Type");
+        StringBuilder query = new StringBuilder(FOLDER_SQL_STRING);
+        QueryStatement stmt = session.createQueryStatement(query.toString());
+        stmt.setString(1, cmisObject.getId());
+        DiscoveryService discoveryService = this.session.getBinding().getDiscoveryService();
+        return discoveryService.query(session.getRepositoryInfo().getId(), stmt.toString(),
+                false, operationContext.isIncludeAllowableActions(), operationContext.getIncludeRelationships(),
+                operationContext.getRenditionFilterString(), BigInteger.valueOf(1),
+                BigInteger.valueOf(0), null).getNumItems().longValue() > 0;
+    }
+
 
     /**
      * listet den Inhalt eines Folders
@@ -228,11 +254,7 @@ public class AlfrescoConnector {
                 break;
             }
             case VerteilungConstants.LIST_MODUS_DOCUMENTS:{  // nur Dokumente
-                StringBuilder query = new StringBuilder("select d.*, o.*, c.*, i.* from my:archivContent as d " +
-                                                            "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
-                                                            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
-                                                            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
-                                                            "WHERE IN_FOLDER(d, ?) ");
+                StringBuilder query = new StringBuilder(DOCUMENT_SQL_STRING);
 
                 query.append(" ORDER BY " + buildOrder(order, columns, modus));
                 QueryStatement stmt = session.createQueryStatement(query.toString());
@@ -242,9 +264,7 @@ public class AlfrescoConnector {
                 break;
             }
             case VerteilungConstants.LIST_MODUS_FOLDER: { // nur Folder
-                StringBuilder query = new StringBuilder("select d.*, o.* from cmis:folder as d " +
-                                                            "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
-                                                            "WHERE IN_FOLDER(d, ?) AND d.cmis:objectTypeId<>'F:cm:systemfolder'");
+                StringBuilder query = new StringBuilder(FOLDER_SQL_STRING);
 
                 query.append(" ORDER BY " + buildOrder(order, columns, modus));
                 QueryStatement stmt = session.createQueryStatement(query.toString());
@@ -263,13 +283,13 @@ public class AlfrescoConnector {
      * baut die Orderbedingung auf
      * @param order         die einzelnen Spalten nach denen sortiert werden soll
      * @param columns       die zu den Spalten gehörenden Feldnamen
-     * @param modus         der Modus
+     * @param modus         der Modus (1 == Dokumente 2 == Folder)
      * @return              die Sortierung als String
      */
     private String buildOrder(List<Order> order, List<Column> columns, int modus) {
         String orderString = "";
         if (order == null || order.isEmpty())
-            orderString = modus == 1? "my:documentDate" : "cmis:name" + " DESC";
+            orderString = modus == 1? "my:documentDate DESC, cmis:creationDate DESC" : "cmis:name" + " DESC";
         else  {
             StringBuilder sb = new StringBuilder();
             boolean first = true;
@@ -298,30 +318,40 @@ public class AlfrescoConnector {
 
         final DiscoveryService discoveryService = this.session.getBinding().getDiscoveryService();
         final ObjectFactory of = this.session.getObjectFactory();
-        final long totalNumItems =  discoveryService.query(session.getRepositoryInfo().getId(), stmt.toString(),
+        final ObjectList resultList = discoveryService.query(session.getRepositoryInfo().getId(), stmt.toString(),
                 false, operationContext.isIncludeAllowableActions(), operationContext.getIncludeRelationships(),
                 operationContext.getRenditionFilterString(), BigInteger.valueOf(Integer.MAX_VALUE),
-                BigInteger.valueOf(Long.MAX_VALUE), null).getNumItems().longValue();
+                BigInteger.valueOf(0), null);
+        final long totalNumItems = resultList.getNumItems().longValue();
 
         result = new CollectionIterable<CmisObject>(new AbstractPageFetcher<CmisObject>(operationContext.getMaxItemsPerPage()) {
 
             @Override
             protected Page<CmisObject> fetchPage(long skipCount) {
                 // fetch the data
-                ObjectList resultList = discoveryService.query(session.getRepositoryInfo().getId(), stmt.toString(),
+                /*ObjectList resultList = discoveryService.query(session.getRepositoryInfo().getId(), stmt.toString(),
                         false, operationContext.isIncludeAllowableActions(), operationContext.getIncludeRelationships(),
                         operationContext.getRenditionFilterString(), BigInteger.valueOf(this.maxNumItems),
-                        BigInteger.valueOf(skipCount), null);
+                        BigInteger.valueOf(skipCount), null);*/
 
                 // convert query results
+                long i = 0;
+                long k = 0;
                 List<CmisObject> page = new ArrayList<CmisObject>();
                 if (resultList.getObjects() != null) {
-                    for (ObjectData objectData : resultList.getObjects()) {
-                        if (objectData == null) {
-                            continue;
-                        }
 
-                        page.add(of.convertObject(objectData, operationContext));
+                    for (ObjectData objectData : resultList.getObjects()) {
+                        if (i >= skipCount) {
+                            if (objectData == null) {
+                                continue;
+                            }
+
+                            page.add(of.convertObject(objectData, operationContext));
+                            k++;
+                            if (k > maxNumItems)
+                                break;
+                        }
+                        i++;
                     }
                 }
 

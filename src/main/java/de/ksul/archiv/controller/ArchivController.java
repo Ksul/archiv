@@ -107,27 +107,6 @@ public class ArchivController {
     }
 
 
-
-    /**
-     * über diese Methode können die Alfresco Parameter nachträglich gesetzt werden.
-     * @param server         der Name des Alfresco Servers
-     * @param binding        der Binding teil der URL
-     * @param username       der verwendete Username
-     * @param password       das Passwort
-     */
-/*    public void setParameter(String server,
-                             String binding,
-                             String username,
-                             String password) {
-        this.con = new AlfrescoConnector(username, password, server, binding);
-        if (this.con.isConnected()) {
-            collectTitle();
-            logger.info("Connected to Alfresco Server!");
-        } else {
-            logger.info("Could not establish Connection to Alfresco Server!");
-        }
-    }*/
-
     /**
      * sucht alle Titel und stellt sie in einer Liste zur Verfügung
      */
@@ -1336,23 +1315,8 @@ public class ArchivController {
             operationContext.setIncludeAcls(false);
             operationContext.setIncludePolicies(false);
             operationContext.setIncludeAllowableActions(false);
-            ItemIterable<CmisObject> children = ((Folder) cmisObject).getChildren(operationContext);
-            o.put("hasChildren", children.getTotalNumItems() > 0);
-            boolean hasChildFolder = false;
-            boolean hasChildDocuments = false;
-            for (CmisObject childObject : children) {
-                if (childObject instanceof Folder) {
-                    hasChildFolder = true;
-                }
-                if (childObject instanceof Document) {
-                    hasChildDocuments = true;
-                }
-                if (hasChildDocuments && hasChildFolder)
-                    break;
-            }
-
+            boolean hasChildFolder = con.hasChildFolder(cmisObject);
             o.put("hasChildFolder", hasChildFolder);
-            o.put("hasChildDocuments", hasChildDocuments);
             // JsTree
             o.put("id", cmisObject.getId());
             o.put("children", hasChildFolder);
