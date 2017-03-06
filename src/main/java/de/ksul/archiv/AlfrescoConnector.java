@@ -348,7 +348,7 @@ public class AlfrescoConnector {
 
                             page.add(of.convertObject(objectData, operationContext));
                             k++;
-                            if (k > maxNumItems)
+                            if (k >= maxNumItems)
                                 break;
                         }
                         i++;
