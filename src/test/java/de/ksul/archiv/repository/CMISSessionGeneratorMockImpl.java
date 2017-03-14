@@ -568,6 +568,10 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             propertyCreationDate.setDisplayName("Creation Date ");
             GregorianCalendar cal = new GregorianCalendar();
             cal.setTime(new Date());
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+            }
             propertyCreationDate.setValue(cal);
             properties.addProperty(propertyCreationDate);
             objectData.setProperties(properties);

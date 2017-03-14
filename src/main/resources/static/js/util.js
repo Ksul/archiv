@@ -9,7 +9,7 @@
  */
 function checkServerStatus(url) {
 
-    var obj = executeService("isURLAvailable", null, [{"name":"server", "value":url}, {"name":"timeout", "value":"5000"}], null, true);
+    var obj = executeService({"name": "isURLAvailable", "ignoreError": true}, [{"name":"server", "value":url}, {"name":"timeout", "value":"5000"}]);
     return obj.data.toString() == "true";
 }
 
@@ -19,51 +19,51 @@ function checkServerStatus(url) {
  * der entsprechende Parameter wird dann nicht mehr übergeben und muss dann in der entsprechenden Servicemethode im
  * Applet aus dem internenen Spreicher besorgt werden. Bislang funktioniert dieses Verfahren aber nur mit einem
  * Parameter.
- * @param service           der Name des Service
- * @param done              Funktion, die ausgeführt werden soll, wenn der Aufruf asynchron erfolgen soll. Funktioniert
- *                          nur beim Servlet
+ * @param service           Json Object mit dem Service
+ *                          name            Name des Services
+ *                          callback        Funktion, die ausgeführt werden soll, wenn der Aufruf asynchron erfolgen soll
+ *                          errorMessage    Fehlermeldung
+ *                          successMessage  Erfolgsmeldung
+ *                          ignoreError     Flag, ob ein Fehler ignoriert werden soll
+ *                          direct          Flag, dass das Ergebnis direkt zurückgegegeben werden soll. In diesen Fällen kommt kein JSON zurück
  * @param params            die Parameter als JSON Objekt
  *                          name:  der Name des Parameters ( wird nur für das Servlet gebraucht)
  *                          value: der Inhalt des Paramaters
  *                          type: der Typ des Parameters
- * @param messages          Array mit Meldungen. Die erste ist die Fehlermeldung, der zweite Eintrag ist eine Erfolgsmeldung
- * @param ignoreError       Flag, ob ein Fehler ignoriert werden soll
- * @param direct            Flag, dass das Ergebnis direkt zurückgegegeben werden soll. In diesen Fällen kommt kein JSON zurück
- *                          und daher kann auch nichts überprüft werden.
  * @return das Ergebnis als JSON Objekt
- * Diese methode kann nicht aufgerufen werdeb bevor die abhängigen Bibliotheken geladen werden weil diese auch von der Methode
+ * Diese Methode kann nicht aufgerufen werdeb bevor die abhängigen Bibliotheken geladen werden weil diese auch von der Methode
  * benutzt werden. Dies ist unter anderem jQuery.
  */
-function executeService(service, done, params, messages, ignoreError, direct) {
+function executeService(service, params) {
     var json;
     var index;
     var errorMessage;
     var successMessage;
+    var done;
+    var url = "/Archiv/";
     var longParameter = false;
     var times = [];
     try {
-        if (exist(messages)) {
-            if (typeof messages == "object") {
-                if (messages.length == 2) {
-                    errorMessage = messages[0];
-                    successMessage = messages[1];
-                } else {
-                    errorMessage = messages[0];
-                }
-            } else if (typeof messages == "string") {
-                errorMessage = messages;
-            }
-        }
-        REC.log(DEBUG, "Execute: " + service);
+        if (service.errorMessage)
+            errorMessage = service.errorMessage;
+        if (service.successMessage)
+            successMessage = service.successMessage;
+        REC.log(DEBUG, "Execute: " + service.name);
         times.push(new Date().getTime());
         var asynchron = true;
-        if (!done) {
+        if (!service.callback) {
             asynchron = false;
             done = function (data) {
                 json = data;
             }
+        } else {
+            done = service.callback;
         }
-        // Aufruf über Servlet
+        if (service.url) {
+            url = service.url;
+            if (!url.endsWith("/"))
+                url = url + "/";
+        }
         var dataString = {};
         if (exist(params)) {
             for (index = 0; index < params.length; ++index) {
@@ -80,21 +80,21 @@ function executeService(service, done, params, messages, ignoreError, direct) {
             datatype: "json",
             cache: false,
             async: asynchron,
-            url: "/Archiv/" + service,
+            url: url + service.name,
             error: function (response) {
                 try {
-                    var r = jQuery.parseJSON(response.responseText);
-                    if (!ignoreError)
+                    var errorTxt = response.statusText;
+                    if (!service.ignoreError)
                         message("Fehler", "Path: " + r.path + "<br>Exception: " + r.exception + "<br>" + r.error +": " + r.message);
                     else {
-                        json = {error: r, success: false, data: null};
+                        json = {error: errorTxt, success: false, data: null};
                     }
                 } catch (e) {
                     var str = "FEHLER:\n";
                     str = str + e.toString() + "\n";
                     for (var prop in e)
                         str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
-                    if (!ignoreError)
+                    if (!service.ignoreError)
                         message("Fehler", str + "<br>" + response.responseText);
                     else {
                         json = {error: str, success: false, data: null};
@@ -102,20 +102,24 @@ function executeService(service, done, params, messages, ignoreError, direct) {
                 }
             },
             success: function (data) {
-                if (direct) {
+                if (service.direct) {
                     // es kommt keine JSON Struktur zurück
                     json = data;
                 } else if (!data.success) {
                     if (exist(errorMessage))
                         errorString = errorMessage + "<br>" + data.data;
-                    else
-                        errorString = data.data;
+                    else {
+                        if (data.data)
+                            errorString = data.data;
+                        if (data.error)
+                            errorString = data.error;
+                    }
                     // gibt es eine Fehlermeldung aus dem Service?
-                    if (data.error && !ignoreError) {
+                    if (data.error && !service.ignoreError) {
                         errorString = errorString + "<br>" + data.error;
                         REC.log(ERROR, data.error);
                     }
-                    if (!ignoreError) {
+                    if (!service.ignoreError) {
                         REC.log(ERROR, data.data);
                         fillMessageBox(true);
                     } else
@@ -133,11 +137,11 @@ function executeService(service, done, params, messages, ignoreError, direct) {
         });
 
         times.push(new Date().getTime());
-        REC.log(INFORMATIONAL, "Execution of Service: " + service + " duration " + (times[1] - times[0]) + " ms");
+        REC.log(INFORMATIONAL, "Execution of Service: " + service.name + " duration " + (times[1] - times[0]) + " ms");
         fillMessageBox(true);
         return json;
     } catch (e) {
-        var p = "Service: " + service + "<br>";
+        var p = "Service: " + service.name + "<br>";
         if (exist(params)) {
             for (index = 0; index < params.length; ++index) {
                 p = p + "Parameter: " + params[index].name;
@@ -151,7 +155,7 @@ function executeService(service, done, params, messages, ignoreError, direct) {
             p = errorMessage + "<br>" + e.toString() + "<br>" + p;
         else
             p = errorMessage + "<br>" + e.toString();
-        if (!ignoreError)
+        if (!service.ignoreError)
             errorHandler(e, p);
         return {error: e, success: false, data: null};
     }
@@ -418,21 +422,6 @@ function message(title, str, autoClose, height, width) {
 
     var $dialog = div.html(str).dialog(dialogSettings).css({height:height+"px", width:width+"px", overflow:"auto"});
     $dialog.dialog('open');
-}
-
-/**
- * setzt die Alfresco Parameter im Applet
- * @return       true   Operation war erfolgreich
- *               false  Operation war nicht erfolgreich
- */
-function setAppletParameter(){
-    var json = executeService("setParameter", null, [
-        {"name": "server", "value": server},
-        {"name": "binding", "value": binding},
-        {"name": "user", "value": user},
-        {"name": "password", "value": password}
-    ], "Alfresco Parameter konnten nicht im Applet gesetzt werden:");
-    return json.success;
 }
 
 

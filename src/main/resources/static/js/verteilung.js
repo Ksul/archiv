@@ -290,9 +290,9 @@ function readFiles(files) {
                         return function (evt) {
                             try {
                                 if (evt.target.readyState == FileReader.DONE) {// DONE == 2
-                                    var json = executeService("extractPDFContent", null, [
+                                    var json = executeService({"name": "extractPDFContent", "errorMessage": "PDF Datei konte nicht geparst werden:"}, [
                                         {"name": "content", "value": evt.target.result, "type": "byte"}
-                                    ], "PDF Datei konte nicht geparst werden:");
+                                    ]);
                                     if (json.success) {
                                         if (count == 1)
                                             loadText(evt.target.result, json.data, theFile.name, theFile.type, null);
@@ -315,12 +315,12 @@ function readFiles(files) {
                         return function (evt) {
                             try {
                                 if (evt.target.readyState == FileReader.DONE) {
-                                    var json = executeService("extractZIPAndExtractPDFToInternalStorage", null, [
+                                    var json = executeService({"name": "extractZIPAndExtractPDFToInternalStorage", "errorMessage": "ZIP Datei konte nicht entpackt werden:"}, [
                                         {"name": "content", "value": evt.target.result, "type": "byte"}
-                                    ], "ZIP Datei konte nicht entpackt werden:");
+                                    ]);
                                     if (json.success) {
                                         count = count + json.data - 1;
-                                        var json1 = executeService("getCompleteDataFromInternalStorage");
+                                        var json1 = executeService({"name": "getCompleteDataFromInternalStorage"});
                                         if (json1.success) {
                                             var erg = json1.data;
                                             for (var pos in erg) {
@@ -711,14 +711,14 @@ function sendRules() {
         var erg = false;
         if (currentRules.endsWith("doc.xml")) {
             vkbeautify.xml(rulesEditor.getSession().getValue());
-            var json = executeService("updateDocument", null, [
+            var json = executeService({"name": "updateDocument", "errorMessage": "Regeln konnten nicht übertragen werden:"}, [
                 {"name": "documentId", "value": rulesID},
                 {"name": "content", "value": rulesEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "text/xml"},
                 {"name": "extraProperties", "value": ""},
                 {"name": "versionState", "value": "minor"},
                 {"name": "versionComment", "value": ""}
-            ], "Regeln konnten nicht übertragen werden:");
+            ]);
             if (json.success) {
                 REC.log(INFORMATIONAL, "Regeln erfolgreich zum Server übertragen!");
                 rulesID = $.parseJSON(json.data).objectId;
@@ -747,10 +747,10 @@ function getRules(rulesId, loadLocal) {
             REC.log(INFORMATIONAL, "Regeln erfolgreich lokal gelesen!");
             fillMessageBox(true);
         } else {
-            var json = executeService("getDocumentContent", null, [
+            var json = executeService({"name": "getDocumentContent", "errorMessage": "Regeln konnten nicht gelesen werden:"}, [
                 {"name": "documentId", "value": rulesID},
                 {"name": "extract", "value": "false"}
-            ], "Regeln konnten nicht gelesen werden:");
+            ]);
             if (json.success) {
                 rulesEditor.getSession().setValue(json.data);
                 rulesEditor.getSession().foldAll(1);
@@ -828,9 +828,9 @@ function formatScript() {
 function openFile(file) {
     try {
         var name = convertPath(file);
-        var json = executeService("openFile", null, [
+        var json = executeService({"name": "openFile", "errorMessage": "Datei konnte nicht geöffnet werden:"}, [
             {"name": "filePath", "value": name}
-        ], "Datei konnte nicht geöffnet werden:");
+        ]);
         if (json.success) {
             REC.log(INFORMATIONAL, "Datei " + name + " erfolgreich geöffnet!");
             fillMessageBox(true);
@@ -852,10 +852,10 @@ function openFile(file) {
 function save(file, text) {
     try {
         var name =  convertPath(file);
-        var json = executeService("saveToFile", null, [
+        var json = executeService({"name": "saveToFile", "errorMessage": "Skript konnte nicht gespeichert werden:"}, [
             {"name": "filePath", "value": name},
             {"name": "content", "value": text}
-        ], "Skript konnte nicht gespeichert werden:");
+        ]);
         if (json.success) {
             REC.log(INFORMATIONAL, file + " erfolgreich gesichert!");
             fillMessageBox(true);
@@ -896,10 +896,10 @@ function handleRulesSelect(evt) {
  */
 function getScript() {
     var fetchScript = function () {
-        var json = executeService("getDocumentContent", null, [
+        var json = executeService({"name": "getDocumentContent", "errorMessage": "Skript konnte nicht gelesen werden:"}, [
             {"name": "documentId", "value": scriptID},
             {"name": "extract", "value": "false"}
-        ], "Skript konnte nicht gelesen werden:");
+        ]);
         if (json.success) {
             textEditor.getSession().setValue(json.data);
             REC.log(INFORMATIONAL, "Script erfolgreich heruntergeladen!");
@@ -953,10 +953,10 @@ function openScript() {
         } else {
             if (REC.exist(scriptID)) {
                 // ScriptID ist vorhanden, wir versuchen das Skript vom Alfresco Server zu laden
-                json = executeService("getDocumentContent", null, [
+                json = executeService({"name": "getDocumentContent", "errorMessage": "Skript konnte nicht gelesen werden:"}, [
                     {"name": "documentId", "value": scriptID},
                     {"name": "extract", "value": "false"}
-                ], "Skript konnte nicht gelesen werden:");
+                ]);
                 if (json.success) {
                     content = json.data;
                     read = true;
@@ -1019,14 +1019,14 @@ function sendScript() {
     try {
         var erg = false;
         if (workDocument.endsWith("recognition.js")) {
-            var json = executeService("updateDocument", null, [
+            var json = executeService({"name": "updateDocument", "errorMessage": "Skript konnte nicht zum Server gesendet werden:"}, [
                 {"name": "documentId", "value": scriptID},
                 {"name": "content", "value": textEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "application/javascript"},
                 {"name": "extraProperties", "value": ""},
                 {"name": "versionState", "value": "minor"},
                 {"name": "versionComment", "value": ""}
-            ], "Skript konnte nicht zum Server gesendet werden:");
+            ]);
             if (json.success) {
                 REC.log(INFORMATIONAL, "Script erfolgreich zum Server gesendet!");
                 scriptID = $.parseJSON(json.data).objectId;
@@ -1045,14 +1045,14 @@ function sendScript() {
  */
 function sendToInbox() {
     try {
-        var json = executeService("createDocument", null, [
+        var json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successmessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
             {"name": "documentId", "value": inboxFolderId},
             {"name": "fileName", "value": currentFile},
             {"name": "documentContent", "value": currentContent, "type": "byte"},
             {"name": "mimeType", "value": "application/pdf"},
             {"name": "extraCMSProperties", "value": ""},
             {"name": "versionState", "value": "none"}
-        ], ["Dokument konnte nicht auf den Server geladen werden:", "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"]);
+        ]);
     } catch (e) {
         errorHandler(e);
     }

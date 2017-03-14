@@ -67,7 +67,7 @@ function handleDropInbox(evt) {
                 return function (evt) {
                     if (evt.target.readyState == FileReader.DONE) {
                         var content = evt.target.result;
-                        var json = executeService("createDocument", null,[
+                        var json = executeService({"name": "createDocument", "errorMessage": "Dokument konnten nicht im Alfresco angelegt werden!"},[
                             {"name": "documentId", "value":inboxFolderId},
                             {"name": "fileName", "value": f.name},
                             {"name": "content", "value": base64EncArr(strToUTF8Arr(content))},
@@ -75,7 +75,7 @@ function handleDropInbox(evt) {
                             {"name": "extraProperties", "value": "{}"},
                             {"name": "versionState", "value": "major"}
 
-                        ], "Dokument konnten nicht im Alfresco angelegt werden!");
+                        ]);
                     }
 
                 }  })(f);
@@ -551,9 +551,9 @@ function loadAlfrescoTable() {
         try {
             event.preventDefault();
             event.stopImmediatePropagation();
-            var erg = executeService("openDocument", null, [
+            var erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
                 {"name": "documentId", "value": alfrescoTabelle.row($(obj).closest('tr')).data().objectID}
-            ], ["Dokument konnten nicht geöffnet werden!"]);
+            ]);
             if (erg.success) {
                 var  file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
                 var fileURL = URL.createObjectURL(file);
@@ -726,7 +726,7 @@ function loadAlfrescoTable() {
                                 image.className = "alfrescoTableThumbnailEvent alfrescoTableDragable treeDropable";
                                 image.draggable = true;
                                 image.style.cursor = "pointer";
-                                image.src = "data:image/png;base64," + executeService("getThumbnail", null, [
+                                image.src = "data:image/png;base64," + executeService({"name": "getThumbnail"}, [
                                         {"name": "documentId", "value": row.objectID}]).data;
                                 $('#alfrescoTabelle tbody').on( 'click', '#' + image.id, function (event) {
                                     openDocument(this, event);
@@ -1044,9 +1044,9 @@ function loadAlfrescoSearchTable() {
         try {
             event.preventDefault();
             event.stopImmediatePropagation();
-            var erg = executeService("openDocument", null, [
+            var erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
                 {"name": "documentId", "value": alfrescoSearchTabelle.row($(obj).closest('tr')).data().objectID}
-            ], ["Dokument konnten nicht geöffnet werden!"]);
+            ]);
             if (erg.success) {
                 var  file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
                 var fileURL = URL.createObjectURL(file);
@@ -1216,7 +1216,7 @@ function loadAlfrescoSearchTable() {
                                 image.className = "alfrescoSearchTableThumbnailEvent";
                                 image.draggable = true;
                                 image.style.cursor = "pointer";
-                                image.src = "data:image/png;base64," + executeService("getThumbnail", null, [
+                                image.src = "data:image/png;base64," + executeService({"name": "getThumbnail"}, [
                                         {"name": "documentId", "value": row.objectID}]).data;
                                 $('#alfrescoSearchTabelle tbody').on( 'click', '#' + image.id, function (event) {
                                     openDocument(this, event);
@@ -1984,10 +1984,10 @@ function editDocument(input, id) {
             }
 
         };
-        erg = executeService("updateProperties", done, [
+        erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Dokument konnte nicht aktualisiert werden!", "ignoreError": true}, [
             {"name": "documentId", "value": id},
             {"name": "extraProperties", "value": JSON.stringify(extraProperties)}
-        ], "Dokument konnte nicht aktualisiert werden!", true);
+        ]);
      } catch (e) {
         errorHandler(e);
     }
@@ -2010,9 +2010,9 @@ function deleteDocument() {
                     row.remove().draw(false);
             }
         };
-        var erg = executeService("deleteDocument", done, [
+        var erg = executeService({"name": "deleteDocument", "callback": done, "errorMessage": "Dokument konnte nicht gelöscht werden!"}, [
             {"name": "documentId", "value": origData.objectID}
-        ], ["Dokument konnte nicht gelöscht werden!"]);
+        ]);
      } catch (e) {
         errorHandler(e);
     }
@@ -2054,10 +2054,10 @@ function createFolder(input, origData) {
                     fillBreadCrumb(lastElement.data().data);
             }
         };
-        var erg = executeService("createFolder", done, [
+        var erg = executeService({"name": "createFolder", "callback": done, "errorMessage": "Ordner konnte nicht erstellt werden!"}, [
             {"name": "documentId", "value": origData.objectId},
             {"name": "extraProperties", "value": JSON.stringify(extraProperties)}
-        ], "Ordner konnte nicht erstellt werden!", false);
+        ]);
      } catch (e) {
         errorHandler(e);
     }
@@ -2082,7 +2082,7 @@ function editFolder(input, id) {
                 'cm:description': input.description
             }
         };
-        var done = new function (json) {
+        var done = function (json) {
             if (json.success) {
                 var lastElement = $("#breadcrumblist").children().last();
                 var newData = json.data;
@@ -2108,10 +2108,10 @@ function editFolder(input, id) {
             }
 
         };
-        erg = executeService("updateProperties", done,[
+        erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Ordner konnte nicht aktualisiert werden!", "ignoreError": true}, done,[
             {"name": "documentId", "value": id},
             {"name": "extraProperties", "value": JSON.stringify(extraProperties)}
-        ], "Ordner konnte nicht aktualisiert werden!", true);
+        ]);
       } catch (e) {
         errorHandler(e);
     }
@@ -2126,7 +2126,7 @@ function editFolder(input, id) {
 function deleteFolder() {
     try {
         var origData = $("#dialogBox").alpaca().data;
-        var done = new function (json) {
+        var done = function (json) {
             if (json.success) {
                 var lastElement = $("#breadcrumblist").children().last();
                 // Tree updaten
@@ -2150,9 +2150,9 @@ function deleteFolder() {
             }
 
         }
-        var erg = executeService("deleteFolder", done, [
+        var erg = executeService({"name": "deleteFolder", "callback": done, "errorMessage": "Ordner konnte nicht gelöscht werden!"}, [
             {"name": "documentId", "value": origData.objectID}
-        ], "Ordner konnte nicht gelöscht werden!", false);
+        ]);
     } catch (e) {
         errorHandler(e);
     }
@@ -2180,10 +2180,10 @@ function switchAlfrescoDirectory(data) {
             $("#tree").jstree('select_node', objectID);
 
         };
-        var json = executeService("listFolder", done, [
+        var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
             {"name": "filePath", "value": objectID},
             {"name": "withFolder", "value": -1}
-        ], "Verzeichnis konnte nicht aus dem Server gelesen werden:");
+        ]);
         if (objectID != -1) {
             var len = calculateTableHeight("alfrescoCenterCenterCenter", "dtable2", alfrescoTabelle, "alfrescoTabelleHeader", "alfrescoTableFooter");
             alfrescoTabelle.page.len(len);
@@ -2276,12 +2276,12 @@ function handleAlfrescoImageClicks() {
         try {
             var tr = $(this).closest('tr');
             // Kommentare lesen
-            var json = executeService("getComments", null, [
+            var json = executeService({"name": "getComments", "errorMessage": "Kommentare konnten nicht gelesen werden!"}, [
                 {
                     "name": "documentId",
                     "value": $('#' + tr[0].parentElement.parentElement.id).DataTable().row(tr).data().objectID
                 }
-            ], ["Kommentare konnten nicht gelesen werden!"]);
+            ]);
             if (json.success) {
                 startCommentsDialog(json.data);
             }
@@ -2305,10 +2305,10 @@ function handleAlfrescoImageClicks() {
             var tr = $(this).closest('tr');
             var tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
             var id = tabelle.row(tr).data().objectID;
-            var json = executeService("getDocumentContent", null, [
+            var json = executeService({"name": "getDocumentContent", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
                 {"name": "documentId", "value": tabelle.row(tr).data().objectID},
                 {"name": "extract", "value": "true"}
-            ], ["Dokument konnten nicht gelesen werden!"]);
+            ]);
             if (json.success) {
                 loadText(json.data, json.data, tabelle.row(tr).data().name, tabelle.row(tr).data().contentStreamMimeType, null);
                 tabLayout.tabs("option", "active", 2);
@@ -2330,9 +2330,9 @@ function handleAlfrescoImageClicks() {
             if (data && data.parents) {
                 var node = tree.get_node(data.parents[0].objectId);
                 while (!node) {
-                    var json = executeService("getNodeById", null, [
+                    var json = executeService({"name": "getNodeById", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
                         {"name": "documentId", "value": data.parents[0].objectId}
-                    ], ["Dokument konnten nicht gelesen werden!"]);
+                    ]);
                     if (json.success) {
                         data = json.data;
                         results.push(data);
@@ -2489,9 +2489,9 @@ function handleVerteilungImageClicks() {
             var tr = $(this).closest('tr');
             var row = tabelle.row(tr).data();
             var name = row[1];
-            var erg = executeService("openPDF", null, [
+            var erg = executeService({"name": "openPDF", "errorMessage": "Dokument konnte nicht geöffnet werden!"}, [
                 {"name": "fileName", "value": daten[name].file}
-            ], ["Dokument konnte nicht geöffnet werden!"]);
+            ]);
             if (erg.success) {
                 var file = new Blob([base64DecToArr(erg.data)], {type: erg.mimeType});
                 var fileURL = URL.createObjectURL(file);
@@ -2507,14 +2507,14 @@ function handleVerteilungImageClicks() {
             var row = tabelle.row(tr).data();
             var name = row[1];
             var docId = "workspace:/SpacesStore/" + daten[name]["container"];
-            var json = executeService("createDocument", null, [
+            var json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successMessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
                 {"name": "documentId", "value": inboxFolderId},
                 { "name": "fileName", "value": name},
                 { "name": "documentContent", "value": daten[name].content, "type": "byte"},
                 { "name": "documentType", "value": "application/pdf"},
                 { "name": "extraCMSProperties", "value": ""},
                 { "name": "versionState", "value": "major"}
-            ], ["Dokument konnte nicht auf den Server geladen werden:", "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"]);
+            ]);
         } catch (e) {
             errorHandler(e);
         }
@@ -2627,10 +2627,10 @@ function loadAndConvertDataForTree(aNode, callBack) {
                         message("Fehler", "Folder konnte nicht erfolgreich im Alfresco gelesen werden!");
                     }    
                 };
-                var json = executeService("listFolder", done, [
+                var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
                     {"name": "filePath", "value": aNode.id != "#" ? aNode.id : archivFolderId},
                     {"name": "withFolder", "value": -1}
-                ], "Verzeichnis konnte nicht aus dem Server gelesen werden:");
+                ]);
             }
         }
     } catch (e) {
@@ -2963,7 +2963,7 @@ function loadAlfrescoTree() {
                 var nodeId = data.node.data.objectID;
                 var parentId = data.node.data.parentId;
                 var destinationId = data.parent;
-                var done = new function (json) {
+                var done = function (json) {
                     if (json.success) {
                         var newData = json.data;
                         var source = json.source;
@@ -2983,11 +2983,11 @@ function loadAlfrescoTree() {
                         data.node.data = newData;
                     }
                 }
-                executeService("moveNode", done, [
+                executeService({"name": "moveNode", "callback": done, "errorMessage": "Ordner konnte nicht verschoben werden:"}, [
                     {"name": "documentId", "value": nodeId},
                     {"name": "currentLocationId", "value": parentId},
                     {"name": "destinationId", "value": destinationId}
-                ], "Ordner konnte nicht verschoben werden:");
+                ]);
             } catch (e) {
                 errorHandler(e);
             }
@@ -3065,11 +3065,11 @@ function loadAlfrescoTree() {
                                     }
                                 };
                                 //Dokument wurde verschoben
-                                var json = executeService("moveNode", done, [
+                                var json = executeService({"name": "moveNode", "callback": done, "errorMessage": "Dokument konnte nicht verschoben werden:"}, [
                                     {"name": "documentId", "value": sourceData.objectID},
                                     {"name": "currentLocationId", "value": sourceData.parentId},
                                     {"name": "destinationId", "value": targetData.objectID}
-                                ], "Dokument konnte nicht verschoben werden:");
+                                ]);
 
                             }
                         }
@@ -3122,20 +3122,20 @@ function checkAndBuidAlfrescoEnvironment() {
      * @return {{result, success}| das Ergebnis}
      */
     function buildAlfrescoFolder(folder, id, txt) {
-        var erg = executeService("getNodeId", null, [
+        var erg = executeService({"name": "getNodeId", "ignoreError": true}, [
             {"name": "filePath", "value": folder}
-        ], null, true);
+        ]);
         if (!erg.success) {
             var name = folder.split("/").pop();
             var extraProperties = "{'cmis:folder': {'cmis:name': '" + name +"'}, 'P:cm:titled':{'cm:title': '" + name +"', 'cm:description':'" + txt + "'}}"
-            erg = executeService("createFolder", null, [
+            erg = executeService({"name": "createFolder"}, [
                 {"name": "documentId", "value": id},
                 {"name": "extraProperties", "value": extraProperties}
             ]);
             if (erg.success) {
-                erg = executeService("getNodeId", null, [
+                erg = executeService({"name": "getNodeId", "errorMessage": txt + " konnte nicht gefunden werden:"}, [
                     {"name": "filePath", "value": folder}
-                ], txt + " konnte nicht gefunden werden:");
+                ]);
                 if (!erg.success)
                     REC.log(WARN, txt + " konnte auf dem Alfresco Server nicht gefunden werden!");
             }
@@ -3146,7 +3146,7 @@ function checkAndBuidAlfrescoEnvironment() {
     
     var ret, erg;
     // ist schon ein Alfresco Server verbunden?
-    erg = executeService("isConnected", null, []);
+    erg = executeService({"name": "isConnected"});
     if (erg.success && erg.data) {
         alfrescoServerAvailable = true;
     }
@@ -3157,7 +3157,7 @@ function checkAndBuidAlfrescoEnvironment() {
         // Ticket besorgen
         if (exist(getSettings("user")) && exist(getSettings("password")) && exist(getSettings("server"))) {
             //TODO
-            erg = executeService("getTicketWithUserAndPassword", null,
+            erg = executeService({"name": "getTicketWithUserAndPassword"},
                 [{"name": "user", "value": getSettings("user")},
                     {"name": "password", "value": getSettings("password")},
                     {"name": "server", "value": getSettings("server")}
@@ -3166,12 +3166,12 @@ function checkAndBuidAlfrescoEnvironment() {
                 // Binding prüfen
                 if (alfrescoServerAvailable && exist(getSettings("binding")))
                 if (checkServerStatus(getSettings("binding") + "?alf_ticket=" + erg.data)) {
-                    erg = executeService("setParameter", null, [
+                    erg = executeService({"name": "setParameter", "errorMessage" : "Parameter für die Services konnten nicht gesetzt werden:"}, [
                         {"name": "server", "value": getSettings("server")},
                         {"name": "binding", "value": getSettings("binding")},
                         {"name": "user", "value": getSettings("user")},
                         {"name": "password", "value": getSettings("password")}
-                    ], "Parameter für die Services konnten nicht gesetzt werden:");
+                    ]);
                     if (!erg.success) {
                         REC.log(WARN, "Binding Parameter konnten nicht gesetzt werden!");
                     } else
@@ -3188,9 +3188,9 @@ function checkAndBuidAlfrescoEnvironment() {
     if (alfrescoServerAvailable) {
         var extraProperties;
         // Skript Verzeichnis prüfen
-        erg = executeService("getNodeId", null, [
+        erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
             {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
-        ], null, true);
+        ]);
         if (erg.success)
             scriptFolderId = erg.data;
         else {
@@ -3198,9 +3198,9 @@ function checkAndBuidAlfrescoEnvironment() {
         }
         // Verteilskript prüfen
         if (erg.success) {
-            erg = executeService("getNodeId", null, [
+            erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
                 {"name": "filePath", "value": "/Datenverzeichnis/Skripte/recognition.js"}
-            ], null, true);
+            ]);
             if (!erg.success) {
                 var script;
                 if (isLocal())
@@ -3212,7 +3212,7 @@ function checkAndBuidAlfrescoEnvironment() {
                     }).responseText;
                 }
                 if (exist(script) && script.length > 0) {
-                    erg = executeService("createDocument", null, [
+                    erg = executeService({"name" : "createDocument", "errorMessage" : "Verteilungsskript konnte nicht erstellt werden!"}, [
                         {"name": "documentId", "value": scriptFolderId},
                         {"name": "fileName", "value": "recognition.js"},
                         {"name": "content", "value": base64EncArr(strToUTF8Arr(script))},
@@ -3222,7 +3222,7 @@ function checkAndBuidAlfrescoEnvironment() {
                             "value": "{'cmis:document':{'cmis:name': 'recognition.js'},'P:cm:titled':{'cm:description':'Skript zum Verteilen der Dokumente'}}"
                         },
                         {"name": "versionState", "value": "major"}
-                    ], "Verteilungsskript konnte nicht erstellt werden!");
+                    ]);
                     if (erg.success)
                         scriptID = $.parseJSON(erg.data).objectId;
                     else {
@@ -3236,9 +3236,9 @@ function checkAndBuidAlfrescoEnvironment() {
         }
         if (erg.success) {
             // Regeln prüfen
-            erg = executeService("getNodeId", null, [
+            erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
                 {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
-            ], null, true);
+            ]);
             if (!erg.success) {
                 var doc;
                 if (isLocal())
@@ -3250,7 +3250,7 @@ function checkAndBuidAlfrescoEnvironment() {
                     }).responseText;
                 }
                 if (exist(doc) && doc.length > 0) {
-                    erg = executeService("createDocument", null, [
+                    erg = executeService({"name" : "createDocument", "errorMessage" : "Verteilungsregeln konnten nicht erstellt werden!"}, [
                         {"name": "documentId", "value": scriptFolderId},
                         {"name": "fileName", "value": "doc.xml"},
                         {"name": "content", "value": base64EncArr(strToUTF8Arr(doc))},
@@ -3261,7 +3261,7 @@ function checkAndBuidAlfrescoEnvironment() {
                         },
                         {"name": "versionState", "value": "major"}
 
-                    ], "Verteilungsregeln konnten nicht erstellt werden!");
+                    ]);
                     if (erg.success)
                         rulesID = $.parseJSON(erg.data).objectId;
                     else {
@@ -3275,9 +3275,9 @@ function checkAndBuidAlfrescoEnvironment() {
         }
         if (erg.success) {
             // Archiv prüfen
-            erg = executeService("getNodeId", null, [
+            erg = executeService({"name" : "getNodeId", "errorMessage" : "Archiv konnte nicht gefunden werden:"}, [
                 {"name": "filePath", "value": "/"}
-            ], "Archiv konnte nicht gefunden werden:");
+            ]);
             if (erg.success) {
                 alfrescoRootFolderId = erg.data;
             } else {
@@ -3356,9 +3356,9 @@ function checkAndBuidAlfrescoEnvironment() {
 function initApplication() {
     var erg;
     try {
-        erg = executeService("isConnected", null, [], null, true);
+        erg = executeService({"name": "isConnected", "ignoreError": true});
         if (erg.success && erg.data) {
-            erg = executeService("getConnection", null, [], null, true);
+            erg = executeService({"name": "getConnection", "ignoreError": true});
             if (erg.success) {
                 settings = {
                     "settings": [

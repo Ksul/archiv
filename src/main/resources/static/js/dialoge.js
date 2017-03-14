@@ -295,8 +295,7 @@ function startDocumentDialog(data, modus, modal) {
                                 "type": "local",
                                 "source": function(query) {
                                     var results = [];
-                                    var json = executeService("getTitles", null, [
-                                    ], null, true);
+                                    var json = executeService({"name": "getTitles", "ignoreError": true});
                                     for (var i = 0; i < json.data.length; i++) {
                                         results.push({
                                             "value": json.data[i]

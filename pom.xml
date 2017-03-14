@@ -170,6 +170,20 @@
 				<configuration>
 					<executable>true</executable>
 				</configuration>
+				<executions>
+					<execution>
+						<id>pre-integration-test</id>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>post-integration-test</id>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
@@ -181,7 +195,7 @@
 				<version>1.8</version>
 				<executions>
 					<execution>
-						<phase>test</phase>
+						<phase>integration-test</phase>
 						<goals>
 							<goal>start</goal>
 						</goals>

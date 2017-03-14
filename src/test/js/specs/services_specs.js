@@ -5,11 +5,11 @@
 describe("Test für die Rest Services", function() {
 
     it("getNodeId", function () {
-    var json =   erg = executeService("getNodeId", null, [
-        {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
-    ], null, true);
+    var json =   erg = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true},  [
+        {"name": "filePath", "value": "/Archiv/Unbekannt"}
+    ]);
 
-        //expect(json.success).toBe(true);
+        expect(json.success).toBe(true);
     });
 
 });
