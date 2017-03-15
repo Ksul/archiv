@@ -26,11 +26,16 @@ function checkServerStatus(url) {
  *                          successMessage  Erfolgsmeldung
  *                          ignoreError     Flag, ob ein Fehler ignoriert werden soll
  *                          direct          Flag, dass das Ergebnis direkt zurückgegegeben werden soll. In diesen Fällen kommt kein JSON zurück
+ *                          url             Url für den Aufruf Wird eigentlich nur für Tests gebraucht
  * @param params            die Parameter als JSON Objekt
  *                          name:  der Name des Parameters ( wird nur für das Servlet gebraucht)
  *                          value: der Inhalt des Paramaters
  *                          type: der Typ des Parameters
  * @return das Ergebnis als JSON Objekt
+ *                          data            das Ergebnis der Anbfrage
+ *                          success         Boolean der den Erfolg der Services speichert
+ *                          error           eventuelle Fehler
+ *                          duration        die Zeit, die der Service gebraucht hat
  * Diese Methode kann nicht aufgerufen werdeb bevor die abhängigen Bibliotheken geladen werden weil diese auch von der Methode
  * benutzt werden. Dies ist unter anderem jQuery.
  */
@@ -85,7 +90,7 @@ function executeService(service, params) {
                 try {
                     var errorTxt = response.statusText;
                     if (!service.ignoreError)
-                        message("Fehler", "Path: " + r.path + "<br>Exception: " + r.exception + "<br>" + r.error +": " + r.message);
+                        message("Fehler", "Path: " + response.path + "<br>Exception: " + response.exception + "<br>" + response.error +": " + response.message);
                     else {
                         json = {error: errorTxt, success: false, data: null};
                     }
@@ -126,6 +131,10 @@ function executeService(service, params) {
                         data.error = errorString;
                     json = data;
                 } else {
+                    times.push(new Date().getTime());
+                    data.duration = times[1] - times[0];
+                    REC.log(INFORMATIONAL, "Execution of Service: " + service.name + " duration " + (times[1] - times[0]) + " ms");
+                    fillMessageBox(true);
                     if (exist(successMessage)) {
                         REC.log(INFORMATIONAL, successMessage);
                         fillMessageBox(true);
@@ -135,10 +144,6 @@ function executeService(service, params) {
 
             }
         });
-
-        times.push(new Date().getTime());
-        REC.log(INFORMATIONAL, "Execution of Service: " + service.name + " duration " + (times[1] - times[0]) + " ms");
-        fillMessageBox(true);
         return json;
     } catch (e) {
         var p = "Service: " + service.name + "<br>";

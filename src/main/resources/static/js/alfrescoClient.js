@@ -566,6 +566,7 @@ function loadAlfrescoTable() {
     }
 
     try {
+        var duration;
         $.fn.dataTable.moment('DD.MM.YY');
         alfrescoTabelle = $('#alfrescoTabelle').DataTable({
             "jQueryUI": false,
@@ -592,7 +593,13 @@ function loadAlfrescoTable() {
                     data.filePath = meta.oInit.filePath;
                     data.withFolder = meta.oInit.withFolder;
                     data.itemsToSkip = meta.oInit.itemsToSkip;
+                    duration = new Date().getTime();
                     return JSON.stringify(data);
+                },
+                dataSrc: function (data) {
+                    REC.log(INFORMATIONAL, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
+                    fillMessageBox(true);
+                    return data.data;
                 },
                 dataType: "json",
                 processData: false,
@@ -1060,6 +1067,7 @@ function loadAlfrescoSearchTable() {
 
 
     try {
+        var duration;
         $.fn.dataTable.moment('DD.MM.YY');
         alfrescoSearchTabelle = $('#alfrescoSearchTabelle').DataTable({
             "jQueryUI": false,
@@ -1084,7 +1092,13 @@ function loadAlfrescoSearchTable() {
                 data: function (data, meta) {
                     data.filePath = meta.oInit.itemsToSkip;
                     data.cmisQuery = meta.oInit.cmisQuery;
+                    duration = new Date().getTime();
                     return JSON.stringify(data);
+                },
+                dataSrc: function (data) {
+                    REC.log(INFORMATIONAL, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
+                    fillMessageBox(true);
+                    return data.data;
                 },
                 dataType: "json",
                 processData: false,
