@@ -78,7 +78,7 @@
 
     $(document).ready(function() {
         obj = executeService({"name": "getNodeId", "errorMessage": "Archiv konnte nicht gefunden werden:" }, [
-            {"name": "filePath", "value": "/Archiv/Unbekannt"}
+            {"name": "folderId", "value": "/Archiv/Unbekannt"}
         ]);
         $('#dynamic').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
         tabelle = $('#example').DataTable( {
@@ -92,7 +92,7 @@
                 "url": "/Archiv/listFolderWithPagination",
                 type: "POST",
                 data: function (data) {
-                    data.filePath = obj.data;
+                    data.folderId = obj.data;
                     data.withFolder = 1;
                     data.itemsToSkip = 0;
                     return JSON.stringify(data);

@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -54,7 +55,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         buildDocument("CDocument", folder);
         buildDocument("DDocument", folder);
         DataTablesRequest dataTablesRequest = new DataTablesRequest();
-        dataTablesRequest.setFilePath(folder.getId());
+        dataTablesRequest.setFolderId(folder.getId());
         dataTablesRequest.setWithFolder(VerteilungConstants.LIST_MODUS_DOCUMENTS);
         dataTablesRequest.setLength(2);
         dataTablesRequest.setStart(0);
@@ -87,7 +88,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         buildDocument("TestDocument2", folder);
         buildTestFolder("FolderTest", folder);
         DataTablesRequest dataTablesRequest = new DataTablesRequest();
-        dataTablesRequest.setFilePath(folder.getId());
+        dataTablesRequest.setFolderId(folder.getId());
         dataTablesRequest.setWithFolder(VerteilungConstants.LIST_MODUS_FOLDER);
         dataTablesRequest.setLength(-1);
         DataTablesResponse obj = services.listFolder(dataTablesRequest);
@@ -142,6 +143,11 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
+        request.setFilePath("/xyz");
+        obj = services.getNodeId(request);
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(false));
+        assertThat(obj.getData(), nullValue());
     }
 
 
@@ -188,6 +194,11 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
+        request.setFilePath("/xyz");
+        obj = services.getNodeId(request);
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(false));
+        assertThat(obj.getData(), nullValue());
     }
 
 
@@ -256,7 +267,10 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     public void testCreateDocument() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
         String content = "Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?";
-        String extraProperties = "{\"P:cm:titled\":{\"cm:description\":\"Testdokument\"}}";
+        Map<String, Object> p1 = new HashMap<>();
+        p1.put("cm:description", "Testdokument");
+        Map<String, Object> extraProperties = new HashMap<>();
+        extraProperties.put("P:cm:titled", p1);
         RestRequest request = new RestRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
@@ -291,7 +305,20 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     public void testCreateDocumentWithCustomModel() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
         String content = "Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?";
-        String extraProperties = "{\"P:cm:titled\":{\"cm:description\":\"Testdokument\"}, \"P:cm:emailed\":{\"cm:sentdate\":\"" + new Date().getTime() + "\"}, \"P:my:amountable\":{\"my:amount\":\"25.33\"}, \"D:my:archivContent\":{\"my:person\":\"Katja\", \"my:documentDate\":\"" + new Date().getTime() + "\"}}";
+        Map<String, Object> p1 = new HashMap<>();
+        p1.put("cm:description", "Testdokument");
+        Map<String, Object> p2 = new HashMap<>();
+        p2.put("cm:sentdate", new Date().getTime());
+        Map<String, Object> p3 = new HashMap<>();
+        p3.put("my:amount", 25.33);
+        Map<String, Object> p4 = new HashMap<>();
+        p4.put("my:person", "Katja");
+        p4.put("my:documentDate", new Date().getTime());
+        Map<String, Object> extraProperties = new HashMap<>();
+        extraProperties.put("P:cm:titled", p1);
+        extraProperties.put("P:cm:emailed", p2);
+        extraProperties.put("P:my:amountable", p3);
+        extraProperties.put("D:my:archivContent", p4);
         RestRequest request = new RestRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
@@ -330,8 +357,14 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        String extraProperties = "{\"cmis:folder\":{\"cmis:name\": \"Testfolder\"}, \"P:cm:titled\":{\"cm:title\": \"Testtitel\", \"cm:description\":\"Dies ist ein ArchivControllerTest Folder\"}}";
-
+        Map<String, Object> p1 = new HashMap<>();
+        p1.put("cm:title", "Testtitel");
+        p1.put("cm:description", "Dies ist ein ArchivControllerTest Folder");
+        Map<String, Object> p2 = new HashMap<>();
+        p2.put("cmis:name", "Testfolder");
+        Map<String, Object> extraProperties = new HashMap<>();
+        extraProperties.put("cmis:folder", p2);
+        extraProperties.put("P:cm:titled", p1);
         request.setDocumentId((String) obj.getData());
         request.setExtraProperties(extraProperties);
         obj = services.createFolder(request);
@@ -354,7 +387,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         CmisObject folder = buildTestFolder("TestFolder", null);
         Document document = (Document) buildDocument("TestDocument", folder);
 
-        String extraProperties;
+
         String content = "Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?";
         RestRequest request = new RestRequest();
         request.setDocumentId(document.getId());
@@ -379,7 +412,11 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        extraProperties = "{\"D:my:archivContent\":{\"my:person\":\"Katja\", \"my:documentDate\":\"" + new Date().getTime() + "\"}}";
+        Map<String, Object> p4 = new HashMap<>();
+        p4.put("my:person", "Katja");
+        p4.put("my:documentDate", new Date().getTime());
+        Map<String, Object> extraProperties = new HashMap<>();
+        extraProperties.put("D:my:archivContent", p4);
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
         request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
@@ -407,8 +444,20 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(data, Matchers.notNullValue());
         assertThat(data.get("versionLabel"), equalTo("2.0"));
         assertThat(data.get("checkinComment"), equalTo("neuer Versionskommentar"));
-        extraProperties = "{\"P:cm:titled\":{\"cm:description\":\"Testdokument\"}, \"P:cm:emailed\":{\"cm:sentdate\":\"" + new Date().getTime() + "\"}, \"P:my:amountable\":{\"my:amount\":\"25.33\", \"my:tax\":\"true\"}, \"D:my:archivContent\":{\"my:person\":\"Katja\", \"my:documentDate\":\"" + new Date().getTime() + "\"}}";
-
+        extraProperties.clear();
+        Map<String, Object> p1 = new HashMap<>();
+        p1.put("cm:description", "Testdokument");
+        Map<String, Object> p2 = new HashMap<>();
+        p2.put("cm:sentdate", new Date().getTime());
+        Map<String, Object> p3 = new HashMap<>();
+        p3.put("my:amount", 25.33);
+        p3.put("my:tax", true);
+        p4.put("my:person", "Katja");
+        p4.put("my:documentDate", new Date().getTime());
+        extraProperties.put("P:cm:titled", p1);
+        extraProperties.put("P:cm:emailed", p2);
+        extraProperties.put("P:my:amountable", p3);
+        extraProperties.put("D:my:archivContent", p4);
         request.setDocumentId((String) data.get("objectId"));
         request.setContent(null);
         request.setExtraProperties(extraProperties);
@@ -435,9 +484,15 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     @Test
     public void testChangeFolder() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
-
-        String extraProperties = "{\"cmis:folder\":{\"cmis:objectTypeId\": \"cmis:folder\",\"cmis:name\": \"FolderTest\"}, \"P:cm:titled\": {\"cm:title\": \"Titel\",\"cm:description\": \"Beschreibung\" }}";
-
+       Map<String, Object> p1 = new HashMap<>();
+        p1.put("cm:title", "Titel");
+        p1.put("cm:description", "Beschreibung");
+        Map<String, Object> p2 = new HashMap<>();
+        p2.put("cmis:objectTypeId", "cmis:folder");
+        p2.put("cmis:name", "FolderTest");
+        Map<String, Object> extraProperties = new HashMap<>();
+        extraProperties.put("cmis:folder", p2);
+        extraProperties.put("P:cm:titled", p1);
         RestRequest request = new RestRequest();
         request.setDocumentId(folder.getId());
         request.setExtraProperties(extraProperties);
@@ -447,8 +502,13 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj.getData(), notNullValue());
         folder.refresh();
         assertThat(folder.getName(), is(("FolderTest")));
-
-        extraProperties = "{\"cmis:folder\":{\"cmis:objectTypeId\": \"cmis:folder\",\"cmis:name\": \"TestFolder\"}, \"P:cm:titled\": {\"cm:title\": \"\",\"cm:description\": \"\" }}";
+        extraProperties.clear();
+        p1.put("cm:title", "");
+        p1.put("cm:description", "");
+        p2.put("cmis:objectTypeId", "cmis:folder");
+        p2.put("cmis:name", "Testfolder");
+        extraProperties.put("cmis:folder", p2);
+        extraProperties.put("P:cm:titled", p1);
         request.setDocumentId(folder.getId());
         request.setExtraProperties(extraProperties);
         obj = services.updateProperties(request);
@@ -465,8 +525,25 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         CmisObject folder = buildTestFolder("TestFolder", null);
         CmisObject document = buildDocument("TestDocument", folder);
         long time = new Date().getTime();
-
-        String extraProperties = "{\"P:cm:titled\":{\"cm:description\":\"Testdokument\", \"cm:title\":\"Testdokument \\tTest\"}, \"D:my:archivContent\": { \"my:documentDate\": \"" + time + "\", \"my:person\": \"Katja\"},\"P:cm:emailed\":{\"cm:sentdate\":\"" + time + "\"}, \"P:my:amountable\":{\"my:amount\":\"25.33\", \"my:tax\":\"true\"}, \"P:my:idable\": {\"my:idvalue\": \"null\"}}";
+        Map<String, Object> p1 = new HashMap<>();
+        p1.put("cm:description", "Testdokument");
+        p1.put("cm:title", "Testdokument");
+        Map<String, Object> p2 = new HashMap<>();
+        p2.put("cm:sentdate", time);
+        Map<String, Object> p3 = new HashMap<>();
+        p3.put("my:amount", 25.33);
+        p3.put("my:tax", true);
+        Map<String, Object> p4 = new HashMap<>();
+        p4.put("my:person", "Katja");
+        p4.put("my:documentDate", time);
+        Map<String, Object> p5 = new HashMap<>();
+        p5.put("my:idvalue", null);
+        Map<String, Object> extraProperties = new HashMap<>();
+        extraProperties.put("P:cm:titled", p1);
+        extraProperties.put("P:cm:emailed", p2);
+        extraProperties.put("P:my:amountable", p3);
+        extraProperties.put("D:my:archivContent", p4);
+        extraProperties.put("P:my:idable", p5);
         RestRequest request = new RestRequest();
         request.setDocumentId(document.getId());
         request.setExtraProperties(extraProperties);
@@ -477,7 +554,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
         Map<String, Object> data = (Map) obj.getData();
         assertThat(data, Matchers.notNullValue());
-        assertThat(data.get("title"), is("Testdokument \tTest"));
+        assertThat(data.get("title"), is("Testdokument"));
         assertThat(((BigDecimal) data.get("amount")).doubleValue(), is(25.33d));
         assertThat(data.get("tax"), is(true));
         assertThat(data.get("person"), is("Katja"));
@@ -485,8 +562,15 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(data.get("sentdate"), is(time));
 
         document.refresh();
-        extraProperties = "{\"P:cm:titled\":{\"cm:description\":\"Testdokument\",\"cm:title\":\"Testdokument\"}, \"P:cm:emailed\":{\"cm:sentdate\":\"" + time + "\"}, \"P:my:amountable\":{\"my:amount\":\"25.34\", \"my:tax\":\"true\"}, \"P:my:idable\": {\"my:idvalue\": \"123\"}}";
-        request.setDocumentId(document.getId());
+        extraProperties.clear();
+        p3.put("my:amount", 25.34);
+        p5.put("my:idvalue", "123");
+        extraProperties.put("P:cm:titled", p1);
+        extraProperties.put("P:cm:emailed", p2);
+        extraProperties.put("P:my:amountable", p3);
+        extraProperties.put("D:my:archivContent", p4);
+        extraProperties.put("P:my:idable", p5);
+         request.setDocumentId(document.getId());
         request.setExtraProperties(extraProperties);
         obj = services.updateProperties(request);
         assertThat(obj, notNullValue());
@@ -500,7 +584,13 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(data.get("idvalue"), is("123"));
 
         document.refresh();
-        extraProperties = "{\"P:cm:titled\":{\"cm:description\":\"Testdokument\"}, \"P:cm:emailed\":{\"cm:sentdate\":\"" + time + "\"}, \"P:my:amountable\":{\"my:amount\":\"\", \"my:tax\":\"\"}}";
+        extraProperties.clear();
+        p3.put("my:amount", null);
+        p3.put("my:tax", null);
+        extraProperties.put("P:cm:titled", p1);
+        extraProperties.put("P:cm:emailed", p2);
+        extraProperties.put("P:my:amountable", p3);
+        extraProperties.put("D:my:archivContent", p4);
         request.setDocumentId(document.getId());
         request.setExtraProperties(extraProperties);
         obj = services.updateProperties(request);

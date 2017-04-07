@@ -12,9 +12,9 @@ public interface Response {
 
     public void setSuccess(boolean success);
 
-    public Throwable getError();
+    public Exception getError();
 
-    public void setError(Throwable error);
+    public void setError(Exception error);
 
     public boolean hasError();
 

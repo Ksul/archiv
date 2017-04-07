@@ -12,7 +12,7 @@ public class RestResponse implements Response {
 
     private boolean success;
 
-    private Throwable error;
+    private Exception error;
 
     private Object data;
 
@@ -28,12 +28,12 @@ public class RestResponse implements Response {
     }
 
     @Override
-    public Throwable getError() {
+    public Exception getError() {
         return error;
     }
 
     @Override
-    public void setError(Throwable error) {
+    public void setError(Exception error) {
         this.error = error;
     }
 

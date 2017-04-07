@@ -243,6 +243,7 @@ public class AlfrescoConnector {
                                                int modus) throws ArchivException {
 
         ItemIterable<CmisObject> result = null;
+        long time;
 
         OperationContext operationContext = getOperationContext();
         switch (modus) {
@@ -250,7 +251,9 @@ public class AlfrescoConnector {
                 operationContext.setOrderBy(buildOrder(order, columns, modus));
                 CmisObject object = this.session.getObject(this.session.createObjectId(folderId));
                 Folder folder = (Folder) object;
+                time = System.currentTimeMillis();
                 result = folder.getChildren(operationContext);
+                logger.debug("Time for Execution of folder.getChildren() " + (System.currentTimeMillis() - time) + " ms");
                 break;
             }
             case VerteilungConstants.LIST_MODUS_DOCUMENTS:{  // nur Dokumente
@@ -260,7 +263,6 @@ public class AlfrescoConnector {
                 QueryStatement stmt = session.createQueryStatement(query.toString());
                 stmt.setString(1, folderId);
                 result = getCmisObjects(stmt, operationContext);
-
                 break;
             }
             case VerteilungConstants.LIST_MODUS_FOLDER: { // nur Folder
@@ -315,13 +317,15 @@ public class AlfrescoConnector {
     public ItemIterable<CmisObject> getCmisObjects(QueryStatement stmt,
                                                    final OperationContext operationContext) {
         ItemIterable<CmisObject> result;
-
+        long time;
         final DiscoveryService discoveryService = this.session.getBinding().getDiscoveryService();
         final ObjectFactory of = this.session.getObjectFactory();
+        time = System.currentTimeMillis();
         final ObjectList resultList = discoveryService.query(session.getRepositoryInfo().getId(), stmt.toString(),
                 false, operationContext.isIncludeAllowableActions(), operationContext.getIncludeRelationships(),
                 operationContext.getRenditionFilterString(), BigInteger.valueOf(Integer.MAX_VALUE),
                 BigInteger.valueOf(0), null);
+        logger.debug("Time for Execution of discoveryService.query() " + (System.currentTimeMillis() - time) + " ms");
         final long totalNumItems = resultList.getNumItems().longValue();
 
         result = new CollectionIterable<CmisObject>(new AbstractPageFetcher<CmisObject>(operationContext.getMaxItemsPerPage()) {

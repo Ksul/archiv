@@ -112,23 +112,23 @@ function executeService(service, params) {
                     json = data;
                 } else if (!data.success) {
                     if (exist(errorMessage))
-                        errorString = errorMessage + "<br>" + data.data;
+                        errorString = errorMessage + "<br>";
                     else {
                         if (data.data)
                             errorString = data.data;
                         if (data.error)
-                            errorString = data.error;
+                            errorString = data.error.message;
                     }
                     // gibt es eine Fehlermeldung aus dem Service?
                     if (data.error && !service.ignoreError) {
-                        errorString = errorString + "<br>" + data.error;
-                        REC.log(ERROR, data.error);
+                        errorString = errorString + "<br>" + data.error.message;
+                        REC.log(ERROR, data.error.message);
+                        fillMessageBox(true);
                     }
-                    if (!service.ignoreError) {
+                    if (!service.ignoreError && data.data) {
                         REC.log(ERROR, data.data);
                         fillMessageBox(true);
-                    } else
-                        data.error = errorString;
+                    } 
                     json = data;
                 } else {
                     times.push(new Date().getTime());

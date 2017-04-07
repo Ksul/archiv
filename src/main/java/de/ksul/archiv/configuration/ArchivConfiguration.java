@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,6 +28,7 @@ public class ArchivConfiguration {
     private ArchivProperties archivProperties;
 
     @Bean
+    @Profile("!env_test")
     public Session getSession() {
         Session session;
         try {
@@ -41,6 +43,7 @@ public class ArchivConfiguration {
     }
 
     @Bean
+    @Profile("!env_test")
     AlfrescoConnector getConnector() {
         return new AlfrescoConnector(getSession(), archivProperties.getServer(), archivProperties.getBinding(), archivProperties.getUser(), archivProperties.getPassword());
 

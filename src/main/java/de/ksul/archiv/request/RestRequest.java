@@ -1,5 +1,7 @@
 package de.ksul.archiv.request;
 
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Klaus Schulte (m500288)
@@ -36,9 +38,7 @@ public class RestRequest {
 
     private String versionComment;
 
-    private String extraProperties;
-
-    private String ticket;
+    private Map<String, Object> extraProperties;
 
     private String comment;
 
@@ -155,20 +155,12 @@ public class RestRequest {
         this.versionComment = versionComment;
     }
 
-    public String getExtraProperties() {
+    public Map<String, Object> getExtraProperties() {
         return extraProperties;
     }
 
-    public void setExtraProperties(String extraProperties) {
+    public void setExtraProperties(Map<String, Object> extraProperties) {
         this.extraProperties = extraProperties;
-    }
-
-    public String getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(String ticket) {
-        this.ticket = ticket;
     }
 
     public String getComment() {

@@ -1,3 +1,4 @@
+debug: false
 ksul:
   archiv:
     server: http://localhost:9080/alfresco/
@@ -16,3 +17,7 @@ management:
 logging:
   path: ./
   level: info
+
+spring:
+  main:
+    banner-mode: log

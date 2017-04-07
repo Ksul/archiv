@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class DataTablesRequest  {
 
-    private String filePath;
+    private String folderId;
 
     private int withFolder;
 
@@ -58,12 +58,12 @@ public class DataTablesRequest  {
     private List<Column> columns;
 
 
-    public String getFilePath() {
-        return filePath;
+    public String getFolderId() {
+        return folderId;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFolderId(String folderId) {
+        this.folderId = folderId;
     }
 
     public int getWithFolder() {

@@ -1,6 +1,5 @@
 package de.ksul.archiv.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.*;
 import de.ksul.archiv.request.ConnectionRequest;
 import de.ksul.archiv.request.DataTablesRequest;
@@ -70,9 +69,9 @@ public class ArchivController {
             obj.setSuccess(true);
             obj.setData(con.isConnected());
 
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -89,9 +88,9 @@ public class ArchivController {
         try {
             obj.setSuccess(true);
             obj.setData(titles);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -144,9 +143,9 @@ public class ArchivController {
             } else {
                 obj.setData(false);
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -169,9 +168,9 @@ public class ArchivController {
             obj.setName(document.getName());
             obj.setData(Base64.encodeBase64String(con.getDocumentContent(document)));
             obj.setSuccess(true);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -194,9 +193,9 @@ public class ArchivController {
                 }
             }
             obj.setSuccess(true);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -216,9 +215,9 @@ public class ArchivController {
             CmisObject cmisObject = con.getNodeById(model.getDocumentId());
             obj.setSuccess(true);
             obj.setData(con.getComments(cmisObject));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -237,9 +236,9 @@ public class ArchivController {
             CmisObject cmisObject = con.getNodeById(model.getDocumentId());
             obj.setSuccess(true);
             obj.setData(con.addComment(cmisObject, model.getComment()));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -254,9 +253,11 @@ public class ArchivController {
     @RequestMapping(value = "/listFolderWithPagination")
     public @ResponseBody DataTablesResponse listFolderWithPagination(@RequestBody @Valid final DataTablesRequest model) {
 
+
         ArrayList<Map<String, Object>> list = new ArrayList();
         DataTablesResponse resp = new DataTablesResponse();
         long itemsToSkip;
+        long time = System.currentTimeMillis();
         ItemIterable<CmisObject> cmisObjects;
         try {
             if (model.getLength() == -1) {
@@ -264,29 +265,41 @@ public class ArchivController {
                 itemsToSkip = 0;
             } else
                 itemsToSkip = model.getStart();
-
-            // state = new JSONObject("{state: {opened: false, disabled: false, selected: false}}");
-            // das Root Object übergeben?
-            if (model.getFilePath().equals("-1"))
-                model.setFilePath(con.getNode("/Archiv").getId());
-
-            cmisObjects = con.listFolder(model.getFilePath(), model.getOrders(), model.getColumns(), model.getWithFolder()).skipTo(itemsToSkip).getPage(model.getLength());
-
-            for (CmisObject cmisObject : cmisObjects) {
-                list.add(convertObjectToJson(model.getFilePath(), cmisObject));
-            }
-
-
-            resp.setRecordsTotal(cmisObjects.getTotalNumItems());
+            resp.setRecordsTotal(0);
             resp.setDraw(model.getDraw());
-            resp.setRecordsFiltered(cmisObjects.getTotalNumItems());
-            resp.setMoreItems(cmisObjects.getHasMoreItems());
-            resp.setParent(model.getFilePath());
+            resp.setRecordsFiltered(0);
+            resp.setMoreItems(false);
+            resp.setParent(null);
             resp.setData(list);
             resp.setSuccess(true);
 
-        } catch (Throwable t) {
-            resp.setError(t);
+            if (model.getFolderId() != null) {
+                // das Root Object übergeben?
+                if (model.getFolderId().equals("-1")) {
+                    CmisObject cmisObject = con.getNode("/Archiv");
+                    if (cmisObject != null)
+                        model.setFolderId(cmisObject.getId());
+                    else
+                        return resp;
+                }
+
+                cmisObjects = con.listFolder(model.getFolderId(), model.getOrders(), model.getColumns(), model.getWithFolder()).skipTo(itemsToSkip).getPage(model.getLength());
+
+                for (CmisObject cmisObject : cmisObjects) {
+                    list.add(convertObjectToJson(model.getFolderId(), cmisObject));
+                }
+
+                resp.setRecordsTotal(cmisObjects.getTotalNumItems());
+                resp.setDraw(model.getDraw());
+                resp.setRecordsFiltered(cmisObjects.getTotalNumItems());
+                resp.setMoreItems(cmisObjects.getHasMoreItems());
+                resp.setParent(model.getFolderId());
+                resp.setData(list);
+                resp.setSuccess(true);
+            }
+            logger.debug("Time for Execution of listFolderWithPagination() " + (System.currentTimeMillis() - time) + " ms");
+        } catch (Exception e) {
+            resp.setError(e);
             resp.setSuccess(false);
         }
         return resp;
@@ -319,9 +332,9 @@ public class ArchivController {
         try {
             obj.setSuccess(true);
             obj.setData(con.getNode(model.getFilePath()).getId());
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -339,9 +352,9 @@ public class ArchivController {
         try {
             obj.setSuccess(true);
             obj.setData(convertCmisObjectToJSON(con.getNode(model.getFilePath())));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -360,9 +373,9 @@ public class ArchivController {
         try {
             obj.setSuccess(true);
             obj.setData(convertCmisObjectToJSON(con.getNodeById(model.getDocumentId())));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -407,8 +420,8 @@ public class ArchivController {
 
             obj.setSuccess(true);
             obj.setData(list);
-        } catch (Throwable t) {
-            obj.setError(t);
+        } catch (Exception e) {
+            obj.setError(e);
             obj.setSuccess(false);
         }
         return obj;
@@ -454,8 +467,8 @@ public class ArchivController {
                 obj.setData(list);
             }
 
-        } catch (Throwable t) {
-            obj.setError(t);
+        } catch (Exception e) {
+            obj.setError(e);
             obj.setSuccess(false);
         }
         return obj;
@@ -481,9 +494,9 @@ public class ArchivController {
             } else
                 obj.setData(new String((byte[]) obj.getData(), "UTF-8"));
 
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -512,9 +525,9 @@ public class ArchivController {
                 obj.setSuccess(false);
                 obj.setData("Der verwendete Pfad ist kein Folder!");
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -541,9 +554,9 @@ public class ArchivController {
                 obj.setSuccess(false);
                 obj.setData(document == null ? "Das Document ist nicht vorhanden!" : "Das Document ist nicht vom Typ Document!");
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -566,7 +579,7 @@ public class ArchivController {
             Map<String, Object> outMap = null;
             if (folderObject != null && folderObject instanceof Folder) {
 
-                if (model.getExtraProperties() != null && model.getExtraProperties().length() > 0)
+                if (model.getExtraProperties() != null )
                   outMap = buildProperties(model.getExtraProperties());
 
                 document = con.createDocument((Folder) folderObject, model.getFileName(), Base64.decodeBase64(model.getContent()), model.getMimeType(), outMap, createVersionState(model.getVersionState()));
@@ -581,9 +594,9 @@ public class ArchivController {
                 obj.setSuccess(false);
                 obj.setData(folderObject == null ? "Der angegebene Pfad  ist nicht vorhanden!" : "Der verwendete Pfad ist kein Folder!");
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -610,7 +623,7 @@ public class ArchivController {
 
 
 
-                if (model.getExtraProperties() != null && model.getExtraProperties().length() > 0) {
+                if (model.getExtraProperties() != null) {
                     outMap = buildProperties(model.getExtraProperties());
                 }
 
@@ -624,9 +637,9 @@ public class ArchivController {
                 obj.setData(cmisObject == null ? "Ein Document mit der Id " + model.getDocumentId() + " ist nicht vorhanden!" : "Das verwendete Document mit der Id" + model.getDocumentId() + " ist nicht vom Typ Document!");
             }
 
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
 
         return obj;
@@ -648,7 +661,7 @@ public class ArchivController {
             CmisObject cmisObject = con.getNodeById(model.getDocumentId());
             if (cmisObject != null) {
 
-                if (model.getExtraProperties() != null && model.getExtraProperties().length() > 0)
+                if (model.getExtraProperties() != null)
                     outMap = buildProperties(model.getExtraProperties());
 
                 else {
@@ -665,9 +678,9 @@ public class ArchivController {
                 obj.setData("Ein Document mit der Id " + model.getDocumentId() + " ist nicht vorhanden!");
             }
 
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
 
         return obj;
@@ -710,9 +723,9 @@ public class ArchivController {
                 obj.setSuccess(false);
                 obj.setData(node == null ? "Ein Document mit der Id " + model.getDocumentId() + " ist nicht vorhanden!" : "Das verwendete Document mit der Id" + model.getDocumentId() + " ist nicht vom Typ Document oder Folder!");
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -731,7 +744,7 @@ public class ArchivController {
             CmisObject target;
             Map<String, Object> outMap = null;
 
-            if (model.getExtraProperties() != null && model.getExtraProperties().length() > 0)
+            if (model.getExtraProperties() != null)
                 outMap = buildProperties(model.getExtraProperties());
             else {
                 obj.setSuccess(false);
@@ -757,9 +770,9 @@ public class ArchivController {
                 obj.setSuccess(false);
                 obj.setData(target == null ? "Der angebene Pfad mit der Id " + model.getDocumentId() + " ist nicht vorhanden!" : "Der verwendete Pfad " + target + " ist kein Folder!");
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -784,11 +797,11 @@ public class ArchivController {
                 obj.setData(list);
             } else {
                 obj.setSuccess(false);
-                obj.setData(folder == null ? "Der  angegebene Pfad ist nicht vorhanden!" : "Der verwendete Pfad st kein Folder!");
+                obj.setData(folder == null ? "Der  angegebene Pfad ist nicht vorhanden!" : "Der verwendete Pfad ist kein Folder!");
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -826,9 +839,9 @@ public class ArchivController {
                 obj.setSuccess(false);
                 obj.setData(httpUrlConn.getResponseMessage());
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -851,9 +864,9 @@ public class ArchivController {
             }
             obj.setSuccess(true);
             obj.setData(1);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -872,9 +885,9 @@ public class ArchivController {
             PDFConnector con = new PDFConnector();
             obj.setSuccess(true);
             obj.setData(con.pdftoText(new ByteArrayInputStream(bytes)));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -894,9 +907,9 @@ public class ArchivController {
             PDFConnector con = new PDFConnector();
             obj.setSuccess(true);
             obj.setData(con.pdftoText(new ByteArrayInputStream(bytes)));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -937,16 +950,16 @@ public class ArchivController {
                 obj.setSuccess(true);
                 obj.setData(arrayList);
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         } finally {
             try {
                 if (zipin != null)
                     zipin.close();
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 obj.setSuccess(false);
-                obj.setError(t);
+                obj.setError(e);
             }
         }
         return obj;
@@ -990,16 +1003,16 @@ public class ArchivController {
                 obj.setSuccess(true);
                 obj.setData(counter);
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         } finally {
             try {
                 if (zipin != null)
                     zipin.close();
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 obj.setSuccess(false);
-                obj.setError(t);
+                obj.setError(e);
             }
         }
         return obj;
@@ -1033,9 +1046,9 @@ public class ArchivController {
                 }
                 obj.setData(counter);
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -1079,9 +1092,9 @@ public class ArchivController {
                 }
             }
 
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -1114,9 +1127,9 @@ public class ArchivController {
                 obj.setSuccess(true);
                 obj.setData(data);
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -1134,9 +1147,9 @@ public class ArchivController {
             entries.clear();
             obj.setSuccess(true);
             obj.setData("");
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -1154,9 +1167,9 @@ public class ArchivController {
             byte[] buffer = readFile(model.getFilePath());
             obj.setSuccess(true);
             obj.setData(Base64.encodeBase64String(buffer));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }
@@ -1194,12 +1207,9 @@ public class ArchivController {
      * @param extraCMSProperties    der String mit den Properties im JSON Format
      * @throws IOException
      */
-    protected Map<String, Object> buildProperties(String extraCMSProperties) throws IOException {
+    protected Map<String, Object> buildProperties(Map<String, Object> extraCMSProperties) throws IOException {
 
-        ObjectMapper mapper = new ObjectMapper();
-        logger.trace("buildProperties from " + extraCMSProperties);
-        Map<String, Object> props = mapper.readValue(extraCMSProperties, Map.class);
-        Iterator nameItr = props.keySet().iterator();
+        Iterator nameItr = extraCMSProperties.keySet().iterator();
         Map<String, Object> outMap = new HashMap<>();
         List<String> liste = new ArrayList<>();
         while (nameItr.hasNext()) {
@@ -1213,10 +1223,10 @@ public class ArchivController {
             if (name.toUpperCase().startsWith("D:")) {
                 outMap.put(PropertyIds.OBJECT_TYPE_ID, name);
             }
-            Iterator innerItr = ((Map) props.get(name)).keySet().iterator();
+            Iterator innerItr = ((Map) extraCMSProperties.get(name)).keySet().iterator();
             while (innerItr.hasNext()) {
                 String innerName = (String) innerItr.next();
-                outMap.put(innerName, ((Map) props.get(name)).get(innerName));
+                outMap.put(innerName, ((Map) extraCMSProperties.get(name)).get(innerName));
             }
         }
         if (liste.size() > 0)
@@ -1354,9 +1364,9 @@ public class ArchivController {
                 }
             }
             obj.setSuccess(true);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             obj.setSuccess(false);
-            obj.setError(t);
+            obj.setError(e);
         }
         return obj;
     }

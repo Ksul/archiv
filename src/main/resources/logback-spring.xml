@@ -9,6 +9,6 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
-
+    <logger name="de.ksul" level="DEBUG"/>
 </configuration>
 

@@ -233,9 +233,11 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     public void testGetNode() throws Exception {
         CmisObject cmisObject;
         cmisObject = con.getNode("/Datenverzeichnis");
+        ((FileableCmisObject) cmisObject).getPaths();
         assertThat(cmisObject, Matchers.notNullValue());
         assertThat(cmisObject, Matchers.instanceOf(Folder.class));
         cmisObject = con.getNode("/Datenverzeichnis/Skripte/backup.js.sample");
+        ((FileableCmisObject) cmisObject).getPaths();
         assertThat(cmisObject, Matchers.notNullValue());
         assertThat(cmisObject, Matchers.instanceOf(Document.class));
     }
@@ -269,6 +271,16 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
                 break;
             }
         }
+        erg = con.query("SELECT cmis:name, cmis:objectId from cmis:document where cmis:name LIKE '%.js.sample'");
+        assertThat(erg, Matchers.notNullValue());
+        assertThat(erg.size(), Matchers.greaterThan(1));
+        for (int i = 0; i < erg.get(0).size(); i++) {
+            if (((AbstractPropertyData) erg.get(0).get(i)).getId().equalsIgnoreCase("cmis:name")) {
+                assertThat(erg.get(0).get(i).getFirstValue().toString(), Matchers.endsWith(".js.sample"));
+                break;
+            }
+        }
+
     }
 
 

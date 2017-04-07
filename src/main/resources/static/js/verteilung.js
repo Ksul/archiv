@@ -715,7 +715,7 @@ function sendRules() {
                 {"name": "documentId", "value": rulesID},
                 {"name": "content", "value": rulesEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "text/xml"},
-                {"name": "extraProperties", "value": ""},
+                {"name": "extraProperties", "value": {}},
                 {"name": "versionState", "value": "minor"},
                 {"name": "versionComment", "value": ""}
             ]);
@@ -1023,7 +1023,7 @@ function sendScript() {
                 {"name": "documentId", "value": scriptID},
                 {"name": "content", "value": textEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "application/javascript"},
-                {"name": "extraProperties", "value": ""},
+                {"name": "extraProperties", "value": {}},
                 {"name": "versionState", "value": "minor"},
                 {"name": "versionComment", "value": ""}
             ]);
@@ -1048,9 +1048,9 @@ function sendToInbox() {
         var json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successmessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
             {"name": "documentId", "value": inboxFolderId},
             {"name": "fileName", "value": currentFile},
-            {"name": "documentContent", "value": currentContent, "type": "byte"},
+            {"name": "content", "value": currentContent, "type": "byte"},
             {"name": "mimeType", "value": "application/pdf"},
-            {"name": "extraCMSProperties", "value": ""},
+            {"name": "extraProperties", "value": {}},
             {"name": "versionState", "value": "none"}
         ]);
     } catch (e) {

@@ -72,7 +72,7 @@ function handleDropInbox(evt) {
                             {"name": "fileName", "value": f.name},
                             {"name": "content", "value": base64EncArr(strToUTF8Arr(content))},
                             {"name": "mimeType", "value": "application/pdf"},
-                            {"name": "extraProperties", "value": "{}"},
+                            {"name": "extraProperties", "value": {}},
                             {"name": "versionState", "value": "major"}
 
                         ]);
@@ -582,7 +582,7 @@ function loadAlfrescoTable() {
             "processing": true,
             "serverSide": true,
             "iconView": false,
-            "filePath" : -1,
+            "folderId" : -1,
             "withFolder": 1,
             "itemsToSkip": 0,
             "pageLength": 1, // kann hier 1 sein, weil im Root keine Dokumente sind
@@ -590,7 +590,7 @@ function loadAlfrescoTable() {
                 "url": "/Archiv/listFolderWithPagination",
                 type: "POST",
                 data: function (data, meta) {
-                    data.filePath = meta.oInit.filePath;
+                    data.folderId = meta.oInit.folderId;
                     data.withFolder = meta.oInit.withFolder;
                     data.itemsToSkip = meta.oInit.itemsToSkip;
                     duration = new Date().getTime();
@@ -2000,7 +2000,7 @@ function editDocument(input, id) {
         };
         erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Dokument konnte nicht aktualisiert werden!", "ignoreError": true}, [
             {"name": "documentId", "value": id},
-            {"name": "extraProperties", "value": JSON.stringify(extraProperties)}
+            {"name": "extraProperties", "value": extraProperties}
         ]);
      } catch (e) {
         errorHandler(e);
@@ -2016,10 +2016,10 @@ function deleteDocument() {
         var origData = $("#dialogBox").alpaca().data;
         var done = function (json) {
             if (json.success) {
-                var row = alfrescoTabelle.row('#' + origData.objectID);
+                var row = alfrescoTabelle.row('#' + origData.objectId);
                 if (row && row.length)
                     row.remove().draw(false);
-                row = alfrescoSearchTabelle.row('#' + data.objectID);
+                row = alfrescoSearchTabelle.row('#' + data.objectId);
                 if (row && row.length)
                     row.remove().draw(false);
             }
@@ -2070,7 +2070,7 @@ function createFolder(input, origData) {
         };
         var erg = executeService({"name": "createFolder", "callback": done, "errorMessage": "Ordner konnte nicht erstellt werden!"}, [
             {"name": "documentId", "value": origData.objectId},
-            {"name": "extraProperties", "value": JSON.stringify(extraProperties)}
+            {"name": "extraProperties", "value": extraProperties}
         ]);
      } catch (e) {
         errorHandler(e);
@@ -2124,7 +2124,7 @@ function editFolder(input, id) {
         };
         erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Ordner konnte nicht aktualisiert werden!", "ignoreError": true}, done,[
             {"name": "documentId", "value": id},
-            {"name": "extraProperties", "value": JSON.stringify(extraProperties)}
+            {"name": "extraProperties", "value": extraProperties}
         ]);
       } catch (e) {
         errorHandler(e);
@@ -2195,13 +2195,13 @@ function switchAlfrescoDirectory(data) {
 
         };
         var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
-            {"name": "filePath", "value": objectID},
+            {"name": "folderId", "value": objectID},
             {"name": "withFolder", "value": -1}
         ]);
         if (objectID != -1) {
             var len = calculateTableHeight("alfrescoCenterCenterCenter", "dtable2", alfrescoTabelle, "alfrescoTabelleHeader", "alfrescoTableFooter");
             alfrescoTabelle.page.len(len);
-            alfrescoTabelle.settings().init().filePath = objectID;
+            alfrescoTabelle.settings().init().folderId = objectID;
             alfrescoTabelle.ajax.reload();
             $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineDocumentFieldDefinition());
         }
@@ -2642,7 +2642,7 @@ function loadAndConvertDataForTree(aNode, callBack) {
                     }    
                 };
                 var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
-                    {"name": "filePath", "value": aNode.id != "#" ? aNode.id : archivFolderId},
+                    {"name": "folderId", "value": aNode.id != "#" ? aNode.id : archivFolderId},
                     {"name": "withFolder", "value": -1}
                 ]);
             }
@@ -3141,7 +3141,7 @@ function checkAndBuidAlfrescoEnvironment() {
         ]);
         if (!erg.success) {
             var name = folder.split("/").pop();
-            var extraProperties = "{'cmis:folder': {'cmis:name': '" + name +"'}, 'P:cm:titled':{'cm:title': '" + name +"', 'cm:description':'" + txt + "'}}"
+            var extraProperties = {"cmis:folder": {"cmis:name": "" + name +""}, "P:cm:titled":{"cm:title": "" + name +"", "cm:description":"" + txt + ""}};
             erg = executeService({"name": "createFolder"}, [
                 {"name": "documentId", "value": id},
                 {"name": "extraProperties", "value": extraProperties}
@@ -3216,29 +3216,28 @@ function checkAndBuidAlfrescoEnvironment() {
                 {"name": "filePath", "value": "/Datenverzeichnis/Skripte/recognition.js"}
             ]);
             if (!erg.success) {
-                var script;
-                if (isLocal())
-                    script = openFile('src/main/javascript/recognition.js');
-                else {
-                    script = $.ajax({
-                        url: createPathToFile("src/main/javascript/recognition.js"),
-                        async: false
-                    }).responseText;
-                }
+                var script = $.ajax({
+                    url: createPathToFile("src/main/javascript/recognition.js"),
+                    async: false
+                }).responseText;
+
                 if (exist(script) && script.length > 0) {
-                    erg = executeService({"name" : "createDocument", "errorMessage" : "Verteilungsskript konnte nicht erstellt werden!"}, [
+                    erg = executeService({
+                        "name": "createDocument",
+                        "errorMessage": "Verteilungsskript konnte nicht erstellt werden!"
+                    }, [
                         {"name": "documentId", "value": scriptFolderId},
                         {"name": "fileName", "value": "recognition.js"},
                         {"name": "content", "value": base64EncArr(strToUTF8Arr(script))},
                         {"name": "mimeType", "value": "application/x-javascript"},
                         {
                             "name": "extraProperties",
-                            "value": "{'cmis:document':{'cmis:name': 'recognition.js'},'P:cm:titled':{'cm:description':'Skript zum Verteilen der Dokumente'}}"
+                            "value":  {"cmis:document": {"cmis:name": "recognition.js"}, "P:cm:titled": {"cm:description": "Skript zum Verteilen der Dokumente" }}
                         },
                         {"name": "versionState", "value": "major"}
                     ]);
-                    if (erg.success)
-                        scriptID = $.parseJSON(erg.data).objectId;
+                     if (erg.success)
+                        scriptID = erg.data.objectId;
                     else {
                         REC.log(WARN, "Verteilscript (recognition.js) konnte auf dem Alfresco Server nicht angelegt werden!");
                     }
@@ -3254,30 +3253,28 @@ function checkAndBuidAlfrescoEnvironment() {
                 {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
             ]);
             if (!erg.success) {
-                var doc;
-                if (isLocal())
-                    doc = openFile('./rules/doc.xml');
-                else {
-                    doc = $.ajax({
-                        url: createPathToFile("./rules/doc.xml"),
-                        async: false
-                    }).responseText;
-                }
+                var doc = $.ajax({
+                    url: createPathToFile("./rules/doc.xml"),
+                    async: false
+                }).responseText;
                 if (exist(doc) && doc.length > 0) {
-                    erg = executeService({"name" : "createDocument", "errorMessage" : "Verteilungsregeln konnten nicht erstellt werden!"}, [
+                    erg = executeService({
+                        "name": "createDocument",
+                        "errorMessage": "Verteilungsregeln konnten nicht erstellt werden!"
+                    }, [
                         {"name": "documentId", "value": scriptFolderId},
                         {"name": "fileName", "value": "doc.xml"},
                         {"name": "content", "value": base64EncArr(strToUTF8Arr(doc))},
                         {"name": "mimeType", "value": "text/xml"},
                         {
                             "name": "extraProperties",
-                            "value": "{'cmis:document':{'cmis:name': 'doc.xml'}, 'P:cm:titled':{'cm:description':'Dokument mit den Verteil-Regeln'}}"
+                            "value": {"cmis:document":{"cmis:name": "doc.xml"}, "P:cm:titled":{"cm:description":"Dokument mit den Verteil-Regeln"}}
                         },
                         {"name": "versionState", "value": "major"}
 
                     ]);
                     if (erg.success)
-                        rulesID = $.parseJSON(erg.data).objectId;
+                        rulesID = erg.data.objectId;
                     else {
                         REC.log(WARN, "Verteilregeln (doc.xml) konnten auf dem Alfresco Server nicht angelegt werden!");
                     }

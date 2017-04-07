@@ -3,6 +3,7 @@ package de.ksul.archiv.repository;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.query.parser.cqn.CQNParser;
 import com.googlecode.cqengine.resultset.ResultSet;
+import de.ksul.archiv.AlfrescoConnector;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
 import org.apache.chemistry.opencmis.client.runtime.*;
@@ -22,6 +23,8 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 import org.apache.chemistry.opencmis.commons.spi.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -41,23 +44,24 @@ import static com.googlecode.cqengine.codegen.AttributeBytecodeGenerator.createA
  */
 public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
 
+    private static Logger logger = LoggerFactory.getLogger(CMISSessionGeneratorMockImpl.class.getName());
 
-    Map<String, PropertyDefinition<?>> propertyDefinitionMap;
-    Map<String, PropertyDefinition<?>> secondaryPropertyDefinitionMap;
-    Map<String, SecondaryType> secondaryTypeStore;
+    private Map<String, PropertyDefinition<?>> propertyDefinitionMap;
+    private Map<String, PropertyDefinition<?>> secondaryPropertyDefinitionMap;
+    private Map<String, SecondaryType> secondaryTypeStore;
 
 
-    SessionImpl sessionImpl;
-    SessionFactory sessionFactory;
-    ObjectType objectType;
-    FolderTypeImpl folderType;
-    DocumentTypeImpl documentType;
-    RepositoryInfo repositoryInfo;
-    CmisBinding binding;
-    ObjectFactory objectFactory;
-    ObjectServiceImpl objectService;
-    AuthenticationProvider authenticationProvider;
-    Repository repository = new Repository();
+    private SessionImpl sessionImpl;
+    private SessionFactory sessionFactory;
+    private ObjectType objectType;
+    private FolderTypeImpl folderType;
+    private DocumentTypeImpl documentType;
+    private RepositoryInfo repositoryInfo;
+    private CmisBinding binding;
+    private ObjectFactory objectFactory;
+    private ObjectServiceImpl objectService;
+    private AuthenticationProvider authenticationProvider;
+    private Repository repository = new Repository();
 
     private class Repository {
 
@@ -67,7 +71,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         Map<ObjectId, ContentStream> contentStore = new HashMap<>();
 
 
-        public List<FileableCmisObject> query(String query) {
+        private List<FileableCmisObject> query(String query) {
             List<FileableCmisObject> ret = new ArrayList<>();
             CQNParser<FileableCmisObject> parser = CQNParser.forPojoWithAttributes(FileableCmisObject.class, createAttributes(FileableCmisObject.class));
             ResultSet<FileableCmisObject> results = parser.retrieve(sqlStore, query);
@@ -77,7 +81,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             return ret;
         }
 
-        public List<FileableCmisObject> getChildren(String id, int skip, int maxItems) {
+        private List<FileableCmisObject> getChildren(String id, int skip, int maxItems) {
             int i = 0;
 
             List<FileableCmisObject> ret = new ArrayList<>();
@@ -96,53 +100,56 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             return ret;
         }
 
-        public void update(FileableCmisObject cmisObject, FileableCmisObject cmisObjectNew) {
+        private void update(FileableCmisObject cmisObject, FileableCmisObject cmisObjectNew) {
             idStore.put(new ObjectIdImpl(cmisObject.getId()), cmisObjectNew);
             if (pathStore.containsKey(cmisObject.getName()))
                 pathStore.remove(cmisObject.getName());
             pathStore.put(cmisObjectNew.getName(), cmisObjectNew);
             if (contentStore.containsKey(new ObjectIdImpl(cmisObject.getId())))
                 contentStore.replace(new ObjectIdImpl(cmisObjectNew.getId()), contentStore.get(new ObjectIdImpl(cmisObject.getId())));
+            logger.info(cmisObject.getName()  + "[ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] im Repository geändert!");
         }
 
-        public void delete(FileableCmisObject cmisObject) {
+        private void delete(FileableCmisObject cmisObject) {
             sqlStore.remove(cmisObject);
-            idStore.remove(cmisObject.getId());
             pathStore.remove(cmisObject.getName());
             if (contentStore.containsKey(new ObjectIdImpl(cmisObject.getId())))
                 contentStore.remove(new ObjectIdImpl(cmisObject.getId()));
+            logger.info(cmisObject.getName()  + "[ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] aus dem Repository gelöscht!");
+            idStore.remove(new ObjectIdImpl(cmisObject.getId()));
         }
 
-        public void insert(FileableCmisObject cmisObject) {
+        private void insert(FileableCmisObject cmisObject) {
             String name = cmisObject.getName();
             sqlStore.add(cmisObject);
             pathStore.put(name, cmisObject);
             idStore.put(new ObjectIdImpl(cmisObject.getId()), cmisObject);
+            logger.info(name  + "[ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] ins Repository eingetragen!");
         }
 
 
-        public void insert(FileableCmisObject cmisObject, ContentStream contentStream) {
+        private void insert(FileableCmisObject cmisObject, ContentStream contentStream) {
             insert(cmisObject);
             contentStore.put(new ObjectIdImpl(cmisObject.getId()), contentStream);
         }
 
-        public boolean contains(String name) {
+        private boolean contains(String name) {
             return pathStore.containsKey(name);
         }
 
-        public boolean contains(ObjectId id) {
+        private boolean contains(ObjectId id) {
             return idStore.containsKey(id);
         }
 
-        public FileableCmisObject get(String name) {
+        private FileableCmisObject get(String name) {
             return pathStore.get(name);
         }
 
-        public FileableCmisObject get(ObjectId id) {
+        private FileableCmisObject get(ObjectId id) {
             return idStore.get(id);
         }
 
-        public FileableCmisObject getByPath(String path) {
+        private FileableCmisObject getByPath(String path) {
             FileableCmisObject parent = null;
             String[] parts;
             int i = 1;
@@ -170,11 +177,11 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             return null;
         }
 
-        public ContentStream getContent(FileableCmisObject cmisObject) {
+        private ContentStream getContent(FileableCmisObject cmisObject) {
             return getContent(new ObjectIdImpl(cmisObject.getId()));
         }
 
-        public ContentStream getContent(ObjectId id) {
+        private ContentStream getContent(ObjectId id) {
             return contentStore.get(id);
         }
     }
@@ -214,11 +221,11 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
 
         secondaryTypeStore = createSecondaryTypes();
 
-        repository.insert(createFileableCmisObject("0", "root", "root", "", true, false));
-        repository.insert(createFileableCmisObject("1", "/", "/", "0", true, false));
-        repository.insert(createFileableCmisObject("2", "/", "Datenverzeichnis", "1", true, false));
-        repository.insert(createFileableCmisObject("3", "Datenverzeichnis", "Skripte", "2", true, false));
-        repository.insert(createFileableCmisObject("4", "Datenverzeichnis/Skripte", "backup.js.sample", "3", false, false), createStream("//123"));
+        repository.insert(createFileableCmisObject("1", "", "/", "0", true, false, null));
+        repository.insert(createFileableCmisObject("2", "/", "Datenverzeichnis", "1", true, false, null));
+        repository.insert(createFileableCmisObject("3", "/Datenverzeichnis", "Skripte", "2", true, false, null));
+        repository.insert(createFileableCmisObject("4", "/Datenverzeichnis/Skripte", "backup.js.sample", "3", false, false, "plain/text"), createStream("//123"));
+        repository.insert(createFileableCmisObject("5", "/Datenverzeichnis/Skripte", "alfresco docs.js.sample", "3", false, false, "plain/text"), createStream("// log"));
 
     }
 
@@ -335,7 +342,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
     }
 
     private Map<String, PropertyDefinition<?>> getStringPropertyDefinitionMap() {
-        Map<String, PropertyDefinition<?>> map = new HashMap();
+        Map<String, PropertyDefinition<?>> map = new HashMap<>();
         PropertyIdDefinitionImpl propertyIdDefinition = new PropertyIdDefinitionImpl();
         propertyIdDefinition.setId("cmis:objectId");
         propertyIdDefinition.setDisplayName("Object ID");
@@ -435,6 +442,15 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         propertyCheckinCommentDefinition.setPropertyType(PropertyType.STRING);
         propertyCheckinCommentDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:checkinComment", propertyCheckinCommentDefinition);
+        PropertyStringDefinitionImpl propertyContentStreamMimeTypeDefinition = new PropertyStringDefinitionImpl();
+        propertyContentStreamMimeTypeDefinition.setId("cmis:contentStreamMimeType");
+        propertyContentStreamMimeTypeDefinition.setDisplayName("Content Stream MIME Type");
+        propertyContentStreamMimeTypeDefinition.setQueryName("cmis:contentStreamMimeType");
+        propertyContentStreamMimeTypeDefinition.setLocalName("contentStreamMimeType");
+        propertyContentStreamMimeTypeDefinition.setCardinality(Cardinality.SINGLE);
+        propertyContentStreamMimeTypeDefinition.setPropertyType(PropertyType.STRING);
+        propertyContentStreamMimeTypeDefinition.setUpdatability(Updatability.READONLY);
+        map.put("cmis:contentStreamMimeType", propertyContentStreamMimeTypeDefinition);
         PropertyIdDefinitionImpl propertySecondaryObjectTypeIdDefinition = new PropertyIdDefinitionImpl();
         propertySecondaryObjectTypeIdDefinition.setId("cmis:secondaryObjectTypeIds");
         propertySecondaryObjectTypeIdDefinition.setDisplayName("Secondary Object Type Id");
@@ -465,7 +481,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         return map;
     }
 
-    FileableCmisObject createFileableCmisObject(String id, String path, String name, String parent, boolean folder, boolean majorVersion) {
+    private FileableCmisObject createFileableCmisObject(String id, String path, String name, String parent, boolean folder, boolean majorVersion, String mimeType) {
         FileableCmisObject fileableCmisObject;
 
         ObjectDataImpl objectData = new ObjectDataImpl();
@@ -489,7 +505,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         propertyPath.setLocalName("path");
         propertyPath.setQueryName("cmis:path");
         propertyPath.setDisplayName("Path");
-        propertyPath.setValue(path);
+        propertyPath.setValue(path + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/")  + name);
         properties.addProperty(propertyPath);
         PropertyIdImpl propertyType = new PropertyIdImpl();
         propertyType.setId("cmis:baseTypeId");
@@ -540,6 +556,13 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             propertyVersionLabel.setLocalName("versionLabel");
             propertyVersionLabel.setValue(majorVersion ? "1.0" : "0.1");
             properties.addProperty(propertyVersionLabel);
+            PropertyStringImpl propertyMimeType = new PropertyStringImpl();
+            propertyMimeType.setId("cmis:contentStreamMimeType");
+            propertyMimeType.setDisplayName("Content Stream MIME Type");
+            propertyMimeType.setQueryName("cmis:contentStreamMimeType");
+            propertyMimeType.setLocalName("contentStreamMimeType");
+            propertyMimeType.setValue(mimeType);
+            properties.addProperty(propertyMimeType);
             PropertyStringImpl propertyCheckinComment = new PropertyStringImpl();
             propertyCheckinComment.setId("cmis:checkinComment");
             propertyCheckinComment.setDisplayName("Checkin Comment");
@@ -735,15 +758,15 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
             throw new IllegalArgumentException();
         }
         String name = (String) props.get(PropertyIds.NAME);
-        String id = Double.toString(Math.random() * 100 + 1);
+        String id = Double.toString(Math.random() * 100 + 1).replace('.', 'X');
         FileableCmisObject cmis = (FileableCmisObject) args[1];
-        String path = cmis.getPaths().get(0);
+        String path = cmis.getPaths().get(0) ;
         if (!folder && invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
             majorVersion = true;
         if (!folder)
-            repository.insert(createFileableCmisObject(id, path, name, cmis.getId(), folder, majorVersion), (ContentStream) invocation.getArguments()[2]);
+            repository.insert(createFileableCmisObject(id, path, name, cmis.getId(), folder, majorVersion, ((ContentStream) invocation.getArguments()[2]).getMimeType()), (ContentStream) invocation.getArguments()[2]);
         else
-            repository.insert(createFileableCmisObject(id, path, name, cmis.getId(), folder, majorVersion));
+            repository.insert(createFileableCmisObject(id, path, name, cmis.getId(), folder, majorVersion, null));
 
         return new ObjectIdImpl(id);
     }
@@ -784,7 +807,16 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                         FileableCmisObject cmisObject = repository.get(new ObjectIdImpl((String) invocation.getArguments()[1]));
                         for (Property property : cmisObject.getProperties()) {
                             if (property.getId().equalsIgnoreCase("cmis:parentId")) {
-                                result.add(getObjectParentDataFromCmisObject(repository.get(new ObjectIdImpl(property.getValueAsString()))));
+
+                                FileableCmisObject parentObject = repository.get(new ObjectIdImpl(property.getValueAsString()));
+                                ObjectParentDataImpl objectData = new ObjectParentDataImpl();
+                                objectData.setObject(getObjectDataFromCmisObject(parentObject));
+                                if (cmisObject.getType() instanceof FolderType)
+                                    objectData.setRelativePathSegment(parentObject.getPropertyValue("cmis:path"));
+                                else
+                                    objectData.setRelativePathSegment(cmisObject.getName());
+
+                                result.add(objectData);
                                 break;
                             }
                         }
@@ -844,6 +876,8 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                             });
                         }
                         objectInFolderList.setObjects(folderDatas.subList(skip.intValue(), skip.intValue() + maxItems.intValue() > folderDatas.size() ? folderDatas.size() :  skip.intValue() + maxItems.intValue()));
+                        objectInFolderList.setNumItems(BigInteger.valueOf(folderDatas.size()));
+                        objectInFolderList.setHasMoreItems(skip.intValue() + maxItems.intValue() > folderDatas.size() ? false : true);
                         return objectInFolderList;
                     }
                 });
@@ -923,6 +957,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
                         }
                         objectList.setObjects(list.subList(skip.intValue(), skip.intValue() + maxItems.intValue() > list.size() ? list.size() :  skip.intValue() + maxItems.intValue()));
                         objectList.setNumItems(BigInteger.valueOf(list.size()));
+                        objectList.setHasMoreItems(skip.intValue() + maxItems.intValue() > list.size() ? false : true);
                         return objectList;
                     }
                 });
@@ -1065,13 +1100,6 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
         return objectData;
     }
 
-    private ObjectParentData getObjectParentDataFromCmisObject(FileableCmisObject cmisObject) {
-        ObjectParentDataImpl objectData = new ObjectParentDataImpl();
-        objectData.setObject(getObjectDataFromCmisObject(cmisObject));
-        objectData.setRelativePathSegment(cmisObject.getPropertyValue("cmis:path"));
-        return objectData;
-    }
-
     private BindingsObjectFactory mockBindingsObjectFactory() {
         BindingsObjectFactory bindingsObjectFactory = mock(BindingsObjectFactory.class);
         when(bindingsObjectFactory.createContentStream(any(String.class), any(BigInteger.class), any(String.class), any(InputStream.class))).thenAnswer(
@@ -1095,7 +1123,7 @@ public class CMISSessionGeneratorMockImpl implements CMISSessionGenerator {
     private RepositoryInfo mockRepositoryInfo() {
         RepositoryInfo info = mock(RepositoryInfo.class);
         when(info.getId()).thenReturn("0");
-        when(info.getRootFolderId()).thenReturn("99999");
+        when(info.getRootFolderId()).thenReturn("1");
         return info;
     }
 
