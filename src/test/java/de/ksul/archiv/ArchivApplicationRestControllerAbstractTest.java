@@ -502,4 +502,25 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
+    @Test
+    public void testMoveNode() throws Exception {
+        CmisObject folder = buildTestFolder("TestFolder", null);
+        CmisObject document = buildDocument("TestDocument", folder);
+        CmisObject newFolder = buildTestFolder("FolderTest", null);
+        RestRequest request = new RestRequest();
+        request.setDocumentId(document.getId());
+        request.setCurrentLocationId(folder.getId());
+        request.setDestinationId(newFolder.getId());
+        this.mockMvc.perform(post("/moveNode")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data", isA(LinkedHashMap.class)))
+                .andExpect(jsonPath("$.data.parents", isA(LinkedHashMap.class)))
+                .andExpect(jsonPath("$.data.parents.0.name", is("FolderTest")));
+    }
 }

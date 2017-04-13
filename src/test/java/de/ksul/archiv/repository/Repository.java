@@ -1,6 +1,5 @@
 package de.ksul.archiv.repository;
 
-import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
@@ -9,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +39,8 @@ public class Repository {
     }
 
     List<FileableCmisObject> query(String query) {
+        if (query == null)
+            throw new RuntimeException("query must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
         List<FileableCmisObject> list = new ArrayList<>();
@@ -60,8 +59,9 @@ public class Repository {
     }
 
     List<FileableCmisObject> getChildren(String id, int skip, int maxItems) {
+        if (id == null)
+            throw new RuntimeException("id must be set!");
         int i = 0;
-
         List<FileableCmisObject> ret = new ArrayList<>();
         if (root == null)
             throw new RuntimeException("no Root Node!");
@@ -80,6 +80,8 @@ public class Repository {
     }
 
     FileableCmisObject getParent(String id){
+        if (id == null)
+            throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
         TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
@@ -95,9 +97,9 @@ public class Repository {
 
     void update(FileableCmisObject cmisObject, FileableCmisObject cmisObjectNew) {
         if (cmisObject == null)
-            throw new RuntimeException("cmisObject not set!");
+            throw new RuntimeException("cmisObject must be set!");
         if (cmisObjectNew == null)
-            throw new RuntimeException("cmisObjectNew not set!");
+            throw new RuntimeException("cmisObjectNew must be set!");
         String name = cmisObject.getName();
         if (root == null)
             throw new RuntimeException("no Root Node!");
@@ -111,14 +113,14 @@ public class Repository {
 
     List<String> deleteTree(FileableCmisObject cmisObject) {
         if (cmisObject == null)
-            throw new RuntimeException("cmisObject not set!");
+            throw new RuntimeException("cmisObject must be set!");
         delete(cmisObject);
         return new ArrayList<String>();
     }
 
     void delete(FileableCmisObject cmisObject) {
         if (cmisObject == null)
-            throw new RuntimeException("cmisObject not set!");
+            throw new RuntimeException("cmisObject must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
         logger.info(cmisObject.getName() + "[ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] aus dem Repository gelöscht!");
@@ -129,7 +131,7 @@ public class Repository {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject not set!");
         if (parentId == null)
-            throw new RuntimeException("parentId not set!");
+            throw new RuntimeException("parentId must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
         TreeNode<FileableCmisObject> node = root.findTreeNodeForId(cmisObject.getId());
@@ -147,7 +149,7 @@ public class Repository {
 
     void insert(String parentPath, FileableCmisObject cmisObject, ContentStream contentStream) {
         if (cmisObject == null)
-            throw new RuntimeException("cmisObject not set!");
+            throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
         String id = cmisObject.getId();
         if (parentPath == null) {
@@ -211,10 +213,14 @@ public class Repository {
     }
 
     ContentStream getContent(FileableCmisObject cmisObject) {
+        if (cmisObject == null)
+            throw new RuntimeException("cmisObject must be set!");
         return getContent(new ObjectIdImpl(cmisObject.getId()));
     }
 
     ContentStream getContent(ObjectId id) {
+        if (id == null)
+            throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
         return root.findTreeNodeForId(id.getId()).getContentStream();

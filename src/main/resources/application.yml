@@ -1,4 +1,14 @@
 debug: false
+
+info:
+  version: '@pom.version@'
+  app:
+    name: '@pom.name@'
+  build:
+    version: '@project.version@'
+    number:  '@buildNumber@'
+    date:    '@maven.build.timestamp@'
+
 ksul:
   archiv:
     server: http://localhost:9080/alfresco/
