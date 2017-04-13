@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="true">
+<configuration debug="false">
 
     <jmxConfigurator/>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
@@ -9,6 +9,6 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
-    <logger name="de.ksul" level="DEBUG"/>
+    <logger name="de.ksul" level="INFO"/>
 </configuration>
 

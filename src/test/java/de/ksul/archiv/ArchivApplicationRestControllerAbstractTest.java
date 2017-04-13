@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -76,28 +77,15 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     }
 
-    @Test
-    public void testGetConnection() throws Exception {
-        this.mockMvc.perform(get("/getConnection")
-                .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.error", nullValue()))
-                .andExpect(jsonPath("$.data.server", nullValue()))
-                .andExpect(jsonPath("$.data.binding", nullValue()))
-                .andExpect(jsonPath("$.data.user", nullValue()))
-                .andExpect(jsonPath("$.data.password", nullValue()));
 
-    }
 
     @Test
     public void testOpenDocument() throws Exception {
-        RestRequest restRequest = new RestRequest();
-        restRequest.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
+        RestRequest request = new RestRequest();
+        request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
         this.mockMvc.perform(post("/openDocument")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content( objectMapper.writeValueAsBytes(restRequest))
+                .content( objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -106,10 +94,10 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.name", is("backup.js.sample")))
                 .andExpect(jsonPath("$.mimeType", is("application/x-javascript")))
                 .andExpect(jsonPath("$.data", startsWith(Base64.encodeBase64String("// ".getBytes()))));
-        restRequest.setDocumentId("1");
+        request.setDocumentId("1");
         this.mockMvc.perform(post("/openDocument")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content( objectMapper.writeValueAsBytes(restRequest))
+                .content( objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -121,21 +109,21 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetNodeId() throws Exception {
-        RestRequest restRequest = new RestRequest();
-        restRequest.setFilePath("/");
+        RestRequest request = new RestRequest();
+        request.setFilePath("/");
         this.mockMvc.perform(post("/getNodeId")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
                 .andExpect(jsonPath("$.data", notNullValue()));
-        restRequest.setFilePath("/xyz");
+        request.setFilePath("/xyz");
         this.mockMvc.perform(post("/getNodeId")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -154,16 +142,16 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("cmis:document", p1);
         extraProperties.put("P:cm:titled", p2);
-        RestRequest restRequest = new RestRequest();
-        restRequest.setDocumentId(folder.getId());
-        restRequest.setFileName("Testdocument");
-        restRequest.setContent(Base64.encodeBase64String("Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?".getBytes()));
-        restRequest.setMimeType("text");
-        restRequest.setVersionState(VersioningState.MINOR.value());
-        restRequest.setExtraProperties(extraProperties);
+        RestRequest request = new RestRequest();
+        request.setDocumentId(folder.getId());
+        request.setFileName("Testdocument");
+        request.setContent(Base64.encodeBase64String("Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?".getBytes()));
+        request.setMimeType("text");
+        request.setVersionState(VersioningState.MINOR.value());
+        request.setExtraProperties(extraProperties);
         this.mockMvc.perform(post("/createDocument")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -250,11 +238,11 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetNode() throws Exception {
-        RestRequest restRequest = new RestRequest();
-        restRequest.setFilePath("/Datenverzeichnis");
+        RestRequest request = new RestRequest();
+        request.setFilePath("/Datenverzeichnis");
         this.mockMvc.perform(post("/getNode")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -264,10 +252,10 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.data.parentId", notNullValue()))
                 .andExpect(jsonPath("$.data.path", is("/Datenverzeichnis")))
                 .andExpect(jsonPath("$.data.name", is("Datenverzeichnis")));
-        restRequest.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
+        request.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
         this.mockMvc.perform(post("/getNode")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -277,10 +265,10 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.data.name", is("backup.js.sample")))
                 .andExpect(jsonPath("$.data.parents", isA(LinkedHashMap.class)))
                 .andExpect(jsonPath("$.data.parents.size()", is(1)));
-        restRequest.setFilePath("/xyz");
+        request.setFilePath("/xyz");
         this.mockMvc.perform(post("/getNode")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -291,11 +279,11 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetNodeById() throws Exception {
-        RestRequest restRequest = new RestRequest();
-        restRequest.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
+        RestRequest request = new RestRequest();
+        request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
         this.mockMvc.perform(post("/getNodeById")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -305,10 +293,10 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.data.name", is("backup.js.sample")))
                 .andExpect(jsonPath("$.data.parents", isA(LinkedHashMap.class)))
                 .andExpect(jsonPath("$.data.parents.size()", is(1)));
-        restRequest.setDocumentId("9999");
+        request.setDocumentId("9999");
         this.mockMvc.perform(post("/getNodeById")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -384,22 +372,22 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetDocumentContent() throws Exception {
-        RestRequest restRequest = new RestRequest();
-        restRequest.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
-        restRequest.setExtract(false);
+        RestRequest request = new RestRequest();
+        request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
+        request.setExtract(false);
         this.mockMvc.perform(post("/getDocumentContent")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
                 .andExpect(jsonPath("$.data", startsWith("// ")));
-        restRequest.setDocumentId("x");
+        request.setDocumentId("x");
         this.mockMvc.perform(post("/getDocumentContent")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -411,23 +399,23 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
     @Test
     public void testUploadDocument() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
-        RestRequest restRequest = new RestRequest();
-        restRequest.setDocumentId(folder.getId());
-        restRequest.setFileName(System.getProperty("user.dir") + filePdf);
-        restRequest.setVersionState(VersioningState.MINOR.value());
+        RestRequest request = new RestRequest();
+        request.setDocumentId(folder.getId());
+        request.setFileName(System.getProperty("user.dir") + filePdf);
+        request.setVersionState(VersioningState.MINOR.value());
         this.mockMvc.perform(post("/uploadDocument")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
                 .andExpect(jsonPath("$.data", isA(String.class)));
-        restRequest.setDocumentId("999");
+        request.setDocumentId("999");
         this.mockMvc.perform(post("/uploadDocument")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsBytes(restRequest))
+                .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -435,4 +423,83 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.error", notNullValue()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
+
+    @Test
+    public void testUpdateProperties() throws Exception {
+        CmisObject folder = buildTestFolder("TestFolder", null);
+        CmisObject document = buildDocument("TestDocument", folder);
+        long time = new Date().getTime();
+        Map<String, Object> p1 = new HashMap<>();
+        p1.put("cm:description", "Testdokument");
+        p1.put("cm:title", "Testdokument");
+        Map<String, Object> p2 = new HashMap<>();
+        p2.put("cm:sentdate", time);
+        Map<String, Object> p3 = new HashMap<>();
+        p3.put("my:amount", 25.33);
+        p3.put("my:tax", true);
+        Map<String, Object> p4 = new HashMap<>();
+        p4.put("my:person", "Katja");
+        p4.put("my:documentDate", time);
+        Map<String, Object> p5 = new HashMap<>();
+        p5.put("my:idvalue", null);
+        Map<String, Object> extraProperties = new HashMap<>();
+        extraProperties.put("P:cm:titled", p1);
+        extraProperties.put("P:cm:emailed", p2);
+        extraProperties.put("P:my:amountable", p3);
+        extraProperties.put("D:my:archivContent", p4);
+        extraProperties.put("P:my:idable", p5);
+        RestRequest request = new RestRequest();
+        request.setDocumentId(document.getId());
+        request.setExtraProperties(extraProperties);
+        this.mockMvc.perform(post("/updateProperties")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data", isA(LinkedHashMap.class)))
+                .andExpect(jsonPath("$.data.amount", is(25.33)))
+                .andExpect(jsonPath("$.data.person", is("Katja")))
+                .andExpect(jsonPath("$.data.versionLabel", is("0.1")))
+                .andExpect(jsonPath("$.data.name", is("TestDocument")))
+                .andExpect(jsonPath("$.data.tax", is(true)));
+        extraProperties.clear();
+        p3.put("my:amount", 25.34);
+        p5.put("my:idvalue", "123");
+        extraProperties.put("P:cm:titled", p1);
+        extraProperties.put("P:cm:emailed", p2);
+        extraProperties.put("P:my:amountable", p3);
+        extraProperties.put("D:my:archivContent", p4);
+        extraProperties.put("P:my:idable", p5);
+        request.setDocumentId(document.getId());
+        request.setExtraProperties(extraProperties);
+        this.mockMvc.perform(post("/updateProperties")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data", isA(LinkedHashMap.class)))
+                .andExpect(jsonPath("$.data.amount", is(25.34)))
+                .andExpect(jsonPath("$.data.person", is("Katja")))
+                .andExpect(jsonPath("$.data.versionLabel", is("0.1")))
+                .andExpect(jsonPath("$.data.name", is("TestDocument")))
+                .andExpect(jsonPath("$.data.tax", is(true)))
+                .andExpect(jsonPath("$.data.idvalue", is("123")));
+        request.setDocumentId("x");
+        this.mockMvc.perform(post("/updateProperties")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", notNullValue()))
+                .andExpect(jsonPath("$.data", nullValue()));
+    }
+
 }

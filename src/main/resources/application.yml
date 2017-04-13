@@ -19,5 +19,10 @@ logging:
   level: info
 
 spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
   main:
     banner-mode: log

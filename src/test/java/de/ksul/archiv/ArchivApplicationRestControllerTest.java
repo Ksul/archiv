@@ -4,11 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import de.ksul.archiv.controller.ArchivController;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,6 +47,21 @@ public class ArchivApplicationRestControllerTest extends ArchivApplicationRestCo
         fileTxt = "/src/test/resources/test.txt";
         fileZip = "/src/test/resources/Sample.zip";
         super.setUp();
+    }
+
+    @Test
+    public void testGetConnection() throws Exception {
+        this.mockMvc.perform(get("/getConnection")
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data.server", nullValue()))
+                .andExpect(jsonPath("$.data.binding", nullValue()))
+                .andExpect(jsonPath("$.data.user", nullValue()))
+                .andExpect(jsonPath("$.data.password", nullValue()));
+
     }
 
 }

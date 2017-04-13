@@ -570,7 +570,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         extraProperties.put("P:my:amountable", p3);
         extraProperties.put("D:my:archivContent", p4);
         extraProperties.put("P:my:idable", p5);
-         request.setDocumentId(document.getId());
+        request.setDocumentId(document.getId());
         request.setExtraProperties(extraProperties);
         obj = services.updateProperties(request);
         assertThat(obj, notNullValue());
