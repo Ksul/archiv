@@ -16,25 +16,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ArchivTestConfiguration.class, ArchivConfiguration.class})
 public class ArchivApplicationTests {
-
-
-	@Autowired
-	private MockMvc mockMvc;
-
-
-
 	@Test
 	public void contextLoads() {
-	}
-
-
-	@Test
-	public void testIsConnected() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/Archiv/isConnected")
-				.accept(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.content().contentType("application/json"));
-
 	}
 
 }

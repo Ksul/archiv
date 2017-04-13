@@ -284,7 +284,6 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     }
 
 
-
     @Test
     public void testGetDocumentContent() throws Exception{
         byte[] content = con.getDocumentContent((Document) con.findDocument("SELECT * from cmis:document where cmis:name='backup.js.sample'", null, null).iterator().next());
