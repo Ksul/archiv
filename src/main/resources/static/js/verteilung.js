@@ -54,6 +54,7 @@ function manageControls() {
     document.getElementById('sendRules').removeAttribute("disabled");
     document.getElementById('saveRules').setAttribute("disabled", true);
     document.getElementById('sendToInbox').style.display = 'block';
+    document.getElementById('sendToInbox').removeAttribute("disabled");
 
     if (testMode) {
         document.getElementById('test').style.display = 'none';
@@ -72,8 +73,10 @@ function manageControls() {
         document.getElementById('play').setAttribute("disabled", true);
     }
 */
-    if (textEditor.getSession().getValue().length == 0)
+    if (textEditor.getSession().getValue().length == 0) {
         document.getElementById('searchCont').setAttribute("disabled", true);
+        document.getElementById('sendToInbox').setAttribute("disabled", true);
+    }
     if (multiMode) {
         document.getElementById('inTxt').style.display = 'none';
         document.getElementById('dtable').style.display = 'block';
