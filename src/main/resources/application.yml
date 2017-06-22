@@ -23,6 +23,9 @@ server:
 management:
   security:
     enabled: false
+    info:
+      git:
+        mode: full
 
 logging:
   path: ./
