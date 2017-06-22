@@ -200,13 +200,13 @@
                          class="inner-center container tabPanel hidden">
                         <ul id="menu-1" class="sf-menu" onmouseover="alfrescoLayout.allowOverflow(this);">
                             <li class="current">
-                                <a href="#ansicht" class="fa fa-eye fa-2x" ></a>
+                                <a href="#ansicht" class="fa fa-file-text-o fa-1x" ></a>
                                 <ul class="tabPanel">
                                     <li>
-                                        <a href="#normal" class="fa fa-file-text-o fa-2x" onclick="showAlfrescoNormalView();"></a>
+                                        <a href="#normal" class="fa fa-file-text-o fa-1x" onclick="showAlfrescoNormalView();"></a>
                                     </li>
                                     <li>
-                                        <a href="#icons" class="fa fa-photo fa-2x" onclick="showAlfrescoIconView();"></a>
+                                        <a href="#icons" class="fa fa-photo fa-1x" onclick="showAlfrescoIconView();"></a>
                                     </li>
                                 </ul>
                             </li>
@@ -248,11 +248,11 @@
             <div id="tab2" class="tabPanel hidden">
                 <div id="searchNorth" onmouseover="searchLayout.allowOverflow(this);" class="inner-north container ui-widget-header hidden" >
                     <div id="searchNorthCenter" class="inner-center tabPanel hidden">
-                        <label for="alfrescoSearch" style="float:left;margin: 20px 5px 5px 5px;">Suche </label>
-                        <input id="alfrescoSearch" style="width:400px;height:auto;float:left;margin: 20px 5px 5px 5px;"
+                        <label for="alfrescoSearch" style="float:left;margin: 5px 5px 5px 5px;">Suche </label>
+                        <input id="alfrescoSearch" style="width:400px;height:auto;float:left;margin: 2px 5px 5px 5px;"
                                class="ui-autocomplete-input" autocomplete="off"/>
                         <div id="alfrescoSearchButton" onclick="startSearch($('#alfrescoSearch').val());"
-                             style="margin: 18px 5px 5px 5px;">Suche
+                             style="margin: 0px 5px 5px 5px;">Suche
                         </div>
                     </div>
                     <div id="searchNorthEast"
@@ -260,13 +260,13 @@
                         <ul id="menu-2" style="float: right;" class="sf-menu"
                             onmouseover="searchLayout.allowOverflow(this);">
                             <li class="current">
-                                <a href="#ansicht">Ansicht</a>
-                                <ul class="ui-widget-header">
+                                <a href="#ansicht" class="fa fa-file-text-o fa-1x" ></a>
+                                <ul class="tabPanel">
                                     <li>
-                                        <a href="#normal" onclick="showAlfrescoSearchNormalView();">Normal</a>
+                                        <a href="#normal" class="fa fa-file-text-o fa-1x" onclick="showAlfrescoSEarchNormalView();"></a>
                                     </li>
                                     <li>
-                                        <a href="#icons" onclick="showAlfrescoSearchIconView();">Icons</a>
+                                        <a href="#icons" class="fa fa-photo fa-1x" onclick="showAlfrescoSearchIconView();"></a>
                                     </li>
                                 </ul>
                             </li>
