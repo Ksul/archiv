@@ -48,7 +48,7 @@
             <xsd:attribute name="word" type="xsd:string" use="optional">
                 <xsd:annotation>
                     <xsd:documentation>Sucht nach ganzen Wörtern. Der Parameter kann aus 2 Komponenten bestehen, die
-                        durch ein KOmma getrennt werden
+                        durch ein Komma getrennt werden
                         Der erste Wert beschreibt di Anzahl Wörter bis zum gesuchten Ergebnis
                         Der zweite (optionale) Wert gibt die Anzahl Wörter an, die in das Ergebnis übernommen werden
                         sollen (Default: 1)
@@ -105,7 +105,7 @@
                     <xsd:documentation>Groß/Kleinschreibung wird bei der Suche berücksichtigt.</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
-            <xsd:attribute name="dir" use="optional">
+            <xsd:attribute name="direction" use="optional">
                 <xsd:annotation>
                     <xsd:documentation></xsd:documentation>
                 </xsd:annotation>
