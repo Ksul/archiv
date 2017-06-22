@@ -60,12 +60,12 @@ if (typeof (space) == "undefined") {
     };
     Liste.prototype.add = function(element) {
         if (this.contains(element))
-            throw "Element " + element.name + " bereits vorhanden";
+            throw "Element " + element.name + " already available";
         this.push(element);
     };
     Liste.prototype.remove = function(element) {
         if (!this.contains(element))
-            throw "Element " + element.name + " nicht vorhanden";
+            throw "Element " + element.name + " not available";
         for (var i = 0; i < this.length; i++) {
             if (this[i] == element)
                 delete this[i];
@@ -186,7 +186,7 @@ if (typeof (space) == "undefined") {
 
     ScriptNode.prototype.createFolder = function (name) {
         if (this.type != "cm:folder")
-            throw "Kein Folder!";
+            throw "no folder!";
         var newFolder = new ScriptNode(name, "cm:folder");
         this.children.add(newFolder);
         newFolder.parent.add(this);
@@ -210,7 +210,7 @@ if (typeof (space) == "undefined") {
 
     ScriptNode.prototype.checkout = function () {
         if (this.hasAspect(("cm:workingcopy")))
-            throw "Der Knoten " + this.name + " ist bereits ausgecheckt!";
+            throw "Node " + this.name + " is already checked out!";
         var workNode = this.clone();
         workNode.addAspect("cm:workingcopy");
         workNode.workingParent = this;
@@ -223,7 +223,7 @@ if (typeof (space) == "undefined") {
 
     ScriptNode.prototype.checkin = function () {
         if (!REC.exist(this.workingParent) || !this.hasAspect(("cm:workingcopy")))
-            throw "Der Knoten " + this.name + " ist nicht ausgecheckt!";
+            throw "Node " + this.name + " is not checked out!";
         this.aspect.remove(new BasicObject("cm:workingcopy"));
         var i = 1;
         while(this.workingParent.versions.contains(new BasicObject(i)))
@@ -237,9 +237,9 @@ if (typeof (space) == "undefined") {
 
     ScriptNode.prototype.getVersion = function(label) {
         if (!this.isVersioned())
-            throw this.name + " ist nicht versioniert!";
+            throw this.name + " has no version!";
         if (!this.versions.contains(new BasicObject(label)))
-            throw "Version " + label + " von " +this.name + " ist nicht vorhanden!";
+            throw "Version " + label + " of " +this.name + " is not available!";
         return this.versions.get(new BasicObject(label)).value;
     };
 
@@ -253,7 +253,7 @@ if (typeof (space) == "undefined") {
 
     ScriptNode.prototype.createNode = function (name, typ, assocType) {
         if (this.type != "cm:folder" && this.type != "fm:forum" && this.type != "fm:topic")
-            throw "Kein Folder!";
+            throw "No Folder!";
         var newNode =  new ScriptNode(name, typ);
         this.children.add(newNode);
         newNode.parent.add(this);
@@ -265,7 +265,7 @@ if (typeof (space) == "undefined") {
 
     ScriptNode.prototype.addNode = function(node){
         if (this.type != "cm:folder" && this.type != "fm:forum" && this.type != "fm:topic")
-            throw "Kein Folder!";
+            throw "No Folder!";
         this.children.add(node);
         node.parent.add(this);
         node.displayPath = node._getDisplayPath();
@@ -401,7 +401,7 @@ if (typeof (space) == "undefined") {
     CategoryNode.prototype.createRootCategory = function(aspect, name) {
         var obj = new BasicObject(name);
         if (this.rootCategories.contains(obj))
-            throw "Root Category " + name + " bereits vorhanden!";
+            throw "Root Category " + name + " is already avaiable!";
         var rootCategory =  new CategoryNode(aspect, name);
         this.rootCategories.add(rootCategory);
         return rootCategory;
@@ -1407,8 +1407,8 @@ function ArchivTyp(srch) {
     };
 
     /**
-     * handelt das Dokument
-     * @param {array} documente     eine Liste der gefundenen bereits vorhandene gleichen Dokumente
+     * handelt das Verhalten für die Dokumente
+     * @param {array} documente    eine Liste der gefundenen bereits vorhandene gleichen Dokumente
      * @param destination          das ermittelte Ziel Verzeichnis für das hochgeladene Dokument
      */
     this.handleDocument = function(documente, destination) {
@@ -1434,7 +1434,7 @@ function ArchivTyp(srch) {
                     break;
                 } else {
                     // this.unique == "error"
-                    // Fehler werfen und hochgeladenes Dokument in die Duplicate Box stellen
+                    // Fehler werfen und hochgeladenes Dokument in die Duplicate Box stellen (Standard)
                     REC.errors.push("Dokument mit dem " + (REC.currentDocument.name == document.name ? "Dateinamen " + REC.currentDocument.name : "Titel " + REC.currentDocument.properties["cm:title"]) + " ist im Zielordner bereits vorhanden! ");
                     REC.log(TRACE, "ArchivTyp.resolve: move document to folder " + REC.completeNodePath(REC.duplicateBox));
                     if (!REC.currentDocument.move(REC.duplicateBox))
@@ -1475,7 +1475,7 @@ function ArchivTyp(srch) {
             found = true;
             if (this.name != "Fehler")
                 REC.currXMLName.push(this.name);
-            REC.log(INFORMATIONAL, "Regel gefunden " + this.name);
+            REC.log(INFORMATIONAL, "Rule found " + this.name);
             if (REC.exist(REC.currentSearchItems)) {
                 REC.currentSearchItems = REC.currentSearchItems.concat(this.searchItem);
             } else
@@ -1534,7 +1534,7 @@ function ArchivTyp(srch) {
                             }
                             if (REC.errors.length > 0) {
                                 if (!REC.currentDocument.move(REC.errorBox))
-                                    REC.errors.push("Dokument konnte nicht in den Zielordner verschoben werden " + REC.completeNodePath(REC.errorBox));
+                                    REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
                                 return found;
                             }
                         }
@@ -1579,7 +1579,7 @@ function ArchivTyp(srch) {
                             }
                         }
                     } else {
-                        REC.errors.push("kein Zielordner vorhanden!");
+                        REC.errors.push("no suitable destination folder!");
                     }
                 }
             }
@@ -1656,7 +1656,7 @@ function ArchivPosition(srch) {
                     if (dir.length > 0)
                         fol = companyhome.childByNamePath(dir);
                     if (!REC.exist(fol)) {
-                        REC.log(INFORMATIONAL, "erstelle Folder " + dir);
+                        REC.log(INFORMATIONAL, "create folder " + dir);
                         if (top == null) {
                             REC.log(TRACE, "buildFolder: create Folder[" + part + "] at companyhome ");
                             top = companyhome.createFolder(part);
@@ -1665,7 +1665,7 @@ function ArchivPosition(srch) {
                             top = top.createFolder(part);
                         }
                         if (top == null) {
-                            REC.errors.push("Folder " + dir + " konnte nicht erstellt werden");
+                            REC.errors.push("Folder " + dir + " not successfuly created");
                             break;
                         }
                     } else {
@@ -1690,7 +1690,7 @@ function ArchivPosition(srch) {
         if (REC.exist(this.folder)) {
             var tmp1 = REC.replaceVar(this.folder);
             if (!tmp1[1]) {
-                erg = "Variabel konnte nicht im Foldernamen ersetzt werden!\n";
+                erg = "replace of variabel in name of folder not successful!\n";
                 REC.errors.push(erg);
                 return;
             }
@@ -1698,7 +1698,7 @@ function ArchivPosition(srch) {
             var exp = new RegExp("[*\"<>\?:|]|\\.$");
             if (tmp.match(exp)) {
                 var m = exp.exec(tmp);
-                erg = "Ung\ufffdtige Zeichen f\ufffdr Foldernamen!\n";
+                erg = "invalid characters for a foldername\n";
                 erg = erg + tmp + "\n";
                 erg = erg + "Position " + m.index + ":\n";
                 for (var i = 0; i < m.length; i++) {
@@ -2431,8 +2431,14 @@ function SearchItem(srch) {
         var erg = null;
         var exp = [];
         if (kind[0] == "date") {
-            exp[0] = new RegExp("\\d{1,2}\\.?.[ ]{0,9}[A\\u00C4BCDEFGIJKLMNOPRSTUVYZa\\u00E4bcdefgijklmnoprstuvyz]+\\.?[ ]{0,9}(\\d{4}|\\d{2})|\\d{1,2}\\.\\d{1,2}\\.(\\d{4}|\\d{2})", "g");
-            exp[1] = new RegExp("[A\\u00C4BCDEFGIJKLMNOPRSTUVYZa\\u00E4bcdefgijklmnoprstuvyz]+\\.?[ ]{0,9}(\\d{4}|\\d{2})|\\d{1,2}\\.\\d{1,2}\\.(\\d{4}|\\d{2})", "g");
+            // dd.mm.yyyy or dd.mm.yy or dd-mm-yy
+            exp[0] = new RegExp("((0| )[1-9]|[12][0-9]|3[01])[ \\.-](0[1-9]|1[012])[ \\.-](19|20|)\\d\\d", "g");
+            // dd.MMMM.yyyy or dd.MMMM.yy
+            exp[1] = new RegExp("((0| )[1-9]|[12][0-9]|3[01])(.|. | )(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember])[ ](19|20|)\\d\\d", "g");
+            // MMMM.yyyy or MMMM.yy
+            exp[2] = new RegExp("(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember])[ ](19|20|)\\d\\d", "g");
+            //exp[3] = new RegExp("\\d{1,2}\\.?.[ ]{0,9}[A\\u00C4BCDEFGIJKLMNOPRSTUVYZa\\u00E4bcdefgijklmnoprstuvyz]+\\.?[ ]{0,9}(\\d{4}|\\d{2})|\\d{1,2}\\.\\d{1,2}\\.(\\d{4}|\\d{2})", "g");
+            //exp[2] = new RegExp("[A\\u00C4BCDEFGIJKLMNOPRSTUVYZa\\u00E4bcdefgijklmnoprstuvyz]+\\.?[ ]{0,9}(\\d{4}|\\d{2})|\\d{1,2}\\.\\d{1,2}\\.(\\d{4}|\\d{2})", "g");
         } else if (kind[0] == "amount") {
             exp[0] = new RegExp("((([0-9]{1,3}\\.)*[0-9]{1,3})|\\d+)(?:\\.|,(\\d{2}))?( Euro| EUR| \\u20AC)", "g");
         } else if (kind[0] == "float") {
@@ -2444,19 +2450,29 @@ function SearchItem(srch) {
             if (REC.exist(match)) {
                 for (var k = 0; k < match.length; k++) {
                     var result = exp[i].exec(text);
-                    if (kind[0] == "date")
+                    if (kind[0] == "date") {
                         typ = "date";
+                        if (match[k].length <= 5)
+                            break;
+                    }
                     else if (kind[0] == "amount" || kind[0] == "float")
                         typ = "float";
                     var res = new SearchResult(text, match[k], null, result.index, result.index + match[k].length, typ, expected);
                     res.convertValue();
+                    // prüfen, ob der gefundene Wert schon in der Liste der Werte enthalten ist. Falls ja, kann dieses Ergebnis ignoriert werden
                     if (REC.exist(res.val)) {
-                        ret.push(res);
+                        var marker = false;
+                        for (var l = 0; l < ret.length; l++) {
+                            if (ret[l].getStart() <= res.getStart() && ret[l].getEnd() >= res.getEnd())
+                                marker = true;
+                        }
+                        if (!marker)
+                            ret.push(res);
                     }
                 }
-                break;
             }
         }
+        ret.sort(function(a, b){return a.getStart() - b.getStart()});
         if (left)
             ret.reverse();
         return ret.slice(kind[1] - 1);
@@ -3054,7 +3070,7 @@ function SearchResult(document, text, val, startPos, endPos, typ, expected) {
                         tmp.unshift("01");
                     for (var k = tmp.length; k > 0; k--) {
                         if (k > 3) {
-                            REC.log(WARN, "Kein Datum " + text);
+                            REC.log(WARN, "No Date " + text);
                             return null;
                         }
                         if (k == tmp.length && tmp[k - 1].length == 2)
@@ -3776,13 +3792,13 @@ REC = {
     getRules: function () {
         var rules = script.parent.childByNamePath("doc.xml");
         if (!this.exist(rules)) {
-            throw "Regeln nicht gefunden";
+            throw "Rules not found";
         }
-        this.log(INFORMATIONAL, "Regeln gefunden!");
-        this.log(TRACE, "Lade XML...");
+        this.log(INFORMATIONAL, "Rules found!");
+        this.log(TRACE, "Load XML...");
         XMLDoc.loadXML(rules.content + "");
         XMLDoc.parse();
-        this.log(TRACE, "XML geladen");
+        this.log(TRACE, "XML load");
         return new XMLObject(XMLDoc.docNode);
     },
     getIdent: function (count) {
@@ -3800,10 +3816,10 @@ REC = {
             erg = trans.content + "";
             trans.remove();
             if (!this.exist(erg) || erg.length == 0) {
-                throw "Dokumenteninhalt konnte nicht gefunden werden";
+                throw "Content of document not found";
             }
         } else {
-            throw "Dokumenteninhalt konnte nicht extrahiert werden";
+            throw "Content of document could not be extracted";
         }
         return erg.replace(/\r\n/g,'\n');
     },
@@ -3942,11 +3958,47 @@ REC = {
                 break;
         }
         if (!ruleFound) {
-            this.errors.push("Unbekanntes Dokument, keine passende Regel gefunden!");
-            if (!doc.move(this.unknownBox))
-               REC.errors.push("Dokument konnte nicht in den Zielordner verschoben werden " + REC.completeNodePath(REC.unknownBox));
+            this.errors.push("Unknown document, no suitable rule found!");
+            var moved = false;
+            // Datum suchen
+            var searchItem = new SearchItem({});
+            var erg =  searchItem.findSpecialType(this.content, ["date"], false, null);
+            if (REC.exist(erg))  {
+                // Datum gefunden. Jetzt prüfen, welches Datum am nächsten am aktuellen Tagesdatum liegt weil das wahrscheinlich das gesuchte Datum ist
+                var currentDate = new Date();
+                // Vergleichsdatum um zu prüfen, ob das das Datum in der Vergangenheit ( + 6 Monate für irgendwelche Vordatierungen)
+                var compareDate = currentDate.setMonth(currentDate.getMonth() + 6);
+                var foundDate;
+                for (var j = 0; j < erg.length; j++) {
+                    // prüfen ob Datum kleiner als Vergleichsdatum ist und dann das finden was am nächsten am aktuellen Datum liegt
+                    if (erg[j].val < compareDate && (!REC.exist(foundDate) || Math.abs(foundDate - currentDate) > Math.abs(erg[j].val - currentDate)))
+                        foundDate = erg[j].val;
+                }
+                // Foldernamen bilden
+                var folderName;
+                if (!REC.exist(foundDate)) {
+                    // kein plausibles Datum gefunden, also so in den Folder legen
+                    this.log(INFORMATIONAL, "No suitable date found in document " + docName + "! Document will be moved direct to folder...");
+                    folderName = this.unknownBox.name;
+                }
+                else
+                    // Datum gefunden und daraus den Foldernamen bilden
+                    folderName = this.unknownBox.name + '/' + foundDate.getFullYear() + '/'  + REC.dateFormat(foundDate, "F");
+                this.log(INFORMATIONAL, "Document " + docName + " move to " + folderName + "...");
+                var r = {
+                    folder: folderName
+                    };
+                var archivPosition = new ArchivPosition(r);
+                var destination = archivPosition.resolve();
+                if (!doc.move(destination))
+                    REC.errors.push("Document not successful moved to " + REC.completeNodePath(destination));
+                else
+                    moved = true;
+            }
+            if ( !moved && !doc.move(this.unknownBox))
+               REC.errors.push("Document not successfuly moved to aim " + REC.completeNodePath(REC.unknownBox));
         }
-        this.log(INFORMATIONAL, "Process Dokument " + docName + " finished!");
+        this.log(INFORMATIONAL, "Processing of document " + docName + " finished!");
     },
 
     run: function () {
@@ -3959,7 +4011,7 @@ REC = {
                     str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
                 str = str + "Stacktrace: \n" + e.stack.split('\n').reverse().join('\n');
                 this.log(ERROR, str);
-                this.errors.push("Fehler: " + e.toString());
+                this.errors.push("Error: " + e.toString());
             } finally {
                 this.handleUnexpected(this.fehlerBox);
                 logger.log(this.getMessage(false));
