@@ -4,6 +4,7 @@
  */
 function showAlfrescoNormalView(){
     alfrescoTabelle.settings().init().iconView = false;
+    viewMenuNormal.get(0).children[0].children[0].setAttribute('class','fa fa-file-text-o fa-1x');
     viewMenuNormal.children('li:first').superfish('hide');
     alfrescoTabelle.column(0).visible(true);
     alfrescoTabelle.column(1).visible(true);
@@ -17,6 +18,7 @@ function showAlfrescoNormalView(){
  */
 function showAlfrescoIconView(){
     alfrescoTabelle.settings().init().iconView = true;
+    viewMenuNormal.get(0).children[0].children[0].setAttribute('class','fa fa-photo fa-1x');
     viewMenuNormal.children('li:first').superfish('hide');
     alfrescoTabelle.column(0).visible(false);
     alfrescoTabelle.column(1).visible(false);
@@ -32,6 +34,7 @@ function showAlfrescoIconView(){
  */
 function showAlfrescoSearchNormalView(){
     alfrescoSearchTabelle.settings().init().iconView = false;
+    viewMenuSearch.get(0).children[0].children[0].setAttribute('class','fa fa-file-text-o fa-1x');
     viewMenuSearch.children('li:first').superfish('hide');
     alfrescoSearchTabelle.column(0).visible(true);
     alfrescoSearchTabelle.column(1).visible(true);
@@ -44,6 +47,7 @@ function showAlfrescoSearchNormalView(){
  */
 function showAlfrescoSearchIconView() {
     alfrescoSearchTabelle.settings().init().iconView = true;
+    viewMenuSearch.get(0).children[0].children[0].setAttribute('class','fa fa-photo fa-1x');
     viewMenuSearch.children('li:first').superfish('hide');
     alfrescoSearchTabelle.column(0).visible(false);
     alfrescoSearchTabelle.column(1).visible(false);
@@ -286,10 +290,10 @@ function loadLayout() {
             north: {
                 paneSelector: "#searchNorth",
                 name: "searchNorthLayout",
-                size: 45,
-                fxSettings_open: {easing: "easeOutBounce"},
-                closable: false,
+                minSize: 34,
+                maxSize: 34,
                 resizable: false,
+                closable: false,
                 slidable: false,
                 children: {
                     name: "searchNorthInnerLayout",
@@ -348,8 +352,8 @@ function loadLayout() {
             north: {
                 paneSelector: "#alfrescoNorth",
                 name: "alfrescoNorthLayout",
-                minSize: 25,
-                maxSize: 25,
+                minSize: 34,
+                maxSize: 34,
                 resizable: false,
                 closable: false,
                 children: {
