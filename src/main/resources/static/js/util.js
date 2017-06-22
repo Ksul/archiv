@@ -45,7 +45,7 @@ function executeService(service, params) {
     var errorMessage;
     var successMessage;
     var done;
-    var url = "/Archiv/";
+    var url = window.location.pathname.substring(0, window.location.pathname.indexOf("/",2)) + "/";
     var longParameter = false;
     var times = [];
     try {
