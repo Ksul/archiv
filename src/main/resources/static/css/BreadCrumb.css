@@ -51,14 +51,24 @@
 	display: block;
 	float: left;
 	position: relative;
-
+	height: 28px;
 	overflow: hidden;
 	line-height: 21px;
 	margin: 0px 6px 0px 0;
-	padding: 0px 10px 0px 0;
-	font-size: .9167em;
-	background: url(.././images/Chevron.gif) no-repeat 100% 0;
+	padding: 0px 21px 0px 0;
+
+	
 }
+
+.breadCrumb ul li:after {
+	content: "\f105";
+	font-family: FontAwesome;
+	position:absolute;
+	top:0;
+	font-size: 500%;
+	color: blanchedalmond;
+}
+
 .breadCrumb ul li div.chevronOverlay
 {
 	position: absolute;
@@ -75,8 +85,8 @@
 {
 	display: block;
 	position: relative;
-	height: 21px;
-	line-height: 21px;
+	height: 28px;
+	line-height: 28px;
 	overflow: hidden;
 	float: left;
 }
