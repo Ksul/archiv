@@ -67,7 +67,7 @@ public class Repository {
             throw new RuntimeException("no Root Node!");
         TreeNode<FileableCmisObject> startNode = root.findTreeNodeForId(id);
         for (TreeNode<FileableCmisObject> node : startNode){
-           if (!node.equals(startNode)) {
+           if (node.getParent() != null && node.getParent().equals(startNode)) {
                skip--;
                if (skip <= 0)
                    ret.add(node.getData());

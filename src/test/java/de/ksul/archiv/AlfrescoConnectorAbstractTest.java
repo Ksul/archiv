@@ -52,7 +52,9 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
 
        CmisObject folder = buildTestFolder("TestFolder", null);
        Map<String, Object> properties = new HashMap<>();
-       buildTestFolder("Folder", folder);
+       CmisObject testFolder = buildTestFolder("Folder", folder);
+
+       buildTestFolder("Folder1", testFolder);
 
        CmisObject cmisObject = buildDocument("ADocument", folder);
        properties.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
