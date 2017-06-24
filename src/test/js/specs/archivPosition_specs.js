@@ -25,7 +25,7 @@ describe("Test für ArchivPosition", function() {
         var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
         erg = archivPosition.resolve();
         expect(erg).not.toBeDefined();
-        expect(REC.errors[0]).toBe("Ung\ufffdtige Zeichen f\ufffdr Foldernamen!\n/Archiv/Dokumente/Auto/KFZ :Steuern\nPosition 27:\n:\n");
+        expect(REC.errors[0]).toBe("invalid characters for a foldername\n/Archiv/Dokumente/Auto/KFZ :Steuern\nPosition 27:\n:\n");
     });
 
     it("Test3", function () {
@@ -49,7 +49,7 @@ describe("Test für ArchivPosition", function() {
         var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
         erg = archivPosition.resolve();
         expect(erg).not.toBeDefined();
-        expect(REC.errors[1]).toBe("Variabel konnte nicht im Foldernamen ersetzt werden!\n");
+        expect(REC.errors[1]).toBe("replace of variabel in name of folder not successful!\n");
     });
 
     it("testResolveFolder1", function () {
