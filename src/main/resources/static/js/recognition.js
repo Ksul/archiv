@@ -1240,14 +1240,18 @@ function XMLNode(nodeType, doc, str) {
 
 /**
  * beschreibt einen Dokument Typen
- * @param srch  die Parameter
+ * @param srch    die Parameter
+ * @param parent  der Parent Archivtyp
  * @constructor
  */
-function ArchivTyp(srch) {
+function ArchivTyp(srch, parent) {
     var i;
+    // Merker ob eine Destination ermittelt werden konnte
+    this.destinationResolved = false;
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
     this.name = srch.name;
+    this.parent = parent;
     this.searchString = srch.searchString;
     this.type = srch.type;
     if (REC.exist(srch.unique))
@@ -1323,7 +1327,7 @@ function ArchivTyp(srch) {
     if (REC.exist(srch.archivTyp)) {
         REC.log(TRACE, "Archivtyp exist");
         for (i = 0; i < srch.archivTyp.length; i++)
-            tmp.push(new ArchivTyp(srch.archivTyp[i]));
+            tmp.push(new ArchivTyp(srch.archivTyp[i]), this);
         if (tmp.length > 0) {
             REC.log(DEBUG, tmp.length + " Archivtyp found");
             this.archivTyp = tmp;
@@ -1451,6 +1455,8 @@ function ArchivTyp(srch) {
             if (!REC.currentDocument.move(destination))
                 REC.errors.push("Dokument konnte nicht in den Zielordner verschoben werden " + REC.completeNodePath(destination));
         }
+        // notieren das die Destination aufgelöst worden ist
+        this.getTopParent().destinationResolved = true;
     };
 
     /**
@@ -1476,10 +1482,12 @@ function ArchivTyp(srch) {
             if (this.name != "Fehler")
                 REC.currXMLName.push(this.name);
             REC.log(INFORMATIONAL, "Rule found " + this.name);
-            if (REC.exist(REC.currentSearchItems)) {
-                REC.currentSearchItems = REC.currentSearchItems.concat(this.searchItem);
-            } else
-                REC.currentSearchItems = this.searchItem;
+            if (REC.exist(this.searchItem)) {
+                if (REC.exist(REC.currentSearchItems)) {
+                    REC.currentSearchItems = REC.currentSearchItems.concat(this.searchItem);
+                } else
+                    REC.currentSearchItems = this.searchItem;
+            }
             if (REC.exist(this.archivZiel)) {
                 for (i = 0; i < this.archivZiel.length; i++) {
                     REC.log(TRACE, "ArchivTyp.resolve: call ArchivZiel.resolve with " + REC.currentDocument.toString());
@@ -1579,14 +1587,42 @@ function ArchivTyp(srch) {
                             }
                         }
                     } else {
-                        REC.errors.push("no suitable destination folder!");
+                        // hier kommen wir hin, wenn die Archivposition keinen gültigen Folder erzeugen konnte
+                        REC.errors.push("Error creating suitable destination folder!");
+                        // Verschieben in die Error Box
+                        if (!REC.currentDocument.move(REC.errorBox))
+                            REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
+
                     }
                 }
             }
+            else {
+                if (this.getTopParent() == this && !this.destinationResolved) {
+                    // hier kommen wir hin, wenn die geschachtelten Archivtypen keine Destination erzeugen können und
+                    // aktuelle Typ keine definiert hat
+                    REC.errors.push("no suitable destination folder!");
+                    // Verschieben in die Error Box
+                    if (!REC.currentDocument.move(REC.errorBox))
+                        REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
+                }
+            }
         }
+
         REC.debugLevel = orgLevel;
         return found;
     };
+
+    /**
+     * liefert den Top Parent Archivtypen
+     * @returns {ArchivTyp}
+     */
+    this.getTopParent = function() {
+        var parent = this;
+        while(REC.exist(parent.parent)) {
+            parent = parent.parent;
+        }
+        return parent;
+    }
 }
 
 /**
@@ -2502,31 +2538,31 @@ function SearchItem(srch) {
                 var result = pat.exec(txt);
                 foundPos.push(result.index);
             }
-        }
-        if (this.backwards) {
-            REC.log(TRACE, "SearchItem.resolve: start search backwards with " + this.text);
-            foundPos.reverse();
-            match.reverse();
-        } else {
-            REC.log(TRACE, "SearchItem.resolve: start search forwards with " + this.text);
-        }
-        for (var j = 0; j < foundPos.length; j++) {
-            pos = foundPos[j];
-            REC.log(TRACE, "SearchItem.resolve: search found at position " + pos);
-            var str;
-            if (this.left) {
-                str = new SearchResult(txt, txt.slice(lastPos, pos + (this.included ? match[j].length : 0)), null, lastPos, pos + (this.included ? match[j].length : 0), this.objectTyp,
-                    this.expected);
-                REC.log(TRACE, "SearchItem.resolve: get result left from position  " + REC.printTrace(str.text, this.left));
+            if (this.backwards) {
+                REC.log(TRACE, "SearchItem.resolve: start search backwards with " + this.text);
+                foundPos.reverse();
+                match.reverse();
             } else {
-                str = new SearchResult(txt, txt.substr(pos + (this.included ? 0 : match[j].length)), null, pos + (this.included ? 0 : match[j].length), txt.length, this.objectTyp, this.expected);
-                REC.log(TRACE, "SearchItem.resolve: get result right from position  " + REC.printTrace(str.text, this.left));
+                REC.log(TRACE, "SearchItem.resolve: start search forwards with " + this.text);
             }
-            if (REC.exist(str) && str.text.length > 0) {
-                REC.log(TRACE, "SearchItem.resolve: possible result is " + REC.printTrace(str.text, this.left));
-                this.erg.modifyResult(str, count++);
+            for (var j = 0; j < foundPos.length; j++) {
+                pos = foundPos[j];
+                REC.log(TRACE, "SearchItem.resolve: search found at position " + pos);
+                var str;
+                if (this.left) {
+                    str = new SearchResult(txt, txt.slice(lastPos, pos + (this.included ? match[j].length : 0)), null, lastPos, pos + (this.included ? match[j].length : 0), this.objectTyp,
+                        this.expected);
+                    REC.log(TRACE, "SearchItem.resolve: get result left from position  " + REC.printTrace(str.text, this.left));
+                } else {
+                    str = new SearchResult(txt, txt.substr(pos + (this.included ? 0 : match[j].length)), null, pos + (this.included ? 0 : match[j].length), txt.length, this.objectTyp, this.expected);
+                    REC.log(TRACE, "SearchItem.resolve: get result right from position  " + REC.printTrace(str.text, this.left));
+                }
+                if (REC.exist(str) && str.text.length > 0) {
+                    REC.log(TRACE, "SearchItem.resolve: possible result is " + REC.printTrace(str.text, this.left));
+                    this.erg.modifyResult(str, count++);
+                }
+                lastPos = this.left ? 0 : pos;
             }
-            lastPos = this.left ? 0 : pos;
         }
     };
 
@@ -3953,7 +3989,7 @@ REC = {
         var ruleFound = false;
         this.currentSearchItems = null;
         for (var i = 0; i < rules.archivTyp.length; i++) {
-            ruleFound = new ArchivTyp(rules.archivTyp[i]).resolve();
+            ruleFound = new ArchivTyp(rules.archivTyp[i], null).resolve();
             if (ruleFound)
                 break;
         }
@@ -4009,7 +4045,8 @@ REC = {
                 var str = e.toString() + "\n";
                 for (var prop in e)
                     str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
-                str = str + "Stacktrace: \n" + e.stack.split('\n').reverse().join('\n');
+                if (REC.exist(e.stack))
+                    str = str + "Stacktrace: \n" + e.stack.split('\n').reverse().join('\n');
                 this.log(ERROR, str);
                 this.errors.push("Error: " + e.toString());
             } finally {

@@ -15,6 +15,56 @@ describe("Test für ArchivTyp", function() {
         search.setFind(false);
     });
 
+
+
+    it("testWithNestedArchivZiel", function() {
+        REC.content ="ZAUBERFRAU Rechnung";
+        var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
+            ' <archivTyp name="Rechnung Zauberfrau" searchString="Rechnung">' +
+            ' <archivZiel type="my:archivContent" /> ' +
+            ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
+            ' <archivZiel type="my:archivFolder" /> ' +
+            ' </archivPosition>' +
+            ' <searchItem name="tmp" fix="2015" />' +
+            ' </archivTyp>' +
+            ' </archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        console.log(REC.getMessage(true));
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).not.toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
+    });
+
+    it("testWithNestedArchivZielWithError", function() {
+        REC.content ="ZAUBERFRAU Rechnung";
+        var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
+            ' <archivTyp name="Rechnung Zauberfrau" searchString="Zechnung">' +
+            ' <archivZiel type="my:archivContent" /> ' +
+            ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
+            ' <archivZiel type="my:archivFolder" /> ' +
+            ' </archivPosition>' +
+            ' <searchItem name="tmp1" fix="2015" />' +
+            ' </archivTyp>' +
+            ' </archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).not.toBeNull();
+    });
+
+
+
+
     it("testNormal", function () {
         REC.content ="ZAUBERFRAU";
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
