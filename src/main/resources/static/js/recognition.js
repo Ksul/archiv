@@ -1681,28 +1681,28 @@ function ArchivPosition(srch) {
      * @return {*}                  der Alfresco Folder
      */
     this.resolveFolder = function (folderName) {
-        REC.log(TRACE, "buildFolder: entering with " + folderName);
+        REC.log(TRACE, "resolveFolder: entering with " + folderName);
         var fol = null;
         var dir = folderName;
         var top = companyhome.childByNamePath(folderName);
         if (top == null) {
-            REC.log(TRACE, "buildFolder: folder " + folderName + " not found");
+            REC.log(INFORMATIONAL, "resolveFolder: folder " + folderName + " not found");
             var parts = folderName.split("/");
             dir = "";
             for (var i = 0; i < parts.length; i++) {
                 var part = parts[i];
                 if (part.length > 0) {
                     dir = dir + (dir.length == 0 ? "" : "/") + part;
-                    REC.log(TRACE, "buildFolder: search Folder " + dir);
+                    REC.log(TRACE, "resolveFolder: search Folder " + dir);
                     if (dir.length > 0)
                         fol = companyhome.childByNamePath(dir);
                     if (!REC.exist(fol)) {
                         REC.log(INFORMATIONAL, "create folder " + dir);
                         if (top == null) {
-                            REC.log(TRACE, "buildFolder: create Folder[" + part + "] at companyhome ");
+                            REC.log(TRACE, "resolveFolder: create Folder[" + part + "] at companyhome ");
                             top = companyhome.createFolder(part);
                         } else {
-                            REC.log(TRACE, "buildFolder: create Folder[" + part + "] at " + top.name);
+                            REC.log(TRACE, "resolveFolder: create Folder[" + part + "] at " + top.name);
                             top = top.createFolder(part);
                         }
                         if (top == null) {
@@ -1710,13 +1710,13 @@ function ArchivPosition(srch) {
                             break;
                         }
                     } else {
-                        REC.log(TRACE, "buildFolder: folder " + dir + " found");
+                        REC.log(TRACE, "resolveFolder: folder " + dir + " found");
                         top = fol;
                     }
                 }
             }
         }
-        REC.log(TRACE, "buildFolder result is " + dir);
+        REC.log(TRACE, "resolveFolder result is " + dir);
         return top;
     };
 
@@ -1731,7 +1731,7 @@ function ArchivPosition(srch) {
         if (REC.exist(this.folder)) {
             var tmp1 = REC.replaceVar(this.folder);
             if (!tmp1[1]) {
-                erg = "replace of variabel in name of folder not successful!\n";
+                erg = "could not replace the variable in name of folder!\n";
                 REC.errors.push(erg);
                 return;
             }
@@ -4006,9 +4006,7 @@ REC = {
             var erg =  searchItem.findSpecialType(this.content, ["date"], false, null);
             if (REC.exist(erg))  {
                 // Datum gefunden. Jetzt prüfen, welches Datum am nächsten am aktuellen Tagesdatum liegt weil das wahrscheinlich das gesuchte Datum ist
-                var currentDate = new Date();
-                // Vergleichsdatum um zu prüfen, ob das das Datum in der Vergangenheit ( + 6 Monate für irgendwelche Vordatierungen)
-                var compareDate = currentDate.setMonth(currentDate.getMonth() + 6);
+                var compareDate = new Date();
                 var foundDate;
                 for (var j = 0; j < erg.length; j++) {
                     // prüfen ob Datum kleiner als Vergleichsdatum ist und dann das finden was am nächsten am aktuellen Datum liegt
