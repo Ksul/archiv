@@ -1543,6 +1543,8 @@ function ArchivTyp(srch, parentType) {
                             if (REC.errors.length > 0) {
                                 if (!REC.currentDocument.move(REC.errorBox))
                                     REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
+                                else
+                                    REC.log(INFORMATIONAL, "document successfuly moved to " + REC.completeNodePath(REC.errorBox));
                                 return found;
                             }
                         }
@@ -1592,7 +1594,8 @@ function ArchivTyp(srch, parentType) {
                         // Verschieben in die Error Box
                         if (!REC.currentDocument.move(REC.errorBox))
                             REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
-
+                        else
+                            REC.log(INFORMATIONAL, "document successfuly moved to " + REC.completeNodePath(REC.errorBox));
                     }
                 }
             }
@@ -1604,6 +1607,8 @@ function ArchivTyp(srch, parentType) {
                     // Verschieben in die Error Box
                     if (!REC.currentDocument.move(REC.errorBox))
                         REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
+                    else
+                        REC.log(INFORMATIONAL, "document successfuly moved to " + REC.completeNodePath(REC.errorBox));
                 }
             }
         }
