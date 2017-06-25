@@ -1244,14 +1244,14 @@ function XMLNode(nodeType, doc, str) {
  * @param parent  der Parent Archivtyp
  * @constructor
  */
-function ArchivTyp(srch, parent) {
+function ArchivTyp(srch, parentType) {
     var i;
     // Merker ob eine Destination ermittelt werden konnte
     this.destinationResolved = false;
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
     this.name = srch.name;
-    this.parent = parent;
+    this.parentType = parentType;
     this.searchString = srch.searchString;
     this.type = srch.type;
     if (REC.exist(srch.unique))
@@ -1327,7 +1327,7 @@ function ArchivTyp(srch, parent) {
     if (REC.exist(srch.archivTyp)) {
         REC.log(TRACE, "Archivtyp exist");
         for (i = 0; i < srch.archivTyp.length; i++)
-            tmp.push(new ArchivTyp(srch.archivTyp[i]), this);
+            tmp.push(new ArchivTyp(srch.archivTyp[i], this));
         if (tmp.length > 0) {
             REC.log(DEBUG, tmp.length + " Archivtyp found");
             this.archivTyp = tmp;
@@ -1617,12 +1617,12 @@ function ArchivTyp(srch, parent) {
      * @returns {ArchivTyp}
      */
     this.getTopParent = function() {
-        var parent = this;
-        while(REC.exist(parent.parent)) {
-            parent = parent.parent;
+        var parentType = this;
+        while(REC.exist(parentType.parentType)) {
+            parentType = parentType.parentType;
         }
-        return parent;
-    }
+        return parentType;
+    };
 }
 
 /**
