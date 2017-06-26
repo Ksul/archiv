@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <xsd:include schemaLocation=""></xsd:include>
+    <xsd:include schemaLocation=""/>
     <xsd:element name="searchItem">
         <xsd:annotation>
             <xsd:documentation>Sucht nach bestimmten Datentypen: Datum oder Betrag</xsd:documentation>
@@ -41,7 +41,7 @@
                 </xsd:annotation>
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
-                        <xsd:pattern value="[date|amount|float]+(,+[0-9])?"></xsd:pattern>
+                        <xsd:pattern value="(date|amount|float)+(,+[0-9])?"/>
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:attribute>
@@ -55,7 +55,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
-            <xsd:attribute name="eval" type="evalType"></xsd:attribute>
+            <xsd:attribute name="eval" type="evalType"/>
             <xsd:attribute name="fix" type="xsd:string" use="optional">
                 <xsd:annotation>
                     <xsd:documentation>Übernimmt einen fixen Wert als Ergebnis für dieses Attribut</xsd:documentation>
@@ -106,9 +106,6 @@
                 </xsd:annotation>
             </xsd:attribute>
             <xsd:attribute name="direction" use="optional">
-                <xsd:annotation>
-                    <xsd:documentation></xsd:documentation>
-                </xsd:annotation>
                 <xsd:simpleType>
                     <xsd:annotation>
                         <xsd:documentation>legt die Suchrichtung fest</xsd:documentation>
@@ -207,7 +204,7 @@
                 </xsd:annotation>
             </xsd:attribute>
             <xsd:attribute name="debugLevel" type="debugLevelType"/>
-            <xsd:attribute name="removeBlanks" type="removeBlanksType"></xsd:attribute>
+            <xsd:attribute name="removeBlanks" type="removeBlanksType"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="format">
@@ -299,10 +296,10 @@
                 </xsd:annotation>
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="newVersion"></xsd:enumeration>
-                        <xsd:enumeration value="error"></xsd:enumeration>
-                        <xsd:enumeration value="overWrite"></xsd:enumeration>
-                        <xsd:enumeration value="nothing"></xsd:enumeration>
+                        <xsd:enumeration value="newVersion"/>
+                        <xsd:enumeration value="error"/>
+                        <xsd:enumeration value="overWrite"/>
+                        <xsd:enumeration value="nothing"/>
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:attribute>
@@ -387,7 +384,7 @@
                     <xsd:documentation>Name der Kategorie.</xsd:documentation>
                 </xsd:annotation>
                 <xsd:simpleType>
-                    <xsd:restriction base="xsd:string"></xsd:restriction>
+                    <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
             </xsd:attribute>
             <xsd:attribute name="debugLevel" type="debugLevelType"/>
@@ -452,8 +449,8 @@
                         <xsd:documentation>legt die maximale Länge der einzelnen Debugausgaben fest</xsd:documentation>
                     </xsd:annotation>
                     <xsd:restriction base="xsd:integer">
-                        <xsd:minExclusive value="10"></xsd:minExclusive>
-                        <xsd:maxExclusive value="200"></xsd:maxExclusive>
+                        <xsd:minExclusive value="10"/>
+                        <xsd:maxExclusive value="200"/>
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:attribute>

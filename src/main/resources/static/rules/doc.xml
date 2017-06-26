@@ -1,7 +1,7 @@
 <documentTypes
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:cm="http://www.alfresco.org/model/content/1.0"
-        xmlns:my="http://www.schulte.local/archiv" xsi:noNamespaceSchemaLocation="doc.xsd" archivRoot="Archiv/" inBox="Inbox" mandatory="cm:title,my:documentDate,my:person" unknownBox="Unbekannt" errorBox="Fehler" duplicateBox="Fehler/Doppelte" debugLevel="informational" maxDebugLength="40">
+        xmlns:my="http://www.schulte.local/archiv"  xsi:noNamespaceSchemaLocation="doc.xsd" archivRoot="Archiv/" inBox="Inbox" mandatory="cm:title,my:documentDate,my:person" unknownBox="Unbekannt" errorBox="Fehler"  duplicateBox="Fehler/Doppelte" debugLevel="informational" maxDebugLength="40">
     <!-- LVM Gehaltsabrechnung -->
     <archivTyp name="LVMGehalt" searchString="Verdienstabrechnung">
         <archivZiel type="my:archivContent" />
@@ -82,7 +82,7 @@
         <tags name="Cafe Fausto" />
         <category name="Rechnung/Rechnung Cafe Fausto" />
         <searchItem name="person" fix="Klaus" target="my:person" />
-        <searchItem name="id" text="30133" dir="left" word="1" target="my:idvalue">
+        <searchItem name="id" text="30133" direction="left" word="1" target="my:idvalue">
             <archivZiel aspect="my:idable" />
         </searchItem>
         <searchItem name="title" fix="Cafe Fausto" target="cm:title" />
@@ -300,7 +300,7 @@
                     <format formatString="YYYY" />
                 </searchItem>
                 <searchItem name="title" fix="Lastschriftbenachrichtigung {tmp}" target="cm:title" />
-                <searchItem name="betrag" kind="amount" dir="left" target="my:amount">
+                <searchItem name="betrag" kind="amount" direction="left" target="my:amount">
                     <check lowerValue="200" upperValue="400" />
                     <archivZiel aspect="my:amountable" />
                 </searchItem>
@@ -415,7 +415,7 @@
                 <archivZiel aspect="my:amountable" />
             </searchItem>
             <searchItem name="title" fix="Gewinnschuldverschreibung {tmp2}" target="cm:title" />
-            <searchItem name="datum" kind="date" objectTyp="date" dir="left" target="my:documentDate">
+            <searchItem name="datum" kind="date" objectTyp="date" direction="left" target="my:documentDate">
                 <check lowerValue="01/01/1996" upperValue="01/01/2020" />
             </searchItem>
         </archivTyp>
@@ -433,7 +433,7 @@
                 <check lowerValue="01/01/1996" upperValue="01/01/2020" />
                 <format formatString="YYYY" />
             </searchItem>
-            <searchItem name="description" text="Hinweise" readOverReturn="true" dir="left" target="cm:description">
+            <searchItem name="description" text="Hinweise" readOverReturn="true" direction="left" target="cm:description">
                 <delimitter typ="start" text="&#0010;" count="-3" />
                 <delimitter typ="end" text="&#0010;" count="-2" />
             </searchItem>
@@ -458,7 +458,7 @@
             <searchItem name="id" text="Darlehenskontonummer" target="my:idvalue">
                 <archivZiel aspect="my:idable" />
             </searchItem>
-            <searchItem name="betrag" text="H " objectTyp="float" readOverReturn="true" word="1" dir="left" backwards="true" target="my:amount">
+            <searchItem name="betrag" text="H " objectTyp="float" readOverReturn="true" word="1" direction="left" backwards="true" target="my:amount">
                 <check lowerValue="400" upperValue="10000" />
                 <archivZiel aspect="my:amountable" />
             </searchItem>
@@ -676,7 +676,7 @@
             <searchItem name="id" fix="91.011.179.5" target="my:idvalue">
                 <archivZiel aspect="my:idable" />
             </searchItem>
-            <searchItem name="betrag" text="Rechnungsbetrag" objectTyp="float" target="my:amount" readOverReturn="true" dir="left">
+            <searchItem name="betrag" text="Rechnungsbetrag" objectTyp="float" target="my:amount" readOverReturn="true" direction="left">
                 <delimitter typ="start" text="&#0010;" count="-3" />
                 <check lowerValue="150" upperValue="250" />
                 <archivZiel aspect="my:amountable" />
@@ -959,7 +959,7 @@
             </searchItem>
             <archivTyp name="Beitragsrechnung" searchString="Beitragsrechnung">
                 <searchItem name="title" fix="Beitragsrechnung {tmp}" target="cm:title" />
-                <searchItem name="betrag" text="Kontonummer" dir="left" objectTyp="float" target="my:amount" word="1">
+                <searchItem name="betrag" text="Kontonummer" direction="left" objectTyp="float" target="my:amount" word="1">
                     <check lowerValue="50" upperValue="80" />
                     <archivZiel aspect="my:amountable" />
                 </searchItem>
