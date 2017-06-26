@@ -58,7 +58,7 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
-        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).not.toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Unbekannt/WebScriptTest")).not.toBeNull();
     });
 
 

@@ -49,7 +49,7 @@ describe("Test für ArchivPosition", function() {
         var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
         erg = archivPosition.resolve();
         expect(erg).not.toBeDefined();
-        expect(REC.errors[1]).toBe("replace of variabel in name of folder not successful!\n");
+        expect(REC.errors[1]).toBe("could not replace the variable in name of folder!\n");
     });
 
     it("testResolveFolder1", function () {

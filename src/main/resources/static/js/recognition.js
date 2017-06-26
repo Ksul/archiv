@@ -1590,12 +1590,7 @@ function ArchivTyp(srch, parentType) {
                         }
                     } else {
                         // hier kommen wir hin, wenn die Archivposition keinen gültigen Folder erzeugen konnte
-                        REC.errors.push("Error creating suitable destination folder!");
-                        // Verschieben in die Error Box
-                        if (!REC.currentDocument.move(REC.errorBox))
-                            REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
-                        else
-                            REC.log(INFORMATIONAL, "document successfuly moved to " + REC.completeNodePath(REC.errorBox));
+                        REC.moveDocToUnknownBox(REC.currentDocument);
                     }
                 }
             }
@@ -1603,12 +1598,7 @@ function ArchivTyp(srch, parentType) {
                 if (this.getTopParent() == this && !this.destinationResolved) {
                     // hier kommen wir hin, wenn die geschachtelten Archivtypen keine Destination erzeugen können und
                     // aktuelle Typ keine definiert hat
-                    REC.errors.push("no suitable destination folder!");
-                    // Verschieben in die Error Box
-                    if (!REC.currentDocument.move(REC.errorBox))
-                        REC.errors.push("document not moved to aim folder " + REC.completeNodePath(REC.errorBox));
-                    else
-                        REC.log(INFORMATIONAL, "document successfuly moved to " + REC.completeNodePath(REC.errorBox));
+                    REC.moveDocToUnknownBox(REC.currentDocument);
                 }
             }
         }
@@ -3849,7 +3839,11 @@ REC = {
         return ret;
     },
 
-
+    /**
+     * liefert den Inhalt des übergebenen Dokuments
+     * @param doc   das Dokument
+     * @return {XML|*|string|void}
+     */
     getContent: function (doc) {
         var erg;
         var trans = doc.transformDocument("text/plain");
@@ -3882,6 +3876,11 @@ REC = {
         return new Position(startRow, startCol, endRow, endCol, type, desc);
     },
 
+    /**
+     * Handling von Fehlern bei der Erkennung
+     * die Dokumente werden in die angegebene Box geschoben
+     * @param box  die Box, wo die Dokumente hingeschoben werden sollen
+     */
     handleUnexpected: function (box) {
         if (this.errors.length > 0) {
             var comment = "<table border=\"1\"> <tr><td>Nummer</td><td>Fehler</td></tr> ";
@@ -3924,6 +3923,50 @@ REC = {
         } finally {
             this.handleUnexpected(this.fehlerBox);
         }
+    },
+
+    /**
+     * verschiebt das Dokument in die Unknown Box und baut dabei ein Unterverzeichnis mit einem im Dokument gefundenen Datum auf
+     * @param doc   das zu verschiebende Dokument
+     */
+    moveDocToUnknownBox: function (doc) {
+        this.errors.push("Unknown document, no suitable rule found!");
+        var moved = false;
+        // Datum suchen
+        var searchItem = new SearchItem({});
+        var erg = searchItem.findSpecialType(this.content, ["date"], false, null);
+        if (REC.exist(erg)) {
+            // Datum gefunden. Jetzt prüfen, welches Datum am nächsten am aktuellen Tagesdatum liegt weil das wahrscheinlich das gesuchte Datum ist
+            var compareDate = new Date();
+            var foundDate;
+            for (var j = 0; j < erg.length; j++) {
+                // prüfen ob Datum kleiner als Vergleichsdatum ist und dann das finden was am nächsten am aktuellen Datum liegt
+                if (erg[j].val < compareDate && (!REC.exist(foundDate) || Math.abs(foundDate - currentDate) > Math.abs(erg[j].val - currentDate)))
+                    foundDate = erg[j].val;
+            }
+            // Foldernamen bilden
+            var folderName;
+            if (!REC.exist(foundDate)) {
+                // kein plausibles Datum gefunden, also so in den Folder legen
+                this.log(INFORMATIONAL, "No suitable date found in document " + doc.name + "! Document will be moved direct to folder...");
+                folderName = this.unknownBox.name;
+            }
+            else
+            // Datum gefunden und daraus den Foldernamen bilden
+                folderName = this.unknownBox.name + '/' + foundDate.getFullYear() + '/' + REC.dateFormat(foundDate, "F");
+            this.log(INFORMATIONAL, "Document " + doc.name + " move to " + folderName + "...");
+            var r = {
+                folder: folderName
+            };
+            var archivPosition = new ArchivPosition(r);
+            var destination = archivPosition.resolve();
+            if (!doc.move(destination))
+                REC.errors.push("Document not successful moved to " + REC.completeNodePath(destination));
+            else
+                moved = true;
+        }
+        if (!moved && !doc.move(this.unknownBox))
+            REC.errors.push("Document not successfuly moved to aim " + REC.completeNodePath(REC.unknownBox));
     },
 
     /**
@@ -3999,43 +4042,7 @@ REC = {
                 break;
         }
         if (!ruleFound) {
-            this.errors.push("Unknown document, no suitable rule found!");
-            var moved = false;
-            // Datum suchen
-            var searchItem = new SearchItem({});
-            var erg =  searchItem.findSpecialType(this.content, ["date"], false, null);
-            if (REC.exist(erg))  {
-                // Datum gefunden. Jetzt prüfen, welches Datum am nächsten am aktuellen Tagesdatum liegt weil das wahrscheinlich das gesuchte Datum ist
-                var compareDate = new Date();
-                var foundDate;
-                for (var j = 0; j < erg.length; j++) {
-                    // prüfen ob Datum kleiner als Vergleichsdatum ist und dann das finden was am nächsten am aktuellen Datum liegt
-                    if (erg[j].val < compareDate && (!REC.exist(foundDate) || Math.abs(foundDate - currentDate) > Math.abs(erg[j].val - currentDate)))
-                        foundDate = erg[j].val;
-                }
-                // Foldernamen bilden
-                var folderName;
-                if (!REC.exist(foundDate)) {
-                    // kein plausibles Datum gefunden, also so in den Folder legen
-                    this.log(INFORMATIONAL, "No suitable date found in document " + docName + "! Document will be moved direct to folder...");
-                    folderName = this.unknownBox.name;
-                }
-                else
-                    // Datum gefunden und daraus den Foldernamen bilden
-                    folderName = this.unknownBox.name + '/' + foundDate.getFullYear() + '/'  + REC.dateFormat(foundDate, "F");
-                this.log(INFORMATIONAL, "Document " + docName + " move to " + folderName + "...");
-                var r = {
-                    folder: folderName
-                    };
-                var archivPosition = new ArchivPosition(r);
-                var destination = archivPosition.resolve();
-                if (!doc.move(destination))
-                    REC.errors.push("Document not successful moved to " + REC.completeNodePath(destination));
-                else
-                    moved = true;
-            }
-            if ( !moved && !doc.move(this.unknownBox))
-               REC.errors.push("Document not successfuly moved to aim " + REC.completeNodePath(REC.unknownBox));
+            this.moveDocToUnknownBox(doc);
         }
         this.log(INFORMATIONAL, "Processing of document " + docName + " finished!");
     },
