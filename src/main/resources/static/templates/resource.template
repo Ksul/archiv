@@ -25,6 +25,7 @@
 ./js/alfrescoClient.js
 ./js/dialoge.js
 ./js/util.js
+./js/alfrescoMock.js
 ./js/recognition.js
 ./js/verteilung.js
 ./js/jquery-ui/jquery-ui.js

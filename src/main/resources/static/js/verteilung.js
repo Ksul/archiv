@@ -601,6 +601,21 @@ function closeTest() {
  */
 function work() {
     try {
+        // aktuelles Verteilungsskript vom Server holen
+        if (REC.exist(scriptID)) {
+            // ScriptID ist vorhanden, wir versuchen das Skript vom Alfresco Server zu laden
+            var json = executeService({
+                "name": "getDocumentContent",
+                "errorMessage": "Skript konnte nicht gelesen werden:"
+            }, [
+                {"name": "documentId", "value": scriptID},
+                {"name": "extract", "value": "false"}
+            ]);
+            if (json.success) {
+
+                eval("//# sourceURL=recognition.js\n\n" + json.data);
+            }
+        }
         var selectMode = false;
         if (multiMode)
             doReRunAll();
@@ -982,7 +997,7 @@ function openScript() {
         if (read) {
             workDocument = "recognition.js";
             var tmp = REC.mess;
-            eval(content);
+            eval("//# sourceURL=recognition.js\n\n" + content);
             REC.mess = tmp;
             removeMarkers(markers, textEditor);
             textEditor.getSession().setMode(new jsMode());
@@ -1006,7 +1021,7 @@ function openScript() {
 function activateScriptToContext() {
     try {
         modifiedScript = textEditor.getSession().getValue();
-        eval(modifiedScript);
+        eval("//# sourceURL=recognition.js\n\n" + modifiedScript);
         REC.log(INFORMATIONAL, "Die gändeterten Skriptanweisungen sind jetzt wirksam!");
         fillMessageBox(true);
     } catch (e) {
