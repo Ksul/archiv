@@ -37,7 +37,9 @@ describe("Test für SearchItem", function() {
             "300 H \r\n" +
             "Der Verbrauch ist hoch.\r\n" +
             "Betrag dankend erhalten 302,26 €\r\n" +
-            "Unsere Lieferungen";
+            "Unsere Lieferungen\r\n" +
+            "Zahlbetrag \r\n" +
+            "	 25,65 € ";
         REC.content = REC.content.replace(/\r\n/g, '\n');
     });
 
@@ -415,6 +417,18 @@ describe("Test für SearchItem", function() {
         expect(REC.positions[0].endColumn).toBe(8);
     });
 
+    it("testResolveSearchItem29", function() {
+        var rules = '<searchItem name="txt" text="Zahlbetrag" />';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        REC.currentSearchItems = REC.currentSearchItems.concat(searchItem);
+        rules = '<searchItem name="Test 19" value="txt" kind="amount" />';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        expect(searchItem.resolve()).toBe(undefined);
+    });
 
     it("testResolveSearchItemWithPositionAndInt", function() {
         var rules = ' <searchItem name="betrag" text="erhalten" readOverReturn="true" objectTyp="int" target="my:amount" />';

@@ -2428,14 +2428,16 @@ SearchResultContainer.prototype.modifyResult = function (result, pos) {
                 this.addResult(result[i]);
             }
         } else {
-            this[pos].text = result.text;
-            this[pos].val = result.val;
-            this[pos].check = result.check;
-            this[pos].error = result.error;
-            this[pos].typ = result.typ;
-            this[pos].expected = result.expected;
-            this[pos].setStart(this[pos].getStart() + result.getStart());
-            this[pos].setEnd(this[pos].getStart() + result.getEnd() - result.getStart());
+            if (REC.exist(result)) {
+                this[pos].text = result.text;
+                this[pos].val = result.val;
+                this[pos].check = result.check;
+                this[pos].error = result.error;
+                this[pos].typ = result.typ;
+                this[pos].expected = result.expected;
+                this[pos].setStart(this[pos].getStart() + result.getStart());
+                this[pos].setEnd(this[pos].getStart() + result.getEnd() - result.getStart());
+            }
         }
     }
 };
