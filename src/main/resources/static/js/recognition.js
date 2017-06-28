@@ -2265,7 +2265,8 @@ function SearchItem(srch) {
             this.erg.modifyResult(searchResult, 0);
         } else if (REC.exist(this.eval)) {
             e = eval(REC.replaceVar(this.eval)[0]);
-            this.erg.modifyResult(new SearchResult(e.toString(), e.toString(), e, 0, 0, null, this.expected), 0);
+            if (REC.exist(e))
+                this.erg.modifyResult(new SearchResult(e.toString(), e.toString(), e, 0, 0, null, this.expected), 0);
         } else {
             if (REC.exist(this.value)) {
                 e = this.resolveItem(this.value);
