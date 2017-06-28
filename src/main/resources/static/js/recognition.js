@@ -1096,8 +1096,8 @@ function ArchivTyp(srch, parentType) {
                 p.unique = this.unique;
                 p = p.parent;
             }
-            // Mandatory Felder überprüfwn
-            if (REC.exist(REC.mandatoryElements) && this.name != REC.errorBox.name && this.name != REC.duplicateBox.name) {
+            // wenn wir hier im obersten Typ sind dann die Mandatory Felder überprüfen
+            if (!REC.exist(this.parent) && REC.exist(REC.mandatoryElements) && this.name != REC.errorBox.name && this.name != REC.duplicateBox.name) {
                 for (var j = 0; j < REC.mandatoryElements.length; j++) {
                     if (!REC.exist(REC.currentDocument.properties[REC.mandatoryElements[j]])) {
                         REC.errors.push(REC.mandatoryElements[j] + " is missing!");
@@ -1106,7 +1106,7 @@ function ArchivTyp(srch, parentType) {
             }
 
             // alte Kommentare entfernen
-            if (this.name != REC.errorBox.name && this.name != REC.duplicateBox.name) {
+            if (!REC.exist(this.parent) && this.name != REC.errorBox.name && this.name != REC.duplicateBox.name) {
                 var COM = new Comments();
                 COM.removeComments(REC.currentDocument);
             }

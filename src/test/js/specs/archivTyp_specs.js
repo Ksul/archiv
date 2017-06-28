@@ -17,7 +17,7 @@ describe("Test für ArchivTyp", function() {
 
     it("testWithNestedArchivZielWithSearchItems", function() {
         REC.currentDocument.removeProperty("my:person");
-        REC.content ="ZAUBERFRAU Rechnung";
+        REC.content ="ZAUBERFRAU Rechnung Test";
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">'+
             ' <archivPosition folder="Dokumente/Rechnungen/{fol}/{tmp}"/> ' +
             '<searchItem name="person" fix="Test" target="my:person" />' +
