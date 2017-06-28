@@ -699,9 +699,9 @@
             <archivTyp name="Beitragsrechnung" searchString="Beitragsrechnung">
                 <searchItem name="fol" fix="Beitragsrechnungen" />
                 <searchItem name="title" fix="Beitragsrechnung {tmp}" target="cm:title" />
-                <searchItem name="txt" text="Rechnungsbetrag" />
+                <searchItem name="txt" text="Rechnungsbetrag" readOverReturn="true" />
                 <searchItem name="betrag" value="txt" kind="amount" target="my:amount">
-                    <check lowerValue="150" upperValue="200" />
+                    <check lowerValue="20" upperValue="200" />
                     <archivZiel aspect="my:amountable" />
                 </searchItem>
             </archivTyp>
