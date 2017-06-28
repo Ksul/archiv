@@ -812,6 +812,8 @@ function XMLNode(nodeType, doc, str) {
  */
 function ArchivTyp(srch, parentType) {
     var i;
+    // XML merken
+    this.xml = srch.sourceXML;
     // Merker ob eine Destination ermittelt werden konnte
     this.destinationResolved = false;
     if (REC.exist(srch.debugLevel))
@@ -1131,18 +1133,20 @@ function ArchivTyp(srch, parentType) {
                             } else {
                                 REC.log(INFORMATIONAL, "Document place to folder " + REC.completeNodePath(destinationFolder));
                                 REC.log(TRACE, "ArchivTyp.resolve: search Document: " + REC.currentDocument.name + " in " + REC.completeNodePath(destinationFolder));
+                                // prüfen, ob es das Dokument schon im Zielverzeichnis gibt
                                 var tmpDoc = destinationFolder.childByNamePath(REC.currentDocument.name);
                                 if (tmpDoc != null) {
                                     this.handleDocument([tmpDoc], destinationFolder);
                                 } else {
                                     var searchTitleResult = [];
+                                    // Hier wird überprüft, ob es schon Dokument mit dem gleichen Titel gibt
                                     if (REC.exist(this.unique) && REC.exist(REC.results["title"])) {
                                         REC.log(TRACE, "ArchivTyp.resolve: check for unique");
                                         var searchCriteria = "+PATH:\"/" + destinationFolder.qnamePath + "//*\" +@cm\\:title:\"" + REC.results["title"].val + "\"";
                                         REC.log(TRACE, "ArchivTyp.resolve: search document with " + searchCriteria);
                                         searchTitleResult = search.luceneSearch(searchCriteria);
                                         if (searchTitleResult.length > 0) {
-                                            REC.log(TRACE, "ArchivTyp.resolve: search document found " + searchTitleResult.length + " documents");
+                                            REC.log(INFORMATIONAL, "Unique defined and " + searchTitleResult.length + " documents found with same title!");
                                             for (var k = 0; k < searchTitleResult.length; k++) {
                                                 // TODO prüfen, ob man das machen muss
                                                 REC.log(TRACE, "ArchivTyp.resolve: compare with document " + searchTitleResult[k].name + "[" + searchTitleResult[k].properties['cm:title'] + "]...");
@@ -1217,6 +1221,8 @@ function ArchivTyp(srch, parentType) {
 function ArchivPosition(srch) {
     if (REC.exist(srch.debugLevel))
         REC.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     this.link = REC.stringToBoolean(srch.link, false);
     if (REC.exist(srch.folder))
         this.folder = srch.folder;
@@ -1310,8 +1316,6 @@ function ArchivPosition(srch) {
         if (REC.exist(this.folder)) {
             var tmp1 = REC.replaceVar(this.folder);
             if (!tmp1[1]) {
-                erg = "could not replace the variable in name of folder!\n";
-                REC.errors.push(erg);
                 return;
             }
             tmp = tmp + "/" + tmp1[0];
@@ -1366,6 +1370,8 @@ function ArchivPosition(srch) {
 function Format(srch) {
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     this.formatString = srch.formatString;
 
    /**
@@ -1414,6 +1420,8 @@ function Format(srch) {
 function ArchivZiel(srch) {
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     if (REC.exist(srch.aspect))
         this.aspect = srch.aspect;
     if (REC.exist(srch.type))
@@ -1479,6 +1487,8 @@ function Check(srch, parent) {
 
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     if (REC.exist(parent))
         this.parent = parent;
     else
@@ -1654,6 +1664,8 @@ function Delimitter(srch) {
     Encoder.EncodeType = "numerical";
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     this.typ = srch.typ;
     this.text = Encoder.htmlDecode(srch.text);
     this.count = Number(srch.count);
@@ -1738,6 +1750,8 @@ function Delimitter(srch) {
 function Category(srch) {
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     this.name = srch.name;
 
     /**
@@ -1830,6 +1844,8 @@ function Category(srch) {
 function Tags(srch) {
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     this.name = srch.name;
 
     /**
@@ -1880,6 +1896,8 @@ function SearchItem(srch) {
     this.resolved = false;
     if (REC.exist(srch.debugLevel))
         this.debugLevel = REC.getDebugLevel(srch.debugLevel);
+    // XML merken
+    this.xml = srch.sourceXML;
     this.name = srch.name;
     this.readOverReturn = REC.stringToBoolean(srch.readOverReturn, false);
     this.required = REC.stringToBoolean(srch.required, true);
@@ -2831,6 +2849,8 @@ function XMLObject(ruleDocument) {
             this[attribute] = ruleDocument.getAttribute(attribute);
      }
     var tmp = [];
+    // Source eintragen
+    tmp["sourceXML"] = ruleDocument.getUnderlyingXMLText();
     // for each(elem in rule.children()) {
     var elements = ruleDocument.getElements();
     for (var k = 0; k < elements.length; k++) {
@@ -2934,20 +2954,20 @@ REC = {
         if (str.indexOf("{") != -1) {
             replaced = false;
             if (this.exist(this.currentSearchItems)) {
-                for (var i = 0; i < this.currentSearchItems.length && !replaced; i++) {
+                for (var i = 0; i < this.currentSearchItems.length; i++) {
                     if (str.indexOf("{" + this.currentSearchItems[i].name + "}") != -1) {
                         var erg = this.currentSearchItems[i].resolve();
                         if (this.exist(erg)) {
                             str = str.replace(new RegExp("{" + this.currentSearchItems[i].name + "}", 'g'), erg);
-                            replaced = true;
                         } else
                             str = str.replace(new RegExp("{" + this.currentSearchItems[i].name + "}", 'g'), null);
 
                     }
                 }
             }
+            replaced = str.indexOf("{") == -1;
             if (!replaced)
-                REC.errors.push("could not replace Placeholder " + str.match(/\{.+\}/g) + "!");
+                REC.errors.push("Could not replace Placeholder " + str.match(/\{.+\}/g) + "!");
         }
         return [str, replaced];
     },
@@ -3326,8 +3346,8 @@ REC = {
         var messages = [];
         var pos = 0;
         if (this.errors.length > 0) {
-            for (var i = 0; i < this.errors.length; i++)
-                this.log(ERROR, "Fehler: " + this.errors[i]);
+            for (var x = 0; x < this.errors.length; x++)
+                this.log(ERROR, this.errors[x]);
         }
 /*        if (this.showContent || this.debugLevel.level >= DEBUG.level) {
             this.mess.push("=====>");
@@ -3505,13 +3525,13 @@ REC = {
             var folderName;
             if (!REC.exist(foundDate)) {
                 // kein plausibles Datum gefunden, also so in den Folder legen
-                this.log(INFORMATIONAL, "No suitable date found in document " + doc.name + "! Document will be moved direct to folder...");
+                this.log(INFORMATIONAL, "No suitable date found in document " + doc.name + "! Document will be moved direct to folder " + REC.unknownBox.name);
                 folderName = REC.unknownBox.name;
             }
             else
             // Datum gefunden und daraus den Foldernamen bilden
                 folderName = REC.unknownBox.name + '/' + foundDate.getFullYear() + '/' + REC.dateFormat(foundDate, "F");
-            this.log(INFORMATIONAL, "Document " + doc.name + " move to " + folderName + "...");
+            this.log(INFORMATIONAL, "Move Document " + doc.name + " to folder " + folderName);
             var r = {
                 folder: folderName
             };

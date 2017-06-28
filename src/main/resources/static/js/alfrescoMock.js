@@ -302,6 +302,10 @@ ScriptNode.prototype.setProperty = function(key, value){
     this.properties[key] = value;
 };
 
+ScriptNode.prototype.removeProperty = function(key){
+    this.properties.remove(key);
+};
+
 ScriptNode.prototype.ensureVersioningEnabled = function(autoVersion, autoVersionProps){
     if (!this.hasAspect("cm:versionable")) {
         this.addAspect("cm:versionable");

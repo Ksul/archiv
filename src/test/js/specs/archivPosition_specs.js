@@ -34,7 +34,7 @@ describe("Test für ArchivPosition", function() {
         XMLDoc.parse();
         var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         REC.currentSearchItems = REC.currentSearchItems.concat(searchItem);
-        rules = ' <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp2}">';
+        rules = ' <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp2}"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
         var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
@@ -43,13 +43,13 @@ describe("Test für ArchivPosition", function() {
     });
 
     it("Test4", function () {
-        var rules = ' <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp2}">';
+        var rules = ' <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp2}"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
         var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
         erg = archivPosition.resolve();
         expect(erg).not.toBeDefined();
-        expect(REC.errors[1]).toBe("could not replace the variable in name of folder!\n");
+        expect(REC.errors[0]).toBe("Could not replace Placeholder {tmp2}!");
     });
 
     it("testResolveFolder1", function () {

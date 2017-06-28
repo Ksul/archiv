@@ -15,6 +15,35 @@ describe("Test für ArchivTyp", function() {
         search.setFind(false);
     });
 
+    it("testWithNestedArchivZielWithSearchItems", function() {
+        REC.currentDocument.removeProperty("my:person");
+        REC.content ="ZAUBERFRAU Rechnung";
+        var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">'+
+            ' <archivPosition folder="Dokumente/Rechnungen/{fol}/{tmp}"/> ' +
+            '<searchItem name="person" fix="Test" target="my:person" />' +
+            '<searchItem name="id" fix="99.233.620.0" target="my:idvalue"/>' +
+            ' <archivTyp name="Rechnung Zauberfrau" searchString="Rechnung">' +
+            ' <archivZiel type="my:archivContent" /> ' +
+            ' <archivZiel type="my:archivFolder" /> ' +
+            ' <searchItem name="fol" fix="Rechnungen Zauberfrau" /> ' +
+            ' <searchItem name="tmp" fix="2015" />' +
+            ' </archivTyp>' +
+            ' </archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        console.log(REC.getMessage(true));
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).not.toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
+        var doc = companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest");
+        expect(doc.properties["my:idvalue"]).toBe("99.233.620.0");
+        expect(doc.properties["my:person"]).toBe("Test");
+    });
+
     it("testWithNestedArchivZielWithError", function() {
         REC.content ="ZAUBERFRAU Rechnung";
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
@@ -130,7 +159,6 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
         var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
         archivTyp.resolve();
-        console.log(REC.getMessage(true));
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
         var doc = companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest");
         expect(doc).not.toBeNull();
