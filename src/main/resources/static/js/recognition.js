@@ -2330,7 +2330,17 @@ function SearchItem(srch) {
                     this.check[i].resolve();
                 }
             }
-            REC.positions.add(REC.convertPosition(REC.content, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.name, this.erg.getResult().check));
+
+            // Positionen nicht im Server merken weil sie dort nicht gebraucht werden
+            if (typeof Position == "function")
+                new Position(REC.content.substring(0, this.erg.getResult().getStart()).split("\n").length - 1,
+                             this.erg.getResult().getStart() - REC.content.substring(0, this.erg.getResult().getStart()).lastIndexOf("\n") - 1,
+                             REC.content.substring(0, this.erg.getResult().getEnd()).split("\n").length - 1,
+                             this.erg.getResult().getEnd() - REC.content.substring(0,
+                             this.erg.getResult().getEnd()).lastIndexOf("\n") - 1,
+                             this.erg.getResult().check ? "ace_selection" : "ace_step",
+                             this.name);
+
 
             if (REC.exist(this.archivZiel)) {
                 for (i = 0; i < this.archivZiel.length; i++) {
@@ -2361,50 +2371,7 @@ function SearchItem(srch) {
     };
 }
 
-/**
- * beschreibt die Position eines gefundenem Wertes in dem Dokument
- * @param startRow          die Zeile, in der der Wert beginnt
- * @param startColumn       die Spalte, in der der Wert beginnt
- * @param endRow            die Zeile, in der der Wert endet
- * @param endColumn         die Spalte, in der der Wert endete
- * @param type              der Typ des Wertes
- * @param desc              eine Beschreibung
- * @constructor
- */
-function Position(startRow, startColumn, endRow, endColumn, type, desc) {
-    this.startRow = startRow;
-    this.startColumn = startColumn;
-    this.endRow = endRow;
-    this.endColumn = endColumn;
-    this.type = type;
-    this.desc = desc;
 
-    this.print = function () {
-        return "StartRow: " + this.startRow + " StartColumn: " + this.startColumn + " EndRow: " + this.endRow + " EndColumn: " + this.endColumn + " Description: " + this.desc;
-    };
-}
-
-
-
-function PositionContainer() {}
-
-PositionContainer.prototype = [];
-
-PositionContainer.prototype.add = function (pos) {
-    var found = false;
-    if (!(pos.startRow == pos.endRow && pos.startColumn == pos.endColumn)) {
-        for (var i = 0; i < this.length; i++) {
-            if ((pos.startRow > this[i].startRow && pos.endRow < this[i].endRow) || (pos.startRow == this[i].startRow && pos.startColumn >= this[i].startColumn)
-                && (pos.endRow == this[i].endRow && pos.endColumn <= this[i].endColumn)) {
-                this[i] = pos;
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-            this.push(pos);
-    }
-};
 
 function SearchResultContainer() {}
 
@@ -3471,24 +3438,6 @@ REC = {
         return erg.replace(/\r\n/g,'\n');
     },
 
-    /**
-     * konvertiert die absoluten Positionsangaben in ein Positionsobject mit Zeilen und Spalten
-     * @param text          der Text
-     * @param start         die absolute Startposition
-     * @param end           die absolute Endposition
-     * @param desc          die Beschreibung der Positionsangabe
-     * @param type          der Typ der Positionsangabe
-     * @returns {Position}  das konvertierte Positionsobject
-     */
-    convertPosition: function (text, start, end, desc, type) {
-        var startRow = text.substring(0, start).split("\n").length - 1;
-        var startCol = start - text.substring(0, start).lastIndexOf("\n") - 1;
-        var endRow = text.substring(0, end).split("\n").length - 1;
-        var endCol = end - text.substring(0, end).lastIndexOf("\n") - 1;
-        return new Position(startRow, startCol, endRow, endCol, type, desc);
-    },
-
-    
     testRules: function (rules) {
         try {
             this.currXMLName = [];
@@ -3659,7 +3608,6 @@ REC = {
         this.result = [];
         this.errors = [];
         this.results = [];
-        this.positions = new PositionContainer();
         companyhome.init();
         this.archivRoot = companyhome.createFolder("Archiv");
         this.unknownBox = this.archivRoot.createFolder("Unbekannt");
@@ -3686,8 +3634,8 @@ REC = {
     showContent: false,
     result: [],
     errors: [],
-    results: [],
-    positions: new PositionContainer()
+    results: []
+
 };
 REC.run();
 

@@ -28,6 +28,7 @@
 ./js/alfrescoMock.js
 ./js/recognition.js
 ./js/verteilung.js
+./js/xmllint.js
 ./js/jquery-ui/jquery-ui.js
 ./js/jquery/jquery.tmpl.js
 ./js/jquery/jquery.layout.js

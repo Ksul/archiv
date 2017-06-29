@@ -84,6 +84,7 @@ function executeService(service, params) {
             data: JSON.stringify(dataString),
             datatype: "json",
             cache: false,
+            headers: { "cache-control": "no-cache" },
             async: asynchron,
             url: url + service.name,
             error: function (response) {

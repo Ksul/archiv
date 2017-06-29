@@ -3289,6 +3289,43 @@ function checkAndBuidAlfrescoEnvironment() {
             }
         }
         if (erg.success) {
+            // Schema prüfen
+            erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
+                {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xsd"}
+            ]);
+            if (!erg.success) {
+                var doc = $.ajax({
+                    url: createPathToFile("./rules/doc.xsd"),
+                    async: false
+                }).responseText;
+                if (exist(doc) && doc.length > 0) {
+                    erg = executeService({
+                        "name": "createDocument",
+                        "errorMessage": "Verteilungsschema konnten nicht erstellt werden!"
+                    }, [
+                        {"name": "documentId", "value": scriptFolderId},
+                        {"name": "fileName", "value": "doc.xsd"},
+                        {"name": "content", "value": base64EncArr(strToUTF8Arr(doc))},
+                        {"name": "mimeType", "value": "text/xml"},
+                        {
+                            "name": "extraProperties",
+                            "value": {"cmis:document":{"cmis:name": "doc.xsd"}, "P:cm:titled":{"cm:description":"Dokument mit den Verteilschema"}}
+                        },
+                        {"name": "versionState", "value": "major"}
+
+                    ]);
+                    if (erg.success)
+                        rulesSchemaId = erg.data.objectId;
+                    else {
+                        REC.log(WARN, "Verteilschema (doc.xsd) konnten auf dem Alfresco Server nicht angelegt werden!");
+                    }
+                } else
+                    REC.log(WARN, "Verteilschema (doc.xsd) konnten nicht gelesen werden!");
+            } else {
+                rulesSchemaId = erg.data;
+            }
+        }
+        if (erg.success) {
             // Archiv prüfen
             erg = executeService({"name" : "getNodeId", "errorMessage" : "Archiv konnte nicht gefunden werden:"}, [
                 {"name": "filePath", "value": "/"}

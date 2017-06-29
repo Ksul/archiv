@@ -41,6 +41,7 @@ describe("Test für SearchItem", function() {
             "Zahlbetrag \r\n" +
             "	 25,65 € ";
         REC.content = REC.content.replace(/\r\n/g, '\n');
+        Verteilung.positions.clear();
     });
 
 
@@ -80,10 +81,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(1965, 4, 1).getTime());
-        expect(REC.positions[0].startRow).toBe(0);
-        expect(REC.positions[0].endRow).toBe(0);
-        expect(REC.positions[0].startColumn).toBe(26);
-        expect(REC.positions[0].endColumn).toBe(36);
+        expect(Verteilung.positions[0].startRow).toBe(0);
+        expect(Verteilung.positions[0].endRow).toBe(0);
+        expect(Verteilung.positions[0].startColumn).toBe(26);
+        expect(Verteilung.positions[0].endColumn).toBe(36);
     });
 
 
@@ -93,10 +94,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2015, 2, 1).getTime());
-        expect(REC.positions[0].startRow).toBe(6);
-        expect(REC.positions[0].endRow).toBe(6);
-        expect(REC.positions[0].startColumn).toBe(7);
-        expect(REC.positions[0].endColumn).toBe(14);
+        expect(Verteilung.positions[0].startRow).toBe(6);
+        expect(Verteilung.positions[0].endRow).toBe(6);
+        expect(Verteilung.positions[0].startColumn).toBe(7);
+        expect(Verteilung.positions[0].endColumn).toBe(14);
     });
 
     it("testResolveSearchItemWithWordAndFloat", function() {
@@ -105,10 +106,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21.65);
-        expect(REC.positions[0].startRow).toBe(3);
-        expect(REC.positions[0].endRow).toBe(3);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(5);
+        expect(Verteilung.positions[0].startRow).toBe(3);
+        expect(Verteilung.positions[0].endRow).toBe(3);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(5);
     });
 
     it("testResolveSearchItemWithDelimitterAndFloat", function() {
@@ -120,10 +121,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21.65);
-        expect(REC.positions[0].startRow).toBe(3);
-        expect(REC.positions[0].endRow).toBe(3);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(5);
+        expect(Verteilung.positions[0].startRow).toBe(3);
+        expect(Verteilung.positions[0].endRow).toBe(3);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(5);
     });
 
     it("testResolveSearchItemWithDelimitterAndInt", function() {
@@ -135,10 +136,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21);
-        expect(REC.positions[0].startRow).toBe(6);
-        expect(REC.positions[0].endRow).toBe(6);
-        expect(REC.positions[0].startColumn).toBe(25);
-        expect(REC.positions[0].endColumn).toBe(27);
+        expect(Verteilung.positions[0].startRow).toBe(6);
+        expect(Verteilung.positions[0].endRow).toBe(6);
+        expect(Verteilung.positions[0].startColumn).toBe(25);
+        expect(Verteilung.positions[0].endColumn).toBe(27);
     });
 
 
@@ -151,10 +152,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21);
-        expect(REC.positions[0].startRow).toBe(6);
-        expect(REC.positions[0].endRow).toBe(6);
-        expect(REC.positions[0].startColumn).toBe(25);
-        expect(REC.positions[0].endColumn).toBe(27);
+        expect(Verteilung.positions[0].startRow).toBe(6);
+        expect(Verteilung.positions[0].endRow).toBe(6);
+        expect(Verteilung.positions[0].startColumn).toBe(25);
+        expect(Verteilung.positions[0].endColumn).toBe(27);
     });
 
 
@@ -166,10 +167,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2012, 2, 22).getTime());
-        expect(REC.positions[0].startRow).toBe(13);
-        expect(REC.positions[0].endRow).toBe(13);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(12);
+        expect(Verteilung.positions[0].startRow).toBe(13);
+        expect(Verteilung.positions[0].endRow).toBe(13);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(12);
     });
 
     it("testResolveSearchItemWithFloat", function() {
@@ -178,10 +179,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(123.5);
-        expect(REC.positions[0].startRow).toBe(18);
-        expect(REC.positions[0].endRow).toBe(18);
-        expect(REC.positions[0].startColumn).toBe(5);
-        expect(REC.positions[0].endColumn).toBe(10);
+        expect(Verteilung.positions[0].startRow).toBe(18);
+        expect(Verteilung.positions[0].endRow).toBe(18);
+        expect(Verteilung.positions[0].startColumn).toBe(5);
+        expect(Verteilung.positions[0].endColumn).toBe(10);
     });
 
 
@@ -191,10 +192,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2012, 2, 10).getTime());
-        expect(REC.positions[0].startRow).toBe(19);
-        expect(REC.positions[0].endRow).toBe(19);
-        expect(REC.positions[0].startColumn).toBe(11);
-        expect(REC.positions[0].endColumn).toBe(23);
+        expect(Verteilung.positions[0].startRow).toBe(19);
+        expect(Verteilung.positions[0].endRow).toBe(19);
+        expect(Verteilung.positions[0].startColumn).toBe(11);
+        expect(Verteilung.positions[0].endColumn).toBe(23);
     });
 
     it("testResolveSearchItemWithKindAndAmount", function() {
@@ -203,10 +204,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(22);
-        expect(REC.positions[0].startRow).toBe(6);
-        expect(REC.positions[0].endRow).toBe(6);
-        expect(REC.positions[0].startColumn).toBe(28);
-        expect(REC.positions[0].endColumn).toBe(30);
+        expect(Verteilung.positions[0].startRow).toBe(6);
+        expect(Verteilung.positions[0].endRow).toBe(6);
+        expect(Verteilung.positions[0].startColumn).toBe(28);
+        expect(Verteilung.positions[0].endColumn).toBe(30);
     });
 
     it("testResolveSearchItemWithKindAndDate", function() {
@@ -215,10 +216,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2010, 11, 24).getTime());
-        expect(REC.positions[0].startRow).toBe(20);
-        expect(REC.positions[0].endRow).toBe(20);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(10);
+        expect(Verteilung.positions[0].startRow).toBe(20);
+        expect(Verteilung.positions[0].endRow).toBe(20);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(10);
     });
 
     it("testResolveSearchItemWithCheck", function() {
@@ -230,10 +231,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2008, 0, 7).getTime());
-        expect(REC.positions[0].startRow).toBe(22);
-        expect(REC.positions[0].endRow).toBe(22);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(14);
+        expect(Verteilung.positions[0].startRow).toBe(22);
+        expect(Verteilung.positions[0].endRow).toBe(22);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(14);
     });
 
     it("testResolveSearchItem16", function() {
@@ -242,10 +243,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(349.10);
-        expect(REC.positions[0].startRow).toBe(24);
-        expect(REC.positions[0].endRow).toBe(24);
-        expect(REC.positions[0].startColumn).toBe(33);
-        expect(REC.positions[0].endColumn).toBe(39);
+        expect(Verteilung.positions[0].startRow).toBe(24);
+        expect(Verteilung.positions[0].endRow).toBe(24);
+        expect(Verteilung.positions[0].startColumn).toBe(33);
+        expect(Verteilung.positions[0].endColumn).toBe(39);
     });
 
     it("testResolveSearchItemWithDirectionLeft", function() {
@@ -254,10 +255,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe('nächsten');
-        expect(REC.positions[0].startRow).toBe(24);
-        expect(REC.positions[0].endRow).toBe(24);
-        expect(REC.positions[0].startColumn).toBe(7);
-        expect(REC.positions[0].endColumn).toBe(15);
+        expect(Verteilung.positions[0].startRow).toBe(24);
+        expect(Verteilung.positions[0].endRow).toBe(24);
+        expect(Verteilung.positions[0].startColumn).toBe(7);
+        expect(Verteilung.positions[0].endColumn).toBe(15);
     });
 
     it("testResolveSearchItem18", function() {
@@ -268,10 +269,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(123);
-        expect(REC.positions[0].startRow).toBe(24);
-        expect(REC.positions[0].endRow).toBe(24);
-        expect(REC.positions[0].startColumn).toBe(60);
-        expect(REC.positions[0].endColumn).toBe(63);
+        expect(Verteilung.positions[0].startRow).toBe(24);
+        expect(Verteilung.positions[0].endRow).toBe(24);
+        expect(Verteilung.positions[0].startColumn).toBe(60);
+        expect(Verteilung.positions[0].endColumn).toBe(63);
     });
 
 
@@ -281,10 +282,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2011, 7, 23).getTime());
-        expect(REC.positions[0].startRow).toBe(23);
-        expect(REC.positions[0].endRow).toBe(23);
-        expect(REC.positions[0].startColumn).toBe(14);
-        expect(REC.positions[0].endColumn).toBe(24);
+        expect(Verteilung.positions[0].startRow).toBe(23);
+        expect(Verteilung.positions[0].endRow).toBe(23);
+        expect(Verteilung.positions[0].startColumn).toBe(14);
+        expect(Verteilung.positions[0].endColumn).toBe(24);
     });
 
     it("testResolveSearchItem20", function() {
@@ -293,10 +294,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21.49);
-        expect(REC.positions[0].startRow).toBe(17);
-        expect(REC.positions[0].endRow).toBe(17);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(6);
+        expect(Verteilung.positions[0].startRow).toBe(17);
+        expect(Verteilung.positions[0].endRow).toBe(17);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(6);
     });
 
 
@@ -306,10 +307,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2009, 02, 21).getTime());
-        expect(REC.positions[0].startRow).toBe(25);
-        expect(REC.positions[0].endRow).toBe(25);
-        expect(REC.positions[0].startColumn).toBe(6);
-        expect(REC.positions[0].endColumn).toBe(19);
+        expect(Verteilung.positions[0].startRow).toBe(25);
+        expect(Verteilung.positions[0].endRow).toBe(25);
+        expect(Verteilung.positions[0].startColumn).toBe(6);
+        expect(Verteilung.positions[0].endColumn).toBe(19);
     });
 
     it("testResolveSearchItem22", function() {
@@ -323,10 +324,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(189.13);
-        expect(REC.positions[0].startRow).toBe(26);
-        expect(REC.positions[0].endRow).toBe(26);
-        expect(REC.positions[0].startColumn).toBe(20);
-        expect(REC.positions[0].endColumn).toBe(26);
+        expect(Verteilung.positions[0].startRow).toBe(26);
+        expect(Verteilung.positions[0].endRow).toBe(26);
+        expect(Verteilung.positions[0].startColumn).toBe(20);
+        expect(Verteilung.positions[0].endColumn).toBe(26);
     });
 
     it("testResolveSearchItem23", function() {
@@ -371,10 +372,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe("EUR");
-        expect(REC.positions[0].startRow).toBe(14);
-        expect(REC.positions[0].endRow).toBe(14);
-        expect(REC.positions[0].startColumn).toBe(10);
-        expect(REC.positions[0].endColumn).toBe(13);
+        expect(Verteilung.positions[0].startRow).toBe(14);
+        expect(Verteilung.positions[0].endRow).toBe(14);
+        expect(Verteilung.positions[0].startColumn).toBe(10);
+        expect(Verteilung.positions[0].endColumn).toBe(13);
     });
 
     it("testResolveSearchItem26", function() {
@@ -383,10 +384,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe('959 622 2280');
-        expect(REC.positions[0].startRow).toBe(28);
-        expect(REC.positions[0].endRow).toBe(28);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(12);
+        expect(Verteilung.positions[0].startRow).toBe(28);
+        expect(Verteilung.positions[0].endRow).toBe(28);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(12);
     });
 
 
@@ -396,10 +397,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe('560 525 3966');
-        expect(REC.positions[0].startRow).toBe(29);
-        expect(REC.positions[0].endRow).toBe(29);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(12);
+        expect(Verteilung.positions[0].startRow).toBe(29);
+        expect(Verteilung.positions[0].endRow).toBe(29);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(12);
     });
 
 
@@ -411,10 +412,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(4300.01);
-        expect(REC.positions[0].startRow).toBe(30);
-        expect(REC.positions[0].endRow).toBe(30);
-        expect(REC.positions[0].startColumn).toBe(0);
-        expect(REC.positions[0].endColumn).toBe(8);
+        expect(Verteilung.positions[0].startRow).toBe(30);
+        expect(Verteilung.positions[0].endRow).toBe(30);
+        expect(Verteilung.positions[0].startColumn).toBe(0);
+        expect(Verteilung.positions[0].endColumn).toBe(8);
     });
 
     it("testResolveSearchItem29", function() {
@@ -436,10 +437,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(302);
-        expect(REC.positions[0].startRow).toBe(33);
-        expect(REC.positions[0].endRow).toBe(33);
-        expect(REC.positions[0].startColumn).toBe(24);
-        expect(REC.positions[0].endColumn).toBe(27);
+        expect(Verteilung.positions[0].startRow).toBe(33);
+        expect(Verteilung.positions[0].endRow).toBe(33);
+        expect(Verteilung.positions[0].startColumn).toBe(24);
+        expect(Verteilung.positions[0].endColumn).toBe(27);
     });
 
     it("testResolveSearchItemWithPositionAndFloat", function() {
@@ -448,10 +449,10 @@ describe("Test für SearchItem", function() {
         XMLDoc.parse();
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(302.26);
-        expect(REC.positions[0].startRow).toBe(33);
-        expect(REC.positions[0].endRow).toBe(33);
-        expect(REC.positions[0].startColumn).toBe(24);
-        expect(REC.positions[0].endColumn).toBe(30);
+        expect(Verteilung.positions[0].startRow).toBe(33);
+        expect(Verteilung.positions[0].endRow).toBe(33);
+        expect(Verteilung.positions[0].startColumn).toBe(24);
+        expect(Verteilung.positions[0].endColumn).toBe(30);
     });
 
     it("testFindForWord1", function() {

@@ -1,3 +1,87 @@
+function Position(){}
+
+/**
+ * beschreibt die Position eines gefundenem Wertes in dem Dokument
+ * @param startRow          die Zeile, in der der Wert beginnt
+ * @param startColumn       die Spalte, in der der Wert beginnt
+ * @param endRow            die Zeile, in der der Wert endet
+ * @param endColumn         die Spalte, in der der Wert endete
+ * @param css               der CSS Selektor der verwendet werden soll
+ * @param desc              eine Beschreibung
+ * @constructor
+ */
+var Position = function(startRow, startColumn, endRow, endColumn, css, desc) {
+    this.startRow = startRow;
+    this.startColumn = startColumn;
+    this.endRow = endRow;
+    this.endColumn = endColumn;
+    this.css = css;
+    this.desc = desc;
+    Verteilung.positions.add(this);
+
+    this.print = function () {
+        return "StartRow: " + this.startRow + " StartColumn: " + this.startColumn + " EndRow: " + this.endRow + " EndColumn: " + this.endColumn + " Description: " + this.desc;
+    };
+
+
+};
+
+Position.convertPosition = function (text, start, end, desc, type) {
+    var startRow = text.substring(0, start).split("\n").length - 1;
+    var startCol = start - text.substring(0, start).lastIndexOf("\n") - 1;
+    var endRow = text.substring(0, end).split("\n").length - 1;
+    var endCol = end - text.substring(0, end).lastIndexOf("\n") - 1;
+    return new Position(startRow, startCol, endRow, endCol, type, desc);
+};
+
+
+function Marker () {}
+
+Marker.constructor = function(id, editor, css) {
+    this.id = id;
+    this.editor = editor;
+    this.css = css;
+};
+
+Marker.prototype.getMarkerId = function() {
+    return this.id;
+};
+
+Marker.prototype.getEditor = function() {
+    return this.editor;
+};
+
+Marker.prototype.getCSS = function() {
+    return this.css;
+};
+
+function PositionContainer() {}
+
+PositionContainer.prototype = [];
+
+PositionContainer.prototype.add = function (pos) {
+    var found = false;
+    if (!(pos.startRow == pos.endRow && pos.startColumn == pos.endColumn)) {
+        for (var i = 0; i < this.length; i++) {
+            if ((pos.startRow > this[i].startRow && pos.endRow < this[i].endRow) || (pos.startRow == this[i].startRow && pos.startColumn >= this[i].startColumn)
+                && (pos.endRow == this[i].endRow && pos.endColumn <= this[i].endColumn)) {
+                this[i] = pos;
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            this.push(pos);
+    }
+};
+
+PositionContainer.prototype.clear = function () {
+    this.splice(0, this.length);
+};
+
+
+
+
 /**
  * zeigt die Progressbar
  * wird momentan nicht verwendet
@@ -180,7 +264,7 @@ function loadText(content, txt, name, typ, container) {
         currentContent = content;
         currentText = txt;
         currentContainer = container;
-        removeMarkers(markers, textEditor);
+        removeMarkers(textEditor);
         textEditor.getSession().setValue(txt);
         document.getElementById('headerWest').textContent = name;
         propsEditor.getSession().setValue("");
@@ -409,36 +493,27 @@ function doReRunAll() {
  * @returns {Array}   die erzeugten Markierungen im Editor
  */
 function setMarkers(positions, editor) {
-    var markers = [];
     if (REC.exist(positions)) {
-        /*
-         * var cssText = ".ace-chrome .ace_marker-layer .ace_step1 {background:
-         * rgb(252, 0, 0);}"; var cssClass = "ace-chrome"; var dom =
-         * require("ace/lib/dom"); dom.importCssString(cssText, cssClass);
-         */
         var markerId;
         for ( var i = 0; i < positions.length; i++) {
             var pos = positions[i];
-            var r = new Range(pos.startRow, pos.startColumn, pos.endRow, pos.endColumn);
-            if (pos.type)
-                markerId = editor.getSession().addMarker(r, "ace_selection", pos.desc, false);
-            else
-                markerId = editor.getSession().addMarker(r, "ace_step", pos.desc, false);
-            markers.push(markerId);
+            var r = new Verteilung.Range(pos.startRow, pos.startColumn, pos.endRow, pos.endColumn);
+            var marker = new Marker(editor.getSession().addMarker(r, pos.css, pos.desc, false), editor, pos.css);
+            Verteilung.markers.push(marker);
         }
     }
-    return markers;
 }
 
 
 /**
  * entfernt die Markierungen im Editor
- * @param markers  die Markierungen
  * @param editor   der verwendete Editor
+ * @param css      der verwendetete CSS Selektor
  */
-function removeMarkers(markers, editor) {
-    for ( var i = 0; i < markers.length; i++) {
-        editor.getSession().removeMarker(markers[i]);
+function removeMarkers(editor, css) {
+    for ( var i = 0; i < Verteilung.markers.length; i++) {
+        if (!css || css == Verteilung. markers[i].getCSS())
+            editor.getSession().removeMarker(Verteilung.markers[i].getMarkerId());
     }
 }
 
@@ -453,12 +528,12 @@ function setXMLPosition(position) {
     for ( var i = 0; i < position.length; i++)
         pos = text.indexOf("<archivTyp name=\"" + position[i] + "\"", pos);
     if (pos != -1) {
-        pos1 = text.indexOf("</archivTyp>", pos);
+        var pos1 = text.indexOf("</archivTyp>", pos);
         if (pos1 != -1) {
-            var p = REC.convertPosition(text, pos, pos1 + 12, "");
+            var p = Position.convertPosition(text, pos, pos1 + 12, "");
             rulesEditor.getSession().unfold(p.startRow + 1, true);
             rulesEditor.gotoLine(p.startRow + 1);
-            rulesEditor.selection.setSelectionRange(new Range(p.startRow, p.startColumn, p.endRow, p.endColumn));
+            rulesEditor.selection.setSelectionRange(new Verteilung.Range(p.startRow, p.startColumn, p.endRow, p.endColumn));
         }
     }
 }
@@ -558,14 +633,14 @@ function doTest() {
             success: function (data) {
                 if (data.success[0]) {
                     REC.currentDocument.setContent(data.result[0].text.toString());
-                    removeMarkers(markers, textEditor);
+                    removeMarkers(textEditor);
                     textEditor.getSession().setValue(data.result[0].text.toString());
                     currentRules = "test.xml";
                     document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
                     rulesEditor.getSession().setValue(data.result[0].xml.toString());
                     REC.testRules(rulesEditor.getSession().getValue());
                     setXMLPosition(REC.currXMLName);
-                    markers = setMarkers(REC.positions, textEditor);
+                    setMarkers(REC.positions, textEditor);
                     propsEditor.getSession().setValue(printResults(REC.results));
                     fillMessageBox(true);
                     testMode = true;
@@ -601,10 +676,13 @@ function closeTest() {
  */
 function work() {
     try {
+        var json;
+        var schemaContent;
+        var validate = true;
         // aktuelles Verteilungsskript vom Server holen
         if (REC.exist(scriptID)) {
             // ScriptID ist vorhanden, wir versuchen das Skript vom Alfresco Server zu laden
-            var json = executeService({
+            json = executeService({
                 "name": "getDocumentContent",
                 "errorMessage": "Skript konnte nicht gelesen werden:"
             }, [
@@ -641,7 +719,7 @@ function work() {
                         wrap: false,
                         caseSensitive: false,
                         wholeWord: false,
-                        start: new Range(range.end.row, range.end.column, range.end.row, range.end.column),
+                        start: new Verteilung.Range(range.end.row, range.end.column, range.end.row, range.end.column),
                         regExp: false
                     });
                     if (end)
@@ -656,7 +734,7 @@ function work() {
                         wrap: false,
                         caseSensitive: false,
                         wholeWord: false,
-                        start: new Range(range.end.row, range.end.column, range.end.row, range.end.column),
+                        start: new Verteilung.Range(range.end.row, range.end.column, range.end.row, range.end.column),
                         regExp: false
                     });
                     range.setEnd(end.end);
@@ -681,7 +759,7 @@ function work() {
                             wrap: false,
                             caseSensitive: false,
                             wholeWord: false,
-                            start: new Range(range.end.row, range.end.column, range.end.row, range.end.column),
+                            start: new Verteilung.Range(range.end.row, range.end.column, range.end.row, range.end.column),
                             regExp: false
                         });
                         if (end)
@@ -704,12 +782,44 @@ function work() {
             REC.init();
             REC.currentDocument.properties.content.write(new Content(textEditor.getSession().getValue()));
             REC.currentDocument.name = currentFile;
-            removeMarkers(markers, textEditor);
-            REC.testRules(sel);
-            if (!selectMode)
-                setXMLPosition(REC.currXMLName);
-            markers = setMarkers(REC.positions, textEditor);
+            removeMarkers(textEditor);
+            if (REC.exist(rulesSchemaId)) {
+                json = executeService({
+                    "name": "getDocumentContent",
+                    "errorMessage": "Schema konnten nicht gelesen werden:"
+                }, [
+                    {"name": "documentId", "value": rulesSchemaId},
+                    {"name": "extract", "value": "false"}
+                ]);
+                if (json.success) {
+                    schemaContent = json.data;
+                }
+            }
+            if (REC.exist(schemaContent)) {
+                removeMarkers(rulesEditor, "ace_error");
+                var validateErrors = xmllint.validateXML({xml: sel, schema: schemaContent}).errors;
+                    if (REC.exist(validateErrors)) {
+                        validate = false;
+                        for (var i = 0; i < validateErrors.length; i++) {
+                            var err = validateErrors[i];
+                            if(err.startsWith("file_0.xml")) {
+                                var line = err.split(":")[1];
+                                rulesEditor.getSession().addMarker(new Verteilung.Range(line, 0, line, 1), "ace_error", "fullLine");
+                            }
+                            REC.log(ERROR, validateErrors[i]);
+                        }
+                    }
+            }
+            if (validate) {
+                REC.testRules(sel);
+                if (!selectMode)
+                    setXMLPosition(REC.currXMLName);
+
+                setMarkers(REC.positions, textEditor);
+            }
             fillMessageBox(true);
+            if (!validate)
+                message("Fehler", "Regeln sind syntaktisch nicht korrekt!");
             propsEditor.getSession().setValue(printResults(REC.results));
             document.getElementById('inTxt').style.display = 'block';
             document.getElementById('dtable').style.display = 'none';
@@ -818,7 +928,7 @@ function format() {
         // window.parent.frames.rules.rulesEditor.getSession().foldAll(1);
         if (typeof currXMLName != "undefined" && currXMLName != null) {
             setXMLPosition(currXMLName);
-            markers = setMarkers(positions, textEditor);
+            setMarkers(positions, textEditor);
         }
     } catch (e) {
         errorHandler(e);
@@ -963,11 +1073,11 @@ function openScript() {
         // 84% sind das Maximum, danach ist das Fenster mit den Regel ganz verschwunden und beim Schliessen
         // des Scriptes die Darstellung der Regeln kaputt
         verteilungLayout.sizePane("west", "84%");
-        oldContent = textEditor.getSession().getValue();
+        Verteilung.oldContent = textEditor.getSession().getValue();
         var content, json, script;
         var read = false;
-        if (REC.exist(modifiedScript) && modifiedScript.length > 0) {
-            content = modifiedScript;
+        if (REC.exist(Verteilung.modifiedScript) && Verteilung.modifiedScript.length > 0) {
+            content = Verteilung.modifiedScript;
         } else {
             if (REC.exist(scriptID)) {
                 // ScriptID ist vorhanden, wir versuchen das Skript vom Alfresco Server zu laden
@@ -999,7 +1109,7 @@ function openScript() {
             var tmp = REC.mess;
             eval("//# sourceURL=recognition.js\n\n" + content);
             REC.mess = tmp;
-            removeMarkers(markers, textEditor);
+            removeMarkers(textEditor);
             textEditor.getSession().setMode(new jsMode());
             textEditor.getSession().setValue(content);
             textEditor.setShowInvisibles(false);
@@ -1020,8 +1130,8 @@ function openScript() {
  */
 function activateScriptToContext() {
     try {
-        modifiedScript = textEditor.getSession().getValue();
-        eval("//# sourceURL=recognition.js\n\n" + modifiedScript);
+        Verteilung.modifiedScript = textEditor.getSession().getValue();
+        eval("//# sourceURL=recognition.js\n\n" + Verteilung.modifiedScript);
         REC.log(INFORMATIONAL, "Die gändeterten Skriptanweisungen sind jetzt wirksam!");
         fillMessageBox(true);
     } catch (e) {
@@ -1083,8 +1193,8 @@ function closeScript() {
     try {
         verteilungLayout.sizePane("west", panelSizeReminder);
         textEditor.getSession().setMode(new txtMode());
-        if (REC.exist(oldContent) && oldContent.length > 0)
-            textEditor.getSession().setValue(oldContent);
+        if (REC.exist(Verteilung.oldContent) && Verteilung.oldContent.length > 0)
+            textEditor.getSession().setValue(Verteilung.oldContent);
         else
             textEditor.getSession().setValue("");
         textEditor.setShowInvisibles(true);
@@ -1095,9 +1205,11 @@ function closeScript() {
     }
 }
 
-var Range = require("ace/range").Range;
-var markers = [];
-var results = [];
-var oldContent = null;
-var modifiedScript = null;
+var Verteilung = {
+    Range: require("ace/range").Range,
+    markers: [],
+    oldContent:  null,
+    modifiedScript: null,
+    positions: new PositionContainer()
+};
 

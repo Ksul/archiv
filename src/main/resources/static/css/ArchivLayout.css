@@ -434,6 +434,12 @@ p {
     opacity: 0.3;
 }
 
+.ace_error {
+    position:absolute;
+    background:rgba(255,0,0,0.5);
+    z-index:20
+}
+
 
 button.ui-dialog-titlebar-close span.ui-icon {
     margin-left: -8px !important;
