@@ -475,7 +475,7 @@ function loadLayout() {
                 slidable: true,
                 onresize: function () {
                     try {
-                        textEditor.resize();
+                        Verteilung.textEditor.resize();
                         resizeTable("verteilungWest", "dtable", "tabelle", "verteilungTabelleHeader", "verteilungTableFooter");
                     } catch (e){
                         errorHandler(e);
@@ -496,7 +496,7 @@ function loadLayout() {
                 size:.15,
                 paneSelector: "#verteilungEast",
                 onresize: function () {
-                    propsEditor.resize();
+                    Verteilung.propsEditor.resize();
                 }
             },
             //	enable state management
@@ -2433,7 +2433,7 @@ function handleVerteilungImageClicks() {
             var row = tabelle.row(tr).data();
             var name = row[1];
             REC.currentDocument.setContent(daten[name]["text"]);
-            REC.testRules(rulesEditor.getSession().getValue());
+            REC.testRules(Verteilung.rulesEditor.getSession().getValue());
             daten[name].log = REC.mess;
             daten[name].result = results;
             daten[name].position = REC.positions;
@@ -2461,10 +2461,10 @@ function handleVerteilungImageClicks() {
             currentFile = daten[name]["file"];
             document.getElementById('headerWest').textContent = currentFile;
             setXMLPosition(daten[name]["xml"]);
-            removeMarkers(markers, textEditor);
-            markers = setMarkers(daten[name]["position"], textEditor);
-            textEditor.getSession().setValue(daten[name]["text"]);
-            propsEditor.getSession().setValue(printResults(daten[name]["result"]));
+            removeMarkers(markers, Verteilung.textEditor);
+            markers = setMarkers(daten[name]["position"]);
+            Verteilung.textEditor.getSession().setValue(daten[name]["text"]);
+            Verteilung.propsEditor.getSession().setValue(printResults(daten[name]["result"]));
             //TODO das muss anders gemacht werden
             fillMessageBox(daten[name]["log"], true);
             manageControls();
@@ -2486,10 +2486,10 @@ function handleVerteilungImageClicks() {
                     message("Fehler", "Permission to delete file was denied.");
                 }
                 currentFile = daten[name]["file"];
-                textEditor.getSession().setValue("");
-                propsEditor.getSession().setValue("");
+                Verteilung.textEditor.getSession().setValue("");
+                Verteilung.propsEditor.getSession().setValue("");
                 clearMessageBox();
-                rulesEditor.getSession().foldAll(1);
+                Verteilung.rulesEditor.getSession().foldAll(1);
                 if (currentFile.length > 0) {
                     var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
                     file.initWithPath(currentFile);
@@ -3453,26 +3453,26 @@ function start() {
         loadLayout();
         document.getElementById('filesinput').addEventListener('change', readMultiFile, false);
         REC.init();
-        propsEditor = ace.edit("inProps");
-        propsEditor.setReadOnly(true);
-        propsEditor.renderer.setShowGutter(false);
-        propsEditor.setShowPrintMargin(false);
-        propsEditor.$blockScrolling = Infinity;
-        outputEditor = ace.edit("inOutput");
-        outputEditor.setReadOnly(true);
-        outputEditor.setShowPrintMargin(false);
-        outputEditor.$blockScrolling = Infinity;
+        Verteilung.propsEditor = ace.edit("inProps");
+        Verteilung.propsEditor.setReadOnly(true);
+        Verteilung.propsEditor.renderer.setShowGutter(false);
+        Verteilung.propsEditor.setShowPrintMargin(false);
+        Verteilung.propsEditor.$blockScrolling = Infinity;
+        Verteilung.outputEditor = ace.edit("inOutput");
+        Verteilung.outputEditor.setReadOnly(true);
+        Verteilung.outputEditor.setShowPrintMargin(false);
+        Verteilung.outputEditor.$blockScrolling = Infinity;
         var zoneRules = document.getElementById('inRules');
         zoneRules.addEventListener('dragover', handleDragOver, false);
         zoneRules.addEventListener('drop', handleRulesSelect, false);
 
-        rulesEditor = ace.edit("inRules");
-        //rulesEditor.setTheme("ace/theme/eclipse");
+        Verteilung.rulesEditor = ace.edit("inRules");
+        //Verteilung.rulesEditor.setTheme("ace/theme/eclipse");
         var xmlMode = require("ace/mode/xml").Mode;
-        rulesEditor.getSession().setMode(new xmlMode());
-        rulesEditor.setShowPrintMargin(false);
-        rulesEditor.setDisplayIndentGuides(true);
-        rulesEditor.commands.addCommand({
+        Verteilung.rulesEditor.getSession().setMode(new xmlMode());
+        Verteilung.rulesEditor.setShowPrintMargin(false);
+        Verteilung.rulesEditor.setDisplayIndentGuides(true);
+        Verteilung.rulesEditor.commands.addCommand({
             name: "save",
             bindKey: {
                 win: "Ctrl-Shift-S",
@@ -3480,7 +3480,7 @@ function start() {
             },
             exec: save
         });
-        rulesEditor.commands.addCommand({
+        Verteilung.rulesEditor.commands.addCommand({
             name: "format",
             bindKey: {
                 win: "Ctrl-Shift-F",
@@ -3488,15 +3488,15 @@ function start() {
             },
             exec: format
         });
-        rulesEditor.$blockScrolling = Infinity;
-        textEditor = ace.edit("inTxt");
-        textEditor.setTheme("ace/theme/chrome");
-        textEditor.setShowInvisibles(true);
-        textEditor.setShowPrintMargin(false);
+        Verteilung.rulesEditor.$blockScrolling = Infinity;
+        Verteilung.textEditor = ace.edit("inTxt");
+        Verteilung.textEditor.setTheme("ace/theme/chrome");
+        Verteilung.textEditor.setShowInvisibles(true);
+        Verteilung.textEditor.setShowPrintMargin(false);
         jsMode = require("ace/mode/javascript").Mode;
         txtMode = require("ace/mode/text").Mode;
-        textEditor.getSession().setMode(new txtMode());
-        textEditor.$blockScrolling = Infinity;
+        Verteilung.textEditor.getSession().setMode(new txtMode());
+        Verteilung.textEditor.$blockScrolling = Infinity;
         var zone = document.getElementById('inTxt');
         zone.addEventListener('dragover', handleDragOver, false);
         zone.addEventListener('drop', handleFileSelect, false);

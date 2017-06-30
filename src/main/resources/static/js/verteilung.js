@@ -1,7 +1,6 @@
-function Position(){}
-
 /**
  * beschreibt die Position eines gefundenem Wertes in dem Dokument
+ * @param editor            der Editor
  * @param startRow          die Zeile, in der der Wert beginnt
  * @param startColumn       die Spalte, in der der Wert beginnt
  * @param endRow            die Zeile, in der der Wert endet
@@ -10,50 +9,69 @@ function Position(){}
  * @param desc              eine Beschreibung
  * @constructor
  */
-var Position = function(startRow, startColumn, endRow, endColumn, css, desc) {
+var Position = function(editor, startRow, startColumn, endRow, endColumn, css, desc) {
+    if (REC.exist(editor))
+        this.editor = editor;
+    else
+        this.editor = Verteilung.textEditor;
     this.startRow = startRow;
     this.startColumn = startColumn;
     this.endRow = endRow;
     this.endColumn = endColumn;
     this.css = css;
     this.desc = desc;
+    this.markerId = null;
     Verteilung.positions.add(this);
 
     this.print = function () {
         return "StartRow: " + this.startRow + " StartColumn: " + this.startColumn + " EndRow: " + this.endRow + " EndColumn: " + this.endColumn + " Description: " + this.desc;
     };
 
+    this.getMarkerId = function() {
+        return this.markerId;
+    };
 
+    this.setMarkerId = function(id) {
+        this.markerId = id;
+    };
+
+    this.getEditor = function() {
+        return this.editor;
+    };
+
+    this.getCSS = function() {
+        return this.css;
+    };
+
+    this.getDesc = function(){
+        return this.desc;
+    };
+
+    this.getStartRow = function() {
+        return this.startRow;
+    };
+
+    this.getStartColumn = function() {
+        return this.startColumn;
+    };
+
+    this.getEndRow = function() {
+        return this.endRow;
+    };
+
+    this.getEndColumn = function() {
+        return this.endColumn;
+    };
 };
 
-Position.convertPosition = function (text, start, end, desc, type) {
+Position.convertPosition = function (editor, text, start, end, css, desc) {
     var startRow = text.substring(0, start).split("\n").length - 1;
     var startCol = start - text.substring(0, start).lastIndexOf("\n") - 1;
     var endRow = text.substring(0, end).split("\n").length - 1;
     var endCol = end - text.substring(0, end).lastIndexOf("\n") - 1;
-    return new Position(startRow, startCol, endRow, endCol, type, desc);
+    return new Position(editor, startRow, startCol, endRow, endCol, css, desc);
 };
 
-
-function Marker () {}
-
-Marker.constructor = function(id, editor, css) {
-    this.id = id;
-    this.editor = editor;
-    this.css = css;
-};
-
-Marker.prototype.getMarkerId = function() {
-    return this.id;
-};
-
-Marker.prototype.getEditor = function() {
-    return this.editor;
-};
-
-Marker.prototype.getCSS = function() {
-    return this.css;
-};
 
 function PositionContainer() {}
 
@@ -157,7 +175,7 @@ function manageControls() {
         document.getElementById('play').setAttribute("disabled", true);
     }
 */
-    if (textEditor.getSession().getValue().length == 0) {
+    if (Verteilung.textEditor.getSession().getValue().length == 0) {
         document.getElementById('searchCont').setAttribute("disabled", true);
         document.getElementById('sendToInbox').setAttribute("disabled", true);
     }
@@ -264,10 +282,10 @@ function loadText(content, txt, name, typ, container) {
         currentContent = content;
         currentText = txt;
         currentContainer = container;
-        removeMarkers(textEditor);
-        textEditor.getSession().setValue(txt);
+        removeMarkers(Verteilung.textEditor);
+        Verteilung.textEditor.getSession().setValue(txt);
         document.getElementById('headerWest').textContent = name;
-        propsEditor.getSession().setValue("");
+        Verteilung.propsEditor.getSession().setValue("");
         manageControls();
     } catch (e) {
         errorHandler(e);
@@ -291,13 +309,13 @@ function loadMultiText(content, txt, name, typ,  notDeleteable, container) {
         var dat = [];
         REC.currentDocument.properties.content.write(txt);
         REC.currentDocument.name = name;
-        REC.testRules(rulesEditor.getSession().getValue());
+        REC.testRules(Verteilung.rulesEditor.getSession().getValue());
         dat["text"] = txt;
         dat["file"] = name;
         dat["content"] = content;
         dat["log"] = REC.mess;
         dat["result"] = REC.results;
-        dat["position"] = REC.positions;
+        dat["position"] = Verteilung.positions;
         dat["xml"] = REC.currXMLName;
         dat["typ"] = typ;
         dat["error"] = REC.errors;
@@ -355,10 +373,10 @@ function readFiles(files) {
         if (currentRules == null || !currentRules.endsWith("doc.xml")) {
             var open = openFile("./rules/doc.xml");
             currentRules = open[1];
-            rulesEditor.getSession().setValue(open[0]);
-            rulesEditor.getSession().foldAll(1);
+            Verteilung.rulesEditor.getSession().setValue(open[0]);
+            Verteilung.rulesEditor.getSession().foldAll(1);
         }
-        textEditor.getSession().setValue("");
+        Verteilung.textEditor.getSession().setValue("");
         tabelle.clear();
         daten = [];
         var count = files.length;
@@ -449,7 +467,7 @@ function readFiles(files) {
                     r.readAsText(f);
                 }
             } else {
-                textEditor.getSession().setValue(textEditor.getSession().getValue() + " Failed to load file!\n");
+                Verteilung.textEditor.getSession().setValue(Verteilung.textEditor.getSession().getValue() + " Failed to load file!\n");
             }
             first = false;
         }
@@ -463,17 +481,17 @@ function readFiles(files) {
  */
 function doReRunAll() {
     try {
-        textEditor.getSession().setValue("");
+        Verteilung.textEditor.getSession().setValue("");
         clearMessageBox();
         var tabData =  tabelle.fnGetData();
         tabelle._fnClearTable();
         for ( var i = 0; i < tabData.length; i++) {
             var name = tabData[i][1];
             REC.currentDocument.setContent(daten[name].text);
-            REC.testRules(rulesEditor.getSession().getValue());
+            REC.testRules(Verteilung.rulesEditor.getSession().getValue());
             daten[name].log = REC.mess;
             daten[name].result = REC.results;
-            daten[name].position = REC.positions;
+            daten[name].position = Verteilung.positions;
             daten[name].xml = REC.currXMLName;
             daten[name].error = REC.errors;
             var ergebnis = [];
@@ -489,19 +507,25 @@ function doReRunAll() {
 /**
  * markiert in den Regeln die verendeten Stellen
  * @param positions   die Positionen im Text
- * @param editor      der zuständige Editor
  * @returns {Array}   die erzeugten Markierungen im Editor
  */
-function setMarkers(positions, editor) {
+function setMarkers(positions) {
+
+    var mark = function (position) {
+        var r = new Verteilung.Range(position.startRow, position.startColumn, position.endRow, position.endColumn);
+        position.setMarkerId(position.editor.getSession().addMarker(r, position.css, position.desc, false));
+    };
+
     if (REC.exist(positions)) {
-        var markerId;
-        for ( var i = 0; i < positions.length; i++) {
-            var pos = positions[i];
-            var r = new Verteilung.Range(pos.startRow, pos.startColumn, pos.endRow, pos.endColumn);
-            var marker = new Marker(editor.getSession().addMarker(r, pos.css, pos.desc, false), editor, pos.css);
-            Verteilung.markers.push(marker);
-        }
+        if (positions instanceof Array) {
+            for (var i = 0; i < positions.length; i++) {
+                mark(positions[i]);
+            }
+        } else
+            mark(positions);
     }
+
+
 }
 
 
@@ -511,9 +535,9 @@ function setMarkers(positions, editor) {
  * @param css      der verwendetete CSS Selektor
  */
 function removeMarkers(editor, css) {
-    for ( var i = 0; i < Verteilung.markers.length; i++) {
-        if (!css || css == Verteilung. markers[i].getCSS())
-            editor.getSession().removeMarker(Verteilung.markers[i].getMarkerId());
+    for ( var i = 0; i < Verteilung.positions.length; i++) {
+        if (Verteilung.positions[i].getEditor() == editor && (!css || css == Verteilung. positions[i].getCSS()))
+            editor.getSession().removeMarker(Verteilung.positions[i].getMarkerId());
     }
 }
 
@@ -522,18 +546,22 @@ function removeMarkers(editor, css) {
  * @param position die Position der Regel im Text
  */
 function setXMLPosition(position) {
-    rulesEditor.getSession().foldAll(1);
-    var text = rulesEditor.getSession().getValue();
+    Verteilung.rulesEditor.getSession().foldAll(1);
+    var text = Verteilung.rulesEditor.getSession().getValue();
     var pos = 0;
     for ( var i = 0; i < position.length; i++)
         pos = text.indexOf("<archivTyp name=\"" + position[i] + "\"", pos);
     if (pos != -1) {
         var pos1 = text.indexOf("</archivTyp>", pos);
         if (pos1 != -1) {
-            var p = Position.convertPosition(text, pos, pos1 + 12, "");
-            rulesEditor.getSession().unfold(p.startRow + 1, true);
-            rulesEditor.gotoLine(p.startRow + 1);
-            rulesEditor.selection.setSelectionRange(new Verteilung.Range(p.startRow, p.startColumn, p.endRow, p.endColumn));
+            pos1 = pos1 + 12;
+            var startRow = text.substring(0, pos).split("\n").length - 1;
+            var startCol = pos - text.substring(0, pos).lastIndexOf("\n") - 1;
+            var endRow = text.substring(0, pos1).split("\n").length - 1;
+            var endCol = pos1 - text.substring(0, pos1).lastIndexOf("\n") - 1;
+            Verteilung.rulesEditor.getSession().unfold(startRow + 1, true);
+            Verteilung.rulesEditor.gotoLine(startRow + 1);
+            Verteilung.rulesEditor.selection.setSelectionRange(new Verteilung.Range(startRow, startCol, endRow, endCol));
         }
     }
 }
@@ -574,16 +602,16 @@ function printResults(results) {
  * @param reverse   die Reihenfolge wird umgedreht
  */
 function fillMessageBox(reverse) {
-    if (typeof outputEditor != "undefined" && outputEditor != null)
-        outputEditor.getSession().setValue(REC.getMessage(reverse));
+    if (typeof Verteilung.outputEditor != "undefined" && Verteilung.outputEditor != null)
+        Verteilung.outputEditor.getSession().setValue(REC.getMessage(reverse));
 }
 
 /**
  * löscht den Inhalt des Meldungsfensters
  */
 function clearMessageBox(){
-    if (typeof outputEditor != "undefined" && outputEditor != null)
-        outputEditor.getSession().setValue("");
+    if (typeof Verteilung.outputEditor != "undefined" && Verteilung.outputEditor != null)
+        Verteilung.outputEditor.getSession().setValue("");
 }
 
 /**
@@ -593,10 +621,10 @@ function doBack() {
     try {
         multiMode = true;
         showMulti = false;
-        textEditor.getSession().setValue("");
+        Verteilung.textEditor.getSession().setValue("");
         clearMessageBox();
-        propsEditor.getSession().setValue("");
-        rulesEditor.getSession().foldAll(1);
+        Verteilung.propsEditor.getSession().setValue("");
+        Verteilung.rulesEditor.getSession().foldAll(1);
         manageControls();
     } catch (e) {
         errorHandler(e);
@@ -633,15 +661,15 @@ function doTest() {
             success: function (data) {
                 if (data.success[0]) {
                     REC.currentDocument.setContent(data.result[0].text.toString());
-                    removeMarkers(textEditor);
-                    textEditor.getSession().setValue(data.result[0].text.toString());
+                    removeMarkers(Verteilung.textEditor);
+                    Verteilung.textEditor.getSession().setValue(data.result[0].text.toString());
                     currentRules = "test.xml";
                     document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
-                    rulesEditor.getSession().setValue(data.result[0].xml.toString());
-                    REC.testRules(rulesEditor.getSession().getValue());
+                    Verteilung.rulesEditor.getSession().setValue(data.result[0].xml.toString());
+                    REC.testRules(Verteilung.rulesEditor.getSession().getValue());
                     setXMLPosition(REC.currXMLName);
-                    setMarkers(REC.positions, textEditor);
-                    propsEditor.getSession().setValue(printResults(REC.results));
+                    setMarkers(Verteilung.positions, Verteilung.textEditor);
+                    Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
                     fillMessageBox(true);
                     testMode = true;
                     manageControls();
@@ -660,9 +688,9 @@ function doTest() {
 function closeTest() {
     try {
         testMode = false;
-        textEditor.getSession().setValue(currentContent);
-        propsEditor.getSession().setValue("");
-        outputEditor.getSession().setValue("");
+        Verteilung.textEditor.getSession().setValue(currentContent);
+        Verteilung.propsEditor.getSession().setValue("");
+        Verteilung.outputEditor.getSession().setValue("");
         document.getElementById('headerWest').textContent = currentFile;
         openRules();
         manageControls();
@@ -698,11 +726,11 @@ function work() {
         if (multiMode)
             doReRunAll();
         else {
-            var range = rulesEditor.getSelectionRange();
-            var sel = rulesEditor.getSession().getTextRange(range);
+            var range = Verteilung.rulesEditor.getSelectionRange();
+            var sel = Verteilung.rulesEditor.getSession().getTextRange(range);
             if (sel.length > 0) {
                 if (!sel.startsWith("<")) {
-                    var start = rulesEditor.find('<', {
+                    var start = Verteilung.rulesEditor.find('<', {
                         backwards: true,
                         wrap: false,
                         caseSensitive: false,
@@ -714,7 +742,7 @@ function work() {
                         range.setStart(start.start);
                 }
                 if (!sel.endsWith("/>")) {
-                    var end = rulesEditor.find('>', {
+                    var end = Verteilung.rulesEditor.find('>', {
                         backwards: false,
                         wrap: false,
                         caseSensitive: false,
@@ -725,11 +753,11 @@ function work() {
                     if (end)
                         range.setEnd(end.end);
                 }
-                sel = rulesEditor.getSession().getTextRange(range);
+                sel = Verteilung.rulesEditor.getSession().getTextRange(range);
                 if (!sel.endsWith("/>")) {
                     var tmp = sel.substring(1, sel.indexOf(" "));
                     tmp = "</" + tmp + ">";
-                    end = rulesEditor.find(tmp, {
+                    end = Verteilung.rulesEditor.find(tmp, {
                         backwards: false,
                         wrap: false,
                         caseSensitive: false,
@@ -739,12 +767,12 @@ function work() {
                     });
                     range.setEnd(end.end);
                 }
-                rulesEditor.selection.setSelectionRange(range);
-                sel = rulesEditor.getSession().getTextRange(range);
+                Verteilung.rulesEditor.selection.setSelectionRange(range);
+                sel = Verteilung.rulesEditor.getSession().getTextRange(range);
                 if (!sel.startsWith("<tags") && !sel.startsWith("<category") && !sel.startsWith("<archivPosition")) {
                     selectMode = true;
                     if (!sel.startsWith("<searchItem ")) {
-                        start = rulesEditor.find('<searchItem', {
+                        start = Verteilung.rulesEditor.find('<searchItem', {
                             backwards: true,
                             wrap: false,
                             caseSensitive: false,
@@ -754,7 +782,7 @@ function work() {
                         });
                         if (start)
                             range.setStart(start.start);
-                        end = rulesEditor.find('</searchItem>', {
+                        end = Verteilung.rulesEditor.find('</searchItem>', {
                             backwards: false,
                             wrap: false,
                             caseSensitive: false,
@@ -764,8 +792,8 @@ function work() {
                         });
                         if (end)
                             range.setEnd(end.end);
-                        rulesEditor.selection.setSelectionRange(range);
-                        sel = rulesEditor.getSession().getTextRange(range);
+                        Verteilung.rulesEditor.selection.setSelectionRange(range);
+                        sel = Verteilung.rulesEditor.getSession().getTextRange(range);
                     }
                     if (!sel.startsWith("<archivTyp "))
                         sel = "<archivTyp name='' searchString=''>" + sel;
@@ -776,13 +804,13 @@ function work() {
                     if (!sel.endsWith("</documentTypes>"))
                         sel = sel + "</documentTypes>";
                 } else
-                    sel = rulesEditor.getSession().getValue();
+                    sel = Verteilung.rulesEditor.getSession().getValue();
             } else
-                sel = rulesEditor.getSession().getValue();
+                sel = Verteilung.rulesEditor.getSession().getValue();
             REC.init();
-            REC.currentDocument.properties.content.write(new Content(textEditor.getSession().getValue()));
+            REC.currentDocument.properties.content.write(new Content(Verteilung.textEditor.getSession().getValue()));
             REC.currentDocument.name = currentFile;
-            removeMarkers(textEditor);
+            removeMarkers(Verteilung.textEditor);
             if (REC.exist(rulesSchemaId)) {
                 json = executeService({
                     "name": "getDocumentContent",
@@ -796,7 +824,7 @@ function work() {
                 }
             }
             if (REC.exist(schemaContent)) {
-                removeMarkers(rulesEditor, "ace_error");
+                removeMarkers(Verteilung.rulesEditor, "ace_error");
                 var validateErrors = xmllint.validateXML({xml: sel, schema: schemaContent}).errors;
                     if (REC.exist(validateErrors)) {
                         validate = false;
@@ -804,7 +832,9 @@ function work() {
                             var err = validateErrors[i];
                             if(err.startsWith("file_0.xml")) {
                                 var line = err.split(":")[1];
-                                rulesEditor.getSession().addMarker(new Verteilung.Range(line, 0, line, 1), "ace_error", "fullLine");
+                                var p = new Position(Verteilung.rulesEditor, line, 0, line, 1, "ace_error", "fullLine");
+                                setMarkers(p, Verteilung.rulesEditor);
+                                // Verteilung.rulesEditor.getSession().addMarker(new Verteilung.Range(line, 0, line, 1), "ace_error", "fullLine");
                             }
                             REC.log(ERROR, validateErrors[i]);
                         }
@@ -815,12 +845,12 @@ function work() {
                 if (!selectMode)
                     setXMLPosition(REC.currXMLName);
 
-                setMarkers(REC.positions, textEditor);
+                setMarkers(Verteilung.positions, Verteilung.textEditor);
             }
             fillMessageBox(true);
             if (!validate)
                 message("Fehler", "Regeln sind syntaktisch nicht korrekt!");
-            propsEditor.getSession().setValue(printResults(REC.results));
+            Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
             document.getElementById('inTxt').style.display = 'block';
             document.getElementById('dtable').style.display = 'none';
         }
@@ -838,10 +868,10 @@ function sendRules() {
     try {
         var erg = false;
         if (currentRules.endsWith("doc.xml")) {
-            vkbeautify.xml(rulesEditor.getSession().getValue());
+            vkbeautify.xml(Verteilung.rulesEditor.getSession().getValue());
             var json = executeService({"name": "updateDocument", "errorMessage": "Regeln konnten nicht übertragen werden:"}, [
                 {"name": "documentId", "value": rulesID},
-                {"name": "content", "value": rulesEditor.getSession().getValue(), "type": "byte"},
+                {"name": "content", "value": Verteilung.rulesEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "text/xml"},
                 {"name": "extraProperties", "value": {}},
                 {"name": "versionState", "value": "minor"},
@@ -870,8 +900,8 @@ function getRules(rulesId, loadLocal) {
         var ret;
         if (loadLocal) {
             var open = openFile("./rules/doc.xml");
-            rulesEditor.getSession().setValue(open);
-            rulesEditor.getSession().foldAll(1);
+            Verteilung.rulesEditor.getSession().setValue(open);
+            Verteilung.rulesEditor.getSession().foldAll(1);
             REC.log(INFORMATIONAL, "Regeln erfolgreich lokal gelesen!");
             fillMessageBox(true);
         } else {
@@ -880,8 +910,8 @@ function getRules(rulesId, loadLocal) {
                 {"name": "extract", "value": "false"}
             ]);
             if (json.success) {
-                rulesEditor.getSession().setValue(json.data);
-                rulesEditor.getSession().foldAll(1);
+                Verteilung.rulesEditor.getSession().setValue(json.data);
+                Verteilung.rulesEditor.getSession().foldAll(1);
                 REC.log(INFORMATIONAL, "Regeln erfolgreich vom Server übertragen!");
                 fillMessageBox(true);
             } else
@@ -905,12 +935,12 @@ function openRules() {
             document.getElementById('headerCenter').textContent = "Regeln (Server: doc.xml)";
         } else {
             $.get('./rules/doc.xml', function (msg) {
-                rulesEditor.getSession().setValue(new XMLSerializer().serializeToString(msg));
-                rulesEditor.getSession().foldAll(1);
+                Verteilung.rulesEditor.getSession().setValue(new XMLSerializer().serializeToString(msg));
+                Verteilung.rulesEditor.getSession().foldAll(1);
                 currentRules = "doc.xml";
             });
             document.getElementById('headerCenter').textContent = "Regeln (doc.xml)";
-            //	window.parent.frames.rules.rulesEditor.getSession().setValue("Regeln konnten nicht geladen werden!");
+            //	window.parent.frames.rules.Verteilung.rulesEditor.getSession().setValue("Regeln konnten nicht geladen werden!");
         }
     } catch (e) {
         errorHandler(e);
@@ -922,13 +952,13 @@ function openRules() {
  */
 function format() {
     try {
-        var xml = rulesEditor.getSession().getValue();
+        var xml = Verteilung.rulesEditor.getSession().getValue();
         xml = vkbeautify.xml(xml);
-        rulesEditor.getSession().setValue(xml);
-        // window.parent.frames.rules.rulesEditor.getSession().foldAll(1);
+        Verteilung.rulesEditor.getSession().setValue(xml);
+        // window.parent.frames.rules.Verteilung.rulesEditor.getSession().foldAll(1);
         if (typeof currXMLName != "undefined" && currXMLName != null) {
             setXMLPosition(currXMLName);
-            setMarkers(positions, textEditor);
+            setMarkers(positions, Verteilung.textEditor);
         }
     } catch (e) {
         errorHandler(e);
@@ -940,9 +970,9 @@ function format() {
  */
 function formatScript() {
     try {
-        var txt = textEditor.getSession().getValue();
+        var txt = Verteilung.textEditor.getSession().getValue();
         txt = js_beautify(txt);
-        textEditor.getSession().setValue(txt);
+        Verteilung.textEditor.getSession().setValue(txt);
     } catch (e) {
         errorHandler(e);
     }
@@ -1008,8 +1038,8 @@ function handleRulesSelect(evt) {
             var r = new FileReader();
             r.onload = function(e) {
                 var contents = e.target.result;
-                rulesEditor.getSession().setValue(contents);
-                rulesEditor.getSession().foldAll(1);
+                Verteilung.rulesEditor.getSession().setValue(contents);
+                Verteilung.rulesEditor.getSession().foldAll(1);
             };
             r.readAsText(f);
         } else {
@@ -1029,13 +1059,13 @@ function getScript() {
             {"name": "extract", "value": "false"}
         ]);
         if (json.success) {
-            textEditor.getSession().setValue(json.data);
+            Verteilung.textEditor.getSession().setValue(json.data);
             REC.log(INFORMATIONAL, "Script erfolgreich heruntergeladen!");
             fillMessageBox(true);
         }
     };
     try {
-        if (!textEditor.getSession().getUndoManager().isClean()) {
+        if (!Verteilung.textEditor.getSession().getUndoManager().isClean()) {
             var $dialog = $('<div></div>').html('Skript wurde geändert!<br>Neu laden?').dialog({
                 autoOpen: true,
                 title: "Skript laden",
@@ -1073,7 +1103,7 @@ function openScript() {
         // 84% sind das Maximum, danach ist das Fenster mit den Regel ganz verschwunden und beim Schliessen
         // des Scriptes die Darstellung der Regeln kaputt
         verteilungLayout.sizePane("west", "84%");
-        Verteilung.oldContent = textEditor.getSession().getValue();
+        Verteilung.oldContent = Verteilung.textEditor.getSession().getValue();
         var content, json, script;
         var read = false;
         if (REC.exist(Verteilung.modifiedScript) && Verteilung.modifiedScript.length > 0) {
@@ -1109,11 +1139,11 @@ function openScript() {
             var tmp = REC.mess;
             eval("//# sourceURL=recognition.js\n\n" + content);
             REC.mess = tmp;
-            removeMarkers(textEditor);
-            textEditor.getSession().setMode(new jsMode());
-            textEditor.getSession().setValue(content);
-            textEditor.setShowInvisibles(false);
-            textEditor.getSession().getUndoManager().markClean();
+            removeMarkers(Verteilung.textEditor);
+            Verteilung.textEditor.getSession().setMode(new jsMode());
+            Verteilung.textEditor.getSession().setValue(content);
+            Verteilung.textEditor.setShowInvisibles(false);
+            Verteilung.textEditor.getSession().getUndoManager().markClean();
             scriptMode = true;
             fillMessageBox(true);
             manageControls();
@@ -1130,7 +1160,7 @@ function openScript() {
  */
 function activateScriptToContext() {
     try {
-        Verteilung.modifiedScript = textEditor.getSession().getValue();
+        Verteilung.modifiedScript = Verteilung.textEditor.getSession().getValue();
         eval("//# sourceURL=recognition.js\n\n" + Verteilung.modifiedScript);
         REC.log(INFORMATIONAL, "Die gändeterten Skriptanweisungen sind jetzt wirksam!");
         fillMessageBox(true);
@@ -1149,7 +1179,7 @@ function sendScript() {
         if (workDocument.endsWith("recognition.js")) {
             var json = executeService({"name": "updateDocument", "errorMessage": "Skript konnte nicht zum Server gesendet werden:"}, [
                 {"name": "documentId", "value": scriptID},
-                {"name": "content", "value": textEditor.getSession().getValue(), "type": "byte"},
+                {"name": "content", "value": Verteilung.textEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "application/javascript"},
                 {"name": "extraProperties", "value": {}},
                 {"name": "versionState", "value": "minor"},
@@ -1192,12 +1222,12 @@ function sendToInbox() {
 function closeScript() {
     try {
         verteilungLayout.sizePane("west", panelSizeReminder);
-        textEditor.getSession().setMode(new txtMode());
+        Verteilung.textEditor.getSession().setMode(new txtMode());
         if (REC.exist(Verteilung.oldContent) && Verteilung.oldContent.length > 0)
-            textEditor.getSession().setValue(Verteilung.oldContent);
+            Verteilung.textEditor.getSession().setValue(Verteilung.oldContent);
         else
-            textEditor.getSession().setValue("");
-        textEditor.setShowInvisibles(true);
+            Verteilung.textEditor.getSession().setValue("");
+        Verteilung.textEditor.setShowInvisibles(true);
         scriptMode = false;
         manageControls();
     } catch (e) {
@@ -1207,7 +1237,10 @@ function closeScript() {
 
 var Verteilung = {
     Range: require("ace/range").Range,
-    markers: [],
+    rulesEditor: null,
+    textEditor:  null,
+    propsEditor: null,
+    outputEditor: null,
     oldContent:  null,
     modifiedScript: null,
     positions: new PositionContainer()

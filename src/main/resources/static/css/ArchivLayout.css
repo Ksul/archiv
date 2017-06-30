@@ -440,6 +440,37 @@ p {
     z-index:20
 }
 
+.ace_select1 {
+    position:absolute;
+    background:rgba(255,0,255,0.2);
+    z-index:20
+}
+
+
+.ace_select2 {
+    position:absolute;
+    background:rgba(255,255,0,0.2);
+    z-index:20
+}
+
+.ace_select3 {
+    position:absolute;
+    background:rgba(0,255,190,0.2);
+    z-index:20
+}
+
+.ace_select4 {
+    position:absolute;
+    background:rgba(0,0,255,0.2);
+    z-index:20
+}
+
+.ace_select5 {
+    position:absolute;
+    background:rgba(0,255,0,0.2);
+    z-index:20
+}
+
 
 button.ui-dialog-titlebar-close span.ui-icon {
     margin-left: -8px !important;

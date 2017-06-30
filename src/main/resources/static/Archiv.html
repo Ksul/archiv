@@ -10,10 +10,7 @@
         // <![CDATA[
 
 
-        var rulesEditor;
-        var textEditor;
-        var propsEditor;
-        var outputEditor;
+
         var alfrescoMode = false;
         var scriptID = null;
         var rulesID = null;
@@ -311,7 +308,7 @@
                                                                        value=""/>
                                 </td>
                                 <td width="60px" align="center"><input
-                                        onclick="var needle = prompt('Find:', textEditor.getCopyText());textEditor.find(needle);"
+                                        onclick="var needle = prompt('Find:', Verteilung.textEditor.getCopyText());Verteilung.textEditor.find(needle);"
                                         name="searchCont" id="searchCont" type="submit" class="search"
                                         title="Search" value=""/>
                                 </td>
@@ -336,7 +333,7 @@
                                         style="display: none"/>
                                 </td>
                                 <td width="60px" align="center"><input
-                                        onclick="save(this.workDocument, textEditor.getSession().getValue());modifiedScript=null;"
+                                        onclick="save(this.workDocument, Verteilung.textEditor.getSession().getValue());modifiedScript=null;"
                                         name="saveScript" id="saveScript" type="submit" class="save"
                                         title="Save" value="" style="display: none"/>
                                 </td>
@@ -380,17 +377,17 @@
                                 </td>
 
                                 <td width="60px" align="center"><input
-                                        onclick="var needle = prompt('Find:', rulesEditor.getCopyText());rulesEditor.find(needle);"
+                                        onclick="var needle = prompt('Find:', Verteilung.rulesEditor.getCopyText());VerteilungrulesEditor.find(needle);"
                                         name="searchRules" id="searchRules" type="submit" class="search"
                                         title="Search" value=""/>
                                 </td>
                                 <td width="60px" align="center"><input
-                                        onclick="rulesEditor.getSession().foldAll(1);"
+                                        onclick="Verteilung.rulesEditor.getSession().foldAll(1);"
                                         name="foldAll" id="foldAll" type="submit" class="minimize"
                                         title="Fold All" value=""/>
                                 </td>
                                 <td width="60px" align="center"><input
-                                        onclick="rulesEditor.getSession().unfold();"
+                                        onclick="Verteilung.rulesEditor.getSession().unfold();"
                                         name="unfoldAll" id="unfoldAll" type="submit" class="maximize"
                                         title="Unfold All" value=""/></td>
                                 <td width="60px" align="center"><input
@@ -402,7 +399,7 @@
                                                                        title="Sende Regeln" value=""/>
                                 </td>
                                 <td width="60px" align="center"><input
-                                        onclick="save(currentRules, vkbeautify.xml(rulesEditor.getSession().getValue()));"
+                                        onclick="save(currentRules, vkbeautify.xml(Verteilung.rulesEditor.getSession().getValue()));"
                                         name="saveRules" id="saveRules" type="submit" class="save" title="Save"
                                         value=""/>
                                 </td>

@@ -10,12 +10,12 @@ describe("Test für Delimitter", function() {
 
     it("test1", function() {
         var text = "     Dies ist ein  Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter typ="start" count="5" text="&#0032;" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("Dies ist ein  Test");
@@ -23,13 +23,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test2", function() {
-        var text = "     Dies ist ein  Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="start" count="6"  text="&#0032;" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "     Dies ist ein  Test";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("ist ein  Test");
@@ -37,13 +37,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test3", function() {
-        var text = "\n \nDies ist ein Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="start" count="2"  text="&#0010;"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "\n \nDies ist ein Test";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("Dies ist ein Test");
@@ -51,13 +51,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test4", function() {
-        var text = "Dies\nist\nein\nTest";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="start" count="-3"  text="&#0010;"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "Dies\nist\nein\nTest";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult( text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("ist\nein\nTest");
@@ -65,13 +65,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test5", function() {
-        var text = "Dies\nist\nein\nTest\n";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="start" count="-3"  text="&#0010;"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "Dies\nist\nein\nTest\n";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult( text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("ein\nTest\n");
@@ -79,13 +79,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test6", function() {
-        var text = "Dies ist ein Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="start" count="3"  text="e"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "Dies ist ein Test";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules,  "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("st");
@@ -93,13 +93,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test7", function() {
-        var text = "Dies ist ein Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="end" count="3"  text="e"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "Dies ist ein Test";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("Dies ist ein T");
@@ -107,13 +107,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test8", function() {
-        var text = "Dies ist ein Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="end" count="2"  text="e"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "Dies ist ein Test";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("Dies ist ");
@@ -121,13 +121,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test9", function() {
-        var text = "Dies ist ein Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="start" count="4" removeBlanks="before" text=""/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "Dies ist ein Test";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("isteinTest");
@@ -135,13 +135,13 @@ describe("Test für Delimitter", function() {
     });
 
     it("test10", function() {
-        var text = "Dies ist ein Test";
-        var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
-        erg.addResult(result);
         var rules = '<delimitter debugLevel="trace" typ="start" count="5" removeBlanks="after" text=""/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
+        var text = "Dies ist ein Test";
+        var erg = new SearchResultContainer();
+        var result = new SearchResult(text, rules, "Test", 0, text.length, "String", "asd");
+        erg.addResult(result);
         var delimitter = new Delimitter(new XMLObject(XMLDoc.docNode));
         erg = delimitter.resolve(erg, false);
         expect(erg.getResult().text).toBe("isteinTest");

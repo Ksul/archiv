@@ -457,7 +457,7 @@ describe("Test für SearchItem", function() {
 
     it("testFindForWord1", function() {
         var text = "Dies ist ein Test";
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
+        var result = new SearchResult(text, "", "Test", 0, text.length, "String", "asd");
         searchItem = new SearchItem({});
         searchItem.erg.addResult(result);
         searchItem.findForWords( [1], false);
@@ -468,7 +468,7 @@ describe("Test für SearchItem", function() {
 
     it("testFindForWord2", function() {
         var text = "Dies ist ein Test";
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
+        var result = new SearchResult( text, "", "Test", 0, text.length, "String", "asd");
         searchItem = new SearchItem({});
         searchItem.erg.addResult(result);
         searchItem.findForWords([1,2], false);
@@ -480,7 +480,7 @@ describe("Test für SearchItem", function() {
     it("testFindForWord3", function() {
         var text = "Dies ist ein Test";
         var erg = new SearchResultContainer();
-        var result = new SearchResult(text, text, "Test", 0, text.length, "String", "asd");
+        var result = new SearchResult(text, "", "Test", 0, text.length, "String", "asd");
         searchItem = new SearchItem({});
         searchItem.erg.addResult(result);
         searchItem.findForWords([2,2], true);

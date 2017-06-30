@@ -428,6 +428,8 @@ XMLDoc = {
             str = this.source.substring(open + 1, close);
             var n = this.parseTag(str);
             if (n) {
+                n.setStartPos(open);
+                n.setEndPos(close + 1);
                 err = !this.handleNode(n);
             }
             pos = close + 1;
@@ -675,8 +677,26 @@ function XMLNode(nodeType, doc, str) {
     // configure the methods
     this.selectNode = XMLDoc.selectNode;
     this.selectNodeText = XMLDoc.selectNodeText;
+    this.startPos = 0;
+    this.endPos = 0;
 
-     this.addAttribute = function(attributeName, attributeValue) {
+    this.setStartPos = function(value) {
+        this.startPos = value;
+    };
+
+    this.setEndPos = function(value) {
+        this.endPos = value;
+    };
+
+    this.getStartPos = function(){
+        return this.startPos;
+    };
+
+    this.getEndPos = function(){
+        return this.endPos;
+    };
+
+    this.addAttribute = function(attributeName, attributeValue) {
         // if the name is found, the old value is overwritten by the new value
         this.attributes['_' + attributeName] = attributeValue;
         return true;
@@ -2095,7 +2115,7 @@ function SearchItem(srch) {
                     }
                     else if (kind[0] == "amount" || kind[0] == "float")
                         typ = "float";
-                    var res = new SearchResult(text, match[k], null, result.index, result.index + match[k].length, typ, expected);
+                    var res = new SearchResult( match[k], this.xml, null, result.index, result.index + match[k].length, typ, expected);
                     res.convertValue();
                     // prüfen, ob der gefundene Wert schon in der Liste der Werte enthalten ist. Falls ja, kann dieses Ergebnis ignoriert werden
                     if (REC.exist(res.val)) {
@@ -2152,11 +2172,11 @@ function SearchItem(srch) {
                 REC.log(TRACE, "SearchItem.resolve: search found at position " + pos);
                 var str;
                 if (this.left) {
-                    str = new SearchResult(txt, txt.slice(lastPos, pos + (this.included ? match[j].length : 0)), null, lastPos, pos + (this.included ? match[j].length : 0), this.objectTyp,
+                    str = new SearchResult(txt.slice(lastPos, pos + (this.included ? match[j].length : 0)), this.xml, null, lastPos, pos + (this.included ? match[j].length : 0), this.objectTyp,
                         this.expected);
                     REC.log(TRACE, "SearchItem.resolve: get result left from position  " + REC.printTrace(str.text, this.left));
                 } else {
-                    str = new SearchResult(txt, txt.substr(pos + (this.included ? 0 : match[j].length)), null, pos + (this.included ? 0 : match[j].length), txt.length, this.objectTyp, this.expected);
+                    str = new SearchResult(txt.substr(pos + (this.included ? 0 : match[j].length)), this.xml,  null, pos + (this.included ? 0 : match[j].length), txt.length, this.objectTyp, this.expected);
                     REC.log(TRACE, "SearchItem.resolve: get result right from position  " + REC.printTrace(str.text, this.left));
                 }
                 if (REC.exist(str) && str.text.length > 0) {
@@ -2260,18 +2280,18 @@ function SearchItem(srch) {
             this.text = REC.replaceVar(this.text)[0];
         var txt = null;
         if (REC.exist(this.fix)) {
-            var searchResult = new SearchResult(REC.replaceVar(this.fix)[0], REC.replaceVar(this.fix)[0], null, 0, 0, this.objectTyp, this.expected);
+            var searchResult = new SearchResult(REC.replaceVar(this.fix)[0], this.xml, null, 0, 0, this.objectTyp, this.expected);
             searchResult.convertValue();
             this.erg.modifyResult(searchResult, 0);
         } else if (REC.exist(this.eval)) {
             e = eval(REC.replaceVar(this.eval)[0]);
             if (REC.exist(e))
-                this.erg.modifyResult(new SearchResult(e.toString(), e.toString(), e, 0, 0, null, this.expected), 0);
+                this.erg.modifyResult(new SearchResult(e.toString(), this.xml, e, 0, 0, null, this.expected), 0);
         } else {
             if (REC.exist(this.value)) {
                 e = this.resolveItem(this.value);
                 if (REC.exist(e)) {
-                    e = new SearchResult(e.document, e.text, e.val, e.getStart(), e.getEnd(), e.typ, e.expected);
+                    e = new SearchResult(e.text, e.xml, e.val, e.getStart(), e.getEnd(), e.typ, e.expected);
                     if (REC.exist(this.expected))
                         e.expected = this.expected;
                     if (REC.exist(this.objectTyp))
@@ -2332,15 +2352,10 @@ function SearchItem(srch) {
             }
 
             // Positionen nicht im Server merken weil sie dort nicht gebraucht werden
-            if (typeof Position == "function")
-                new Position(REC.content.substring(0, this.erg.getResult().getStart()).split("\n").length - 1,
-                             this.erg.getResult().getStart() - REC.content.substring(0, this.erg.getResult().getStart()).lastIndexOf("\n") - 1,
-                             REC.content.substring(0, this.erg.getResult().getEnd()).split("\n").length - 1,
-                             this.erg.getResult().getEnd() - REC.content.substring(0,
-                             this.erg.getResult().getEnd()).lastIndexOf("\n") - 1,
-                             this.erg.getResult().check ? "ace_selection" : "ace_step",
-                             this.name);
-
+            if (typeof Position == "function") {
+                Position.convertPosition(Verteilung.textEditor, REC.content, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.erg.getResult().check ? "ace_selection" + REC.xyz++ : "ace_step", this.name);
+               // Position.convertPosition(Verteilung.rulesEditor, Verteilung.rulesEditor.getSession().getValue(), this.xml.getStart(),  this.xml.getEnd(), "ace_selection" + REC.xyz++);
+            }
 
             if (REC.exist(this.archivZiel)) {
                 for (i = 0; i < this.archivZiel.length; i++) {
@@ -2521,17 +2536,19 @@ SearchResultContainer.prototype.convert = function () {
 /**
  * speichert das Ergebnis einer Suche
  * @param  text       der Text mit der Fundstelle
+ * @param  xml        die relevate XML für dieses Ergebnis
  * @param  val        das Ergebnis als passender Objecttyp
  * @param  startPos   die Beginnposition des Ergebnis im Text
  * @param  endPos     die Endeposition des Ergebnis im Text
  * @param  typ        der Typ des Ergebnis
  * @param  expected   für Testzwecke. Hier kann ein erwartetes Ergebnis hinterlegt werden
  */
-function SearchResult(document, text, val, startPos, endPos, typ, expected) {
-    this.document = document;
+function SearchResult(text, xml, val, startPos, endPos, typ, expected) {
     this.text = text;
+    this.xml = xml;
     var start = startPos;
     var end = endPos;
+    // Merker dass das Ergebnis geprüft ist
     this.check = true;
     this.error = null;
     this.val = val;
@@ -2722,14 +2739,6 @@ function SearchResult(document, text, val, startPos, endPos, typ, expected) {
     };
 
     /**
-     * liefert den für das Ergebnis relevanten Teil des Textes
-     * @returns {*|string}
-     */
-    this.getRelevantTextPart = function(){
-        return this.document.substring(start, end);
-    };
-
-    /**
      * Stringrepräsentation des Objektes
      * @param ident         Einrückung
      * @return {string}     das Objekt als String
@@ -2818,7 +2827,7 @@ function XMLObject(ruleDocument) {
      }
     var tmp = [];
     // Source eintragen
-    tmp["sourceXML"] = ruleDocument.getUnderlyingXMLText();
+    tmp["sourceXML"] = new XMLSource(ruleDocument.getUnderlyingXMLText(), ruleDocument.getStartPos(), ruleDocument.getEndPos());
     // for each(elem in rule.children()) {
     var elements = ruleDocument.getElements();
     for (var k = 0; k < elements.length; k++) {
@@ -2837,6 +2846,24 @@ function XMLObject(ruleDocument) {
 function DebugLevel(level, text) {
     this.level = level;
     this.text = text;
+}
+
+function XMLSource (text, start, end) {
+    this.text = text;
+    this.start = start;
+    this.end = end;
+
+    this.getText = function() {
+        return this.text;
+    };
+
+    this.getStart = function() {
+        return this.start;
+    };
+
+    this.getEnd = function() {
+        return this.end;
+    };
 }
 
 
@@ -3615,6 +3642,7 @@ REC = {
         this.errorBox  = this.archivRoot.createFolder("Fehler");
         this.duplicateBox = this.errorBox.createFolder("Doppelte");
         this.currentDocument = companyhome.createNode('WebScriptTest', "my:archivContent");
+        this.xyz = 0;
     },
     
     id: Math.random() * 100,
@@ -3634,7 +3662,8 @@ REC = {
     showContent: false,
     result: [],
     errors: [],
-    results: []
+    results: [],
+    xyz: 0
 
 };
 REC.run();
