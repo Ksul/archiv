@@ -3221,7 +3221,7 @@ function checkAndBuidAlfrescoEnvironment() {
             ]);
             if (!erg.success) {
                 var script = $.ajax({
-                    url: createPathToFile("src/main/javascript/recognition.js"),
+                    url: createPathToFile("./js/recognition.js"),
                     async: false
                 }).responseText;
 

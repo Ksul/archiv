@@ -9,23 +9,26 @@
  * @param desc              eine Beschreibung
  * @constructor
  */
-var Position = function(editor, startRow, startColumn, endRow, endColumn, css, desc) {
-    if (REC.exist(editor))
-        this.editor = editor;
-    else
-        this.editor = Verteilung.textEditor;
-    this.startRow = startRow;
-    this.startColumn = startColumn;
-    this.endRow = endRow;
-    this.endColumn = endColumn;
+var Position = function(typ, startPosition, endPosition, css, desc) {
+    this.typ = typ;
+    if (arguments.length == 7) {
+        this.startPosition = eval(this.typ.editor).getSession().getValue().split("\n", arguments[1]).join("\n").length + arguments[2];
+        this.endPosition = eval(this.typ.editor).getSession().getValue().split("\n", arguments[3]).join("\n").length + arguments[4];
+    } else {
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+    }
     this.css = css;
     this.desc = desc;
     this.markerId = null;
+    this.startRow = 0;
+    this.startColumn = 0;
+    this.endRow = 0;
+    this.endColumn = 0;
+    this.css = null;
+
     Verteilung.positions.add(this);
 
-    this.print = function () {
-        return "StartRow: " + this.startRow + " StartColumn: " + this.startColumn + " EndRow: " + this.endRow + " EndColumn: " + this.endColumn + " Description: " + this.desc;
-    };
 
     this.getMarkerId = function() {
         return this.markerId;
@@ -36,7 +39,7 @@ var Position = function(editor, startRow, startColumn, endRow, endColumn, css, d
     };
 
     this.getEditor = function() {
-        return this.editor;
+        return this.typ.editor;
     };
 
     this.getCSS = function() {
@@ -62,16 +65,33 @@ var Position = function(editor, startRow, startColumn, endRow, endColumn, css, d
     this.getEndColumn = function() {
         return this.endColumn;
     };
-};
 
-Position.convertPosition = function (editor, text, start, end, css, desc) {
-    var startRow = text.substring(0, start).split("\n").length - 1;
-    var startCol = start - text.substring(0, start).lastIndexOf("\n") - 1;
-    var endRow = text.substring(0, end).split("\n").length - 1;
-    var endCol = end - text.substring(0, end).lastIndexOf("\n") - 1;
-    return new Position(editor, startRow, startCol, endRow, endCol, css, desc);
-};
+    this.setStartRow = function(value) {
+        this.startRow = value;
+    };
 
+    this.setStartColumn = function(value) {
+        this.startColumn = value;
+    };
+
+    this.setEndRow = function(value) {
+        this.endRow = value;
+    };
+
+    this.setEndColumn = function(value) {
+        this.endColumn = value;
+    };
+
+    this.convertPosition = function ( text) {
+        if (arguments.length == 0)
+            var text = eval(this.typ.editor).getSession().getValue();
+        this.startRow = text.substring(0, this.startPosition).split("\n").length - 1;
+        this.startColumn = this.startPosition - text.substring(0, this.startPosition).lastIndexOf("\n") - 1;
+        this.endRow = text.substring(0, this.endPosition).split("\n").length - 1;
+        this.endColumn = this.endPosition - text.substring(0, this.endPosition).lastIndexOf("\n") - 1;
+        return this;
+    };
+};
 
 function PositionContainer() {}
 
@@ -79,10 +99,9 @@ PositionContainer.prototype = [];
 
 PositionContainer.prototype.add = function (pos) {
     var found = false;
-    if (!(pos.startRow == pos.endRow && pos.startColumn == pos.endColumn)) {
+    if (!(pos.startPosition == pos.endPosition) ) {
         for (var i = 0; i < this.length; i++) {
-            if ((pos.startRow > this[i].startRow && pos.endRow < this[i].endRow) || (pos.startRow == this[i].startRow && pos.startColumn >= this[i].startColumn)
-                && (pos.endRow == this[i].endRow && pos.endColumn <= this[i].endColumn)) {
+            if (pos.typ == this[i].typ && (pos.startPosition > this[i].startPosition && pos.endPosition < this[i].endPosition)) {
                 this[i] = pos;
                 found = true;
                 break;
@@ -97,7 +116,33 @@ PositionContainer.prototype.clear = function () {
     this.splice(0, this.length);
 };
 
+/**
+ * markiert in den Regeln die verwendeten Stellen
+ */
+PositionContainer.prototype.setMarkers = function () {
 
+    var mark = function (position) {
+        var p = position.convertPosition();
+        var r = new Verteilung.Range(p.startRow, p.startColumn, p.endRow, p.endColumn);
+        p.setMarkerId(eval(p.typ.editor).getSession().addMarker(r, p.css, p.desc, false));
+    };
+
+    for (var i = 0; i < this.length; i++) {
+        mark(this[i]);
+    }
+};
+
+/**
+ * entfernt die Markierungen im Editor
+ * @param editor   der verwendete Editor
+ * @param css      der verwendetete CSS Selektor
+ */
+PositionContainer.prototype.removeMarkers = function (editor, css) {
+    for ( var i = 0; i < Verteilung.positions.length; i++) {
+        if (Verteilung.positions[i].getEditor() == editor && (!css || css == Verteilung. positions[i].getCSS()))
+            editor.getSession().removeMarker(Verteilung.positions[i].getMarkerId());
+    }
+};
 
 
 /**
@@ -282,7 +327,7 @@ function loadText(content, txt, name, typ, container) {
         currentContent = content;
         currentText = txt;
         currentContainer = container;
-        removeMarkers(Verteilung.textEditor);
+        Verteilung.positions.removeMarkers(Verteilung.textEditor);
         Verteilung.textEditor.getSession().setValue(txt);
         document.getElementById('headerWest').textContent = name;
         Verteilung.propsEditor.getSession().setValue("");
@@ -504,42 +549,6 @@ function doReRunAll() {
     }
 }
 
-/**
- * markiert in den Regeln die verendeten Stellen
- * @param positions   die Positionen im Text
- * @returns {Array}   die erzeugten Markierungen im Editor
- */
-function setMarkers(positions) {
-
-    var mark = function (position) {
-        var r = new Verteilung.Range(position.startRow, position.startColumn, position.endRow, position.endColumn);
-        position.setMarkerId(position.editor.getSession().addMarker(r, position.css, position.desc, false));
-    };
-
-    if (REC.exist(positions)) {
-        if (positions instanceof Array) {
-            for (var i = 0; i < positions.length; i++) {
-                mark(positions[i]);
-            }
-        } else
-            mark(positions);
-    }
-
-
-}
-
-
-/**
- * entfernt die Markierungen im Editor
- * @param editor   der verwendete Editor
- * @param css      der verwendetete CSS Selektor
- */
-function removeMarkers(editor, css) {
-    for ( var i = 0; i < Verteilung.positions.length; i++) {
-        if (Verteilung.positions[i].getEditor() == editor && (!css || css == Verteilung. positions[i].getCSS()))
-            editor.getSession().removeMarker(Verteilung.positions[i].getMarkerId());
-    }
-}
 
 /**
  * zeigt die verwendete Regel
@@ -661,14 +670,14 @@ function doTest() {
             success: function (data) {
                 if (data.success[0]) {
                     REC.currentDocument.setContent(data.result[0].text.toString());
-                    removeMarkers(Verteilung.textEditor);
+                    Verteilung.positions.removeMarkers(Verteilung.textEditor);
                     Verteilung.textEditor.getSession().setValue(data.result[0].text.toString());
                     currentRules = "test.xml";
                     document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
                     Verteilung.rulesEditor.getSession().setValue(data.result[0].xml.toString());
                     REC.testRules(Verteilung.rulesEditor.getSession().getValue());
                     setXMLPosition(REC.currXMLName);
-                    setMarkers(Verteilung.positions, Verteilung.textEditor);
+                    Verteilung.positions.setMarkers();
                     Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
                     fillMessageBox(true);
                     testMode = true;
@@ -810,7 +819,7 @@ function work() {
             REC.init();
             REC.currentDocument.properties.content.write(new Content(Verteilung.textEditor.getSession().getValue()));
             REC.currentDocument.name = currentFile;
-            removeMarkers(Verteilung.textEditor);
+            Verteilung.positions.removeMarkers(Verteilung.textEditor);
             if (REC.exist(rulesSchemaId)) {
                 json = executeService({
                     "name": "getDocumentContent",
@@ -824,7 +833,7 @@ function work() {
                 }
             }
             if (REC.exist(schemaContent)) {
-                removeMarkers(Verteilung.rulesEditor, "ace_error");
+                Verteilung.positions.removeMarkers(Verteilung.rulesEditor, "ace_error");
                 var validateErrors = xmllint.validateXML({xml: sel, schema: schemaContent}).errors;
                     if (REC.exist(validateErrors)) {
                         validate = false;
@@ -832,10 +841,8 @@ function work() {
                             var err = validateErrors[i];
                             if(err.startsWith("file_0.xml")) {
                                 var line = err.split(":")[1];
-                                var p = new Position(Verteilung.rulesEditor, line, 0, line, 1, "ace_error", "fullLine");
-                                setMarkers(p, Verteilung.rulesEditor);
-                                // Verteilung.rulesEditor.getSession().addMarker(new Verteilung.Range(line, 0, line, 1), "ace_error", "fullLine");
-                            }
+                                new Position(Verteilung.POSITIONTYP.RULES, line, 0, line, 1, "ace_error", "fullLine");
+                             }
                             REC.log(ERROR, validateErrors[i]);
                         }
                     }
@@ -844,9 +851,8 @@ function work() {
                 REC.testRules(sel);
                 if (!selectMode)
                     setXMLPosition(REC.currXMLName);
-
-                setMarkers(Verteilung.positions, Verteilung.textEditor);
             }
+            Verteilung.positions.setMarkers();
             fillMessageBox(true);
             if (!validate)
                 message("Fehler", "Regeln sind syntaktisch nicht korrekt!");
@@ -958,7 +964,7 @@ function format() {
         // window.parent.frames.rules.Verteilung.rulesEditor.getSession().foldAll(1);
         if (typeof currXMLName != "undefined" && currXMLName != null) {
             setXMLPosition(currXMLName);
-            setMarkers(positions, Verteilung.textEditor);
+            Verteilung.positions.setMarkers();
         }
     } catch (e) {
         errorHandler(e);
@@ -1139,7 +1145,7 @@ function openScript() {
             var tmp = REC.mess;
             eval("//# sourceURL=recognition.js\n\n" + content);
             REC.mess = tmp;
-            removeMarkers(Verteilung.textEditor);
+            Verteilung.positions.removeMarkers(Verteilung.textEditor);
             Verteilung.textEditor.getSession().setMode(new jsMode());
             Verteilung.textEditor.getSession().setValue(content);
             Verteilung.textEditor.setShowInvisibles(false);
@@ -1243,6 +1249,11 @@ var Verteilung = {
     outputEditor: null,
     oldContent:  null,
     modifiedScript: null,
-    positions: new PositionContainer()
+    positions: new PositionContainer(),
+    POSITIONTYP: {
+        TEXT : {value: 0, name: "Text", editor: "Verteilung.textEditor"},
+        RULES: {value: 1, name: "Rules", editor: "Verteilung.rulesEditor"},
+        PROPS : {value: 2, name: "Pros", editor: "Verteilung.propsEditor"}
+    }
 };
 

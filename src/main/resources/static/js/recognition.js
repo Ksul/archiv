@@ -6,7 +6,7 @@ var DEBUG = new DebugLevel(4, "DEBUG");
 var TRACE = new DebugLevel(5, "TRACE");
 var whitespace = "\n\n\t ";
 
-Encoder = {
+var Encoder = {
 
     // When encoding do we convert characters into html or numerical entities
     EncodeType : "entity",  // entity OR numerical
@@ -2353,8 +2353,8 @@ function SearchItem(srch) {
 
             // Positionen nicht im Server merken weil sie dort nicht gebraucht werden
             if (typeof Position == "function") {
-                Position.convertPosition(Verteilung.textEditor, REC.content, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.erg.getResult().check ? "ace_selection" + REC.xyz++ : "ace_step", this.name);
-               // Position.convertPosition(Verteilung.rulesEditor, Verteilung.rulesEditor.getSession().getValue(), this.xml.getStart(),  this.xml.getEnd(), "ace_selection" + REC.xyz++);
+                new Position(Verteilung.POSITIONTYP.TEXT, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.erg.getResult().check ? "ace_selection" + REC.xyz++ : "ace_step", this.name);
+                new Position(Verteilung.POSITIONTYP.RULES, this.xml.getStart(),  this.xml.getEnd(), "ace_selection" + REC.xyz++, "fullLine");
             }
 
             if (REC.exist(this.archivZiel)) {
