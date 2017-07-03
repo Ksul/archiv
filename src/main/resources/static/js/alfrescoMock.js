@@ -120,7 +120,8 @@ function ScriptNode(name, type) {
     this.properties["content"] = new Content();
     this.children = new Liste();
     this.childAssocs = new Liste();
-    this.parent = new Liste();
+    // Parents können keine Liste sein, denn für die contains Methode wird nur der Name herangezogen was hier nicht passt.
+    this.parent = [];
     this.versions = new Liste();
     this.type = type;
     this.workingParent = null;
@@ -179,7 +180,7 @@ ScriptNode.prototype.createFolder = function (name) {
         throw "no folder!";
     var newFolder = new ScriptNode(name, "cm:folder");
     this.children.add(newFolder);
-    newFolder.parent.add(this);
+    newFolder.parent.push(this);
     newFolder.displayPath = newFolder._getDisplayPath();
     return newFolder;
 };
@@ -246,7 +247,7 @@ ScriptNode.prototype.createNode = function (name, typ, assocType) {
         throw "No Folder!";
     var newNode =  new ScriptNode(name, typ);
     this.children.add(newNode);
-    newNode.parent.add(this);
+    newNode.parent.push(this);
     newNode.displayPath = newNode._getDisplayPath();
     if (typeof assocType != "undefined")
         this.createAssociation(newNode, assocType);
@@ -257,7 +258,7 @@ ScriptNode.prototype.addNode = function(node){
     if (this.type != "cm:folder" && this.type != "fm:forum" && this.type != "fm:topic")
         throw "No Folder!";
     this.children.add(node);
-    node.parent.add(this);
+    node.parent.push(this);
     node.displayPath = node._getDisplayPath();
 };
 
@@ -279,7 +280,7 @@ ScriptNode.prototype.remove = function () {
 ScriptNode.prototype.copy = function(newNode) {
     var cNode =  new ScriptNode(this.name, this.typ);
     newNode.children.add(cNode);
-    cNode.parent.add(newNode);
+    cNode.parent.push(newNode);
     return cNode;
 };
 
@@ -292,9 +293,9 @@ ScriptNode.prototype.move = function (newNode) {
         this.parent[i].children.remove(this);
     }
     newNode.children.add(this);
-    this.parent.clear();
-    this.parent.add(newNode);
-    newNode.displayPath = newNode._getDisplayPath();
+    this.parent = [];
+    this.parent.push(newNode);
+    this.displayPath = newNode._getDisplayPath();
     return true;
 };
 
@@ -339,7 +340,7 @@ ScriptNode.prototype.init = function() {
     this.children.clear();
     this.childAssocs.clear();
     this.versions.clear();
-    this.parent.clear();
+    this.parent = [];
     this.workingParent = null;
     this.displayPath = "";
 };
