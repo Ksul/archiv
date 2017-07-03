@@ -217,7 +217,7 @@
     };
 })(this);
 
-define("ace/lib/oop",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/oop",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     exports.inherits = function(ctor, superCtor) {
@@ -245,7 +245,7 @@ define("ace/lib/oop",["require","exports","module"], function(require, exports, 
 
 });
 
-define("ace/range",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/range",["require","exports","module"], function(require, exports, module) {
     "use strict";
     var comparePoints = function(p1, p2) {
         return p1.row - p2.row || p1.column - p2.column;
@@ -484,7 +484,7 @@ define("ace/range",["require","exports","module"], function(require, exports, mo
     exports.Range = Range;
 });
 
-define("ace/apply_delta",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/apply_delta",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     function throwDeltaError(delta, errorText){
@@ -549,7 +549,7 @@ define("ace/apply_delta",["require","exports","module"], function(require, expor
     }
 });
 
-define("ace/lib/event_emitter",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/event_emitter",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     var EventEmitter = {};
@@ -675,7 +675,7 @@ define("ace/lib/event_emitter",["require","exports","module"], function(require,
 
 });
 
-define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/event_emitter"], function(require, exports, module) {
+ace.define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/event_emitter"], function(require, exports, module) {
     "use strict";
 
     var oop = require("./lib/oop");
@@ -800,7 +800,7 @@ define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/event_e
 
 });
 
-define("ace/document",["require","exports","module","ace/lib/oop","ace/apply_delta","ace/lib/event_emitter","ace/range","ace/anchor"], function(require, exports, module) {
+ace.define("ace/document",["require","exports","module","ace/lib/oop","ace/apply_delta","ace/lib/event_emitter","ace/range","ace/anchor"], function(require, exports, module) {
     "use strict";
 
     var oop = require("./lib/oop");
@@ -913,7 +913,7 @@ define("ace/document",["require","exports","module","ace/lib/oop","ace/apply_del
             return this.removeFullLines(firstRow, lastRow);
         };
         this.insertNewLine = function(position) {
-            console.warn("Use of document.insertNewLine is deprecated. Use insertMergedLines(position, [\'\', \'\']) instead.");
+            console.warn("Use of document.insertNewLine is deprecated. Use insertMergedLines(position, ['', '']) instead.");
             return this.insertMergedLines(position, ["", ""]);
         };
         this.insert = function(position, text) {
@@ -1156,7 +1156,7 @@ define("ace/document",["require","exports","module","ace/lib/oop","ace/apply_del
     exports.Document = Document;
 });
 
-define("ace/lib/lang",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/lang",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     exports.last = function(a) {
@@ -1202,7 +1202,7 @@ define("ace/lib/lang",["require","exports","module"], function(require, exports,
         var copy = [];
         for (var i=0, l=array.length; i<l; i++) {
             if (array[i] && typeof array[i] == "object")
-                copy[i] = this.copyObject( array[i] );
+                copy[i] = this.copyObject(array[i]);
             else
                 copy[i] = array[i];
         }
@@ -1220,14 +1220,12 @@ define("ace/lib/lang",["require","exports","module"], function(require, exports,
             }
             return copy;
         }
-        var cons = obj.constructor;
-        if (cons === RegExp)
+        if (Object.prototype.toString.call(obj) !== "[object Object]")
             return obj;
 
-        copy = cons();
-        for (var key in obj) {
+        copy = {};
+        for (var key in obj)
             copy[key] = deepCopy(obj[key]);
-        }
         return copy;
     };
 
@@ -1346,7 +1344,7 @@ define("ace/lib/lang",["require","exports","module"], function(require, exports,
     };
 });
 
-define("ace/worker/mirror",["require","exports","module","ace/range","ace/document","ace/lib/lang"], function(require, exports, module) {
+ace.define("ace/worker/mirror",["require","exports","module","ace/range","ace/document","ace/lib/lang"], function(require, exports, module) {
     "use strict";
 
     var Range = require("../range").Range;
@@ -1408,7 +1406,7 @@ define("ace/worker/mirror",["require","exports","module","ace/range","ace/docume
 
 });
 
-define("ace/mode/javascript/jshint",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/mode/javascript/jshint",["require","exports","module"], function(require, exports, module) {
     module.exports = (function outer (modules, cache, entry) {
         var previousRequire = typeof require == "function" && require;
         function newRequire(name, jumped){
@@ -3148,7 +3146,7 @@ define("ace/mode/javascript/jshint",["require","exports","module"], function(req
                     }
                     var length = object.length;
                     length = (length && isLength(length) &&
-                    (isArray(object) || (support.nonEnumArgs && isArguments(object))) && length) || 0;
+                        (isArray(object) || (support.nonEnumArgs && isArguments(object))) && length) || 0;
 
                     var Ctor = object.constructor,
                         index = -1,
@@ -4288,8 +4286,8 @@ define("ace/mode/javascript/jshint",["require","exports","module"], function(req
 
             function FutureReservedWord(name, meta) {
                 var x = type(name, (meta && meta.nud) || function() {
-                    return this;
-                });
+                        return this;
+                    });
 
                 meta = meta || {};
                 meta.isFutureReservedWord = true;
@@ -7980,8 +7978,8 @@ define("ace/mode/javascript/jshint",["require","exports","module"], function(req
                             return;
 
                         reIgnoreStr = escapeRegex(delimiterPair.start) +
-                        "[\\s\\S]*?" +
-                        escapeRegex(delimiterPair.end);
+                            "[\\s\\S]*?" +
+                            escapeRegex(delimiterPair.end);
 
                         reIgnore = new RegExp(reIgnoreStr, "ig");
 
@@ -11685,7 +11683,7 @@ define("ace/mode/javascript/jshint",["require","exports","module"], function(req
 
 });
 
-define("ace/mode/javascript_worker",["require","exports","module","ace/lib/oop","ace/worker/mirror","ace/mode/javascript/jshint"], function(require, exports, module) {
+ace.define("ace/mode/javascript_worker",["require","exports","module","ace/lib/oop","ace/worker/mirror","ace/mode/javascript/jshint"], function(require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
@@ -11734,21 +11732,21 @@ define("ace/mode/javascript_worker",["require","exports","module","ace/lib/oop",
     (function() {
         this.setOptions = function(options) {
             this.options = options || {
-                esnext: true,
-                moz: true,
-                devel: true,
-                browser: true,
-                node: true,
-                laxcomma: true,
-                laxbreak: true,
-                lastsemic: true,
-                onevar: false,
-                passfail: false,
-                maxerr: 100,
-                expr: true,
-                multistr: true,
-                globalstrict: true
-            };
+                    esnext: true,
+                    moz: true,
+                    devel: true,
+                    browser: true,
+                    node: true,
+                    laxcomma: true,
+                    laxbreak: true,
+                    lastsemic: true,
+                    onevar: false,
+                    passfail: false,
+                    maxerr: 100,
+                    expr: true,
+                    multistr: true,
+                    globalstrict: true
+                };
             this.doc.getValue() && this.deferredUpdate.schedule(100);
         };
 
@@ -11775,7 +11773,7 @@ define("ace/mode/javascript_worker",["require","exports","module","ace/lib/oop",
 
             var errors = [];
             var maxErrorLevel = this.isValidJS(value) ? "warning" : "error";
-            lint(value, this.options);
+            lint(value, this.options, this.options.globals);
             var results = lint.errors;
 
             var errorAdded = false
@@ -11832,7 +11830,7 @@ define("ace/mode/javascript_worker",["require","exports","module","ace/lib/oop",
 
 });
 
-define("ace/lib/es5-shim",["require","exports","module"], function(require, exports, module) {
+ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, exports, module) {
 
     function Empty() {}
 
@@ -12491,11 +12489,11 @@ define("ace/lib/es5-shim",["require","exports","module"], function(require, expo
     function isPrimitive(input) {
         var type = typeof input;
         return (
-        input === null ||
-        type === "undefined" ||
-        type === "boolean" ||
-        type === "number" ||
-        type === "string"
+            input === null ||
+            type === "undefined" ||
+            type === "boolean" ||
+            type === "number" ||
+            type === "string"
         );
     }
 
