@@ -9,23 +9,26 @@
  * @param desc              eine Beschreibung
  * @constructor
  */
-var Position = function(typ, startPosition, endPosition, css, desc) {
-    this.typ = typ;
+var Position = function() {
+    this.typ = arguments[0];
     if (arguments.length == 7) {
         this.startPosition = eval(this.typ.editor).getSession().getValue().split("\n", arguments[1]).join("\n").length + arguments[2];
         this.endPosition = eval(this.typ.editor).getSession().getValue().split("\n", arguments[3]).join("\n").length + arguments[4];
+        this.css = arguments[5];
+        this.desc = arguments[6];
+        
     } else {
-        this.startPosition = startPosition;
-        this.endPosition = endPosition;
+        this.startPosition = arguments[1];
+        this.endPosition = arguments[2];
+        this.css = arguments[3];
+        this.desc = arguments[4];
     }
-    this.css = css;
-    this.desc = desc;
+
     this.markerId = null;
     this.startRow = 0;
     this.startColumn = 0;
     this.endRow = 0;
     this.endColumn = 0;
-    this.css = null;
 
     Verteilung.positions.add(this);
 
