@@ -135,18 +135,6 @@ PositionContainer.prototype.setMarkers = function () {
     }
 };
 
-/**
- * entfernt die Markierungen im Editor
- * @param editor   der verwendete Editor
- * @param css      der verwendetete CSS Selektor
- */
-PositionContainer.prototype.removeMarkers = function (editor, css) {
-    for ( var i = 0; i < Verteilung.positions.length; i++) {
-        if (Verteilung.positions[i].getEditor() == editor && (!css || css == Verteilung. positions[i].getCSS()))
-            editor.getSession().removeMarker(Verteilung.positions[i].getMarkerId());
-    }
-};
-
 
 /**
  * zeigt die Progressbar
@@ -330,7 +318,7 @@ function loadText(content, txt, name, typ, container) {
         currentContent = content;
         currentText = txt;
         currentContainer = container;
-        Verteilung.positions.removeMarkers(Verteilung.textEditor);
+        $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
         Verteilung.textEditor.getSession().setValue(txt);
         document.getElementById('headerWest').textContent = name;
         Verteilung.propsEditor.getSession().setValue("");
@@ -673,7 +661,7 @@ function doTest() {
             success: function (data) {
                 if (data.success[0]) {
                     REC.currentDocument.setContent(data.result[0].text.toString());
-                    Verteilung.positions.removeMarkers(Verteilung.textEditor);
+                    $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
                     Verteilung.textEditor.getSession().setValue(data.result[0].text.toString());
                     currentRules = "test.xml";
                     document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
@@ -822,7 +810,7 @@ function work() {
             REC.init();
             REC.currentDocument.properties.content.write(new Content(Verteilung.textEditor.getSession().getValue()));
             REC.currentDocument.name = currentFile;
-            Verteilung.positions.removeMarkers(Verteilung.textEditor);
+            $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
             if (REC.exist(rulesSchemaId)) {
                 json = executeService({
                     "name": "getDocumentContent",
@@ -836,7 +824,7 @@ function work() {
                 }
             }
             if (REC.exist(schemaContent)) {
-                Verteilung.positions.removeMarkers(Verteilung.rulesEditor, "ace_error");
+                $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
                 var validateErrors = xmllint.validateXML({xml: sel, schema: schemaContent}).errors;
                     if (REC.exist(validateErrors)) {
                         validate = false;
@@ -1148,8 +1136,8 @@ function openScript() {
             var tmp = REC.mess;
             eval("//# sourceURL=recognition.js\n\n" + content);
             REC.mess = tmp;
-            Verteilung.positions.removeMarkers(Verteilung.textEditor);
-            Verteilung.textEditor.getSession().setMode(new jsMode());
+            $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
+            Verteilung.textEditor.getSession().setMode("ace/mode/javascript");
             Verteilung.textEditor.getSession().setValue(content);
             Verteilung.textEditor.setShowInvisibles(false);
             Verteilung.textEditor.getSession().getUndoManager().markClean();
@@ -1231,7 +1219,7 @@ function sendToInbox() {
 function closeScript() {
     try {
         verteilungLayout.sizePane("west", panelSizeReminder);
-        Verteilung.textEditor.getSession().setMode(new txtMode());
+        Verteilung.textEditor.getSession().setMode("ace/mode/text");
         if (REC.exist(Verteilung.oldContent) && Verteilung.oldContent.length > 0)
             Verteilung.textEditor.getSession().setValue(Verteilung.oldContent);
         else
@@ -1245,7 +1233,6 @@ function closeScript() {
 }
 
 var Verteilung = {
-    Range: require("ace/range").Range,
     rulesEditor: null,
     textEditor:  null,
     propsEditor: null,
@@ -1259,4 +1246,7 @@ var Verteilung = {
         PROPS : {value: 2, name: "Pros", editor: "Verteilung.propsEditor"}
     }
 };
+if (ace.require instanceof Function)
+        Verteilung.Range = ace.require("ace/range").Range;
+
 

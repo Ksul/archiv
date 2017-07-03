@@ -3467,9 +3467,7 @@ function start() {
         zoneRules.addEventListener('drop', handleRulesSelect, false);
 
         Verteilung.rulesEditor = ace.edit("inRules");
-        //Verteilung.rulesEditor.setTheme("ace/theme/eclipse");
-        var xmlMode = require("ace/mode/xml").Mode;
-        Verteilung.rulesEditor.getSession().setMode(new xmlMode());
+        Verteilung.rulesEditor.getSession().setMode("ace/mode/xml");
         Verteilung.rulesEditor.setShowPrintMargin(false);
         Verteilung.rulesEditor.setDisplayIndentGuides(true);
         Verteilung.rulesEditor.commands.addCommand({
@@ -3493,9 +3491,7 @@ function start() {
         Verteilung.textEditor.setTheme("ace/theme/chrome");
         Verteilung.textEditor.setShowInvisibles(true);
         Verteilung.textEditor.setShowPrintMargin(false);
-        jsMode = require("ace/mode/javascript").Mode;
-        txtMode = require("ace/mode/text").Mode;
-        Verteilung.textEditor.getSession().setMode(new txtMode());
+        Verteilung.textEditor.getSession().setMode("ace/mode/javascript");
         Verteilung.textEditor.$blockScrolling = Infinity;
         var zone = document.getElementById('inTxt');
         zone.addEventListener('dragover', handleDragOver, false);
