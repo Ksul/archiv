@@ -546,8 +546,12 @@ function doReRunAll() {
  * @param position die Position der Regel im Text
  */
 function setXMLPosition(position) {
-    Verteilung.rulesEditor.getSession().foldAll(1);
-    var text = Verteilung.rulesEditor.getSession().getValue();
+    var session =  Verteilung.rulesEditor.getSession();
+    session.foldAll(1);
+    var text = session.getValue();
+    var rows = session.getLength();
+    for (var j = 0; j< rows; j++)
+         session.removeGutterDecoration(j, "ace_selection6");
     var pos = 0;
     for ( var i = 0; i < position.length; i++)
         pos = text.indexOf("<archivTyp name=\"" + position[i] + "\"", pos);
@@ -559,9 +563,10 @@ function setXMLPosition(position) {
             var startCol = pos - text.substring(0, pos).lastIndexOf("\n") - 1;
             var endRow = text.substring(0, pos1).split("\n").length - 1;
             var endCol = pos1 - text.substring(0, pos1).lastIndexOf("\n") - 1;
-            Verteilung.rulesEditor.getSession().unfold(startRow + 1, true);
+            session.unfold(startRow + 1, true);
             Verteilung.rulesEditor.gotoLine(startRow + 1);
-            Verteilung.rulesEditor.selection.setSelectionRange(new Verteilung.Range(startRow, startCol, endRow, endCol));
+            for (var k = startRow; k < endRow; k++)
+                session.addGutterDecoration(k, "ace_selection6");
         }
     }
 }
@@ -811,6 +816,8 @@ function work() {
             REC.currentDocument.properties.content.write(new Content(Verteilung.textEditor.getSession().getValue()));
             REC.currentDocument.name = currentFile;
             $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
+            $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
+            Verteilung.positions.clear();
             if (REC.exist(rulesSchemaId)) {
                 json = executeService({
                     "name": "getDocumentContent",
@@ -824,7 +831,6 @@ function work() {
                 }
             }
             if (REC.exist(schemaContent)) {
-                $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
                 var validateErrors = xmllint.validateXML({xml: sel, schema: schemaContent}).errors;
                     if (REC.exist(validateErrors)) {
                         validate = false;
@@ -1246,7 +1252,7 @@ var Verteilung = {
         PROPS : {value: 2, name: "Pros", editor: "Verteilung.propsEditor"}
     }
 };
-if (ace.require instanceof Function)
+if (typeof ace != "undefined")
         Verteilung.Range = ace.require("ace/range").Range;
 
 
