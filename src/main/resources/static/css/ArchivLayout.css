@@ -440,6 +440,11 @@ p {
     z-index:20
 }
 
+.ace_selectXML {
+    background: rgba(41, 235, 255, 0.7);
+    z-index:20
+}
+
 .ace_selection0 {
     position:absolute;
     background:rgba(90,255,90,0.4);

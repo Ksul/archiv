@@ -551,7 +551,7 @@ function setXMLPosition(position) {
     var text = session.getValue();
     var rows = session.getLength();
     for (var j = 0; j< rows; j++)
-         session.removeGutterDecoration(j, "ace_selection6");
+         session.removeGutterDecoration(j, "ace_selectXML");
     var pos = 0;
     for ( var i = 0; i < position.length; i++)
         pos = text.indexOf("<archivTyp name=\"" + position[i] + "\"", pos);
@@ -565,8 +565,8 @@ function setXMLPosition(position) {
             var endCol = pos1 - text.substring(0, pos1).lastIndexOf("\n") - 1;
             session.unfold(startRow + 1, true);
             Verteilung.rulesEditor.gotoLine(startRow + 1);
-            for (var k = startRow; k < endRow; k++)
-                session.addGutterDecoration(k, "ace_selection6");
+            for (var k = startRow; k <= endRow; k++)
+                session.addGutterDecoration(k, "ace_selectXML");
         }
     }
 }

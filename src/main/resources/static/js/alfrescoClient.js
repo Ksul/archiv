@@ -3491,7 +3491,7 @@ function start() {
         Verteilung.textEditor.setTheme("ace/theme/chrome");
         Verteilung.textEditor.setShowInvisibles(true);
         Verteilung.textEditor.setShowPrintMargin(false);
-        Verteilung.textEditor.getSession().setMode("ace/mode/javascript");
+        Verteilung.textEditor.getSession().setMode("ace/mode/text");
         Verteilung.textEditor.$blockScrolling = Infinity;
         var zone = document.getElementById('inTxt');
         zone.addEventListener('dragover', handleDragOver, false);
