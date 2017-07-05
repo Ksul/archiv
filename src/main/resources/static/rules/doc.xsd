@@ -166,7 +166,7 @@
             <xsd:attribute name="typ" use="required">
                 <xsd:simpleType>
                     <xsd:annotation>
-                        <xsd:documentation>spezifieziert die Art der Begrenzung.</xsd:documentation>
+                        <xsd:documentation>spezifiziert die Art der Begrenzung.</xsd:documentation>
                     </xsd:annotation>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="start">
@@ -508,7 +508,7 @@
     </xsd:simpleType>
     <xsd:simpleType name="removeReturnsType">
         <xsd:annotation>
-            <xsd:documentation>Spezifiziert, ob Retturns aus dem Dokumententext
+            <xsd:documentation>Spezifiziert, ob Returns aus dem Dokumententext
                 zur Erkennung entfernt werden sollen. Das kann vor der Suche oder
                 auch nachher
                 geschehen.

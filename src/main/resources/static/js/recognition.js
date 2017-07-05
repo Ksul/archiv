@@ -4,7 +4,8 @@ var WARN = new DebugLevel(2, "WARN");
 var INFORMATIONAL = new DebugLevel(3, "INFORMATIONAL");
 var DEBUG = new DebugLevel(4, "DEBUG");
 var TRACE = new DebugLevel(5, "TRACE");
-var whitespace = "\n\n\t ";
+var WHITESPACE = "\n\n\t ";
+var RETURN = "\r\n";
 
 var Encoder = {
 
@@ -441,7 +442,7 @@ XMLDoc = {
 
     parseAttribute: function (src, pos, node) {
         // chew up the whitespace, if any
-        while ((pos < src.length) && (whitespace.indexOf(src.charAt(pos)) != -1)) {
+        while ((pos < src.length) && (WHITESPACE.indexOf(src.charAt(pos)) != -1)) {
             pos++;
         }
         // if there's nothing else, we have no (more) attributes - just break out
@@ -460,7 +461,7 @@ XMLDoc = {
         // extract the parameter name
         var paramname = REC.trim(src.substring(p1, pos++), false, true);
         // chew up whitespace
-        while ((pos < src.length) && (whitespace.indexOf(src.charAt(pos)) != -1)) {
+        while ((pos < src.length) && (WHITESPACE.indexOf(src.charAt(pos)) != -1)) {
             pos++;
         }
         // throw an error if we've run out of string
@@ -2306,7 +2307,8 @@ function SearchItem(srch) {
                 txt = txt.replace(/ /g, '');
             }
             if (REC.exist(this.removeReturns) && this.removeReturns == "before") {
-                txt = txt.replace(/\n/g, '').replace(/\n/g, '');
+                var expression = new RegExp(RETURN, "g");
+                txt = txt.replace(expression, '').replace(expression, '');
             }
             if (REC.exist(this.kind))
                 this.erg.modifyResult(this.findSpecialType(txt, this.kind, this.left, this.expected), 0);
@@ -2489,8 +2491,8 @@ SearchResultContainer.prototype.removeReturns = function () {
     for (var i = 0; i < this.length; i++) {
         if (typeof this[i].text == "string") {
             REC.log(TRACE, "Removing Returns from String...");
-            this[i].mergeStr('\n');
-            this[i].mergeStr('\n');
+            this[i].mergeStr(RETURN);
+            this[i].mergeStr(RETURN);
         }
     }
 };
@@ -2805,7 +2807,7 @@ function SearchResult(text, xml, val, startPos, endPos, typ, expected) {
      * @see readOverReturn
      */
     this.limitToReturn = function() {
-        var exp = new RegExp("[\\n\\n]");
+        var exp = new RegExp(RETURN);
         if (typeof this.text == "string") {
             var pos = this.text.search(exp);
             if (pos != -1) {
@@ -3242,13 +3244,13 @@ REC = {
         var i = 0;
         var k = 0;
         if (leftTrim == true) {
-            while ((i < trimString.length) && (whitespace.indexOf(trimString.charAt(i++)) != -1)) {
+            while ((i < trimString.length) && (WHITESPACE.indexOf(trimString.charAt(i++)) != -1)) {
                 left++;
             }
         }
         if (rightTrim == true) {
             k = trimString.length - 1;
-            while ((k >= left) && (whitespace.indexOf(trimString.charAt(k--)) != -1)) {
+            while ((k >= left) && (WHITESPACE.indexOf(trimString.charAt(k--)) != -1)) {
                 right++;
             }
         }
@@ -3281,7 +3283,7 @@ REC = {
             return -1;
         }
         while (pos < str.length) {
-            if (whitespace.indexOf(str.charAt(pos)) != -1) {
+            if (WHITESPACE.indexOf(str.charAt(pos)) != -1) {
                 return pos;
             } else {
                 pos++;

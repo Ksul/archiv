@@ -40,7 +40,7 @@ describe("Test für SearchItem", function() {
             "Unsere Lieferungen\r\n" +
             "Zahlbetrag \r\n" +
             "	 25,65 € ";
-        REC.content = REC.content.replace(/\r\n/g, '\n');
+        //REC.content = REC.content.replace(/\r\n/g, '\n');
         Verteilung.positions.clear();
     });
 
@@ -79,7 +79,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 1" text="Datum" word="1" readOverReturn="true" objectTyp="date" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(1965, 4, 1).getTime());
         expect(Verteilung.positions[0].startRow).toBe(0);
         expect(Verteilung.positions[0].endRow).toBe(0);
@@ -92,7 +92,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 3" text="ID-Value" word="1,2" direction="left" objectTyp="date" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2015, 2, 1).getTime());
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -118,12 +118,12 @@ describe("Test für SearchItem", function() {
 
     it("testResolveSearchItemWithDelimitterAndFloat", function() {
         var rules = '<searchItem name="Test 5" text="Datum" readOverReturn="true" direction="left" objectTyp="float">' +
-            '<delimitter typ="start" count="-3" text="&#0010;" />' +
-            '<delimitter typ="end" count="1" text="&#0010;" />' +
+            '<delimitter typ="start" count="-3" text="&#0013;&#0010;" />' +
+            '<delimitter typ="end" count="1" text="&#0013;&#0010;" />' +
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21.65);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -140,7 +140,7 @@ describe("Test für SearchItem", function() {
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -158,7 +158,7 @@ describe("Test für SearchItem", function() {
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -171,11 +171,11 @@ describe("Test für SearchItem", function() {
 
     it("testResolveSearchItemWithDelimitterAndDate", function() {
         var rules = '<searchItem name="Test 7" text="Nachtrag" objectTyp="date" >' +
-            '<delimitter typ="start" count="1" text="&#0010;" />' +
+            '<delimitter typ="start" count="1" text="&#0013;&#0010;" />' +
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2012, 2, 22).getTime());
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -189,7 +189,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 8" text="Wert" objectTyp="float" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(123.5);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -204,7 +204,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 9" text="Gültig" objectTyp="date" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2012, 2, 10).getTime());
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -218,7 +218,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 10" kind="amount,1" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(22);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -232,7 +232,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 11" kind="date,4" direction="left"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2010, 11, 24).getTime());
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -244,12 +244,12 @@ describe("Test für SearchItem", function() {
 
     it("testResolveSearchItemWithCheck", function() {
         var rules = '<searchItem name="Test 12" text="KUSA" objectTyp="date">' +
-            '<delimitter typ="start" count="1" text="&#0010;" />' +
+            '<delimitter typ="start" count="1" text="&#0013;&#0010;" />' +
             '<check lowerValue="01/01/2005" upperValue="01/01/2020" />' +
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2008, 0, 7).getTime());
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -263,7 +263,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 13" text="buchen" word="2" objectTyp="float" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(349.10);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -277,7 +277,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 14" text="buchen" word="2" direction="left" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe('nächsten');
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -293,7 +293,7 @@ describe("Test für SearchItem", function() {
             ' </searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(123);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -308,7 +308,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 16" text="Rechnungsdatum" objectTyp="date" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2011, 7, 23).getTime());
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -322,7 +322,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 17" text="Gesamt in EUR" objectTyp="float" word="2" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(21.49);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -337,7 +337,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 18" kind="date,1" direction="left" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(2009, 02, 21).getTime());
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -388,7 +388,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="bet1" text="Wertentwicklung in EUR" word="1" objectTyp="float" required="false" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         REC.currentSearchItems = REC.currentSearchItems.concat(searchItem);
         rules = '<searchItem name="bet2" text="Gesamt in EUR" word="2" objectTyp="float" required="false" />';
         XMLDoc.loadXML(rules);
@@ -406,7 +406,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 22" text="XYZ|Gesamt" word="2" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe("EUR");
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -435,7 +435,7 @@ describe("Test für SearchItem", function() {
         var rules = '<searchItem name="Test 24" text="3966" included="true" word="0,3" direction="left" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe('560 525 3966');
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -452,7 +452,7 @@ describe("Test für SearchItem", function() {
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(4300.01);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -493,7 +493,7 @@ describe("Test für SearchItem", function() {
         var rules = ' <searchItem name="betrag" text="erhalten" readOverReturn="true" objectTyp="float" target="my:amount" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(302.26);
         expect(Verteilung.positions).not.toBe(null);
         Verteilung.positions[0].convertPosition(REC.content);
@@ -506,7 +506,7 @@ describe("Test für SearchItem", function() {
     it("testFindForWord1", function() {
         var text = "Dies ist ein Test";
         var result = new SearchResult(text, "", "Test", 0, text.length, "String", "asd");
-        searchItem = new SearchItem({});
+        var searchItem = new SearchItem({});
         searchItem.erg.addResult(result);
         searchItem.findForWords( [1], false);
         expect(searchItem.erg.getResult().text).toBe("ist");
@@ -517,7 +517,7 @@ describe("Test für SearchItem", function() {
     it("testFindForWord2", function() {
         var text = "Dies ist ein Test";
         var result = new SearchResult( text, "", "Test", 0, text.length, "String", "asd");
-        searchItem = new SearchItem({});
+        var searchItem = new SearchItem({});
         searchItem.erg.addResult(result);
         searchItem.findForWords([1,2], false);
         expect(searchItem.erg.getResult().text).toBe("ist ein");
@@ -529,7 +529,7 @@ describe("Test für SearchItem", function() {
         var text = "Dies ist ein Test";
         var erg = new SearchResultContainer();
         var result = new SearchResult(text, "", "Test", 0, text.length, "String", "asd");
-        searchItem = new SearchItem({});
+        var searchItem = new SearchItem({});
         searchItem.erg.addResult(result);
         searchItem.findForWords([2,2], true);
         expect(searchItem.erg.getResult().text).toBe("Dies ist");
@@ -539,8 +539,8 @@ describe("Test für SearchItem", function() {
 
     it("testFindForSpecialType1", function() {
         var text = "Dies 01.01.2010 ist hoffentlich ein Datum";
-        searchItem = new SearchItem({});
-        erg =  searchItem.findSpecialType(text, ["date"], false, null);
+        var searchItem = new SearchItem({});
+        var erg =  searchItem.findSpecialType(text, ["date"], false, null);
         expect(erg[0].text).toBe("01.01.2010");
         expect(erg[0].getStart()).toBe(5);
         expect(erg[0].getEnd()).toBe(15);
@@ -549,18 +549,18 @@ describe("Test für SearchItem", function() {
 
     it("testFindForSpecialType2", function() {
         var text = "Dies 125,78 €ist hoffentlich ein Betrag";
-        searchItem = new SearchItem({});
-        erg =  searchItem.findSpecialType(text, ["amount"], false, null);
+        var searchItem = new SearchItem({});
+        var erg =  searchItem.findSpecialType(text, ["amount"], false, null);
         expect(erg[0].text).toBe("125,78 €");
         expect(erg[0].getStart()).toBe(5);
-        expect(erg[0].getEnd()).toBe(11);
+        expect(erg[0].getEnd()).toBe(13);
         expect(erg[0].val).toBe(125.78);
     });
 
     it("testFindForSpecialType3", function() {
         var text = "Dies 125,78 €ist hoffentlich ein Betrag";
-        searchItem = new SearchItem({});
-        erg =  searchItem.findSpecialType(text, ["float"], false, null);
+        var searchItem = new SearchItem({});
+        var erg =  searchItem.findSpecialType(text, ["float"], false, null);
         expect(erg[0].text).toBe("125,78");
         expect(erg[0].getStart()).toBe(5);
         expect(erg[0].getEnd()).toBe(11);
@@ -570,8 +570,8 @@ describe("Test für SearchItem", function() {
 
     it("testFindForSpecialType4", function() {
         var text = "Dies 01. März 2010 ist hoffentlich ein Datum";
-        searchItem = new SearchItem({});
-        erg =  searchItem.findSpecialType(text, ["date"], false, null);
+        var searchItem = new SearchItem({});
+        var erg =  searchItem.findSpecialType(text, ["date"], false, null);
         expect(erg[0].text).toBe("01. März 2010");
         expect(erg[0].getStart()).toBe(5);
         expect(erg[0].getEnd()).toBe(18);
@@ -581,8 +581,8 @@ describe("Test für SearchItem", function() {
 
     it("testFindForSpecialType5", function() {
         var text = "Dies März 2010 ist hoffentlich ein Datum";
-        searchItem = new SearchItem({});
-        erg =  searchItem.findSpecialType(text, ["date"], false, null);
+        var searchItem = new SearchItem({});
+        var erg =  searchItem.findSpecialType(text, ["date"], false, null);
         expect(erg[0].text).toBe("März 2010");
         expect(erg[0].getStart()).toBe(5);
         expect(erg[0].getEnd()).toBe(14);

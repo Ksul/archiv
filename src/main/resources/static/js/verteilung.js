@@ -87,11 +87,11 @@ var Position = function() {
 
     this.convertPosition = function ( text) {
         if (arguments.length == 0)
-            var text = eval(this.typ.editor).getSession().getValue();
-        this.startRow = text.substring(0, this.startPosition).split("\n").length - 1;
-        this.startColumn = this.startPosition - text.substring(0, this.startPosition).lastIndexOf("\n") - 1;
-        this.endRow = text.substring(0, this.endPosition).split("\n").length - 1;
-        this.endColumn = this.endPosition - text.substring(0, this.endPosition).lastIndexOf("\n") - 1;
+            text = eval(this.typ.editor).getSession().getValue();
+        this.startRow = text.substring(0, this.startPosition).split(RETURN).length - 1;
+        this.startColumn = this.startPosition - text.substring(0, this.startPosition).lastIndexOf(RETURN) - RETURN.length;
+        this.endRow = text.substring(0, this.endPosition).split(RETURN).length - 1;
+        this.endColumn = this.endPosition - text.substring(0, this.endPosition).lastIndexOf(RETURN) - RETURN.length;
         return this;
     };
 };
