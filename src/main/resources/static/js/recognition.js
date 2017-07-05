@@ -2353,15 +2353,6 @@ function SearchItem(srch) {
                 }
             }
 
-            // Positionen nicht im Server merken weil sie dort nicht gebraucht werden
-            if (typeof Position == "function") {
-                new Position(Verteilung.POSITIONTYP.TEXT, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.erg.getResult().check ? "ace_selection" + REC.xyz : "ace_step", this.name);
-                var start = this.xml.getText().indexOf("name");
-                start = this.xml.getText().indexOf('"', start);
-                var end  = this.xml.getText().indexOf('"', start + 1);
-                new Position(Verteilung.POSITIONTYP.RULES, this.xml.getStart() + start + 1,  this.xml.getStart() + end, "ace_selection" + REC.xyz);
-                REC.xyz++;
-            }
 
             if (REC.exist(this.archivZiel)) {
                 for (i = 0; i < this.archivZiel.length; i++) {
@@ -2386,6 +2377,17 @@ function SearchItem(srch) {
             REC.results[this.name] = this.erg.getResult();
             REC.log(INFORMATIONAL, this.name + " is " + this.erg.getResult().getValue());
             this.resolved = true;
+
+            // Positionen nicht im Server merken weil sie dort nicht gebraucht werden
+            if (typeof Position == "function") {
+                new Position(Verteilung.POSITIONTYP.TEXT, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.erg.getResult().check ? "ace_selection" + REC.xyz : "ace_step", this.name);
+                var start = this.xml.getText().indexOf("name");
+                start = this.xml.getText().indexOf('"', start);
+                var end  = this.xml.getText().indexOf('"', start + 1);
+                new Position(Verteilung.POSITIONTYP.RULES, this.xml.getStart() + start + 1,  this.xml.getStart() + end, "ace_selection" + REC.xyz);
+                REC.xyz++;
+            }
+
             return this.erg.getResult().getValue();
         } else
             return this.handleError();
@@ -3468,7 +3470,7 @@ REC = {
         } else {
             throw "Content of document could not be extracted";
         }
-        return erg.replace(/\r\n/g,'\n');
+        return erg;
     },
 
     testRules: function (rules) {

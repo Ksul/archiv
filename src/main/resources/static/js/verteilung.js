@@ -120,6 +120,19 @@ PositionContainer.prototype.clear = function () {
 };
 
 /**
+ * gibt die Position für einen bestimmten Namen zurück
+ * @param name    der Name
+ * @returns {*}
+ */
+PositionContainer.prototype.get = function(name) {
+    for (var i = 0; i < this.length; i++) {
+        if (this[i].desc == name)
+            return this[i];
+    }
+    return null;
+};
+
+/**
  * markiert in den Regeln die verwendeten Stellen
  */
 PositionContainer.prototype.setMarkers = function () {

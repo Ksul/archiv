@@ -221,11 +221,12 @@ describe("Test für SearchItem", function() {
         var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(22);
         expect(Verteilung.positions).not.toBe(null);
-        Verteilung.positions[0].convertPosition(REC.content);
-        expect(Verteilung.positions[0].startRow).toBe(6);
-        expect(Verteilung.positions[0].endRow).toBe(6);
-        expect(Verteilung.positions[0].startColumn).toBe(28);
-        expect(Verteilung.positions[0].endColumn).toBe(30);
+        var p = Verteilung.positions.get("Test 10");
+        p.convertPosition(REC.content);
+        expect(p.startRow).toBe(6);
+        expect(p.endRow).toBe(6);
+        expect(p.startColumn).toBe(28);
+        expect(p.endColumn).toBe(30);
     });
 
     it("testResolveSearchItemWithKindAndDate", function() {
@@ -359,11 +360,13 @@ describe("Test für SearchItem", function() {
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(189.13);
         expect(Verteilung.positions).not.toBe(null);
-        Verteilung.positions[0].convertPosition(REC.content);
-        expect(Verteilung.positions[0].startRow).toBe(26);
-        expect(Verteilung.positions[0].endRow).toBe(26);
-        expect(Verteilung.positions[0].startColumn).toBe(20);
-        expect(Verteilung.positions[0].endColumn).toBe(26);
+        var p = Verteilung.positions.get("Test 19");
+        p.convertPosition(REC.content);
+        expect(p).not.toBe(null);
+        expect(p.startRow).toBe(26);
+        expect(p.endRow).toBe(26);
+        expect(p.startColumn).toBe(20);
+        expect(p.endColumn).toBe(28);
     });
 
     it("testResolveSearchItem23", function() {
@@ -482,11 +485,12 @@ describe("Test für SearchItem", function() {
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(302);
         expect(Verteilung.positions).not.toBe(null);
-        Verteilung.positions[0].convertPosition(REC.content);
-        expect(Verteilung.positions[0].startRow).toBe(33);
-        expect(Verteilung.positions[0].endRow).toBe(33);
-        expect(Verteilung.positions[0].startColumn).toBe(24);
-        expect(Verteilung.positions[0].endColumn).toBe(27);
+        var p = Verteilung.positions.get("Test 19");
+        p.convertPosition(REC.content);
+        expect(p.startRow).toBe(33);
+        expect(p.endRow).toBe(33);
+        expect(p.startColumn).toBe(24);
+        expect(p.endColumn).toBe(27);
     });
 
     it("testResolveSearchItemWithPositionAndFloat", function() {
@@ -496,11 +500,12 @@ describe("Test für SearchItem", function() {
         var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(302.26);
         expect(Verteilung.positions).not.toBe(null);
-        Verteilung.positions[0].convertPosition(REC.content);
-        expect(Verteilung.positions[0].startRow).toBe(33);
-        expect(Verteilung.positions[0].endRow).toBe(33);
-        expect(Verteilung.positions[0].startColumn).toBe(24);
-        expect(Verteilung.positions[0].endColumn).toBe(30);
+        var p = Verteilung.positions.get("betrag");
+        p.convertPosition(REC.content);
+        expect(p.startRow).toBe(33);
+        expect(p.endRow).toBe(33);
+        expect(p.startColumn).toBe(24);
+        expect(p.endColumn).toBe(30);
     });
 
     it("testFindForWord1", function() {
