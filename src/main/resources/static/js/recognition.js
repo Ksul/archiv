@@ -2643,8 +2643,8 @@ function SearchResult(text, xml, val, startPos, endPos, typ, expected) {
                 // Positionen korrigieren
                 this.val = parseInt(prepared, 10);
                 match = prepared.match(/[-+]?\d+/);
-                this.start = this.start + match.index;
-                this.end = this.start + this.val.toString().length;
+                start = start + match.index;
+                end = start + this.val.toString().length;
             }
         }
         else if (REC.trim(this.typ.toString()).toLowerCase() == "float") {
@@ -2655,12 +2655,12 @@ function SearchResult(text, xml, val, startPos, endPos, typ, expected) {
                 // Positionen korrigieren
                 this.val = parseFloat(prepared);
                 match = prepared.match(/[-+]?\d+((.|,)\d+)?/);
-                this.start = this.start + match.index;
+                start = start + match.index;
                 var pos = this.text.indexOf(' ', match.index);
                 if (pos != -1)
-                    this.end = this.start + pos;
+                    end = start + pos;
                 else
-                    this.end = this.start + this.text.substr(match.index).length;
+                    end = start + this.text.substr(match.index).length;
             }
         }
     };
