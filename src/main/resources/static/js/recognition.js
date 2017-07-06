@@ -3470,7 +3470,7 @@ REC = {
         } else {
             throw "Content of document could not be extracted";
         }
-        return erg;
+        return erg.toString();
     },
 
     testRules: function (rules) {
