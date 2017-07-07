@@ -383,7 +383,7 @@ describe("Test für SearchItem", function() {
         expect(p.startRow).toBe(26);
         expect(p.endRow).toBe(26);
         expect(p.startColumn).toBe(20);
-        expect(p.endColumn).toBe(28);
+        expect(p.endColumn).toBe(26);
     });
 
     it("testResolveSearchItem23", function() {
@@ -506,7 +506,7 @@ describe("Test für SearchItem", function() {
         searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve()).toBe(302);
         expect(Verteilung.positions).not.toBe(null);
-        var p = Verteilung.positions.get("Test 19");
+        var p = Verteilung.positions.get("betrag");
         p.convertPosition(REC.content);
         expect(p.startRow).toBe(33);
         expect(p.endRow).toBe(33);
@@ -579,7 +579,7 @@ describe("Test für SearchItem", function() {
         var erg =  searchItem.findSpecialType(text, ["amount"], false, null);
         expect(erg[0].text).toBe("125,78 €");
         expect(erg[0].getStart()).toBe(5);
-        expect(erg[0].getEnd()).toBe(13);
+        expect(erg[0].getEnd()).toBe(11);
         expect(erg[0].val).toBe(125.78);
     });
 
