@@ -3,7 +3,7 @@ describe("Test für SearchItem", function() {
 
     beforeEach(function () {
         REC.init();
-        REC.content = " Dies ist ein Test!Datum: 01.05.1965\r\n" +
+        var txt = " Dies ist ein Test!Datum: 01.05.1965\r\n" +
             "Wert:\r\n" +
             " \r\n" +
             "21,65\r\n" +
@@ -40,6 +40,7 @@ describe("Test für SearchItem", function() {
             "Unsere Lieferungen\r\n" +
             "Zahlbetrag \r\n" +
             "	 25,65 € ";
+        REC.currentDocument.properties.content.write(new Content(txt));
         Verteilung.positions.clear();
     });
 
@@ -81,7 +82,7 @@ describe("Test für SearchItem", function() {
         var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
         expect(searchItem.resolve().getTime()).toBe(new Date(1965, 4, 1).getTime());
         var p = Verteilung.positions.get("Test 1");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(0);
         expect(p.endRow).toBe(0);
         expect(p.startPosition).toBe(26);
@@ -97,7 +98,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve().getTime()).toBe(new Date(2015, 2, 1).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 3");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(6);
         expect(p.endRow).toBe(6);
         expect(p.startColumn).toBe(7);
@@ -112,7 +113,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(21.65);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 4");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(3);
         expect(p.endRow).toBe(3);
         expect(p.startColumn).toBe(0);
@@ -121,7 +122,7 @@ describe("Test für SearchItem", function() {
 
     it("testResolveSearchItemWithDelimitterAndFloat", function() {
         var rules = '<searchItem name="Test 5" text="Datum" readOverReturn="true" direction="left" objectTyp="float">' +
-            '<delimitter typ="start" count="-3" text="&#0013;&#0010;" />' +
+            '<delimitter typ="start" count="-3" text="{$RETURN}" />' +
             '<delimitter typ="end" count="1" text="&#0013;&#0010;" />' +
             '</searchItem>';
         XMLDoc.loadXML(rules);
@@ -130,7 +131,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(21.65);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 5");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(3);
         expect(p.endRow).toBe(3);
         expect(p.startColumn).toBe(0);
@@ -148,7 +149,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(21);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 6");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(6);
         expect(p.endRow).toBe(6);
         expect(p.startColumn).toBe(25);
@@ -158,8 +159,8 @@ describe("Test für SearchItem", function() {
 
     it("testResolveSearchItemWithDelimitterAndInt", function() {
         var rules = '<searchItem name="Test 6" text="ID-Value" objectTyp="int">' +
-            '<delimitter typ="start" count="2" text="&#0032;" />' +
-            '<delimitter typ="end" count="1 "text="&#0009;" />' +
+            '<delimitter typ="start" count="2" text="{$BLANK}" />' +
+            '<delimitter typ="end" count="1 "text="{$TAB}" />' +
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
@@ -167,7 +168,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(21);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 6");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(6);
         expect(p.endRow).toBe(6);
         expect(p.startColumn).toBe(25);
@@ -177,7 +178,7 @@ describe("Test für SearchItem", function() {
 
     it("testResolveSearchItemWithDelimitterAndDate", function() {
         var rules = '<searchItem name="Test 7" text="Nachtrag" objectTyp="date" >' +
-            '<delimitter typ="start" count="1" text="&#0013;&#0010;" />' +
+            '<delimitter typ="start" count="1" text="&#0010;" />' +
             '</searchItem>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
@@ -185,7 +186,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve().getTime()).toBe(new Date(2012, 2, 22).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 7");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(13);
         expect(p.endRow).toBe(13);
         expect(p.startColumn).toBe(0);
@@ -200,7 +201,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(123.5);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 8");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(18);
         expect(p.endRow).toBe(18);
         expect(p.startColumn).toBe(5);
@@ -216,7 +217,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve().getTime()).toBe(new Date(2012, 2, 10).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 9");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(19);
         expect(p.endRow).toBe(19);
         expect(p.startColumn).toBe(11);
@@ -231,7 +232,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(22);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 10");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(6);
         expect(p.endRow).toBe(6);
         expect(p.startColumn).toBe(28);
@@ -246,7 +247,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve().getTime()).toBe(new Date(2010, 11, 24).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 11");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(20);
         expect(p.endRow).toBe(20);
         expect(p.startColumn).toBe(0);
@@ -255,7 +256,7 @@ describe("Test für SearchItem", function() {
 
     it("testResolveSearchItemWithCheck", function() {
         var rules = '<searchItem name="Test 12" text="KUSA" objectTyp="date">' +
-            '<delimitter typ="start" count="1" text="&#0013;&#0010;" />' +
+            '<delimitter typ="start" count="1" text="&#0010;" />' +
             '<check lowerValue="01/01/2005" upperValue="01/01/2020" />' +
             '</searchItem>';
         XMLDoc.loadXML(rules);
@@ -264,7 +265,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve().getTime()).toBe(new Date(2008, 0, 7).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 12");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(22);
         expect(p.endRow).toBe(22);
         expect(p.startColumn).toBe(0);
@@ -279,7 +280,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(349.10);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 13");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(24);
         expect(p.endRow).toBe(24);
         expect(p.startColumn).toBe(33);
@@ -294,7 +295,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe('nächsten');
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 14");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(24);
         expect(p.endRow).toBe(24);
         expect(p.startColumn).toBe(7);
@@ -311,7 +312,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(123);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 15");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(24);
         expect(p.endRow).toBe(24);
         expect(p.startColumn).toBe(60);
@@ -327,7 +328,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve().getTime()).toBe(new Date(2011, 7, 23).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 16");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(23);
         expect(p.endRow).toBe(23);
         expect(p.startColumn).toBe(14);
@@ -342,7 +343,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(21.49);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 17");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(17);
         expect(p.endRow).toBe(17);
         expect(p.startColumn).toBe(0);
@@ -358,7 +359,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve().getTime()).toBe(new Date(2009, 02, 21).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 18");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(25);
         expect(p.endRow).toBe(25);
         expect(p.startColumn).toBe(6);
@@ -378,7 +379,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(189.13);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 19");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p).not.toBe(null);
         expect(p.startRow).toBe(26);
         expect(p.endRow).toBe(26);
@@ -430,7 +431,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe("EUR");
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 22");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(14);
         expect(p.endRow).toBe(14);
         expect(p.startColumn).toBe(10);
@@ -445,7 +446,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe('959 622 2280');
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 23");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(28);
         expect(p.endRow).toBe(28);
         expect(p.startColumn).toBe(0);
@@ -461,7 +462,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe('560 525 3966');
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 24");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(29);
         expect(p.endRow).toBe(29);
         expect(p.startColumn).toBe(0);
@@ -479,7 +480,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(4300.01);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 25");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(30);
         expect(p.endRow).toBe(30);
         expect(p.startColumn).toBe(0);
@@ -507,7 +508,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(302);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("betrag");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(33);
         expect(p.endRow).toBe(33);
         expect(p.startColumn).toBe(24);
@@ -522,7 +523,7 @@ describe("Test für SearchItem", function() {
         expect(searchItem.resolve()).toBe(302.26);
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("betrag");
-        p.convertPosition(REC.content);
+         p.convertPosition(REC.getContent(REC.currentDocument));
         expect(p.startRow).toBe(33);
         expect(p.endRow).toBe(33);
         expect(p.startColumn).toBe(24);

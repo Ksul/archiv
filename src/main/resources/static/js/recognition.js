@@ -5,8 +5,9 @@ var INFORMATIONAL = new DebugLevel(3, "INFORMATIONAL");
 var DEBUG = new DebugLevel(4, "DEBUG");
 var TRACE = new DebugLevel(5, "TRACE");
 var WHITESPACE = "\n\n\t ";
-var RETURN = "\r\n";
-
+var RETURN = "\n";
+var TAB = "\t";
+var BLANK = " ";
 var Encoder = {
 
     // When encoding do we convert characters into html or numerical entities
@@ -990,7 +991,7 @@ function ArchivTyp(srch, parentType) {
             if (!doc.hasAspect("cm:workingcopy")) {
                 doc.ensureVersioningEnabled(true, false);
                 var workingCopy = doc.checkoutForUpload();
-                workingCopy.properties.content.write(REC.currentDocument.properties.content);
+                workingCopy.properties.content.write(new Content(REC.getContent(REC.currentDocument)));
                 workingCopy.checkin();
                 newDoc.remove();
                 REC.log(INFORMATIONAL, "Neue Version des Dokumentes erstellt");
@@ -1064,7 +1065,7 @@ function ArchivTyp(srch, parentType) {
             REC.debugLevel = this.debugLevel;
         REC.log(DEBUG, "resolve ArchivTyp " + this.name);
         REC.log(TRACE, "ArchivTyp.resolve: settings are: \n" + this);
-        var str = REC.exist(this.removeBlanks) ? REC.content.replace(/ /g, '') : REC.content;
+        var str = REC.exist(this.removeBlanks) ? REC.getContent(REC.currentDocument).replace(/ /g, '') : REC.getContent(REC.currentDocument);
         var pst = (this.completeWord ? "\\b" + this.searchString + "?\\b" : this.searchString);
         var pat = new RegExp(pst, (this.caseSensitive ? "" : "i"));
         if (REC.exist(str) && pat.test(str)) {
@@ -1726,6 +1727,8 @@ function Delimitter(srch) {
         if (REC.exist(this.removeBlanks) && this.removeBlanks == "before") {
             erg.removeBlanks();
         }
+        if (REC.exist(this.text))
+            this.text = REC.replaceVar(this.text)[0];
         for (var i = 0; i < erg.length; i++) {
             if (typeof erg[i].text == "string") {
                 REC.log(DEBUG, "resolve Delimitter: current String is " + REC.printTrace(erg[i].text, direction));
@@ -2302,7 +2305,7 @@ function SearchItem(srch) {
                 } else
                     return this.handleError();
             } else
-                txt = REC.content;
+                txt = REC.getContent(REC.currentDocument);
             if (REC.exist(this.removeBlanks) && this.removeBlanks == "before") {
                 txt = txt.replace(/ /g, '');
             }
@@ -2968,6 +2971,12 @@ REC = {
                     }
                 }
             }
+            if (str.indexOf("{$RETURN}") != -1)
+                str = str.replace(new RegExp("{\\$RETURN}", 'g'), RETURN);
+            if (str.indexOf("{$TAB}") != -1)
+                str = str.replace(new RegExp("{\\$TAB}", 'g'), TAB);
+            if (str.indexOf("{$BLANK}") != -1)
+                str = str.replace(new RegExp("{\\$BLANK}", 'g'), BLANK);
             replaced = str.indexOf("{") == -1;
             if (!replaced)
                 REC.errors.push("Could not replace Placeholder " + str.match(/\{.+\}/g) + "!");
@@ -3470,7 +3479,7 @@ REC = {
         } else {
             throw "Content of document could not be extracted";
         }
-        return erg.toString();
+        return erg.replace(/\r\n/g,'\n');
     },
 
     testRules: function (rules) {
@@ -3549,7 +3558,6 @@ REC = {
         this.currentDocument = doc;
         var docName = this.currentDocument.name;
         this.log(INFORMATIONAL, "Process Dokument " + docName);
-        this.content = this.getContent(this.currentDocument);
         if (this.exist(rules.archivRoot))
             this.archivRoot = companyhome.childByNamePath(this.trim(rules.archivRoot));
         else
@@ -3633,7 +3641,6 @@ REC = {
         this.id = Math.random() * 100;
         this.debugLevel = INFORMATIONAL;
         this.mess = [];
-        this.content = "";
         this.fehlerBox = null;
         this.maxDebugLength = 0;
         this.mandatoryElements = [];

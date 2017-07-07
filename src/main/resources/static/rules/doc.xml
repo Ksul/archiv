@@ -181,7 +181,7 @@
             <format formatString="MMMM YYYY" />
         </searchItem>
         <searchItem name="id" text="Versicherungsnummer:" target="my:idvalue">
-            <delimitter typ="start" text="&#0010;" count="1" />
+            <delimitter typ="start" text="{$RETURN}" count="1" />
             <archivZiel aspect="my:idable" />
         </searchItem>
     </archivTyp>
@@ -434,8 +434,8 @@
                 <format formatString="YYYY" />
             </searchItem>
             <searchItem name="description" text="Hinweise" readOverReturn="true" direction="left" target="cm:description">
-                <delimitter typ="start" text="&#0010;" count="-3" />
-                <delimitter typ="end" text="&#0010;" count="-2" />
+                <delimitter typ="start" text="{$RETURN}" count="-3" />
+                <delimitter typ="end" text="{$RETURN}" count="-2" />
             </searchItem>
         </archivTyp>
     </archivTyp>
@@ -677,7 +677,7 @@
                 <archivZiel aspect="my:idable" />
             </searchItem>
             <searchItem name="betrag" text="Rechnungsbetrag" objectTyp="float" target="my:amount" readOverReturn="true" direction="left">
-                <delimitter typ="start" text="&#0010;" count="-3" />
+                <delimitter typ="start" text="{$RETURN}" count="-3" />
                 <check lowerValue="150" upperValue="250" />
                 <archivZiel aspect="my:amountable" />
             </searchItem>

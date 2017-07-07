@@ -17,7 +17,7 @@ describe("Test für ArchivTyp", function() {
 
     it("testWithNestedArchivZielWithLink", function() {
         REC.currentDocument.removeProperty("my:person");
-        REC.content ="ZAUBERFRAU Rechnung Test";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung Test"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">'+
             ' <archivPosition folder="Dokumente/Rechnungen/{fol}/{tmp}"/> ' +
             ' <archivPosition link="true" folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp}">' +
@@ -50,7 +50,7 @@ describe("Test für ArchivTyp", function() {
 
     it("testWithNestedArchivZielWithSearchItems", function() {
         REC.currentDocument.removeProperty("my:person");
-        REC.content ="ZAUBERFRAU Rechnung Test";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung Test"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">'+
             ' <archivPosition folder="Dokumente/Rechnungen/{fol}/{tmp}"/> ' +
             '<searchItem name="person" fix="Test" target="my:person" />' +
@@ -78,7 +78,7 @@ describe("Test für ArchivTyp", function() {
     });
 
     it("testWithNestedArchivZielWithError", function() {
-        REC.content ="ZAUBERFRAU Rechnung";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
             ' <archivTyp name="Rechnung Zauberfrau" searchString="Zechnung">' +
             ' <archivZiel type="my:archivContent" /> ' +
@@ -105,7 +105,7 @@ describe("Test für ArchivTyp", function() {
         folder = folder.createFolder("Rechnungen Zauberfrau");
         folder = folder.createFolder("2015");
         folder.createNode("WebScriptTest", "my:archivContent");
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         REC.mandatoryElements = ["cm:hansel"];
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
             ' <archivZiel type="my:archivContent" /> ' +
@@ -126,7 +126,7 @@ describe("Test für ArchivTyp", function() {
     });
 
     it("testWithNestedArchivZiel", function() {
-        REC.content ="ZAUBERFRAU Rechnung";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
             ' <archivTyp name="Rechnung Zauberfrau" searchString="Rechnung">' +
             ' <archivZiel type="my:archivContent" /> ' +
@@ -151,7 +151,7 @@ describe("Test für ArchivTyp", function() {
 
 
     it("testNormal", function () {
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -179,7 +179,7 @@ describe("Test für ArchivTyp", function() {
         folder = folder.createFolder("Rechnungen Zauberfrau");
         folder = folder.createFolder("2015");
         folder.createNode("WebScriptTest", "my:archivContent");
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -209,7 +209,7 @@ describe("Test für ArchivTyp", function() {
         var node = folder.createNode("WebScriptTest", "my:archivContent");
         node.setProperty("cm:title", "Rechnung 1");
         search.setFind(true, node);
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -239,7 +239,7 @@ describe("Test für ArchivTyp", function() {
         folder = folder.createFolder("Rechnungen Zauberfrau");
         folder = folder.createFolder("2015");
         folder.createNode("WebScriptTest", "my:archivContent");
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU" unique="nothing">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -266,7 +266,7 @@ describe("Test für ArchivTyp", function() {
         folder = folder.createFolder("2015");
         var node = folder.createNode("WebScriptTest", "my:archivContent");
         node.setProperty("my:person", "Till");
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU" unique="overWrite">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -295,7 +295,7 @@ describe("Test für ArchivTyp", function() {
         var node = folder.createNode("Test", "my:archivContent");
         node.setProperty("cm:title", "Rechnung 1");
         search.setFind(true, node);
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU" unique="overWrite">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -325,7 +325,7 @@ describe("Test für ArchivTyp", function() {
         folder = folder.createFolder("2015");
         var node = folder.createNode("WebScriptTest", "my:archivContent");
         node.properties.content.write(new Content("Hallo"));
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU" unique="newVersion">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -363,7 +363,7 @@ describe("Test für ArchivTyp", function() {
         node.properties.content.write(new Content("Hallo"));
         node.setProperty("cm:title", "Rechnung 1");
         search.setFind(true, node);
-        REC.content ="ZAUBERFRAU";
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU"));
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU" unique="newVersion">' +
             ' <archivZiel type="my:archivContent" /> ' +
             ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
@@ -394,7 +394,7 @@ describe("Test für ArchivTyp", function() {
     });
 
     it("testComplete1", function () {
-        REC.content ="Verdienstabrechnung     0000123456  3000 Abrechnungsmonat Mai 2015";
+        REC.currentDocument.properties.content.write(new Content("Verdienstabrechnung     0000123456  3000 Abrechnungsmonat Mai 2015"));
         var rules = '<archivTyp name="LVMGehalt" searchString="Verdienstabrechnung" debugLevel="debug">                              ' +
             ' <archivZiel type="my:archivContent" />                                                      ' +
             '<archivPosition folder="Dokumente/Gehalt/Gehalt Hansel/{tmp}">                                              ' +
@@ -472,7 +472,7 @@ describe("Test für ArchivTyp", function() {
 
 
     it("testComplete2", function () {
-        REC.content ="Verdienstabrechnung     0000123456 Rückrechnungsdifferenz 200 Abrechnungsmonat R Mai 2015";
+        REC.currentDocument.properties.content.write(new Content("Verdienstabrechnung     0000123456 Rückrechnungsdifferenz 200 Abrechnungsmonat R Mai 2015"));
         var rules = '<archivTyp name="LVMGehalt" searchString="Verdienstabrechnung" debugLevel="debug">                              ' +
             ' <archivZiel type="my:archivContent" />                                                      ' +
             '<archivPosition folder="Dokumente/Gehalt/Gehalt Hansel/{tmp}">                                              ' +
