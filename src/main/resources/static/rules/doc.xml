@@ -861,7 +861,7 @@
             <archivZiel type="my:archivContent" />
             <category name="vermögenswirksame Leistungen" />
             <searchItem name="person" fix="Klaus" target="my:person" />
-            <searchItem name="id" fix="898376" target="my:idvalue">
+            <searchItem name="id" fix="8989376" target="my:idvalue">
                 <archivZiel aspect="my:idable" />
             </searchItem>
             <archivTyp name="jährlicher Kontoauszug" searchString="jährlicher Kontoauszug">
