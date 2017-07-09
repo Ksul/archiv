@@ -73,26 +73,27 @@
             <format formatString="YYYY" />
         </searchItem>
     </archivTyp>
-    <!-- Rechnung Cafe Fausto -->
+    <!-- Rechnung Caffé Fausto -->
     <archivTyp name="Caffe Fausto" searchString="Fausto" unique="error">
         <archivZiel type="my:archivContent" />
         <archivPosition folder="Dokumente/Rechnungen/Rechnungen Caffé Fausto">
             <archivZiel type="my:archivFolder" />
         </archivPosition>
-        <tags name="Cafe Fausto" />
+        <tags name="Caffé Fausto" />
         <category name="Rechnung/Rechnung Caffé Fausto" />
         <searchItem name="person" fix="Klaus" target="my:person" />
         <searchItem name="id" text="Rechnung Nr" word="1" target="my:idvalue">
             <archivZiel aspect="my:idable" />
         </searchItem>
-        <searchItem name="title" fix="Caffé Fausto" target="cm:title" />
+        <searchItem name="title" fix="Caffé Fausto Rechnung {id}" target="cm:title" />
         <searchItem name="datum" kind="date" target="my:documentDate" />
-        <searchItem name="betrag" text="Endbetrag" objectTyp="float" target="my:amount">
+        <searchItem name="betrag" text="Betrag"  readOverReturn="true" objectTyp="float" target="my:amount">
             <check lowerValue="30" upperValue="250" debugLevel="trace" />
             <delimitter typ="start" text="&#0032;" count="2" />
             <archivZiel aspect="my:amountable" />
         </searchItem>
-    </archivTyp>    <!-- Rechnung Solar Direct -->
+    </archivTyp>
+    <!-- Rechnung Solar Direct -->
     <archivTyp name="Solar Direct" searchString="SOLAR DIRECT">
         <archivZiel type="my:archivContent" />
         <archivPosition folder="Dokumente/Rechnungen/Rechnungen Haus">
