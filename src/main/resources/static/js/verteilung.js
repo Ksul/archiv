@@ -325,6 +325,8 @@ function loadText(content, txt, name, typ, container) {
         currentText = txt;
         currentContainer = container;
         $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
+        for (var j = 0; j< Verteilung.rulesEditor.getSession().getLength(); j++)
+            Verteilung.rulesEditor.getSession().removeGutterDecoration(j, "ace_selectXML");
         Verteilung.textEditor.getSession().setValue(txt);
         document.getElementById('headerWest').textContent = name;
         Verteilung.propsEditor.getSession().setValue("");
