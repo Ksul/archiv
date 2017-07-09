@@ -24,7 +24,6 @@ var Position = function() {
         this.desc = arguments[4];
     }
 
-    this.markerId = null;
     this.startRow = 0;
     this.startColumn = 0;
     this.endRow = 0;
@@ -33,13 +32,6 @@ var Position = function() {
     Verteilung.positions.add(this);
 
 
-    this.getMarkerId = function() {
-        return this.markerId;
-    };
-
-    this.setMarkerId = function(id) {
-        this.markerId = id;
-    };
 
     this.getEditor = function() {
         return this.typ.editor;
@@ -140,7 +132,7 @@ PositionContainer.prototype.setMarkers = function () {
     var mark = function (position) {
         var p = position.convertPosition();
         var r = new Verteilung.Range(p.startRow, p.startColumn, p.endRow, p.endColumn);
-        p.setMarkerId(eval(p.typ.editor).getSession().addMarker(r, p.css, p.desc, false));
+        eval(p.typ.editor).getSession().addMarker(r, p.css, p.desc, false);
     };
 
     for (var i = 0; i < this.length; i++) {
@@ -327,6 +319,7 @@ function openPDF(name, fromServer) {
 function loadText(content, txt, name, typ, container) {
     try {
         multiMode = false;
+        txt = txt.replace(/\r\n/g,'\n');
         currentFile = name;
         currentContent = content;
         currentText = txt;
@@ -344,7 +337,6 @@ function loadText(content, txt, name, typ, container) {
 /**
  * lädt ein Dokument und trägt die Inhalte in die Tabelle ein
  * Methode wird benutzt wenn mehr als ein Dokument geladen werden soll
- * Methode wird auch aus dem Applet aufgerufen
  * @param content           der originale Inhalt der Datei
  * @param txt               Textinhalt des Dokumentes
  * @param name              Name des Dokumentes
@@ -355,6 +347,7 @@ function loadText(content, txt, name, typ, container) {
 function loadMultiText(content, txt, name, typ,  notDeleteable, container) {
     try {
         multiMode = true;
+        txt = txt.replace(/\r\n/g,'\n');
         var dat = [];
         REC.currentDocument.properties.content.write(txt);
         REC.currentDocument.name = name;

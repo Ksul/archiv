@@ -86,6 +86,7 @@ describe("Test für Recognition", function() {
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
         REC.recognize(doc, new XMLObject(XMLDoc.docNode));
+        console.log(REC.getMessage(true));
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Unbekannt/2015/Februar/WebScriptTest")).not.toBeNull();

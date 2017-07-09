@@ -3505,7 +3505,7 @@ REC = {
         var moved = false;
         // Datum suchen
         var searchItem = new SearchItem({});
-        var erg = searchItem.findSpecialType(this.content, ["date"], false, null);
+        var erg = searchItem.findSpecialType(REC.getContent(doc), ["date"], false, null);
         if (REC.exist(erg)) {
             // Datum gefunden. Jetzt prüfen, welches Datum am nächsten am aktuellen Tagesdatum liegt weil das wahrscheinlich das gesuchte Datum ist
             var compareDate = new Date();
@@ -3663,7 +3663,6 @@ REC = {
     id: Math.random() * 100,
     debugLevel: DEBUG,
     mess: [],
-    content: "",
     archivRoot: null,
     inBox: null,
     duplicateBox: null,
