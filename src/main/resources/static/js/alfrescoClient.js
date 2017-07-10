@@ -219,7 +219,7 @@ function loadLayout() {
                 paneSelector: "#tabs",
                 resizable: true,
                 slidable: true,
-                size: "auto"
+                size: "auto"                                         
             },
             south: {
                 paneSelector: "#contentSouth",
@@ -229,8 +229,8 @@ function loadLayout() {
                 slidable: true,
                 resizeWithWindow: true,
                 onresize: function () {
-                    if (exist(outputEditor))
-                        outputEditor.resize();
+                    if (REC.exist(Verteilung.outputEditor))
+                        Verteilung.outputEditor.resize();
                 }
             }
         };
@@ -680,7 +680,7 @@ function loadAlfrescoTable() {
                 {
                     "data": null,
                     "title": "Aktion",
-                    "width": "102px",
+                    "width": "120px",
                     "class": "alignLeft"
                 },
                 {
@@ -1177,7 +1177,7 @@ function loadAlfrescoSearchTable() {
                 {
                     "data": null,
                     "title": "Aktion",
-                    "width": "102px",
+                    "width": "120px",
                     "class": "alignLeft"
                 },
                 {
@@ -1576,6 +1576,15 @@ function alfrescoAktionFieldFormatter(data, type, full) {
             image.style.cursor = "none";
         }
         image.title = "Kommentare";
+        image.style.cssFloat = "left";
+        image.style.marginRight = "5px";
+        container.appendChild(image);
+
+        image = document.createElement("i");
+        image.href = "#";
+        image.className = "moveDocument fa fa-files-o fa-15x awesomeEntity";
+        image.title = "Dokument verschieben";
+        image.style.cursor = "pointer";
         image.style.cssFloat = "left";
         image.style.marginRight = "5px";
         container.appendChild(image);
@@ -2308,6 +2317,15 @@ function handleAlfrescoImageClicks() {
             errorHandler(e);
         }
     });
+    // Dokument verschieben
+    $(document).on("click", ".moveDocument", function () {
+        try {
+            var tr = $(this).closest('tr');
+            startMoveDialog($('#' + tr[0].parentElement.parentElement.id).DataTable().row(tr).data());
+        } catch (e) {
+            errorHandler(e);
+        }
+    });
     // Dokument löschen
     $(document).on("click", ".deleteDocument", function () {
         try {
@@ -2461,10 +2479,9 @@ function handleVerteilungImageClicks() {
             currentFile = daten[name]["file"];
             document.getElementById('headerWest').textContent = currentFile;
             setXMLPosition(daten[name]["xml"]);
-            removeMarkers(markers, Verteilung.textEditor);
-            markers = setMarkers(daten[name]["position"]);
             Verteilung.textEditor.getSession().setValue(daten[name]["text"]);
             Verteilung.propsEditor.getSession().setValue(printResults(daten[name]["result"]));
+            Verteilung.positions.setMarkers();
             //TODO das muss anders gemacht werden
             fillMessageBox(daten[name]["log"], true);
             manageControls();

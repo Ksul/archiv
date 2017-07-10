@@ -677,6 +677,143 @@ function startCommentsDialog(comments) {
 }
 
 /**
+ * startet den Dialog zum Verschieben von Dokumenten
+ */
+function startMoveDialog(data) {
+
+
+    try {
+        this.data = data;
+        $dialog = $('<div id="dialogTree"> </div>').dialog({
+            autoOpen: false,
+            title: "Dokumente verschieben",
+            modal: true,
+            height:500,
+            width:400,
+            buttons: {
+                "Verschieben": function () {
+                    var dialogTree = $.jstree.reference('#dialogTree');
+                    var nodeIds = dialogTree.get_selected();
+                    // über alle selektierten Zeilen iterieren
+                    for(var index = 0; index < data.length; ++index) {
+                        var row = alfrescoTabelle.row('#' + data.data.nodes[index]);
+                        var node = dialogTree.get_node(nodeIds[0]);
+                        // verschieben...
+                        var done = function(json) {
+                            if (json.success) {
+                                var newData = json.data;
+                                var source = json.source;
+                                var target = json.target;
+                                REC.log(INFORMATIONAL, "Dokument " + sourceData.name + " von " + source.path + " nach " + target.path + " verschoben");
+                                fillMessageBox(true);
+                                row.remove();
+                                alfrescoTabelle.draw();
+                            }
+                        };
+                        //Dokument wurde verschoben
+                        var json = executeService({"name": "moveNode", "callback": done, "errorMessage": "Dokument konnte nicht verschoben werden:"}, [
+                            {"name": "documentId", "value": data[index].objectID},
+                            {"name": "currentLocationId", "value": data[index].parentId},
+                            {"name": "destinationId", "value": node.objectID}
+                        ]);
+                    }
+                    $(this).dialog("destroy");
+                },
+                "Abbrechen": function () {
+                    $(this).dialog("destroy");
+                }
+            }
+        }).css({height:"600px", width:"400px", overflow:"auto"});
+
+        var dialogTree = $("#dialogTree").jstree({
+            'core': {
+                'data': function (node, aFunction) {
+                    try {
+                        // relevante Knoten im Alfresco suchen
+                        loadAndConvertDataForTree(node, aFunction);
+                    } catch (e) {
+                        errorHandler(e);
+                    }
+                },
+                error : function (err) {
+                    REC.log(DEBUG, err.reason);
+                    fillMessageBox(true);
+                },
+                'themes': {
+                    'responsive': true,
+                    'variant': 'big',
+                    'stripes': false,
+                    'dots': true,
+                    'icons': true
+                }
+            },
+            'types' : {
+            '#' : {
+                "max_children" : 1
+            },
+            'archivRootStandard' : {
+                "valid_children" : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
+                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+            },
+            'archivFolderStandard' : {
+                "valid_children" : [],
+                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+            },
+            'archivDoubleFolderStandard' : {
+                "valid_children" : [],
+                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+            },
+            'archivFehlerFolderStandard' : {
+                "valid_children" : ["archivDoubleFolderStandard"],
+                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+            },
+            'archivDocumentFolderStandard' : {
+                "valid_children" : ["documentFolderStandard"] ,
+                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+            },
+            'documentFolderStandard' : {
+                "valid_children" : -1,
+                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+            }
+        },
+            'plugins': ["dnd", "types"]
+        }).on("changed.jstree",  function (event, data){
+            try {
+                if (data.action == "select_node") {
+                    var dialogTree = $("#dialogTree").jstree(true);
+                    var evt = window.event || event;
+                    var button = evt.which || evt.button;
+
+                    // Select Node nicht bei rechter Maustaste
+                    if (button != 1 && ( typeof button != "undefined")) {
+                        return false;
+                    }
+                    if (!data.node || !data.node.data)
+                    // für den Root Node
+                        switchAlfrescoDirectory(null);
+                    else {
+                        if (data.node.data.baseTypeId == "cmis:folder") {
+                            if (alfrescoServerAvailable) {
+                                switchAlfrescoDirectory(data.node.data);
+                                dialogTree.open_node(data.node.id);
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                errorHandler(e);
+            }
+        });
+
+
+        $dialog.dialog('open');
+
+    } catch (e) {
+        errorHandler(e);
+    }
+}
+
+/**
  * schliesst den Dialog
  */
 function closeDialog() {

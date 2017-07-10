@@ -325,6 +325,8 @@ function loadText(content, txt, name, typ, container) {
         currentText = txt;
         currentContainer = container;
         $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
+        $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
+        $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
         for (var j = 0; j< Verteilung.rulesEditor.getSession().getLength(); j++)
             Verteilung.rulesEditor.getSession().removeGutterDecoration(j, "ace_selectXML");
         Verteilung.textEditor.getSession().setValue(txt);
@@ -580,7 +582,7 @@ function setXMLPosition(position) {
 }
 
 /**
- * gibt die Ergebnisse im entsprechenden Fenster aus
+ * gibt die Ergebnisse der einzelnen Properties im entsprechenden Fenster aus
  * @param results
  * @returns {string}
  */
@@ -589,14 +591,17 @@ function printResults(results) {
     var ret = "";
     var blanks = "                                               ";
     var maxLength = 0;
+    var pos = 0;
     for (key in results) {
         if (key.length > maxLength)
-            maxLength = key.length;
+            maxLength = key.length;                   
     }
     maxLength++;
     for (key in results) {
         if (REC.exist(results[key])) {
             ret = ret + key + blanks.substr(0, maxLength - key.length) + ": " + results[key].getValue();
+            if ( Verteilung.positions.get(key) != null)
+                new Position(Verteilung.POSITIONTYP.PROPS, pos, pos + key.length, Verteilung.positions.get(key).getCSS(), key);
             if (REC.exist(results[key].expected)) {
                 var tmp = eval(results[key].expected);
                 if (REC.exist(results[key].getValue()) && tmp.valueOf() == results[key].getValue().valueOf())
@@ -605,6 +610,7 @@ function printResults(results) {
                     ret = ret + " [FALSE] " + tmp;
             }
             ret = ret + "\n";
+            pos = ret.length;
         }
     }
     return ret;
@@ -675,6 +681,8 @@ function doTest() {
                 if (data.success[0]) {
                     REC.currentDocument.setContent(data.result[0].text.toString());
                     $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
+                    $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
+                    $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
                     Verteilung.textEditor.getSession().setValue(data.result[0].text.toString());
                     currentRules = "test.xml";
                     document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
@@ -683,6 +691,7 @@ function doTest() {
                     setXMLPosition(REC.currXMLName);
                     Verteilung.positions.setMarkers();
                     Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
+                    Verteilung.positions.setMarkers();
                     fillMessageBox(true);
                     testMode = true;
                     manageControls();
@@ -825,6 +834,7 @@ function work() {
             REC.currentDocument.name = currentFile;
             $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
             $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
+            $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
             Verteilung.positions.clear();
             if (REC.exist(rulesSchemaId)) {
                 json = executeService({
@@ -857,11 +867,11 @@ function work() {
                 if (!selectMode)
                     setXMLPosition(REC.currXMLName);
             }
-            Verteilung.positions.setMarkers();
-            fillMessageBox(true);
             if (!validate)
                 message("Fehler", "Regeln sind syntaktisch nicht korrekt!");
             Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
+            Verteilung.positions.setMarkers();
+            fillMessageBox(true);
             document.getElementById('inTxt').style.display = 'block';
             document.getElementById('dtable').style.display = 'none';
         }
@@ -1151,6 +1161,8 @@ function openScript() {
             eval("//# sourceURL=recognition.js\n\n" + content);
             REC.mess = tmp;
             $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
+            $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
+            $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
             Verteilung.textEditor.getSession().setMode("ace/mode/javascript");
             Verteilung.textEditor.getSession().setValue(content);
             Verteilung.textEditor.setShowInvisibles(false);

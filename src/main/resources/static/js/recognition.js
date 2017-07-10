@@ -2382,7 +2382,7 @@ function SearchItem(srch) {
             this.resolved = true;
 
             // Positionen nicht im Server merken weil sie dort nicht gebraucht werden
-            if (typeof Position == "function") {
+            if (typeof Position == "function" && !REC.exist(this.fix)) {
                 new Position(Verteilung.POSITIONTYP.TEXT, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.erg.getResult().check ? "ace_selection" + REC.xyz : "ace_step", this.name);
                 var start = this.xml.getText().indexOf("name");
                 start = this.xml.getText().indexOf('"', start);
