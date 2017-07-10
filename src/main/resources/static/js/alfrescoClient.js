@@ -2321,7 +2321,8 @@ function handleAlfrescoImageClicks() {
     $(document).on("click", ".moveDocument", function () {
         try {
             var tr = $(this).closest('tr');
-            startMoveDialog($('#' + tr[0].parentElement.parentElement.id).DataTable().row(tr).data());
+            var table = $('#' + tr[0].parentElement.parentElement.id).DataTable();
+            startMoveDialog([table.row(tr)]);
         } catch (e) {
             errorHandler(e);
         }

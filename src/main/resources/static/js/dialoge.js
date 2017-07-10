@@ -678,6 +678,8 @@ function startCommentsDialog(comments) {
 
 /**
  * startet den Dialog zum Verschieben von Dokumenten
+ * @param  data     Array mit den Tabellendaten
+ *
  */
 function startMoveDialog(data) {
 
@@ -692,30 +694,36 @@ function startMoveDialog(data) {
             width:400,
             buttons: {
                 "Verschieben": function () {
-                    var dialogTree = $.jstree.reference('#dialogTree');
-                    var nodeIds = dialogTree.get_selected();
-                    // über alle selektierten Zeilen iterieren
-                    for(var index = 0; index < data.length; ++index) {
-                        var row = alfrescoTabelle.row('#' + data.data.nodes[index]);
-                        var node = dialogTree.get_node(nodeIds[0]);
-                        // verschieben...
-                        var done = function(json) {
-                            if (json.success) {
-                                var newData = json.data;
-                                var source = json.source;
-                                var target = json.target;
-                                REC.log(INFORMATIONAL, "Dokument " + sourceData.name + " von " + source.path + " nach " + target.path + " verschoben");
-                                fillMessageBox(true);
-                                row.remove();
-                                alfrescoTabelle.draw();
-                            }
-                        };
-                        //Dokument wurde verschoben
-                        var json = executeService({"name": "moveNode", "callback": done, "errorMessage": "Dokument konnte nicht verschoben werden:"}, [
-                            {"name": "documentId", "value": data[index].objectID},
-                            {"name": "currentLocationId", "value": data[index].parentId},
-                            {"name": "destinationId", "value": node.objectID}
-                        ]);
+                    try {
+                        var dialogTree = $.jstree.reference('#dialogTree');
+                        var nodeIds = dialogTree.get_selected();
+                        // über alle selektierten Zeilen iterieren
+                        for (var index = 0; index < data.length; ++index) {
+                            var row = data[index];
+                            var done = function (json) {
+                                if (json.success) {
+                                    var newData = json.data;
+                                    var source = json.source;
+                                    var target = json.target;
+                                    REC.log(INFORMATIONAL, "Dokument " + row.data().name + " von " + source.path + " nach " + target.path + " verschoben");
+                                    fillMessageBox(true);
+                                    row.remove();
+                                    row.table().draw();
+                                }
+                            };
+                            //Dokument verschieben....
+                            var json = executeService({
+                                "name": "moveNode",
+                                "callback": done,
+                                "errorMessage": "Dokument konnte nicht verschoben werden:"
+                            }, [
+                                {"name": "documentId", "value": row.data().objectID},
+                                {"name": "currentLocationId", "value": row.data().parentId},
+                                {"name": "destinationId", "value": nodeIds[0]}
+                            ]);
+                        }
+                    } catch(e) {
+                        errorHandler(e);
                     }
                     $(this).dialog("destroy");
                 },
@@ -777,32 +785,6 @@ function startMoveDialog(data) {
             }
         },
             'plugins': ["dnd", "types"]
-        }).on("changed.jstree",  function (event, data){
-            try {
-                if (data.action == "select_node") {
-                    var dialogTree = $("#dialogTree").jstree(true);
-                    var evt = window.event || event;
-                    var button = evt.which || evt.button;
-
-                    // Select Node nicht bei rechter Maustaste
-                    if (button != 1 && ( typeof button != "undefined")) {
-                        return false;
-                    }
-                    if (!data.node || !data.node.data)
-                    // für den Root Node
-                        switchAlfrescoDirectory(null);
-                    else {
-                        if (data.node.data.baseTypeId == "cmis:folder") {
-                            if (alfrescoServerAvailable) {
-                                switchAlfrescoDirectory(data.node.data);
-                                dialogTree.open_node(data.node.id);
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
-                errorHandler(e);
-            }
         });
 
 
