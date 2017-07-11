@@ -669,6 +669,10 @@ input[type='checkbox'] {
     float: left
 }
 
+.filter-content{
+    padding-top: 4px
+}
+
 h2 {
     background-color: transparent;
     background-image: url("./../images/alfresco.png");

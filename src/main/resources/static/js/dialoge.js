@@ -20,7 +20,6 @@ function startSettingsDialog(modal) {
         var dialogSettings = { "id": "settingsDialog",
             "schema": {
                 "type": "object",
-                "title": "Server Einstellungen",
                 "properties": {
                     "user": {
                         "type": "string",
@@ -161,7 +160,7 @@ function startSettingsDialog(modal) {
                 }
             }
         };
-        startDialog(dialogSettings, 480, modal);
+        startDialog("Server Einstellungen", dialogSettings, 480, modal);
     } catch (e) {
         errorHandler(e);
     }
@@ -199,7 +198,7 @@ function startDocumentDialog(data, modus, modal) {
                     if (modus == "web-display")
                         return "Dokument löschen?";
                     else
-                        return "Dokument Eigenschaften";
+                        return "a";
                 },
                 "properties": {
                     "name": {
@@ -389,7 +388,7 @@ function startDocumentDialog(data, modus, modal) {
                     }
                 },
                 "templates": {
-                    "threeColumnGridLayout": '<div class="filter-content">' + '{{#if options.label}}<h2>{{options.label}}</h2><span></span>{{/if}}' + '{{#if options.helper}}<p>{{options.helper}}</p>{{/if}}'
+                    "threeColumnGridLayout": '<div class="filter-content">'
                         + '<div id="column-1-1" class="col-1-1"> </div>'
                         + '<div id="column-1-2" class="col-1-2"> </div> <div id="column-2-2" class="col-1-2"> </div>'
                         + '<div id="column-1-7_12" class="col-7-12"> </div> <div id="column-2-5_12" class="col-5-12"> </div>'
@@ -441,7 +440,7 @@ function startDocumentDialog(data, modus, modal) {
             }
         };
         var additionalButton =[{"id":".alpaca-form-button-delete", "function": deleteDocument }];
-        startDialog(dialogDocumentDetailsSettings, 450, modal, additionalButton);
+        startDialog(modus == "web-display" ? "Dokument löschen?" : "Dokument Eigenschaften", dialogDocumentDetailsSettings, 450, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
     }
@@ -463,12 +462,6 @@ function startFolderDialog(data, modus, modal) {
         var folderDialogSettings = { "id": "detailDialog",
             "schema": {
                 "type": "object",
-                "title": function() {
-                    if (modus == "web-display")
-                        return "Ordner löschen?";
-                    else
-                        return "Ordner Eigenschaften";
-                },
                 "properties": {
                     "name": {
                         "type": "string",
@@ -548,7 +541,7 @@ function startFolderDialog(data, modus, modal) {
                     }
                 },
                 "templates": {
-                    "threeColumnGridLayout": '<div class="filter-content">' + '{{#if options.label}}<h2>{{options.label}}</h2><span></span>{{/if}}' + '{{#if options.helper}}<p>{{options.helper}}</p>{{/if}}'
+                    "threeColumnGridLayout": '<div class="filter-content">'
                         + '<div id="column-1-1" class="col-1-1"> </div>'
                         + '<div id="column-1-2" class="col-1-2"> </div> <div id="column-2-2" class="col-1-2"> </div>'
                         + '<div id="column-1-7_12" class="col-7-12"> </div> <div id="column-2-5_12" class="col-5-12"> </div>'
@@ -596,7 +589,7 @@ function startFolderDialog(data, modus, modal) {
             }
         };
         var additionalButton =[{"id":".alpaca-form-button-delete", "function": deleteFolder }];
-        startDialog(folderDialogSettings, 460, modal, additionalButton);
+        startDialog(modus == "web-display" ? "Ordner löschen?" : "Ordner Eigenschaften", folderDialogSettings, 460, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
     }
@@ -808,12 +801,13 @@ function closeDialog() {
 
 /**
  * startet den eigentlichen Dialog
+ * @param title                     der Dialogtitel
  * @param dialogSettings            die Settings für den Dialog
  * @param width                     die Weite des Fensters
  * @param modal                     boolean der festlegt, ob das Fenster modal sein soll
  * @param callbacks                 Array mit Callbacks für weitere Buttons
  */
-function startDialog(dialogSettings, width, modal, callbacks) {
+function startDialog(title, dialogSettings, width, modal, callbacks) {
 
     $("<div>", {id: "dialogBox", class: "grid gridpad"}).appendTo("body");
     $('#dialogBox').alpaca(dialogSettings).dialog({
@@ -821,6 +815,7 @@ function startDialog(dialogSettings, width, modal, callbacks) {
         "width": width,
         "height": 'auto',
         "modal": modal,
+        "title": title,
         "position": {
             "my": "top",
             "at": "center center-20%",
