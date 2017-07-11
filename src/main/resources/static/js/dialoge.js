@@ -676,112 +676,149 @@ function startCommentsDialog(comments) {
  */
 function startMoveDialog(data) {
 
-
     try {
         this.data = data;
-        $dialog = $('<div id="dialogTree"> </div>').dialog({
-            autoOpen: false,
-            title: "Dokumente verschieben",
-            modal: true,
-            height:500,
-            width:400,
-            buttons: {
-                "Verschieben": function () {
-                    try {
-                        var dialogTree = $.jstree.reference('#dialogTree');
-                        var nodeIds = dialogTree.get_selected();
-                        // über alle selektierten Zeilen iterieren
-                        for (var index = 0; index < data.length; ++index) {
-                            var row = data[index];
-                            var done = function (json) {
-                                if (json.success) {
-                                    var newData = json.data;
-                                    var source = json.source;
-                                    var target = json.target;
-                                    REC.log(INFORMATIONAL, "Dokument " + row.data().name + " von " + source.path + " nach " + target.path + " verschoben");
-                                    fillMessageBox(true);
-                                    row.remove();
-                                    row.table().draw();
-                                }
-                            };
-                            //Dokument verschieben....
-                            var json = executeService({
-                                "name": "moveNode",
-                                "callback": done,
-                                "errorMessage": "Dokument konnte nicht verschoben werden:"
-                            }, [
-                                {"name": "documentId", "value": row.data().objectID},
-                                {"name": "currentLocationId", "value": row.data().parentId},
-                                {"name": "destinationId", "value": nodeIds[0]}
-                            ]);
+
+        var moveDialogSettings = { "id": "moveDialog",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
+                }
+            },
+            "options": {
+                "renderForm": true,
+                "fields": {
+                    "token": {
+                        "type": "hidden"
+                    }
+                },
+                "form": {
+                    "buttons": {
+                        "submit": {"value": "Verschieben"},
+                        "reset": {"value": "Abbrechen"}
+                    }
+                }
+            },
+            "data":  {
+                "token": true
+            },
+            "view": {
+                "parent": "web-edit",
+                "locale": "de_DE",
+                "layout": {
+                    "template": "layout"
+                },
+                "templates": {
+                    "layout": '<div class="filter-content" id="dialogTree"></div>'
+                }
+            },
+            "ui": "jquery-ui",
+            "postRender": function (renderedField) {
+                var form = renderedField.form;
+                var dialogTree = $("#dialogTree").jstree({
+                    'core': {
+                        'data': function (node, aFunction) {
+                            try {
+                                // relevante Knoten im Alfresco suchen
+                                loadAndConvertDataForTree(node, aFunction);
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        },
+                        error : function (err) {
+                            REC.log(DEBUG, err.reason);
+                            fillMessageBox(true);
+                        },
+                        'themes': {
+                            'responsive': true,
+                            'variant': 'big',
+                            'stripes': false,
+                            'dots': true,
+                            'icons': true
                         }
-                    } catch(e) {
-                        errorHandler(e);
-                    }
-                    $(this).dialog("destroy");
-                },
-                "Abbrechen": function () {
-                    $(this).dialog("destroy");
+                    },
+                    'types' : {
+                        '#' : {
+                            "max_children" : 1
+                        },
+                        'archivRootStandard' : {
+                            "valid_children" : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
+                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        },
+                        'archivFolderStandard' : {
+                            "valid_children" : [],
+                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        },
+                        'archivDoubleFolderStandard' : {
+                            "valid_children" : [],
+                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        },
+                        'archivFehlerFolderStandard' : {
+                            "valid_children" : ["archivDoubleFolderStandard"],
+                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        },
+                        'archivDocumentFolderStandard' : {
+                            "valid_children" : ["documentFolderStandard"] ,
+                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        },
+                        'documentFolderStandard' : {
+                            "valid_children" : -1,
+                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        }
+                    },
+                    'plugins': ["dnd", "types"]
+                });
+
+                if (form) {
+                    form.registerSubmitHandler(function () {
+                        if (form.isFormValid()) {
+
+                            try {
+                                var dialogTree = $.jstree.reference('#dialogTree');
+                                var nodeIds = dialogTree.get_selected();
+                                // über alle selektierten Zeilen iterieren
+                                for (var index = 0; index < data.length; ++index) {
+                                    var row = data[index];
+                                    var done = function (json) {
+                                        if (json.success) {
+                                            var newData = json.data;
+                                            var source = json.source;
+                                            var target = json.target;
+                                            REC.log(INFORMATIONAL, "Dokument " + row.data().name + " von " + source.path + " nach " + target.path + " verschoben");
+                                            fillMessageBox(true);
+                                            row.remove();
+                                            row.table().draw();
+                                        }
+                                    };
+                                    //Dokument verschieben....
+                                    var json = executeService({
+                                        "name": "moveNode",
+                                        "callback": done,
+                                        "errorMessage": "Dokument konnte nicht verschoben werden:"
+                                    }, [
+                                        {"name": "documentId", "value": row.data().objectID},
+                                        {"name": "currentLocationId", "value": row.data().parentId},
+                                        {"name": "destinationId", "value": nodeIds[0]}
+                                    ]);
+                                }
+
+                                closeDialog();
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        }
+                    });
                 }
             }
-        }).css({height:"600px", width:"400px", overflow:"auto"});
-
-        var dialogTree = $("#dialogTree").jstree({
-            'core': {
-                'data': function (node, aFunction) {
-                    try {
-                        // relevante Knoten im Alfresco suchen
-                        loadAndConvertDataForTree(node, aFunction);
-                    } catch (e) {
-                        errorHandler(e);
-                    }
-                },
-                error : function (err) {
-                    REC.log(DEBUG, err.reason);
-                    fillMessageBox(true);
-                },
-                'themes': {
-                    'responsive': true,
-                    'variant': 'big',
-                    'stripes': false,
-                    'dots': true,
-                    'icons': true
-                }
-            },
-            'types' : {
-            '#' : {
-                "max_children" : 1
-            },
-            'archivRootStandard' : {
-                "valid_children" : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
-            },
-            'archivFolderStandard' : {
-                "valid_children" : [],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
-            },
-            'archivDoubleFolderStandard' : {
-                "valid_children" : [],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
-            },
-            'archivFehlerFolderStandard' : {
-                "valid_children" : ["archivDoubleFolderStandard"],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
-            },
-            'archivDocumentFolderStandard' : {
-                "valid_children" : ["documentFolderStandard"] ,
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
-            },
-            'documentFolderStandard' : {
-                "valid_children" : -1,
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
-            }
-        },
-            'plugins': ["dnd", "types"]
-        });
+        };
 
 
-        $dialog.dialog('open');
+        startDialog("Dokumente verschieben", moveDialogSettings, 400, true);
+
 
     } catch (e) {
         errorHandler(e);
