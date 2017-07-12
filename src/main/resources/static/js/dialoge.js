@@ -684,16 +684,14 @@ function startMoveDialog(data) {
                 "type": "object",
                 "properties": {
                     "token": {
-                        "type": "string",
-                        "required": true
-                    }
+                        "type": "string"                    }
                 }
             },
             "options": {
                 "renderForm": true,
                 "fields": {
                     "token": {
-                       
+                        "type": "hidden"
                     }
                 },
                 "form": {
@@ -703,9 +701,6 @@ function startMoveDialog(data) {
                     },
                     "toggleSubmitValidState": true
                 }
-            },
-            "data":  {
-
             },
             "view": {
                 "parent": "web-edit",
@@ -720,7 +715,7 @@ function startMoveDialog(data) {
             "ui": "jquery-ui",
             "postRender": function (renderedField) {
                 var form = renderedField.form;
-                var token = renderedField.childrenByPropertyId["token"];
+                form.disableSubmitButton();
                 var dialogTree = $("#dialogTree").jstree({
                     'core': {
                         'data': function (node, aFunction) {
@@ -785,12 +780,11 @@ function startMoveDialog(data) {
                             data.node.data.objectID != unknownFolderId &&
                             data.node.data.objectID != doubleFolderId &&
                             data.node.data.objectID != documentFolderId)
-                                token.setValue("true");
-                            else
-                                token.setValue(null);
-                            form.validate(true);
-                            // draw the validation state (top control + all children)
-                            form.refreshValidationState(true);
+                                form.enableSubmitButton();
+                            else {
+                                form.disableSubmitButton();
+                                data.instance.deselect_node(data.node, true);
+                            }
                         }
                     } catch (e) {
                         errorHandler(e);
@@ -799,9 +793,6 @@ function startMoveDialog(data) {
 
                 if (form) {
                     form.registerSubmitHandler(function () {
-                        form.validate(true);
-                        // draw the validation state (top control + all children)
-                        form.refreshValidationState(true);
                         if (form.isFormValid()) {
 
                             try {
