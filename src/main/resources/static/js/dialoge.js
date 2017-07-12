@@ -684,8 +684,8 @@ function startMoveDialog(data) {
                 "type": "object",
                 "properties": {
                     "token": {
-                        "type": "integer",
-                        "minimum": 0
+                        "type": "string",
+                        "required": true
                     }
                 }
             },
@@ -693,18 +693,19 @@ function startMoveDialog(data) {
                 "renderForm": true,
                 "fields": {
                     "token": {
-                        "type": "hidden"
+                       
                     }
                 },
                 "form": {
                     "buttons": {
                         "submit": {"value": "Verschieben"},
                         "reset": {"value": "Abbrechen"}
-                    }
+                    },
+                    "toggleSubmitValidState": true
                 }
             },
             "data":  {
-                "token": true
+
             },
             "view": {
                 "parent": "web-edit",
@@ -719,6 +720,7 @@ function startMoveDialog(data) {
             "ui": "jquery-ui",
             "postRender": function (renderedField) {
                 var form = renderedField.form;
+                var token = renderedField.childrenByPropertyId["token"];
                 var dialogTree = $("#dialogTree").jstree({
                     'core': {
                         'data': function (node, aFunction) {
@@ -771,10 +773,35 @@ function startMoveDialog(data) {
                         }
                     },
                     'plugins': ["dnd", "types"]
+                }).on("changed.jstree",  function (event, data){
+                    try {
+                        if (data.action == "select_node") {
+                           
+                            if (data.node.data &&
+                            data.node.data.objectID != alfrescoRootFolderId &&
+                            data.node.data.objectID != archivFolderId &&
+                            data.node.data.objectID != inboxFolderId &&
+                            data.node.data.objectID != fehlerFolderId &&
+                            data.node.data.objectID != unknownFolderId &&
+                            data.node.data.objectID != doubleFolderId &&
+                            data.node.data.objectID != documentFolderId)
+                                token.setValue("true");
+                            else
+                                token.setValue(null);
+                            form.validate(true);
+                            // draw the validation state (top control + all children)
+                            form.refreshValidationState(true);
+                        }
+                    } catch (e) {
+                        errorHandler(e);
+                    }
                 });
 
                 if (form) {
                     form.registerSubmitHandler(function () {
+                        form.validate(true);
+                        // draw the validation state (top control + all children)
+                        form.refreshValidationState(true);
                         if (form.isFormValid()) {
 
                             try {
