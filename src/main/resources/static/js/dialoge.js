@@ -775,7 +775,6 @@ function startMoveDialog(data) {
                             if (data.node.data &&
                             data.node.data.objectID != alfrescoRootFolderId &&
                             data.node.data.objectID != archivFolderId &&
-                            data.node.data.objectID != inboxFolderId &&
                             data.node.data.objectID != fehlerFolderId &&
                             data.node.data.objectID != unknownFolderId &&
                             data.node.data.objectID != doubleFolderId &&
@@ -785,6 +784,7 @@ function startMoveDialog(data) {
                                 form.disableSubmitButton();
                                 data.instance.deselect_node(data.node, true);
                             }
+                            data.instance.open_node(data.node);
                         }
                     } catch (e) {
                         errorHandler(e);

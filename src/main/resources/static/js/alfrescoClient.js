@@ -3119,7 +3119,7 @@ function loadAlfrescoTree() {
 
         // Initiales Lesen
         if (alfrescoServerAvailable)
-            switchAlfrescoDirectory(null);
+            switchAlfrescoDirectory({objectID: archivFolderId});
 
     } catch (e) {
         errorHandler(e);
