@@ -113,7 +113,7 @@ function calculateTableHeight(panel, divId, tabelle, headerId, footerId) {
         columnPanel = children[0].offsetHeight;
     headerPanel = $('#'+headerId).height();
     footerPanel = $('#'+footerId).height();
-    if (exist(tabelle.settings().init().iconView) && tabelle.settings().init().iconView) // fest nach aktueller CSS
+    if (exist(tabelle) && exist(tabelle.settings().init().iconView) && tabelle.settings().init().iconView) // fest nach aktueller CSS
         rowHeight = 121;
     else
         rowHeight = 33.5;
@@ -586,10 +586,10 @@ function loadAlfrescoTable() {
             "processing": true,
             "serverSide": true,
             "iconView": false,
-            "folderId" : -1,
+            "folderId" : archivFolderId,
             "withFolder": 1,
             "itemsToSkip": 0,
-            "pageLength": 1, // kann hier 1 sein, weil im Root keine Dokumente sind
+            "pageLength": calculateTableHeight("alfrescoCenterCenterCenter", "dtable2", alfrescoTabelle, "alfrescoTabelleHeader", "alfrescoTableFooter"),
             "ajax": {
                 "url": "/Archiv/listFolderWithPagination",
                 type: "POST",
@@ -597,6 +597,7 @@ function loadAlfrescoTable() {
                     data.folderId = meta.oInit.folderId;
                     data.withFolder = meta.oInit.withFolder;
                     data.itemsToSkip = meta.oInit.itemsToSkip;
+                    data.length = meta.oInit.pageLength;
                     duration = new Date().getTime();
                     return JSON.stringify(data);
                 },
@@ -890,7 +891,55 @@ function loadAlfrescoFolderTable() {
             "autoWidth": true,
             "lengthChange": false,
             "searching": false,
-            "pageLength": 1,
+            "folderId" : archivFolderId,
+            "withFolder": -1,
+            "itemsToSkip": 0,
+            "pageLength":  calculateTableHeight("alfrescoCenterCenterNorth", "dtable3", alfrescoFolderTabelle, "alfrescoFolderTabelleHeader", "alfrescoFOlderTableFooter"),
+            "ajax": {
+                "url": "/Archiv/listFolderWithPagination",
+                "type": "POST",
+                "data": function (data, meta) {
+                    data.folderId = meta.oInit.folderId;
+                    data.withFolder = meta.oInit.withFolder;
+                    data.itemsToSkip = meta.oInit.itemsToSkip;
+                    data.length =  meta.oInit.pageLength;
+                    duration = new Date().getTime();
+                    return JSON.stringify(data);
+                },
+                "dataSrc": function (data) {
+
+                    try {
+                        REC.log(INFORMATIONAL, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
+                        //alfrescoFolderTabelle.clear();
+                        resizeTable("alfrescoCenterCenterNorth", "dtable3", "alfrescoFolderTabelle", "alfrescoFolderTabelleHeader", "alfrescoFolderTableFooter");
+                        //alfrescoFolderTabelle.rows.add(json.data).draw();
+                        $.fn.dataTable.makeEditable(alfrescoFolderTabelle, updateInLineFolderFieldFieldDefinition());
+                        var tree = $.jstree.reference('#tree');
+                        var parent = tree.get_node(data.parent);
+                        if (parent) {
+                            fillBreadCrumb(parent.data);
+                            //$("#tree").jstree(true).refresh_node(objectID);
+
+                            // Knoten einfügen
+                            for (var i = 0; i < data.data.length; i++) {
+                                if (!exist(tree.get_node(data.data[i].objectID)))
+                                    tree.create_node(parent, data.data[i]);
+                            }
+
+                            tree.select_node(parent, true, false);
+                            tree.open_node(parent);
+                        }
+                        fillMessageBox(true);
+                        return data.data;
+                    } catch (e) {
+                        errorHandler(e);
+                    }
+                    
+                },
+                "dataType": "json",
+                "processData": false,
+                "contentType": 'application/json;charset=UTF-8'
+            },
             "select": {
                 "style": 'os'
             },
@@ -1100,7 +1149,7 @@ function loadAlfrescoSearchTable() {
                     return JSON.stringify(data);
                 },
                 dataSrc: function (data) {
-                    REC.log(INFORMATIONAL, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
+                    REC.log(INFORMATIONAL, "Execution of Service: findFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
                     fillMessageBox(true);
                     return data.data;
                 },
@@ -1747,40 +1796,42 @@ function fillBreadCrumb(data) {
         var ul = document.createElement('ul');
         ul.id = 'breadcrumblist';
         do {
-            if (!exist(data)) {
-                object = ["Archiv"];
-                id = archivFolderId;
-                parentObj = null;
-                name = "Archiv";
-            }
-            else {
+            if(exist(data.path)) {
                 object = data.path.split('/');
                 id = data.objectID;
                 parentObj = data.parentId;
                 name = data.name;
+
+                var li = document.createElement('li');
+                li.data = {
+                    'objectID': id,
+                    'path': object.join('/'),
+                    'name': name,
+                    'parentId': parentObj
+                };
+                li.id = id;
+                li.onclick = function () {
+                    tree.deselect_all(false);
+                    switchAlfrescoDirectory(this.data);
+                };
+                $.data(li, "data", data);
+                var a = document.createElement('a');
+                a.href = '#';
+                a.text = name;
+                li.appendChild(a);
+                // prüfen, ob ein Parent da ist
+                if (parentObj == null)
+                    fill = false;
+                else {
+                    // Daten des Parents
+                    data = tree.get_node(parentObj).data;
+                    // wenn die nicht existieren sind wir im Root Knoten und können hier abbrechen
+                    if (!exist(data))
+                        fill = false
+                }
+                
+                ul.insertBefore(li, ul.firstChild);
             }
-            var li = document.createElement('li');
-            li.data = {
-                'objectID': id,
-                'path': object.join('/'),
-                'name': name,
-                'parentId': parentObj
-            };
-            li.id = id;
-            li.onclick = function () {
-                tree.deselect_all(false);
-                switchAlfrescoDirectory(this.data);
-            };
-            $.data(li, "data", data);
-            var a = document.createElement('a');
-            a.href = '#';
-            a.text = name;
-            li.appendChild(a);
-            if (parentObj == null)
-                fill = false;
-            else
-                data = tree.get_node(parentObj).data;
-            ul.insertBefore(li, ul.firstChild);
         } while (fill);
         container.append(ul);
     } catch (e) {
@@ -2198,27 +2249,40 @@ function switchAlfrescoDirectory(data) {
         else
             objectID = "-1";
         var done = function(json){
-            alfrescoFolderTabelle.clear();
-            resizeTable("alfrescoCenterCenterNorth", "dtable3", "alfrescoFolderTabelle", "alfrescoFolderTabelleHeader", "alfrescoFolderTableFooter");
-            alfrescoFolderTabelle.rows.add(json.data).draw();
-             $.fn.dataTable.makeEditable( alfrescoFolderTabelle, updateInLineFolderFieldFieldDefinition());
-            fillBreadCrumb(data);
-            //$("#tree").jstree(true).refresh_node(objectID);
-            $("#tree").jstree('select_node', objectID);
-
+            try {
+                alfrescoFolderTabelle.clear();
+                resizeTable("alfrescoCenterCenterNorth", "dtable3", "alfrescoFolderTabelle", "alfrescoFolderTabelleHeader", "alfrescoFolderTableFooter");
+                alfrescoFolderTabelle.rows.add(json.data).draw();
+                $.fn.dataTable.makeEditable(alfrescoFolderTabelle, updateInLineFolderFieldFieldDefinition());
+                fillBreadCrumb(data);
+                //$("#tree").jstree(true).refresh_node(objectID);
+                var tree = $.jstree.reference('#tree');
+                // Knoten einfügen
+                for (var i = 0; i < json.data.length; i++){
+                    if (!exist(tree.get_node(json.data[i].objectID)))
+                        tree.create_node(tree.get_node(objectID), json.data[i] );
+                }
+                tree.select_node(objectID, true, false);
+                tree.open_node(objectID);
+            } catch (e) {
+                errorHandler(e);
+            }
         };
-        var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
-            {"name": "folderId", "value": objectID},
-            {"name": "withFolder", "value": -1}
-        ]);
-        if (objectID != -1) {
+        // var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
+        //     {"name": "folderId", "value": objectID},
+        //     {"name": "withFolder", "value": -1}
+        // ]);
+
             var len = calculateTableHeight("alfrescoCenterCenterCenter", "dtable2", alfrescoTabelle, "alfrescoTabelleHeader", "alfrescoTableFooter");
             alfrescoTabelle.page.len(len);
             alfrescoTabelle.settings().init().folderId = objectID;
             alfrescoTabelle.ajax.reload();
             $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineDocumentFieldDefinition());
-        }
 
+        len = calculateTableHeight("alfrescoCenterCenterNorth", "dtable3", alfrescoFolderTabelle, "alfrescoFolderTabelleHeader", "alfrescoFOlderTableFooter")
+        alfrescoFolderTabelle.page.len(len);
+        alfrescoFolderTabelle.settings().init().folderId = objectID;
+        alfrescoFolderTabelle.ajax.reload();
     } catch (e) {
         errorHandler(e);
     }
@@ -2643,7 +2707,7 @@ function loadAndConvertDataForTree(aNode, callBack) {
                         for (var index = 0; index < json.data.length; index++) {
                             obj.push(buildObjectForTree(json.data[index]));
                         }
-                        if (aNode.id == "#")
+                        if (aNode.id == "#") {
                             obj = [
                                 {
                                     "icon": "",
@@ -2654,6 +2718,10 @@ function loadAndConvertDataForTree(aNode, callBack) {
                                     "type": "archivRootStandard"
                                 }
                             ];
+                            // Daten für den ArchivRoot Ordner eintragen
+                            if (REC.exist(json.data[0].parents[0]))
+                                obj[0].data = json.data[0].parents[0];
+                        }
                         // CallBack ausführen
                         if (obj) {
                             callBack.call(this, obj);
@@ -3018,12 +3086,19 @@ function loadAlfrescoTree() {
                         // Das Objekt im Tree mit dem geänderten Knoten aktualisieren
                         data.node.data = newData;
                     }
-                }
+                };
                 executeService({"name": "moveNode", "callback": done, "errorMessage": "Ordner konnte nicht verschoben werden:"}, [
                     {"name": "documentId", "value": nodeId},
                     {"name": "currentLocationId", "value": parentId},
                     {"name": "destinationId", "value": destinationId}
                 ]);
+            } catch (e) {
+                errorHandler(e);
+            }
+        }).on('loaded.jstree', function (event, data) {
+            try {
+                loadAlfrescoTable();
+                loadAlfrescoFolderTable();
             } catch (e) {
                 errorHandler(e);
             }
@@ -3117,9 +3192,9 @@ function loadAlfrescoTree() {
         });
 
 
-        // Initiales Lesen
-        if (alfrescoServerAvailable)
-            switchAlfrescoDirectory({objectID: archivFolderId});
+        // // Initiales Lesen
+        // if (alfrescoServerAvailable)
+        //     switchAlfrescoDirectory({objectID: archivFolderId});
 
     } catch (e) {
         errorHandler(e);
@@ -3521,18 +3596,18 @@ function start() {
                 decimalSeparator: ','
             }
         });
+        initApplication();
+        loadAlfrescoTree();
 
-        loadAlfrescoTable();
-        loadAlfrescoFolderTable();
         loadAlfrescoSearchTable();
         loadVerteilungTable();
 
-        initApplication();
+
         // Eventhandler für die Image Clicks
         handleVerteilungImageClicks();
         handleAlfrescoFolderImageClicks();
         handleAlfrescoImageClicks();
-        loadAlfrescoTree();
+
         //loadButtons();
         // Icon Buttons
         $("#alfrescoSearchButton").button({
