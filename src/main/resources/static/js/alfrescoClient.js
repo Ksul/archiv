@@ -592,8 +592,8 @@ function loadAlfrescoTable() {
             "pageLength": calculateTableHeight("alfrescoCenterCenterCenter", "dtable2", alfrescoTabelle, "alfrescoTabelleHeader", "alfrescoTableFooter"),
             "ajax": {
                 "url": "/Archiv/listFolderWithPagination",
-                type: "POST",
-                data: function (data, meta) {
+                "type": "POST",
+                "data": function (data, meta) {
                     data.folderId = meta.oInit.folderId;
                     data.withFolder = meta.oInit.withFolder;
                     data.itemsToSkip = meta.oInit.itemsToSkip;
@@ -601,14 +601,14 @@ function loadAlfrescoTable() {
                     duration = new Date().getTime();
                     return JSON.stringify(data);
                 },
-                dataSrc: function (data) {
+                "dataSrc": function (data) {
                     REC.log(INFORMATIONAL, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
                     fillMessageBox(true);
                     return data.data;
                 },
-                dataType: "json",
-                processData: false,
-                contentType: 'application/json;charset=UTF-8'
+                "dataType": "json",
+                "processData": false,
+                "contentType": 'application/json;charset=UTF-8'
             },
             "select": {
                 "style": 'os'
@@ -889,8 +889,11 @@ function loadAlfrescoFolderTable() {
             "scrollXInner": "100%",
             // "sScrollY" : calcDataTableHeight(),
             "autoWidth": true,
+            "deferRender": true,
             "lengthChange": false,
             "searching": false,
+            "processing": true,
+            "serverSide": true,
             "folderId" : archivFolderId,
             "withFolder": -1,
             "itemsToSkip": 0,

@@ -39,8 +39,8 @@ import java.util.zip.ZipInputStream;
  * Time: 15:37
  */
 @RestController
-// für Tests
-@CrossOrigin(origins = {"http://localhost:9876", "http://localhost:9877"})
+@CrossOrigin
+
 public class ArchivController {
 
     private AlfrescoConnector con;

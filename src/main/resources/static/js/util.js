@@ -9,7 +9,10 @@
  */
 function checkServerStatus(url) {
 
-    var obj = executeService({"name": "isURLAvailable", "ignoreError": true}, [{"name":"server", "value":url}, {"name":"timeout", "value":"5000"}]);
+    var obj = executeService({"name": "isURLAvailable", "ignoreError": true}, [{
+        "name": "server",
+        "value": url
+    }, {"name": "timeout", "value": "5000"}]);
     return obj.data.toString() == "true";
 }
 
@@ -45,7 +48,7 @@ function executeService(service, params) {
     var errorMessage;
     var successMessage;
     var done;
-    var url = window.location.pathname.substring(0, window.location.pathname.indexOf("/",2)) + "/";
+    var url = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)) + "/";
     var longParameter = false;
     var times = [];
     try {
@@ -80,28 +83,48 @@ function executeService(service, params) {
         }
         $.ajax({
             type: "POST",
-            contentType : 'application/json; charset=utf-8',
+            contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(dataString),
             datatype: "json",
             cache: false,
-            headers: { "cache-control": "no-cache" },
+            headers: {"cache-control": "no-cache"},
             async: asynchron,
             url: url + service.name,
-            error: function (response) {
+            error: function (xhr, status, error) {
                 try {
-                    var errorTxt = response.statusText;
-                    if (!service.ignoreError)
-                        message("Fehler", "Path: " + response.path + "<br>Exception: " + response.exception + "<br>" + response.error +": " + response.message);
-                    else {
-                        json = {error: errorTxt, success: false, data: null};
+                    var txt;
+                    var statusErrorMap = {
+                        '400': "Server understood the request, but request content was invalid.",
+                        '401': "Unauthorized access.",
+                        '403': "Forbidden resource can't be accessed.",
+                        '500': "Internal server error.",
+                        '503': "Service unavailable."
+                    };
+                    if (xhr.status) {
+                        txt = statusErrorMap[xhr.status];
+                        if (!txt) {
+                            txt = "Unknown Error \n.";
+                        }
+                    } else if (error == 'parsererror') {
+                        txt = "Error.\nParsing JSON Request failed.";
+                    } else if (error == 'timeout') {
+                        txt = "Request Time out.";
+                    } else if (error == 'abort') {
+                        txt = "Request was aborted by the server";
+                    } else {
+                        txt = "Unknown Error \n.";
                     }
+                    if (!service.ignoreError)
+                        message("Fehler", "Status: " + txt + "<br>Response: " + xhr.responseText);
+                    json = {error: txt, success: false, data: null};
+                    
                 } catch (e) {
                     var str = "FEHLER:\n";
                     str = str + e.toString() + "\n";
                     for (var prop in e)
                         str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
                     if (!service.ignoreError)
-                        message("Fehler", str + "<br>" + response.responseText);
+                        message("Fehler", str + "<br>" + xhr.responseText);
                     else {
                         json = {error: str, success: false, data: null};
                     }
@@ -129,7 +152,7 @@ function executeService(service, params) {
                     if (!service.ignoreError && data.data) {
                         REC.log(ERROR, data.data);
                         fillMessageBox(true);
-                    } 
+                    }
                     json = data;
                 } else {
                     times.push(new Date().getTime());
@@ -185,7 +208,7 @@ function getSettings(key) {
             return null;
         else {
             if (!settings)
-                settings = {settings:[]};
+                settings = {settings: []};
             settings.settings.push({"key": key, "value": urlPar});
         }
     }
@@ -202,14 +225,14 @@ function getSettings(key) {
 function timeStamp(withDate) {
     var returnString = "";
     var now = new Date();
-    var time = [ now.getHours(), now.getMinutes(), now.getSeconds() ];
-    for ( var i = 1; i < 3; i++ ) {
-        if ( time[i] < 10 ) {
+    var time = [now.getHours(), now.getMinutes(), now.getSeconds()];
+    for (var i = 1; i < 3; i++) {
+        if (time[i] < 10) {
             time[i] = "0" + time[i];
         }
     }
-    if (withDate){
-        var date = [ now.getMonth() + 1, now.getDate(), now.getFullYear() ];
+    if (withDate) {
+        var date = [now.getMonth() + 1, now.getDate(), now.getFullYear()];
         returnString = returnString + date.join(".") + " ";
     }
     returnString += time.join(":");
@@ -234,9 +257,9 @@ function searchJson(obj, key, val) {
 //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
         if (i == key && obj[i] == val || i == key && val == '') { //
             objects.push(obj);
-        } else if (obj[i] == val && key == ''){
+        } else if (obj[i] == val && key == '') {
 //only add if the object is not already in the array
-            if (objects.lastIndexOf(obj) == -1){
+            if (objects.lastIndexOf(obj) == -1) {
                 objects.push(obj);
             }
         }
@@ -300,7 +323,7 @@ function parseDate(dateString) {
         var seconds = parts[2];
         var date = new Date(year, months.indexOf(month), day, hours, minutes, seconds, 0);
         return date;
-    } catch(e) {
+    } catch (e) {
         return null;
     }
 }
@@ -337,7 +360,7 @@ function getUrlParam(name) {
  * Prüft, ob ein URL Parameter vorhanden ist
  * @returns {boolean}
  */
-function hasUrlParam(){
+function hasUrlParam() {
     return this.location.href.search(/\?/) != -1;
 }
 
@@ -349,7 +372,7 @@ function hasUrlParam(){
 function createPathToFile(filePath) {
     var file = document.URL;
     var parts = file.split("/").reverse();
-    parts.splice(0,1);
+    parts.splice(0, 1);
     if (!filePath.startsWith("/"))
         filePath = "/" + filePath;
     return parts.reverse().join("/") + filePath;
@@ -414,11 +437,11 @@ function message(title, str, autoClose, height, width) {
     };
     var div = $("<div></div>");
     if (exist(autoClose)) {
-       dialogSettings.open = function(event, ui){
-           setTimeout("$('#messageBox').dialog('close')",autoClose);
-       }
+        dialogSettings.open = function (event, ui) {
+            setTimeout("$('#messageBox').dialog('close')", autoClose);
+        }
     } else {
-        dialogSettings.buttons =  {
+        dialogSettings.buttons = {
             "Ok": function () {
                 $(this).dialog("destroy");
                 div.remove();
@@ -426,7 +449,11 @@ function message(title, str, autoClose, height, width) {
         }
     }
 
-    var $dialog = div.html(str).dialog(dialogSettings).css({height:height+"px", width:width+"px", overflow:"auto"});
+    var $dialog = div.html(str).dialog(dialogSettings).css({
+        height: height + "px",
+        width: width + "px",
+        overflow: "auto"
+    });
     $dialog.dialog('open');
 }
 
@@ -451,7 +478,7 @@ function hex2String(hexx) {
  */
 function stringToBytes(str) {
     var ch, st, re = [], j = 0;
-    for ( var i = 0; i < str.length; i++) {
+    for (var i = 0; i < str.length; i++) {
         ch = str.charCodeAt(i);
         if (ch < 127) {
             re[j++] = ch & 0xFF;
@@ -467,7 +494,7 @@ function stringToBytes(str) {
             // add stack contents to result
             // done because chars have "wrong" endianness
             st = st.reverse();
-            for ( var k = 0; k < st.length; ++k)
+            for (var k = 0; k < st.length; ++k)
                 re[j++] = st[k];
         }
     }
@@ -485,7 +512,7 @@ function uuid() {
     uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
     uuid[14] = '4';
     // version 4
-    for ( var i = 0; i < 36; i++) {
+    for (var i = 0; i < 36; i++) {
         if (!uuid[i]) {
             r = 0 | rnd() * 16;
             uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r & 0xf];
