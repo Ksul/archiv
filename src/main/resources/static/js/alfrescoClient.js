@@ -489,7 +489,7 @@ function loadLayout() {
                 size: .45,
                 initClosed: false,
                 onresize: function () {
-                    rulesEditor.resize();
+                    Verteilung.rulesEditor.resize();
                 }
             },
             east: {
