@@ -2300,7 +2300,7 @@ function startSearch(searchText) {
         var sql = "select d.*, o.*, c.*, i.* from my:archivContent as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
-            "join my:idable as i on d.cmis:objectId = i.cmis:objectId  WHERE IN_TREE(d, '" + archivFolderId + "') AND CONTAINS(d, '" + searchText + "')";
+            "join my:idable as i on d.cmis:objectId = i.cmis:objectId  WHERE IN_TREE(d, '" + archivFolderId + "') AND ( CONTAINS(d, 'cmis:name:*" + searchText + "* OR TEXT:" + searchText + "') OR CONTAINS(o, 'cm:title:*" + searchText + "*'))";
         var len = calculateTableHeight("searchCenter", "dtable4", alfrescoSearchTabelle, "alfrescoSearchTabelleHeader", "alfrescoSearchTableFooter");
         alfrescoSearchTabelle.page.len(len);
         alfrescoSearchTabelle.settings().init().cmisQuery = sql;
