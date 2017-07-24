@@ -122,10 +122,10 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.error", notNullValue()))
+                .andExpect(jsonPath("$.error", nullValue()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 

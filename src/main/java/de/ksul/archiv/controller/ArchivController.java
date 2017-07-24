@@ -17,6 +17,7 @@ import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -794,6 +792,7 @@ public class ArchivController {
 
         RestResponse obj = new RestResponse();
         URL url;
+        int erg;
 
         logger.trace("check availibility of: " + model.getServer());
         url = new URL(model.getServer());
@@ -803,8 +802,11 @@ public class ArchivController {
         // Set timeouts in milliseconds
         httpUrlConn.setConnectTimeout(model.getTimeout());
         httpUrlConn.setReadTimeout(model.getTimeout());
-
-        int erg = httpUrlConn.getResponseCode();
+        try {
+                erg = httpUrlConn.getResponseCode();
+        } catch (UnknownHostException u) {
+           erg = HttpURLConnection.HTTP_NOT_FOUND;
+        }
         if (erg == HttpURLConnection.HTTP_OK || erg == HttpURLConnection.HTTP_UNAUTHORIZED) {
             logger.trace("URL is available: " + model.getServer());
             obj.setSuccess(true);
@@ -812,7 +814,7 @@ public class ArchivController {
         } else {
             logger.trace("URL is not available: " + model.getServer());
             obj.setSuccess(false);
-            obj.setData(httpUrlConn.getResponseMessage());
+            obj.setData(erg);
         }
 
         return obj;
