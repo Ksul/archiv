@@ -131,41 +131,44 @@ function executeService(service, params) {
                 }
             },
             success: function (data) {
-                if (service.direct) {
-                    // es kommt keine JSON Struktur zurück
-                    json = data;
-                } else if (!data.success) {
-                    if (exist(errorMessage))
-                        errorString = errorMessage + "<br>";
-                    else {
-                        if (data.data)
-                            errorString = data.data;
-                        if (data.error)
-                            errorString = data.error.message;
-                    }
-                    // gibt es eine Fehlermeldung aus dem Service?
-                    if (data.error && !service.ignoreError) {
-                        errorString = errorString + "<br>" + data.error.message;
-                        REC.log(ERROR, data.error.message);
+                try {
+                    if (service.direct) {
+                        // es kommt keine JSON Struktur zurück
+                        json = data;
+                    } else if (!data.success) {
+                        if (exist(errorMessage))
+                            errorString = errorMessage + "<br>";
+                        else {
+                            if (data.data)
+                                errorString = data.data;
+                            if (data.error)
+                                errorString = data.error.message;
+                        }
+                        // gibt es eine Fehlermeldung aus dem Service?
+                        if (data.error && !service.ignoreError) {
+                            errorString = errorString + "<br>" + data.error.message;
+                            REC.log(ERROR, data.error.message);
+                            fillMessageBox(true);
+                        }
+                        if (!service.ignoreError && data.data) {
+                            REC.log(ERROR, data.data);
+                            fillMessageBox(true);
+                        }
+                        json = data;
+                    } else {
+                        times.push(new Date().getTime());
+                        data.duration = times[1] - times[0];
+                        REC.log(INFORMATIONAL, "Execution of Service: " + service.name + " duration " + (times[1] - times[0]) + " ms");
                         fillMessageBox(true);
+                        if (exist(successMessage)) {
+                            REC.log(INFORMATIONAL, successMessage);
+                            fillMessageBox(true);
+                        }
+                        done(data);
                     }
-                    if (!service.ignoreError && data.data) {
-                        REC.log(ERROR, data.data);
-                        fillMessageBox(true);
-                    }
-                    json = data;
-                } else {
-                    times.push(new Date().getTime());
-                    data.duration = times[1] - times[0];
-                    REC.log(INFORMATIONAL, "Execution of Service: " + service.name + " duration " + (times[1] - times[0]) + " ms");
-                    fillMessageBox(true);
-                    if (exist(successMessage)) {
-                        REC.log(INFORMATIONAL, successMessage);
-                        fillMessageBox(true);
-                    }
-                    done(data);
+                } catch (e) {
+                    errorHandler(e);
                 }
-
             }
         });
         return json;

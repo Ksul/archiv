@@ -143,11 +143,6 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/xyz");
-        obj = services.getNodeId(request);
-        assertThat(obj, notNullValue());
-        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(false));
-        assertThat(obj.getData(), nullValue());
     }
 
 
@@ -194,11 +189,6 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/xyz");
-        obj = services.getNodeId(request);
-        assertThat(obj, notNullValue());
-        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(false));
-        assertThat(obj.getData(), nullValue());
     }
 
 

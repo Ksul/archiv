@@ -601,6 +601,10 @@ function loadAlfrescoTable() {
                     duration = new Date().getTime();
                     return JSON.stringify(data);
                 },
+                "error": function (data, meta) {
+                    alert(data);
+
+                },
                 "dataSrc": function (data) {
                     REC.log(INFORMATIONAL, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
                     fillMessageBox(true);
@@ -2083,10 +2087,10 @@ function deleteDocument() {
         var origData = $("#dialogBox").alpaca().data;
         var done = function (json) {
             if (json.success) {
-                var row = alfrescoTabelle.row('#' + origData.objectId);
+                var row = alfrescoTabelle.row('#' + origData.objectID);
                 if (row && row.length)
                     row.remove().draw(false);
-                row = alfrescoSearchTabelle.row('#' + data.objectId);
+                row = alfrescoSearchTabelle.row('#' + origData.objectID);
                 if (row && row.length)
                     row.remove().draw(false);
             }
@@ -3531,6 +3535,14 @@ function initApplication() {
         checkAndBuidAlfrescoEnvironment();
         openRules();
         manageControls();
+        $.fn.dataTable.ext.errMode = function ( settings, helpPage, message ) {
+          var error = new Error(message.error.message);
+          var stack = "";
+          for (var i = 0; i < message.error.stackTrace.length; i++)
+                stack = stack + message.error.stackTrace[i].className + ":" + message.error.stackTrace[i].methodName + ":" + message.error.stackTrace[i].lineNumber + "<br>";
+          error.stack = stack;
+          errorHandler(error, "Datatables Fehler");
+        };
     } catch (e) {
         errorHandler(e);
     }

@@ -28,7 +28,6 @@ public class ArchivConfiguration {
     private ArchivProperties archivProperties;
 
     @Bean
-    @Profile("!env_test")
     public Session getSession() {
         Session session;
         try {
@@ -43,7 +42,6 @@ public class ArchivConfiguration {
     }
 
     @Bean
-    @Profile("!env_test")
     AlfrescoConnector getConnector() {
         return new AlfrescoConnector(getSession(), archivProperties.getServer(), archivProperties.getBinding(), archivProperties.getUser(), archivProperties.getPassword());
 
