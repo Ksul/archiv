@@ -1,5 +1,6 @@
 package de.ksul.archiv.controller;
 
+import de.ksul.archiv.ArchivException;
 import de.ksul.archiv.response.RestResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class ExceptionHandlingController {
 
-    //@ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public RestResponse handleError(Exception ex) {
 

@@ -602,7 +602,12 @@ function loadAlfrescoTable() {
                     return JSON.stringify(data);
                 },
                 "error": function (data, meta) {
-                    alert(data);
+                    var error = new Error(data.responseJSON.error.message);
+                    var stack = "";
+                    for (var i = 0; i < data.responseJSON.error.stackTrace.length; i++)
+                        stack = stack + data.responseJSON.error.stackTrace[i].className + ":" + data.responseJSON.error.stackTrace[i].methodName + ":" +  data.responseJSON.error.stackTrace[i].lineNumber + "<br>";
+                    error.stack = stack;
+                    errorHandler(error, "Server Error");
 
                 },
                 "dataSrc": function (data) {
@@ -913,6 +918,15 @@ function loadAlfrescoFolderTable() {
                     duration = new Date().getTime();
                     return JSON.stringify(data);
                 },
+                "error": function (data, meta) {
+                    var error = new Error(data.responseJSON.error.message);
+                    var stack = "";
+                    for (var i = 0; i < data.responseJSON.error.stackTrace.length; i++)
+                        stack = stack + data.responseJSON.error.stackTrace[i].className + ":" + data.responseJSON.error.stackTrace[i].methodName + ":" +  data.responseJSON.error.stackTrace[i].lineNumber + "<br>";
+                    error.stack = stack;
+                    errorHandler(error, "Server Error");
+
+                },
                 "dataSrc": function (data) {
 
                     try {
@@ -1154,6 +1168,15 @@ function loadAlfrescoSearchTable() {
                     data.cmisQuery = meta.oInit.cmisQuery;
                     duration = new Date().getTime();
                     return JSON.stringify(data);
+                },
+                "error": function (data, meta) {
+                    var error = new Error(data.responseJSON.error.message);
+                    var stack = "";
+                    for (var i = 0; i < data.responseJSON.error.stackTrace.length; i++)
+                        stack = stack + data.responseJSON.error.stackTrace[i].className + ":" + data.responseJSON.error.stackTrace[i].methodName + ":" +  data.responseJSON.error.stackTrace[i].lineNumber + "<br>";
+                    error.stack = stack;
+                    errorHandler(error, "Server Error");
+
                 },
                 dataSrc: function (data) {
                     REC.log(INFORMATIONAL, "Execution of Service: findFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
@@ -3535,13 +3558,8 @@ function initApplication() {
         checkAndBuidAlfrescoEnvironment();
         openRules();
         manageControls();
-        $.fn.dataTable.ext.errMode = function ( settings, helpPage, message ) {
-          var error = new Error(message.error.message);
-          var stack = "";
-          for (var i = 0; i < message.error.stackTrace.length; i++)
-                stack = stack + message.error.stackTrace[i].className + ":" + message.error.stackTrace[i].methodName + ":" + message.error.stackTrace[i].lineNumber + "<br>";
-          error.stack = stack;
-          errorHandler(error, "Datatables Fehler");
+        $.fn.dataTable.ext.errMode = function ( settings, helpPage, error ) {
+            message(error);
         };
     } catch (e) {
         errorHandler(e);
