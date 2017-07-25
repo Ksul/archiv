@@ -24,7 +24,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -119,9 +122,9 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     private ContentStream createFileStream(String fileName) {
         ContentStreamImpl contentStream = new ContentStreamImpl();
         try {
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(resourceLoader.getResource(fileName).getFile()));
-            bufferedInputStream.mark(0);
-            contentStream.setStream(bufferedInputStream);
+            MarkableFileInputStream markableFileInputStream = new MarkableFileInputStream(new FileInputStream(resourceLoader.getResource(fileName).getFile()));
+            markableFileInputStream.mark(0);
+            contentStream.setStream(markableFileInputStream);
         } catch (IOException e) {
             contentStream.setStream(new ByteArrayInputStream(("Can't read File: " + fileName).getBytes(StandardCharsets.UTF_8)));
         }
