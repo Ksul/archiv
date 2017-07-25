@@ -445,11 +445,16 @@ public class AlfrescoConnector {
      * @throws IOException
      */
     public byte[] getDocumentContent(Document document)  throws IOException{
-        byte fileBytes[] = null;
+        byte fileBytes[] = new byte[4096];
         InputStream inputStream = document.getContentStream().getStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+        while (inputStream.read(fileBytes) != -1) {
+            bufferedOutputStream.write(fileBytes);
+        };
         inputStream.reset();
-        fileBytes = IOUtils.toByteArray(inputStream);
-        return fileBytes;
+
+        return byteArrayOutputStream.toByteArray();
     }
 
     /**

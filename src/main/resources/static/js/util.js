@@ -48,7 +48,7 @@ function executeService(service, params) {
     var errorMessage;
     var successMessage;
     var done;
-    var url = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)) + "/";
+    var url = window.location.pathname == "/context.html" ? "http://localhost:8080/Archiv/" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)) + "/";
     var longParameter = false;
     var times = [];
     try {
@@ -97,6 +97,7 @@ function executeService(service, params) {
                         '400': "Server understood the request, but request content was invalid.",
                         '401': "Unauthorized access.",
                         '403': "Forbidden resource can't be accessed.",
+                        '404': "Not found",
                         '500': "Internal server error.",
                         '503': "Service unavailable."
                     };

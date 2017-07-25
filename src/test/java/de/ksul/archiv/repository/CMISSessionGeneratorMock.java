@@ -1,6 +1,5 @@
 package de.ksul.archiv.repository;
 
-import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
 import org.apache.chemistry.opencmis.client.runtime.*;
@@ -22,9 +21,10 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -38,9 +38,11 @@ import static org.mockito.Mockito.*;
  * Date: 12/4/16
  * Time: 2:47 PM
  */
+@Service
 public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(CMISSessionGeneratorMock.class.getName());
+    private ResourceLoader resourceLoader;
 
     private Map<String, PropertyDefinition<?>> propertyDefinitionMap;
     private Map<String, PropertyDefinition<?>> secondaryPropertyDefinitionMap;
@@ -61,12 +63,12 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
 
 
-    public CMISSessionGeneratorMock() {
+    public CMISSessionGeneratorMock(ResourceLoader resourceLoader) {
 
 
         //       cmisBindingHelper = mock(CmisBindingHelper.class);
         //      given(cmisBindingHelper.createBinding(anyMap(), any(AuthenticationProvider.class), any(TypeDefinitionCache.class))).willReturn(binding);
-
+        this.resourceLoader = resourceLoader;
         propertyDefinitionMap = getStringPropertyDefinitionMap();
         secondaryPropertyDefinitionMap = getSecondaryPropertyDefinitionMap();
         objectService = mockObjectService();
@@ -101,12 +103,28 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         repository.insert("/Datenverzeichnis", createFileableCmisObject("/Datenverzeichnis", "Skripte",  true, false, null));
         repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "backup.js.sample", false, false, "application/x-javascript"), createStream("// "));
         repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "alfresco docs.js.sample",  false, false, "application/x-javascript"), createStream("// "));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xml",  false, false, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xsd",  false, false, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "recognition.js",  false, false, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
+
 
     }
 
     private ContentStream createStream(String content) {
         ContentStreamImpl contentStream = new ContentStreamImpl();
         contentStream.setStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+        return contentStream;
+    }
+
+    private ContentStream createFileStream(String fileName) {
+        ContentStreamImpl contentStream = new ContentStreamImpl();
+        try {
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(resourceLoader.getResource(fileName).getFile()));
+            bufferedInputStream.mark(0);
+            contentStream.setStream(bufferedInputStream);
+        } catch (IOException e) {
+            contentStream.setStream(new ByteArrayInputStream(("Can't read File: " + fileName).getBytes(StandardCharsets.UTF_8)));
+        }
         return contentStream;
     }
 
