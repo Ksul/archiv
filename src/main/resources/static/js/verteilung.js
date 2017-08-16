@@ -440,9 +440,10 @@ function readFiles(files) {
                     reader.onloadend = (function (theFile, clear) {
                         return function (evt) {
                             try {
-                                if (evt.target.readyState == FileReader.DONE) {// DONE == 2
+                                if (evt.target.readyState == FileReader.DONE) {
+                                    // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
                                     var json = executeService({"name": "extractPDFContent", "errorMessage": "PDF Datei konte nicht geparst werden:"}, [
-                                        {"name": "content", "value": evt.target.result, "type": "byte"}
+                                        {"name": "content", "value": btoa(evt.target.result)}
                                     ]);
                                     if (json.success) {
                                         if (count == 1)
@@ -466,8 +467,9 @@ function readFiles(files) {
                         return function (evt) {
                             try {
                                 if (evt.target.readyState == FileReader.DONE) {
+                                    // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
                                     var json = executeService({"name": "extractZIPAndExtractPDFToInternalStorage", "errorMessage": "ZIP Datei konte nicht entpackt werden:"}, [
-                                        {"name": "content", "value": evt.target.result, "type": "byte"}
+                                        {"name": "content", "value": btoa(evt.target.result)}
                                     ]);
                                     if (json.success) {
                                         count = count + json.data - 1;
