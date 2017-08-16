@@ -900,7 +900,7 @@ function sendRules() {
             ]);
             if (json.success) {
                 REC.log(INFORMATIONAL, "Regeln erfolgreich zum Server übertragen!");
-                rulesID = $.parseJSON(json.data).objectId;
+                rulesID = json.data.objectId;
                 erg = true;
                 fillMessageBox(true);
             }
