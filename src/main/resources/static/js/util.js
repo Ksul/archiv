@@ -77,7 +77,8 @@ function executeService(service, params) {
             for (index = 0; index < params.length; ++index) {
                 // falls Bytecode übertragen werden soll, dann Umwandlung damit es nicht zu Konvertierungsproblemen kommt
                 if (exist(params[index].type) && params[index].type == "byte")
-                    params[index].value = btoa(params[index].value);
+                    // Hier nicht btoa verwenden, weil es sonst Probleme mit Umlauten gibt
+                    params[index].value = base64EncArr(strToUTF8Arr((params[index].value)));
                 dataString[params[index].name] = params[index].value;
             }
         }

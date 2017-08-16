@@ -3355,7 +3355,7 @@ function checkAndBuidAlfrescoEnvironment() {
                     }, [
                         {"name": "documentId", "value": scriptFolderId},
                         {"name": "fileName", "value": "recognition.js"},
-                        {"name": "content", "value": base64EncArr(strToUTF8Arr(script))},
+                        {"name": "content", "value": script, "type": "byte"},
                         {"name": "mimeType", "value": "application/x-javascript"},
                         {
                             "name": "extraProperties",
@@ -3391,7 +3391,7 @@ function checkAndBuidAlfrescoEnvironment() {
                     }, [
                         {"name": "documentId", "value": scriptFolderId},
                         {"name": "fileName", "value": "doc.xml"},
-                        {"name": "content", "value": base64EncArr(strToUTF8Arr(doc))},
+                        {"name": "content", "value": doc, "type": "byte"},
                         {"name": "mimeType", "value": "text/xml"},
                         {
                             "name": "extraProperties",
@@ -3428,7 +3428,7 @@ function checkAndBuidAlfrescoEnvironment() {
                     }, [
                         {"name": "documentId", "value": scriptFolderId},
                         {"name": "fileName", "value": "doc.xsd"},
-                        {"name": "content", "value": base64EncArr(strToUTF8Arr(doc))},
+                        {"name": "content", "value": doc, "type": "byte"},
                         {"name": "mimeType", "value": "text/xml"},
                         {
                             "name": "extraProperties",
