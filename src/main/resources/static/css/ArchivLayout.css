@@ -855,3 +855,7 @@ span.awesomeBlue i.awesomeAction {
 .dataTables_paginate {
     padding-right:40px;
 }
+
+a:before {
+    margin-right: 15px;
+}
