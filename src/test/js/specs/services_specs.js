@@ -47,7 +47,7 @@ describe("Test für die Rest Services", function () {
         expect(json.success).toBe(true);
         expect(json.data.length > 0).toBeTruthy();
 
-        var json = executeService({
+        json = executeService({
             "name": "getDocumentContent",
             "url": "http://localhost:8080/Archiv",
             "ignoreError": true
@@ -58,6 +58,43 @@ describe("Test für die Rest Services", function () {
 
         expect(json.success).toBe(true);
         expect(json.data.length > 0).toBeTruthy();
+    });
+
+    it("updateDocument", function () {
+
+        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
+            {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
+        ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data.length > 0).toBeTruthy();
+
+        var rulesID = json.data;
+        json = executeService({
+            "name": "getDocumentContent",
+            "url": "http://localhost:8080/Archiv",
+            "ignoreError": true
+        }, [
+            {"name": "documentId", "value": rulesID},
+            {"name": "extract", "value": "false"}
+        ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data.length > 0).toBeTruthy();
+
+        json = executeService({"name": "updateDocument",   "url": "http://localhost:8080/Archiv",
+            "ignoreError": true}, [
+            {"name": "documentId", "value": rulesID},
+            {"name": "content", "value": json.data, "type": "byte"},
+            {"name": "mimeType", "value": "text/xml"},
+            {"name": "extraProperties", "value": {}},
+            {"name": "versionState", "value": "minor"},
+            {"name": "versionComment", "value": ""}
+        ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data.length > 0).toBeTruthy();
+
     });
 
 });
