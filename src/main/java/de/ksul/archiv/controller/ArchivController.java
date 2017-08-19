@@ -77,7 +77,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * data              die Titel als String
      */
-    @RequestMapping(value = "/getTitles")
+    @RequestMapping(value = "/getTitles", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getTitles() {
         RestResponse obj = new RestResponse();
@@ -122,7 +122,7 @@ public class ArchivController {
      * data     false       keine Connection
      * Map         Die Verbindungsparameter
      */
-    @RequestMapping(value = "/getConnection")
+    @RequestMapping(value = "/getConnection", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getConnection() {
 
@@ -151,7 +151,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * data              der Inhalt als JSON Object
      */
-    @RequestMapping(value = "/openDocument")
+    @RequestMapping(value = "/openDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     ContentResponse openDocument(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -171,7 +171,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/getThumbnail")
+    @RequestMapping(value = "/getThumbnail", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getThumbnail(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -197,7 +197,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * data              die Kommentare  in einer Map
      */
-    @RequestMapping(value = "/getComments")
+    @RequestMapping(value = "/getComments", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getComments(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -218,7 +218,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * data              der neue Kommentare in einer Map
      */
-    @RequestMapping(value = "/addComment")
+    @RequestMapping(value = "/addComment", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse addComment(@RequestBody @Valid final RestRequest model) throws Exception {
         RestResponse obj = new RestResponse();
@@ -237,7 +237,7 @@ public class ArchivController {
      * @param model das Datatables Request Model
      * @return resp              das Datatables Response Model
      */
-    @RequestMapping(value = "/listFolderWithPagination")
+    @RequestMapping(value = "/listFolderWithPagination", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     DataTablesResponse listFolderWithPagination(@RequestBody @Valid final DataTablesRequest model) throws Exception {
 
@@ -297,7 +297,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * result           der Inhalt des Verzeichnisses als JSON Objekte
      */
-    @RequestMapping(value = "/listFolder")
+    @RequestMapping(value = "/listFolder", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     DataTablesResponse listFolder(@RequestBody @Valid final DataTablesRequest model) throws Exception {
         model.setLength(-1);
@@ -313,7 +313,7 @@ public class ArchivController {
      * false   ein Fehler ist aufgetreten
      * data     die Id des Knotens
      */
-    @RequestMapping(value = "/getNodeId")
+    @RequestMapping(value = "/getNodeId", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getNodeId(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -334,7 +334,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/getNode")
+    @RequestMapping(value = "/getNode", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getNode(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -354,7 +354,7 @@ public class ArchivController {
      * false   ein Fehler ist aufgetreten
      * data     der Knoten als Map
      */
-    @RequestMapping(value = "/getNodeById")
+    @RequestMapping(value = "/getNodeById", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getNodeById(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -372,7 +372,7 @@ public class ArchivController {
      * @param model das Datatables Request Model
      * @return obj
      */
-    @RequestMapping(value = "/findDocumentWithPagination")
+    @RequestMapping(value = "/findDocumentWithPagination", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     DataTablesResponse findDocumentWithPagination(@RequestBody @Valid final DataTablesRequest model) throws Exception {
 
@@ -419,7 +419,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * result            Dokument als JSONObject
      */
-    @RequestMapping(value = "/findDocument")
+    @RequestMapping(value = "/findDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     DataTablesResponse findDocument(@RequestBody @Valid final DataTablesRequest model) throws Exception {
 
@@ -433,7 +433,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/query")
+    @RequestMapping(value = "/query", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse query(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -465,7 +465,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/getDocumentContent")
+    @RequestMapping(value = "/getDocumentContent", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getDocumentContent(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -491,7 +491,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/uploadDocument")
+    @RequestMapping(value = "/uploadDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse uploadDocument(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -521,7 +521,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/deleteDocument")
+    @RequestMapping(value = "/deleteDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse deleteDocument(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -549,7 +549,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/createDocument")
+    @RequestMapping(value = "/createDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse createDocument(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -589,7 +589,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/updateDocument")
+    @RequestMapping(value = "/updateDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse updateDocument(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -628,7 +628,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/updateProperties")
+    @RequestMapping(value = "/updateProperties", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse updateProperties(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -666,7 +666,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/moveNode")
+    @RequestMapping(value = "/moveNode", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     MoveResponse moveNode(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -709,7 +709,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/createFolder")
+    @RequestMapping(value = "/createFolder", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse createFolder(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -756,7 +756,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/deleteFolder")
+    @RequestMapping(value = "/deleteFolder", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse deleteFolder(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -786,7 +786,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * data              true, wenn die URL verfügbar ist
      */
-    @RequestMapping(value = "/isURLAvailable")
+    @RequestMapping(value = "/isURLAvailable", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse isURLAvailable(@RequestBody @Valid final ConnectionRequest model) throws Exception {
 
@@ -803,7 +803,7 @@ public class ArchivController {
         httpUrlConn.setConnectTimeout(model.getTimeout());
         httpUrlConn.setReadTimeout(model.getTimeout());
         try {
-                erg = httpUrlConn.getResponseCode();
+            erg = httpUrlConn.getResponseCode();
         } catch (UnknownHostException u) {
            erg = HttpURLConnection.HTTP_NOT_FOUND;
         }
@@ -826,7 +826,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/extractPDFToInternalStorage")
+    @RequestMapping(value = "/extractPDFToInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse extractPDFToInternalStorage(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -850,7 +850,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/extractPDFFile")
+    @RequestMapping(value = "/extractPDFFile", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse extractPDFFile(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -871,7 +871,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/extractPDFContent")
+    @RequestMapping(value = "/extractPDFContent", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse extractPDFContent(@RequestBody @Valid final RestRequest model) {
 
@@ -891,7 +891,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/extractZIP")
+    @RequestMapping(value = "/extractZIP", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse extractZIP(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -942,7 +942,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/extractZIPToInternalStorage")
+    @RequestMapping(value = "/extractZIPToInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse extractZIPToInternalStorage(@RequestBody @Valid final RestRequest model) throws Exception {
         RestResponse obj = new RestResponse();
@@ -995,7 +995,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/extractZIPAndExtractPDFToInternalStorage")
+    @RequestMapping(value = "/extractZIPAndExtractPDFToInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse extractZIPAndExtractPDFToInternalStorage(@RequestBody @Valid final RestRequest model) throws Exception {
 
@@ -1028,7 +1028,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/getDataFromInternalStorage")
+    @RequestMapping(value = "/getDataFromInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getDataFromInternalStorage(@RequestBody @Valid final RestRequest model) {
 
@@ -1073,7 +1073,7 @@ public class ArchivController {
      *
      * @return obj
      */
-    @RequestMapping(value = "/getCompleteDataFromInternalStorage")
+    @RequestMapping(value = "/getCompleteDataFromInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse getCompleteDataFromInternalStorage() {
 
@@ -1107,7 +1107,7 @@ public class ArchivController {
      *
      * @return obj
      */
-    @RequestMapping(value = "/clearInternalStorage")
+    @RequestMapping(value = "/clearInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse clearInternalStorage() {
 
@@ -1126,7 +1126,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj
      */
-    @RequestMapping(value = "/openFile")
+    @RequestMapping(value = "/openFile", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse openFile(@RequestBody @Valid final RestRequest model) throws Exception {
 
