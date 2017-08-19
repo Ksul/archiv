@@ -10,7 +10,6 @@
         // <![CDATA[
 
 
-
         var alfrescoMode = false;
         var scriptID = null;
         var rulesID = null;
@@ -32,8 +31,10 @@
         var alfrescoTabelle;
         var alfrescoFolderTabelle;
         var alfrescoSearchTabelle;
-        var viewMenuNormal;
-        var viewMenuSearch;
+        var alfrescoViewModeMenu;
+        var searchViewModeMenu;
+        var alfrescoDocumentSelectMenu;
+        var searchDocumentSelectMenu;
         var viewMode = 0;
         var workDocument = null;
         var multiMode = false;
@@ -55,7 +56,7 @@
         var globalLayout;
         var anOpen = [];
 
-        window.onload = function() {
+        window.onload = function () {
 
             var ajax = new XMLHttpRequest();
             if (ajax != null) {
@@ -108,7 +109,7 @@
                     }
                 }
                 loadCssEntries(cssEntries);
-                loadJsEntries(jsEntries, function() {
+                loadJsEntries(jsEntries, function () {
                     start();
                 });
             }
@@ -136,10 +137,11 @@
                         fileref.onload = function () {
                             loadJsEntry(index);
                         }
-                    } else if(fn){
+                    } else if (fn) {
                         fn();
                     }
                 }
+
                 loadJsEntry(0);
             }
 
@@ -167,7 +169,7 @@
 <body>
 
 <!--Seite-->
-<div id="clientPage" >
+<div id="clientPage">
     <!--Tab Bereich-->
     <div id="tabs" class="container">
         <div id="tabNorth" class="ui-layout-north ui-widget">
@@ -178,9 +180,10 @@
                     <li id="tabSuche"><a href="#tab2">Suche</a></li>
                     <li id="tabVerteilung"><a href="#tab3">Verteilung</a></li>
                 </ul>
-                <div style="float:right; padding-right:10px;" id="settings" onclick="startSettingsDialog();" class="fa fa-cogs fa-2x" title="Einstellungen"></div>
+                <div style="float:right; padding-right:10px;" id="settings" onclick="startSettingsDialog();"
+                     class="fa fa-cogs fa-2x" title="Einstellungen"></div>
             </div>
-         </div>
+        </div>
         <!--Tab Panels-->
         <div id="tabPanels" class="tabPanel">
             <!--Tab Archiv-->
@@ -194,26 +197,10 @@
                             </div>
                         </div>
                     </div>
-                    <div id="alfrescoNorthEast"
-                         class="inner-center container tabPanel hidden">
-                        <ul id="menu-1" class="sf-menu" onmouseover="alfrescoLayout.allowOverflow(this);">
-                            <li class="current">
-                                <a href="#ansicht" class="fa fa-file-text-o fa-1x" ></a>
-                                <ul class="tabPanel">
-                                    <li>
-                                        <a href="#normal" class="fa fa-file-text-o fa-1x" onclick="showAlfrescoNormalView();"></a>
-                                    </li>
-                                    <li>
-                                        <a href="#icons" class="fa fa-photo fa-1x" onclick="showAlfrescoIconView();"></a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
                 <div id="alfrescoWest" class="inner-west container  hidden">
                     <div id="alfrescoHeaderWest" class="header  ui-widget-header">Archiv</div>
-                    <div >
+                    <div>
                         <div id="tree"></div>
                     </div>
                 </div>
@@ -231,20 +218,56 @@
                         </div>
                         <div id="alfrescoCenterCenterCenter" class="inner-center container  hidden">
                             <div class="header ui-widget-header" id="alfrescoTabelleHeader">Dokumente</div>
-                            <div  class="ui-widget-content" >
-                                <div id="dtable2">
-                                    <table cellpadding="0" cellspacing="0" border="0" class="display"
-                                           id="alfrescoTabelle"></table>
-                                </div>
-                                <div class="header ui-widget-header" id="alfrescoTableFooter"></div>
+                            <div class="ui-widget-content">
+                                <ul id="viewMenuAlfresco" class="sf-menu"
+                                    onmouseover="alfrescoLayout.allowOverflow(this);" style="height: 15px;">
+                                    <li class="current">
+                                        <a id="alfrescoAnsicht" class="fa fa-file-text-o fa-1x">Ansicht</a>
+                                        <ul class="tabPanel">
+                                            <li>
+                                                <a class="fa fa-file-text-o fa-1x" onclick="showAlfrescoNormalView();">Normal</a>
+                                            </li>
+                                            <li>
+                                                <a class="fa fa-photo fa-1x" onclick="showAlfrescoIconView();">Icon</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                                <ul id="selectionMenuAlfrescoDocuments" class="sf-menu"
+                                    onmouseover="alfrescoLayout.allowOverflow(this);" style="height: 15px;">
+                                    <li class="current">
+                                        <a id="alfrescoDocumentAuswahl" class="fa fa-check fa-1x">Auswählen</a>
+                                        <ul class="tabPanel">
+                                            <li>
+                                                <a class="fa fa-check-circle-o fa-1x"
+                                                   onclick="alfrescoTabelle.rows().select();">Alle</a>
+                                            </li>
+                                            <li>
+                                                <a class="fa fa-refresh fa-1x"
+                                                   onclick="var rows = alfrescoTabelle.rows( { selected: true } )[0];alfrescoTabelle.rows().select();alfrescoTabelle.rows(rows).deselect();">Umkehren</a>
+                                            </li>
+                                            <li>
+                                                <a class="fa fa-times-circle-o fa-1x"
+                                                   onclick="alfrescoTabelle.rows().deselect();">Keine</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
                             </div>
+                            <div id="dtable2">
+                                <table cellpadding="0" cellspacing="0" border="0" class="display"
+                                       id="alfrescoTabelle"></table>
+                            </div>
+                            <div class="header ui-widget-header" id="alfrescoTableFooter"></div>
                         </div>
                     </div>
                 </div>
             </div>
             <!--Tab Suche-->
             <div id="tab2" class="tabPanel hidden">
-                <div id="searchNorth" onmouseover="searchLayout.allowOverflow(this);" class="inner-north container ui-widget-header hidden" >
+                <div id="searchNorth" onmouseover="searchLayout.allowOverflow(this);"
+                     class="inner-north container ui-widget-header hidden">
                     <div id="searchNorthCenter" class="inner-center tabPanel hidden">
                         <label for="alfrescoSearch" style="float:left;margin: 5px 5px 5px 5px;">Suche </label>
                         <input id="alfrescoSearch" style="width:400px;height:auto;float:left;margin: 2px 5px 5px 5px;"
@@ -253,33 +276,49 @@
                              style="margin: 0px 5px 5px 5px;">Suche
                         </div>
                     </div>
-                    <div id="searchNorthEast"
-                         class="inner-east tabPanel hidden">
-                        <ul id="menu-2" style="float: right;" class="sf-menu"
-                            onmouseover="searchLayout.allowOverflow(this);">
+                </div>
+                <div id="searchCenter" class="inner-center container hidden">
+                    <div class="header ui-widget-header" id="searchTabelleHeader">Ergebnisse</div>
+                    <div class="ui-widget-content">
+                        <ul id="viewMenuSearch" class="sf-menu" onmouseover="searchLayout.allowOverflow(this);"
+                            style="height: 15px;">
                             <li class="current">
-                                <a href="#ansicht" class="fa fa-file-text-o fa-1x" ></a>
+                                <a id="searchAnsicht" class="fa fa-file-text-o fa-1x">Ansicht</a>
                                 <ul class="tabPanel">
                                     <li>
-                                        <a href="#normal" class="fa fa-file-text-o fa-1x" onclick="showAlfrescoSEarchNormalView();"></a>
+                                        <a class="fa fa-file-text-o fa-1x" onclick="showSearchNormalView();">Normal</a>
                                     </li>
                                     <li>
-                                        <a href="#icons" class="fa fa-photo fa-1x" onclick="showAlfrescoSearchIconView();"></a>
+                                        <a class="fa fa-photo fa-1x" onclick="showSearchIconView();">Icon</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul id="selectionMenuSearchDocuments" class="sf-menu"
+                            onmouseover="searchLayout.allowOverflow(this);" style="height: 15px;">
+                            <li class="current">
+                                <a id="searchDocumentAuswahl" class="fa fa-check fa-1x">Auswählen</a>
+                                <ul class="tabPanel">
+                                    <li>
+                                        <a class="fa fa-check-circle-o fa-1x"
+                                           onclick="alfrescoSearchTabelle.rows().select();">Alle</a>
+                                    </li>
+                                    <li>
+                                        <a class="fa fa-refresh fa-1x" onclick="var rows = alfrescoSearchTabelle.rows( { selected: true } )[0];alfrescoSearchTabelle.rows().select();alfrescoSearchTabelle.rows(rows).deselect();">Umkehren</a>
+                                    </li>
+                                    <li>
+                                        <a class="fa fa-times-circle-o fa-1x"
+                                           onclick="alfrescoSearchTabelle.rows().deselect();">Keine</a>
                                     </li>
                                 </ul>
                             </li>
                         </ul>
                     </div>
-                </div>
-                <div id="searchCenter" class="inner-center container hidden">
-                    <div class="header ui-widget-header" id="searchTabelleHeader">Ergebnisse</div>
-                    <div class="ui-widget-content">
-                        <div id="dtable4">
-                            <table cellpadding="0" cellspacing="0" border="0" class="display"
-                                   id="alfrescoSearchTabelle"></table>
-                        </div>
-                        <div class="header ui-widget-header" id="alfrescoSearchTableFooter"></div>
+                    <div id="dtable4">
+                        <table cellpadding="0" cellspacing="0" border="0" class="display"
+                               id="alfrescoSearchTabelle"></table>
                     </div>
+                    <div class="header ui-widget-header" id="alfrescoSearchTableFooter"></div>
                 </div>
             </div>
             <!--Tab Verteilung-->
@@ -288,7 +327,7 @@
                 <div id="verteilungWest" class="ui-tab-layout-west container ui-widget-header hidden">
                     <div id="headerWest" class="header">Dokument</div>
                     <div id="subHeaderWest" class="subhead">
-                        <table >
+                        <table>
                             <tr>
                                 <td width="70%"><input id="filesinput" name="filesinput"
                                                        type="file" multiple="multiple" size="50"/>
@@ -319,16 +358,19 @@
                                                                        value="" style="display: none"/>
                                 </td>
                                 <td width="60px" align="center"><input onclick="formatScript();"
-                                                                       name="beautifyScript" id="beautifyScript" type="submit"
+                                                                       name="beautifyScript" id="beautifyScript"
+                                                                       type="submit"
                                                                        class="fa fa-magic fa-2x" title="Format" value=""
                                                                        style="display: none"/>
                                 </td>
                                 <td width="60px" align="center"><input onclick="doBack();"
-                                                                       id="back" value="" type="submit" title="Close" class="close"
+                                                                       id="back" value="" type="submit" title="Close"
+                                                                       class="close"
                                                                        style="display: none"/>
                                 </td>
                                 <td width="60px" align="center"><input
-                                        onclick="activateScriptToContext();" name="activateScriptToContext" id="activateScriptToContext"
+                                        onclick="activateScriptToContext();" name="activateScriptToContext"
+                                        id="activateScriptToContext"
                                         type="submit" class="reload" title="Skript im Kontext aktualisieren" value=""
                                         style="display: none"/>
                                 </td>
@@ -371,7 +413,8 @@
                         <table>
                             <tr>
                                 <td width="60px" align="center"><input onclick="format();"
-                                                                       name="beautifyRules" id="beautifyRules" type="submit"
+                                                                       name="beautifyRules" id="beautifyRules"
+                                                                       type="submit"
                                                                        class="fa fa-magic fa-2x"
                                                                        title="Format" value=""/>
                                 </td>
@@ -395,7 +438,8 @@
                                         id="getRules" type="submit" class="download" title="Download Regeln" value=""/>
                                 </td>
                                 <td width="60px" align="center"><input onclick="sendRules();"
-                                                                       name="sendRules" id="sendRules" type="submit" class="upload"
+                                                                       name="sendRules" id="sendRules" type="submit"
+                                                                       class="upload"
                                                                        title="Sende Regeln" value=""/>
                                 </td>
                                 <td width="60px" align="center"><input
@@ -406,7 +450,7 @@
 
                             </tr>
                         </table>
-                        </div>
+                    </div>
                     <div class="ui-widget-content">
                         <div id="inRules" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
                     </div>
@@ -418,11 +462,13 @@
                         <table>
                             <tr>
                                 <td width="60px" align="center"><input onclick="doTest();"
-                                                                       name="test" id="test" type="submit" class="test" title="Test"
+                                                                       name="test" id="test" type="submit" class="test"
+                                                                       title="Test"
                                                                        value=""/>
                                 </td>
                                 <td width="60px" align="center"><input onclick="closeTest();"
-                                                                       name="closeTest" id="closeTest" type="submit" class="close"
+                                                                       name="closeTest" id="closeTest" type="submit"
+                                                                       class="close"
                                                                        title="Close"
                                                                        value="" style="display: none"/>
                                 </td>

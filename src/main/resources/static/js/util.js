@@ -18,11 +18,7 @@ function checkServerStatus(url) {
 
 /**
  * führt einen Service aus
- * die Methode prüft dabei im Appletzweig, ob ein String Parameter zu lang ist und überträgt ihn dann häppchenweise.
- * der entsprechende Parameter wird dann nicht mehr übergeben und muss dann in der entsprechenden Servicemethode im
- * Applet aus dem internenen Spreicher besorgt werden. Bislang funktioniert dieses Verfahren aber nur mit einem
- * Parameter.
- * @param service           Json Object mit dem Service
+ * @param service           JSON Object mit dem Service
  *                          name            Name des Services
  *                          callback        Funktion, die ausgeführt werden soll, wenn der Aufruf asynchron erfolgen soll
  *                          errorMessage    Fehlermeldung
@@ -31,7 +27,7 @@ function checkServerStatus(url) {
  *                          direct          Flag, dass das Ergebnis direkt zurückgegegeben werden soll. In diesen Fällen kommt kein JSON zurück
  *                          url             Url für den Aufruf Wird eigentlich nur für Tests gebraucht
  * @param params            die Parameter als JSON Objekt
- *                          name:  der Name des Parameters ( wird nur für das Servlet gebraucht)
+ *                          name:  der Name des Parameters
  *                          value: der Inhalt des Paramaters
  *                          type: der Typ des Parameters
  * @return das Ergebnis als JSON Objekt
@@ -77,7 +73,8 @@ function executeService(service, params) {
             for (index = 0; index < params.length; ++index) {
                 // falls Bytecode übertragen werden soll, dann Umwandlung damit es nicht zu Konvertierungsproblemen kommt
                 if (exist(params[index].type) && params[index].type == "byte")
-                    params[index].value = btoa(params[index].value);
+                    // Hier nicht btoa verwenden, weil es sonst Probleme mit Umlauten gibt
+                    params[index].value = base64EncArr(strToUTF8Arr((params[index].value)));
                 dataString[params[index].name] = params[index].value;
             }
         }
