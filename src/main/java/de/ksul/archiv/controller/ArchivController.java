@@ -77,7 +77,7 @@ public class ArchivController {
      * false    ein Fehler ist aufgetreten
      * data              die Titel als String
      */
-    @RequestMapping(value = "/getTitles", consumes = "application/json", produces = "application/json")
+    @RequestMapping(value = "/getTitles", produces = "application/json")
     public @ResponseBody
     RestResponse getTitles() {
         RestResponse obj = new RestResponse();
