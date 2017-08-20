@@ -122,7 +122,7 @@ public class ArchivController {
      * data     false       keine Connection
      * Map         Die Verbindungsparameter
      */
-    @RequestMapping(value = "/getConnection", consumes = "application/json", produces = "application/json")
+    @RequestMapping(value = "/getConnection")
     public @ResponseBody
     RestResponse getConnection() {
 
