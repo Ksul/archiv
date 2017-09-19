@@ -553,7 +553,6 @@ public class ArchivController {
     public @ResponseBody
     RestResponse createDocument(@RequestBody @Valid final RestRequest model) throws Exception {
 
-        //TODO Content als String oder als Stream?
         RestResponse obj = new RestResponse();
 
         CmisObject document;
@@ -572,7 +571,7 @@ public class ArchivController {
                 obj.setData(convertCmisObjectToJSON(document));
             } else {
                 obj.setSuccess(false);
-                obj.setData("Ein Document mit dem Namen " + model.getFileName() + " ist nicht vorhanden!");
+                obj.setData("Ein Document mit dem Namen " + model.getFileName() + " konnte nicht erstellt werden!");
             }
         } else {
             obj.setSuccess(false);
@@ -593,7 +592,6 @@ public class ArchivController {
     public @ResponseBody
     RestResponse updateDocument(@RequestBody @Valid final RestRequest model) throws Exception {
 
-        //TODO Content als String oder als Stream?
         RestResponse obj = new RestResponse();
 
 
@@ -1240,6 +1238,7 @@ public class ArchivController {
                 obj.put(Integer.toString(i++), convPropertiesToJSON(folder.getProperties()));
             }
             props.put("parents", obj);
+            props.put("parentId", parents.get(0).getId());
         }
         return props;
     }

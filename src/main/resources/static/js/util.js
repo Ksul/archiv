@@ -242,7 +242,7 @@ function timeStamp(withDate) {
 
 
 /**
- * such eine Key / Value Kombination aus einer Json Struktur
+ * sucht eine Key / Value Kombination aus einer JSON Struktur
  * @param obj           das zu durchsuchende JSON Objekt
  * @param key           der Key
  * @param val           der Wert
@@ -269,7 +269,7 @@ function searchJson(obj, key, val) {
 }
 
 /**
- * ändert das CSS für einen bestimmte Class
+ * ändert das CSS für eine bestimmte Klasse
  * @param className   der Name der Class
  * @param classValue  der neue Wert
  */

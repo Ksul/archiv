@@ -11,7 +11,7 @@
  */
 var Position = function() {
     this.typ = arguments[0];
-    if (arguments.length == 7) {
+    if (arguments.length === 7) {
         this.startPosition = eval(this.typ.editor).getSession().getValue().split("\n", arguments[1]).join("\n").length + arguments[2];
         this.endPosition = eval(this.typ.editor).getSession().getValue().split("\n", arguments[3]).join("\n").length + arguments[4];
         this.css = arguments[5];
@@ -78,7 +78,7 @@ var Position = function() {
     };
 
     this.convertPosition = function ( text) {
-        if (arguments.length == 0)
+        if (arguments.length === 0)
             text = eval(this.typ.editor).getSession().getValue();
         this.startRow = text.substring(0, this.startPosition).split(RETURN).length - 1;
         this.startColumn = this.startPosition - text.substring(0, this.startPosition).lastIndexOf(RETURN) - RETURN.length;
@@ -94,9 +94,9 @@ PositionContainer.prototype = [];
 
 PositionContainer.prototype.add = function (pos) {
     var found = false;
-    if (!(pos.startPosition == pos.endPosition) ) {
+    if (!(pos.startPosition === pos.endPosition) ) {
         for (var i = 0; i < this.length; i++) {
-            if (pos.typ == this[i].typ && (pos.startPosition > this[i].startPosition && pos.endPosition < this[i].endPosition)) {
+            if (pos.typ === this[i].typ && (pos.startPosition > this[i].startPosition && pos.endPosition < this[i].endPosition)) {
                 this[i] = pos;
                 found = true;
                 break;
@@ -118,7 +118,7 @@ PositionContainer.prototype.clear = function () {
  */
 PositionContainer.prototype.get = function(name) {
     for (var i = 0; i < this.length; i++) {
-        if (this[i].desc == name)
+        if (this[i].desc === name)
             return this[i];
     }
     return null;
@@ -216,7 +216,7 @@ function manageControls() {
         document.getElementById('play').setAttribute("disabled", true);
     }
 */
-    if (Verteilung.textEditor.getSession().getValue().length == 0) {
+    if (Verteilung.textEditor.getSession().getValue().length === 0) {
         document.getElementById('searchCont').setAttribute("disabled", true);
         document.getElementById('sendToInbox').setAttribute("disabled", true);
     }
@@ -382,7 +382,7 @@ function loadMultiText(content, txt, name, typ,  notDeleteable, container) {
  * handelt den File-Select der Dateiauswahl
  * @param evt    das Event
  */
-function handleFileSelect(evt) {
+function    handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
     var files = evt.dataTransfer.files;
@@ -416,7 +416,7 @@ function readMultiFile(evt) {
  */
 function readFiles(files) {
     try {
-        if (currentRules == null || !currentRules.endsWith("doc.xml")) {
+        if (currentRules === null || !currentRules.endsWith("doc.xml")) {
             var open = openFile("./rules/doc.xml");
             currentRules = open[1];
             Verteilung.rulesEditor.getSession().setValue(open[0]);
@@ -440,13 +440,13 @@ function readFiles(files) {
                     reader.onloadend = (function (theFile, clear) {
                         return function (evt) {
                             try {
-                                if (evt.target.readyState == FileReader.DONE) {
+                                if (evt.target.readyState === FileReader.DONE) {
                                     // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
                                     var json = executeService({"name": "extractPDFContent", "errorMessage": "PDF Datei konte nicht geparst werden:"}, [
                                         {"name": "content", "value": btoa(evt.target.result)}
                                     ]);
                                     if (json.success) {
-                                        if (count == 1)
+                                        if (count === 1)
                                             loadText(evt.target.result, json.data, theFile.name, theFile.type, null);
                                         else
                                             loadMultiText(evt.target.result, json.data, theFile.name, theFile.type, "false", null);
@@ -466,7 +466,7 @@ function readFiles(files) {
                     reader.onloadend = (function (theFile) {
                         return function (evt) {
                             try {
-                                if (evt.target.readyState == FileReader.DONE) {
+                                if (evt.target.readyState === FileReader.DONE) {
                                     // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
                                     var json = executeService({"name": "extractZIPAndExtractPDFToInternalStorage", "errorMessage": "ZIP Datei konte nicht entpackt werden:"}, [
                                         {"name": "content", "value": btoa(evt.target.result)}
@@ -478,7 +478,7 @@ function readFiles(files) {
                                             var erg = json1.data;
                                             for (var pos in erg) {
                                                 var entry = erg[pos];
-                                                if (count == 1)
+                                                if (count === 1)
                                                     loadText(UTF8ArrToStr(base64DecToArr(entry.data)), entry.extractedData, entry.name, "application/zip", null);
                                                 else {
                                                     // die originalen Bytes kommen decodiert, also encoden!
@@ -497,9 +497,9 @@ function readFiles(files) {
                     reader.readAsBinaryString(blob);
                 }
                 // Text Files
-                if (f.type == "text/plain") {
+                if (f.type === "text/plain") {
                     var r = new FileReader();
-                    if (files.length == 1) {
+                    if (files.length === 1) {
                         r.onload = (function (theFile) {
                             return function (e) {
                                 loadText(e.target.result, e.target.result, theFile.name, theFile.mozFullPath, theFile.type);
@@ -567,9 +567,9 @@ function setXMLPosition(position) {
     var pos = 0;
     for ( var i = 0; i < position.length; i++)
         pos = text.indexOf("<archivTyp name=\"" + position[i] + "\"", pos);
-    if (pos != -1) {
+    if (pos !== -1) {
         var pos1 = text.indexOf("</archivTyp>", pos);
-        if (pos1 != -1) {
+        if (pos1 !== -1) {
             pos1 = pos1 + 12;
             var startRow = text.substring(0, pos).split("\n").length - 1;
             var startCol = pos - text.substring(0, pos).lastIndexOf("\n") - 1;
@@ -602,11 +602,11 @@ function printResults(results) {
     for (key in results) {
         if (REC.exist(results[key])) {
             ret = ret + key + blanks.substr(0, maxLength - key.length) + ": " + results[key].getValue();
-            if ( Verteilung.positions.get(key) != null)
+            if ( Verteilung.positions.get(key) !== null)
                 new Position(Verteilung.POSITIONTYP.PROPS, pos, pos + key.length, Verteilung.positions.get(key).getCSS(), key);
             if (REC.exist(results[key].expected)) {
                 var tmp = eval(results[key].expected);
-                if (REC.exist(results[key].getValue()) && tmp.valueOf() == results[key].getValue().valueOf())
+                if (REC.exist(results[key].getValue()) && tmp.valueOf() === results[key].getValue().valueOf())
                     ret = ret + " [OK]";
                 else
                     ret = ret + " [FALSE] " + tmp;
@@ -623,7 +623,7 @@ function printResults(results) {
  * @param reverse   die Reihenfolge wird umgedreht
  */
 function fillMessageBox(reverse) {
-    if (typeof Verteilung.outputEditor != "undefined" && Verteilung.outputEditor != null)
+    if (typeof Verteilung.outputEditor !== "undefined" && Verteilung.outputEditor !== null)
         Verteilung.outputEditor.getSession().setValue(REC.getMessage(reverse));
 }
 
@@ -631,7 +631,7 @@ function fillMessageBox(reverse) {
  * löscht den Inhalt des Meldungsfensters
  */
 function clearMessageBox(){
-    if (typeof Verteilung.outputEditor != "undefined" && Verteilung.outputEditor != null)
+    if (typeof Verteilung.outputEditor !== "undefined" && Verteilung.outputEditor !== null)
         Verteilung.outputEditor.getSession().setValue("");
 }
 
@@ -952,7 +952,7 @@ function getRules(rulesId, loadLocal) {
 function openRules() {
     var id;
     try {
-        if (rulesID != null && typeof rulesID == "string") {
+        if (rulesID !== null && typeof rulesID === "string") {
             id = rulesID.substring(rulesID.lastIndexOf('/') + 1);
             getRules(id, false);
             document.getElementById('headerCenter').textContent = "Regeln (Server: doc.xml)";
@@ -979,7 +979,7 @@ function format() {
         xml = vkbeautify.xml(xml);
         Verteilung.rulesEditor.getSession().setValue(xml);
         // window.parent.frames.rules.Verteilung.rulesEditor.getSession().foldAll(1);
-        if (typeof currXMLName != "undefined" && currXMLName != null) {
+        if (typeof currXMLName !== "undefined" && currXMLName !== null) {
             setXMLPosition(currXMLName);
             Verteilung.positions.setMarkers();
         }
@@ -1232,6 +1232,7 @@ function sendToInbox() {
             {"name": "documentId", "value": inboxFolderId},
             {"name": "fileName", "value": currentFile},
             {"name": "content", "value": currentContent, "type": "byte"},
+            // TODO Richtigen Mimetype ermitteln
             {"name": "mimeType", "value": "application/pdf"},
             {"name": "extraProperties", "value": {}},
             {"name": "versionState", "value": "none"}
@@ -1274,7 +1275,7 @@ var Verteilung = {
         PROPS : {value: 2, name: "Pros", editor: "Verteilung.propsEditor"}
     }
 };
-if (typeof ace != "undefined")
+if (typeof ace !== "undefined")
         Verteilung.Range = ace.require("ace/range").Range;
 
 

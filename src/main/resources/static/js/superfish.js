@@ -19,6 +19,44 @@
                 anchorClass: 'sf-with-ul',
                 menuArrowClass: 'sf-arrows'
             },
+            recursiveKeySearch = function (key, data) {
+                // not shown - perhaps validate key as non-zero length string
+
+                // Handle null edge case.
+                if (data === null) {
+                    // nothing to do here
+                    return [];
+                }
+
+                // handle case of non-object, which will not be searched
+                if (data !== Object(data)) {
+                    return [];
+                }
+
+                var results = [];
+
+                // Handle array which we just traverse and recurse.
+                if (data.constructor === Array) {
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        results = results.concat(recursiveKeySearch(key, data[i]));
+                    }
+                    return results;
+                }
+
+                // We know we have an general object to work with now.
+                // Now we need to iterate keys
+                for (var dataKey in data) {
+                    if (key === dataKey) {
+                        // we found a match
+                        results.push(data[key]);
+                    }
+
+                    // now recurse into value at key
+                    results = results.concat(recursiveKeySearch(key, data[dataKey]));
+                }
+
+                return results;
+            },
             ios = (function () {
                 var ios = /^(?![\w\W]*Windows Phone)[\w\W]*(iPhone|iPad|iPod)/i.test(navigator.userAgent);
                 if (ios) {
@@ -142,6 +180,68 @@
                     .on('focusin.superfish', 'li', over)
                     .on('focusout.superfish', 'li', out)
                     .on(touchevent, 'a', o, touchHandler);
+            },
+            createMenu = function (obj, el, id) {
+
+                var submenus = [];
+                var selectElement;
+                // prüfen, ob Submenüs da sind
+                for (var k in obj) {
+                    if (obj.hasOwnProperty(k) && typeof obj[k] === 'object')
+                        submenus.push(k)
+                }
+
+                var element = el;
+
+                if (obj.title) {
+                    var menuElement = $('<li>');
+
+                    if (typeof obj.file === "boolean" && obj.file) {
+                        selectElement = $('<label>');
+                        selectElement.attr("for", "files_" + id);
+                        var inputElement = $("<input>");
+                        inputElement.attr("id", "files_" + id);
+                        inputElement.attr("type", "file");
+                        //inputElement.attr("multiple", "multiple");
+                        inputElement.attr("style", "display:none;");
+                        if (obj.action)
+                            inputElement.change( obj.action);
+                        menuElement.append(inputElement);
+
+                    } else {
+                        selectElement = $("<a>");
+                    }
+                    if (obj.className) {
+                        selectElement.addClass(obj.className);
+                        if(submenus.length > 0)
+                            selectElement.addClass(c.anchorClass);
+                    }
+                    if (typeof obj.disabled === "boolean" && obj.disabled) {
+                        selectElement.addClass("disableLI");
+                    } else if (obj.action && !(typeof obj.file === "boolean" && obj.file)) {
+                        selectElement.on("click", obj.action);
+                    }
+
+                    selectElement.text(obj.title);
+                    selectElement.attr("id", id);
+
+                    if (submenus.length > 0) {
+                        var ulElement = $("<ul>");
+                        if (typeof obj.disabled === "boolean" && obj.disabled)
+                            ulElement.addClass("disableLI");
+                        menuElement.append(ulElement);
+                        menuElement.addClass("current");
+                        element = ulElement;
+                    }
+                    menuElement.prepend(selectElement);
+                    el.append(menuElement);
+                }
+
+
+                for (var i in submenus) {
+                    createMenu(obj[submenus[i]], element, submenus[i]);
+                }
+
             };
 
         return {
@@ -182,6 +282,9 @@
                 var $this = this.addClass(o.hoverClass),
                     $ul = $this.children(o.popUpSelector);
 
+                if ($ul.hasClass("disableLI"))
+                    return this;
+
                 if (o.onBeforeShow.call($ul) === false) {
                     return this;
                 }
@@ -219,6 +322,22 @@
                     $this.removeData('sfOptions');
                 });
             },
+            disable: function (id) {
+                var element = $("#" + id);
+                element.addClass("disableLI");
+                element.parent().children("ul").addClass("disableLI");
+                element.off("click");
+            },
+            enable: function (id) {
+                var $this = $(this);
+                var o = $this.data('sfOptions');
+                var element = $(document.getElementById(id));
+                element.removeClass("disableLI");
+                element.parent().children("ul").removeClass("disableLI");
+                var obj = recursiveKeySearch(id, o.menuData);
+                if (obj && obj.length && !obj[0].file && obj[0].action)
+                    element.on("click", obj[0].action);
+            },
             init: function (op) {
                 return this.each(function () {
                     var $this = $(this);
@@ -227,6 +346,9 @@
                     }
                     var o = $.extend({}, $.fn.superfish.defaults, op),
                         $hasPopUp = $this.find(o.popUpSelector).parent('li');
+                    if ($hasPopUp.length === 0) {
+                        createMenu(o.menuData, $this, this.id);
+                    }
                     o.$path = setPathToCurrent($this, o);
 
                     $this.data('sfOptions', o);
@@ -248,11 +370,11 @@
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         }
-        else if (typeof method === 'object' || ! method) {
+        else if (typeof method === 'object' || !method) {
             return methods.init.apply(this, arguments);
         }
         else {
-            return $.error('Method ' +  method + ' does not exist on jQuery.fn.superfish');
+            return $.error('Method ' + method + ' does not exist on jQuery.fn.superfish');
         }
     };
 
@@ -275,7 +397,8 @@
         onHide: $.noop,
         onIdle: $.noop,
         onDestroy: $.noop,
-        onHandleTouch: $.noop
+        onHandleTouch: $.noop,
+        menuData: []
     };
 
 })(jQuery, window);

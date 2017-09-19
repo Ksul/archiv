@@ -35,6 +35,8 @@
         var searchViewModeMenu;
         var alfrescoDocumentSelectMenu;
         var searchDocumentSelectMenu;
+        var alfrescoDocumentActionMenu;
+        var alfrescoSearchDocumentActionMenu;
         var viewMode = 0;
         var workDocument = null;
         var multiMode = false;
@@ -59,7 +61,7 @@
         window.onload = function () {
 
             var ajax = new XMLHttpRequest();
-            if (ajax != null) {
+            if (ajax !== null) {
                 //Caching verhindern
                 var timestamp = new Date();
                 var uniqueURI = "./templates/resource.template?" + "timestamp=" + timestamp.getTime();
@@ -67,8 +69,8 @@
                 ajax.open("GET", uniqueURI, true);
                 ajax.setRequestHeader("X-Test", "test1");
                 ajax.onreadystatechange = function () {
-                    if (this.readyState == 4) {
-                        if (this.status == 200) {
+                    if (this.readyState === 4) {
+                        if (this.status === 200) {
                             loadResources(this.responseText);
                         }
                         else {
@@ -103,7 +105,7 @@
                                 cssEntries.push(element);
 
                             }
-                            if (typeof fileref != "undefined")
+                            if (typeof fileref !== "undefined")
                                 document.getElementsByTagName("head")[0].appendChild(fileref);
                         }
                     }
@@ -219,41 +221,10 @@
                         <div id="alfrescoCenterCenterCenter" class="inner-center container  hidden">
                             <div class="header ui-widget-header" id="alfrescoTabelleHeader">Dokumente</div>
                             <div class="ui-widget-content">
-                                <ul id="viewMenuAlfresco" class="sf-menu"
-                                    onmouseover="alfrescoLayout.allowOverflow(this);" style="height: 15px;">
-                                    <li class="current">
-                                        <a id="alfrescoAnsicht" class="fa fa-file-text-o fa-1x">Ansicht</a>
-                                        <ul class="tabPanel">
-                                            <li>
-                                                <a class="fa fa-file-text-o fa-1x" onclick="showAlfrescoNormalView();">Normal</a>
-                                            </li>
-                                            <li>
-                                                <a class="fa fa-photo fa-1x" onclick="showAlfrescoIconView();">Icon</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
 
-                                <ul id="selectionMenuAlfrescoDocuments" class="sf-menu"
-                                    onmouseover="alfrescoLayout.allowOverflow(this);" style="height: 15px;">
-                                    <li class="current">
-                                        <a id="alfrescoDocumentAuswahl" class="fa fa-check fa-1x">Auswählen</a>
-                                        <ul class="tabPanel">
-                                            <li>
-                                                <a class="fa fa-check-circle-o fa-1x"
-                                                   onclick="alfrescoTabelle.rows().select();">Alle</a>
-                                            </li>
-                                            <li>
-                                                <a class="fa fa-refresh fa-1x"
-                                                   onclick="var rows = alfrescoTabelle.rows( { selected: true } )[0];alfrescoTabelle.rows().select();alfrescoTabelle.rows(rows).deselect();">Umkehren</a>
-                                            </li>
-                                            <li>
-                                                <a class="fa fa-times-circle-o fa-1x"
-                                                   onclick="alfrescoTabelle.rows().deselect();">Keine</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
+                                <ul id="selectionMenuAlfrescoDocuments" class="sf-menu" style="height: 15px;"></ul>
+                                <ul id="actionMenuAlfrescoDocuments" class="sf-menu" style="height: 15px;"></ul>
+                                <ul id="viewMenuAlfresco" class="sf-menu" style="height: 15px;"></ul>
                             </div>
                             <div id="dtable2">
                                 <table cellpadding="0" cellspacing="0" border="0" class="display"
@@ -280,39 +251,9 @@
                 <div id="searchCenter" class="inner-center container hidden">
                     <div class="header ui-widget-header" id="searchTabelleHeader">Ergebnisse</div>
                     <div class="ui-widget-content">
-                        <ul id="viewMenuSearch" class="sf-menu" onmouseover="searchLayout.allowOverflow(this);"
-                            style="height: 15px;">
-                            <li class="current">
-                                <a id="searchAnsicht" class="fa fa-file-text-o fa-1x">Ansicht</a>
-                                <ul class="tabPanel">
-                                    <li>
-                                        <a class="fa fa-file-text-o fa-1x" onclick="showSearchNormalView();">Normal</a>
-                                    </li>
-                                    <li>
-                                        <a class="fa fa-photo fa-1x" onclick="showSearchIconView();">Icon</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <ul id="selectionMenuSearchDocuments" class="sf-menu"
-                            onmouseover="searchLayout.allowOverflow(this);" style="height: 15px;">
-                            <li class="current">
-                                <a id="searchDocumentAuswahl" class="fa fa-check fa-1x">Auswählen</a>
-                                <ul class="tabPanel">
-                                    <li>
-                                        <a class="fa fa-check-circle-o fa-1x"
-                                           onclick="alfrescoSearchTabelle.rows().select();">Alle</a>
-                                    </li>
-                                    <li>
-                                        <a class="fa fa-refresh fa-1x" onclick="var rows = alfrescoSearchTabelle.rows( { selected: true } )[0];alfrescoSearchTabelle.rows().select();alfrescoSearchTabelle.rows(rows).deselect();">Umkehren</a>
-                                    </li>
-                                    <li>
-                                        <a class="fa fa-times-circle-o fa-1x"
-                                           onclick="alfrescoSearchTabelle.rows().deselect();">Keine</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
+                        <ul id="selectionMenuAlfrescoSearchDocuments" class="sf-menu" style="height: 15px;"></ul>
+                        <ul id="actionMenuAlfrescoSearchDocuments" class="sf-menu" style="height: 15px;"></ul>
+                        <ul id="viewMenuSearch" class="sf-menu" style="height: 15px;"></ul>
                     </div>
                     <div id="dtable4">
                         <table cellpadding="0" cellspacing="0" border="0" class="display"

@@ -195,7 +195,7 @@ function startDocumentDialog(data, modus, modal) {
             "schema": {
                 "type": "object",
                 "title": function() {
-                    if (modus == "web-display")
+                    if (modus === "web-display")
                         return "Dokument löschen?";
                     else
                         return "a";
@@ -412,23 +412,25 @@ function startDocumentDialog(data, modus, modal) {
                                 var input = alpaca.getValue();
                                 // die original Daten sichern.
                                 var origData = alpaca.data;
-                                if (modus == "web-edit") {
+                                if (modus === "web-edit") {
                                     // Konvertierung
-                                    if (input.amountDisplay && typeof input.amountDisplay == "string")
+                                    if (input.amountDisplay && typeof input.amountDisplay === "string")
                                         input.amount = parseFloat(input.amountDisplay.replace(/\./g, '').replace(/,/g, "."));
-                                    if (input.documentDateDisplay && typeof input.documentDateDisplay == "string")
+                                    if (input.documentDateDisplay && typeof input.documentDateDisplay === "string")
                                         input.documentDate = $.datepicker.parseDate("dd.mm.yy", input.documentDateDisplay).getTime();
                                     // Wurde was geändert?
-                                    if ((input.title && origData.title != input.title) ||
-                                        (input.description && origData.description != input.description) ||
-                                        (input.person && origData.person != input.person) ||
-                                        (input.documentDate && origData.documentDate != input.documentDate) ||
-                                        (input.amount && origData.amount != input.amount) ||
-                                        (input.tax != origData.tax)) {
+                                    if ((input.title && origData.title !== input.title) ||
+                                        (input.description && origData.description !== input.description) ||
+                                        (input.person && origData.person !== input.person) ||
+                                        (input.documentDate && origData.documentDate !== input.documentDate) ||
+                                        (input.amount && origData.amount !== input.amount) ||
+                                        (input.tax !== origData.tax)) {
                                         editDocument(input, origData.objectID);
                                     }
-                                } else if (modus == "web-display") {
+                                } else if (modus === "web-display") {
                                     deleteDocument(origData);
+                                } else if (modus === "web-create") {
+                                    createDocument(alpaca.getValue(), alpaca.data.file);
                                 }
                                 closeDialog();
                             } catch (e) {
@@ -440,7 +442,7 @@ function startDocumentDialog(data, modus, modal) {
             }
         };
         var additionalButton =[{"id":".alpaca-form-button-delete", "function": deleteDocument }];
-        startDialog(modus == "web-display" ? "Dokument löschen?" : "Dokument Eigenschaften", dialogDocumentDetailsSettings, 450, modal, additionalButton);
+        startDialog(modus === "web-display" ? "Dokument löschen?" : "Dokument Eigenschaften", dialogDocumentDetailsSettings, 450, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
     }
@@ -467,12 +469,12 @@ function startFolderDialog(data, modus, modal) {
                         "type": "string",
                         "title": "Name",
                         "required": true,
-                        "readonly": !(data.objectID != alfrescoRootFolderId &&
-                        data.objectID != archivFolderId &&
-                        data.objectID != fehlerFolderId &&
-                        data.objectID != unknownFolderId &&
-                        data.objectID != doubleFolderId &&
-                        data.objectID != inboxFolderId) 
+                        "readonly": !(data.objectID !== alfrescoRootFolderId &&
+                        data.objectID !== archivFolderId &&
+                        data.objectID !== fehlerFolderId &&
+                        data.objectID !== unknownFolderId &&
+                        data.objectID !== doubleFolderId &&
+                        data.objectID !== inboxFolderId)
                     },
                     "title": {
                         "type": "string",
@@ -564,16 +566,16 @@ function startFolderDialog(data, modus, modal) {
                                 var input = alpaca.getValue();
                                 // die original Daten sichern.
                                 var origData = alpaca.data;
-                                if (modus == "web-create") {
+                                if (modus === "web-create") {
                                     // ein neuer Ordner wird erstellt
                                     createFolder(input, origData);
                                     
                                 }
-                                else if (modus == "web-edit") {
+                                else if (modus === "web-edit") {
                                     // bestehender Ordner wird editiert
-                                    if ((input.name && input.name != origData.name) ||
-                                        (input.title && input.title != origData.title) ||
-                                        (input.description && input.description != origData.description)) {
+                                    if ((input.name && input.name !== origData.name) ||
+                                        (input.title && input.title !== origData.title) ||
+                                        (input.description && input.description !== origData.description)) {
                                         erg = editFolder(input, origData.objectID);
                                         if (!erg.success)
                                             message("Fehler", erg.error);
@@ -589,7 +591,7 @@ function startFolderDialog(data, modus, modal) {
             }
         };
         var additionalButton =[{"id":".alpaca-form-button-delete", "function": deleteFolder }];
-        startDialog(modus == "web-display" ? "Ordner löschen?" : "Ordner Eigenschaften", folderDialogSettings, 460, modal, additionalButton);
+        startDialog(modus === "web-display" ? "Ordner löschen?" : "Ordner Eigenschaften", folderDialogSettings, 460, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
     }
@@ -670,15 +672,88 @@ function startCommentsDialog(comments) {
 }
 
 /**
+ * startet den Dialog zum Hochladen
+ */
+function startUploadDialog() {
+    try {
+        var data = comments.items;
+
+        $dialog = $('<div> <input type="file" multiple="" name="files[]" class="dnd-file-selection-button"> </div>').dialog({
+            autoOpen: false,
+            title: "Kommentare",
+            modal: true,
+            height:300,
+            width:800,
+            buttons: {
+                "Ok": function () {
+                    $(this).dialog("destroy");
+                }
+            }
+        }).css({height:"300px", width:"800px", overflow:"auto"});
+
+        $dialog.dialog('open');
+        $('#custTabelle').DataTable({
+            "jQueryUI": true,
+            "paging": false,
+            "data": data,
+            "scrollX": "100%",
+            "scrollXInner": "100%",
+            // "sScrollY" : calcDataTableHeight(),
+            "autoWidth": true,
+            "lengthChange": false,
+            "searching": false,
+            "columns": [
+                {
+                    "data": "author.username",
+                    "title": "User",
+                    "defaultContent": '',
+                    "type": "string",
+                    "width": "120px",
+                    "class": "alignLeft"
+                },
+                {
+                    "data": "modifiedOn",
+                    "title": "Datum",
+                    "defaultContent": '',
+                    "type": "string",
+                    "width": "120px",
+                    "class": "alignLeft"
+                },
+                {
+                    "title": "Kommentar",
+                    "data": "content",
+                    "class": "alignLeft"
+                }
+            ],
+            "columnDefs": [
+                {
+                    "targets": [0, 2],
+                    "visible": true
+                },
+                {
+                    "targets": [1],
+                    "visible": true,
+                    "render": function (data, type, row) {
+                        return  $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Date.parse(row.modifiedOnISO)));
+                    }
+                }
+            ],
+            "info": false
+        });
+    } catch (e) {
+        errorHandler(e);
+    }
+}
+
+/**
  * startet den Dialog zum Verschieben von Dokumenten
- * @param  data     Array mit den Tabellendaten
+ * @param  rowData  Array mit den Tabellendaten
+ * @param  table    die Tabelle
  *
  */
-function startMoveDialog(data) {
+function startMoveDialog(rowData, table) {
 
     try {
-        this.data = data;
-
         var moveDialogSettings = { "id": "moveDialog",
             "schema": {
                 "type": "object",
@@ -770,16 +845,18 @@ function startMoveDialog(data) {
                     'plugins': ["dnd", "types"]
                 }).on("changed.jstree",  function (event, data){
                     try {
-                        if (data.action == "select_node") {
+                        if (data.action === "select_node") {
                            
                             if (data.node.data &&
-                            data.node.data.objectID != alfrescoRootFolderId &&
-                            data.node.data.objectID != archivFolderId &&
-                            data.node.data.objectID != fehlerFolderId &&
-                            data.node.data.objectID != unknownFolderId &&
-                            data.node.data.objectID != doubleFolderId &&
-                            data.node.data.objectID != documentFolderId)
+                            data.node.data.objectID !== alfrescoRootFolderId &&
+                            data.node.data.objectID !== archivFolderId &&
+                            data.node.data.objectID !== fehlerFolderId &&
+                            data.node.data.objectID !== unknownFolderId &&
+                            data.node.data.objectID !== doubleFolderId &&
+                            data.node.data.objectID !== documentFolderId &&
+                            rowData.filter(function(row){ return row.parentId ===  data.node.data.objectID }).length === 0) {
                                 form.enableSubmitButton();
+                            }
                             else {
                                 form.disableSubmitButton();
                                 data.instance.deselect_node(data.node, true);
@@ -799,17 +876,21 @@ function startMoveDialog(data) {
                                 var dialogTree = $.jstree.reference('#dialogTree');
                                 var nodeIds = dialogTree.get_selected();
                                 // über alle selektierten Zeilen iterieren
-                                for (var index = 0; index < data.length; ++index) {
-                                    var row = data[index];
-                                    var done = function (json) {
+                                for (var index = 0; index < rowData.length; ++index) {
+                                     var done = function (json) {
                                         if (json.success) {
                                             var newData = json.data;
                                             var source = json.source;
                                             var target = json.target;
-                                            REC.log(INFORMATIONAL, "Dokument " + row.data().name + " von " + source.path + " nach " + target.path + " verschoben");
+                                            REC.log(INFORMATIONAL, "Dokument " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
                                             fillMessageBox(true);
-                                            row.remove();
-                                            row.table().draw();
+                                            // nur wenn die Tabelle angeben ist werden die Zeilen gelöscht. Bei der Tabelle mit den Suchergebnissen
+                                            // werden keine Einträge gelöscht und deshalb sollte die Tabelle dort auch nicht für diese Funktion mit
+                                            // angegeben werden.
+                                            if (table) {
+                                                table.row('#' + newData.objectID).remove();
+                                                table.draw();
+                                            }
                                         }
                                     };
                                     //Dokument verschieben....
@@ -818,8 +899,8 @@ function startMoveDialog(data) {
                                         "callback": done,
                                         "errorMessage": "Dokument konnte nicht verschoben werden:"
                                     }, [
-                                        {"name": "documentId", "value": row.data().objectID},
-                                        {"name": "currentLocationId", "value": row.data().parentId},
+                                        {"name": "documentId", "value": rowData[index].objectID},
+                                        {"name": "currentLocationId", "value": rowData[index].parentId},
                                         {"name": "destinationId", "value": nodeIds[0]}
                                     ]);
                                 }

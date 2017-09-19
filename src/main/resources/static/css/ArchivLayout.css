@@ -856,6 +856,6 @@ span.awesomeBlue i.awesomeAction {
     padding-right:40px;
 }
 
-a:before {
+a:before, label:before {
     margin-right: 15px;
 }

@@ -17,8 +17,8 @@
 .sf-menu > li {
 	float: left;
 }
-.sf-menu li:hover > ul,
-.sf-menu li.sfHover > ul {
+.sf-menu li:hover > ul:not(.disableLI),
+.sf-menu li.sfHover > ul:not(.disableLI) {
 	display: block;
 }
 
@@ -42,15 +42,13 @@
 	min-width: 12em; /* allow long menu items to determine submenu width */
 	*width: 12em; /* no auto sub width for IE7, see white-space comment below */
 }
-.sf-menu a {
+.sf-menu a, .sf-menu label {
 	border-left: 1px solid #fff;
 	border-top: 1px solid #dFeEFF; /* fallback colour must use full shorthand */
 	border-top: 1px solid rgba(255,255,255,.5);
 	padding: .75em 1em;
 	text-decoration: none;
 	zoom: 1; /* IE7 */
-}
-.sf-menu a {
 	color: #13a;
 }
 
@@ -70,8 +68,8 @@
 	background: rgb(232, 232, 232);
 }
 .sf-menu ul ul li {
-	background: #9AAEDB;   
-
+	/*background: #9AAEDB;   */
+	background: rgb(232, 232, 232);
 }
 .sf-menu li:hover,
 .sf-menu li.sfHover {
