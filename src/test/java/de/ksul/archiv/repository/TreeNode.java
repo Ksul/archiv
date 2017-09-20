@@ -1,6 +1,5 @@
 package de.ksul.archiv.repository;
 
-import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 
 import java.util.*;

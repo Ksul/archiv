@@ -3,9 +3,7 @@ package de.ksul.archiv.controller;
 import de.ksul.archiv.AlfrescoTest;
 import de.ksul.archiv.FileEntry;
 import de.ksul.archiv.VerteilungConstants;
-import de.ksul.archiv.request.ConnectionRequest;
-import de.ksul.archiv.request.DataTablesRequest;
-import de.ksul.archiv.request.RestRequest;
+import de.ksul.archiv.request.*;
 import de.ksul.archiv.response.DataTablesResponse;
 import de.ksul.archiv.response.MoveResponse;
 import de.ksul.archiv.response.RestResponse;
@@ -127,7 +125,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testGetNodeID() throws Exception {
-        RestRequest request = new RestRequest();
+        ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath("/");
         RestResponse obj = services.getNodeId(request);
         assertThat(obj, notNullValue());
@@ -148,7 +146,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testGetNode() throws Exception {
-        RestRequest request = new RestRequest();
+        ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath("/");
         RestResponse obj = services.getNode(request);
         assertThat(obj, notNullValue());
@@ -168,24 +166,19 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testGetNodeByID() throws Exception {
-        RestRequest request = new RestRequest();
-        request.setFilePath("/");
-        RestResponse obj = services.getNodeId(request);
+        RestResponse obj = services.getNodeId(new ObjectByPathRequest("/"));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setDocumentId((String) obj.getData());
-        obj = services.getNodeById(request);
+        obj = services.getNodeById(new ObjectByIdRequest((String) obj.getData()));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
-        obj = services.getNodeId(request);
+        obj = services.getNodeId(new ObjectByPathRequest("/Datenverzeichnis/Skripte/backup.js.sample"));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setDocumentId((String) obj.getData());
-        obj = services.getNodeById(request);
+        obj = services.getNodeById(new ObjectByIdRequest((String) obj.getData()));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -210,7 +203,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testQuery() throws Exception {
-        RestRequest request = new RestRequest();
+        QueryRequest request = new QueryRequest();
         request.setCmisQuery("SELECT cmis:objectId, cmis:name from cmis:document where cmis:name='backup.js.sample'");
         RestResponse obj = services.query(request);
         assertThat(obj, notNullValue());
@@ -221,12 +214,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testGetDocumentContent() throws Exception {
-        RestRequest request = new RestRequest();
-        request.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
-        String id = (String) services.getNodeId(request).getData();
-        request.setDocumentId(id);
-        request.setExtract(false);
-        RestResponse obj = services.getDocumentContent(request);
+        RestResponse obj = services.getDocumentContent(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/Datenverzeichnis/Skripte/backup.js.sample")).getData()));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -237,7 +225,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     @Test
     public void testUploadDocument() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
-        RestRequest request = new RestRequest();
+        UploadRequest request = new UploadRequest();
         request.setDocumentId(folder.getId());
         request.setFileName(System.getProperty("user.dir") + filePdf);
         request.setVersionState(VersioningState.MINOR.value());
@@ -245,9 +233,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/TestFolder/Test.pdf");
-        request.setDocumentId((String) services.getNodeId(request).getData());
-        obj = services.deleteDocument(request);
+        obj = services.deleteDocument(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/TestFolder/Test.pdf")).getData()));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -261,7 +247,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         p1.put("cm:description", "Testdokument");
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("P:cm:titled", p1);
-        RestRequest request = new RestRequest();
+        DocumentRequest request = new DocumentRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
         request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
@@ -275,18 +261,13 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         Map<String, Object> data = (Map) obj.getData();
         assertThat(data, Matchers.notNullValue());
         assertThat(((String) data.get("name")).equalsIgnoreCase("TestDocument.txt"), is(true));
-        request.setDocumentId((String) data.get("objectId"));
-        request.setExtract(false);
-        obj = services.getDocumentContent(request);
+        obj = services.getDocumentContent(new ObjectByIdRequest((String) data.get("objectId")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
         String document = (String) obj.getData();
         assertThat(document, is(content));
-        request.setFilePath("/TestFolder/TestDocument.txt");
-        obj = services.getNodeId(request);
-        request.setDocumentId((String) obj.getData());
-        obj = services.deleteDocument(request);
+        obj = services.deleteDocument(new ObjectByIdRequest((String)  services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
     }
@@ -309,7 +290,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         extraProperties.put("P:cm:emailed", p2);
         extraProperties.put("P:my:amountable", p3);
         extraProperties.put("D:my:archivContent", p4);
-        RestRequest request = new RestRequest();
+        DocumentRequest request = new DocumentRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
         request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
@@ -323,27 +304,20 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         Map<String, Object> data = (Map) obj.getData();
         assertThat(data, Matchers.notNullValue());
         assertThat((String) data.get("name"), Matchers.equalToIgnoringCase("TestDocument.txt"));
-        request.setDocumentId((String) data.get("objectId"));
-        request.setExtract(false);
-        obj = services.getDocumentContent(request);
+        obj = services.getDocumentContent(new ObjectByIdRequest((String) data.get("objectId")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
         String document = (String) obj.getData();
         assertThat(document, Matchers.equalTo(content));
-        request.setFilePath("/TestFolder/TestDocument.txt");
-        obj = services.getNodeId(request);
-        request.setDocumentId((String) obj.getData());
-        obj = services.deleteDocument(request);
+        obj = services.deleteDocument(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
     }
 
     @Test
     public void testCreateFolder() throws Exception {
-        RestRequest request = new RestRequest();
-        request.setFilePath("/");
-        RestResponse obj = services.getNodeId(request);
+        RestResponse obj = services.getNodeId(new ObjectByPathRequest("/"));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -355,17 +329,14 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("cmis:folder", p2);
         extraProperties.put("P:cm:titled", p1);
-        request.setDocumentId((String) obj.getData());
-        request.setExtraProperties(extraProperties);
-        obj = services.createFolder(request);
+        obj = services.createFolder(new PropertiesRequest((String) obj.getData(), extraProperties));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
         Map<String, Object> data = (Map) obj.getData();
         assertThat(data, notNullValue());
         assertThat((String) data.get("name"), Matchers.equalToIgnoringCase("TestFolder"));
-        request.setDocumentId((String) data.get("objectId"));
-        obj = services.deleteFolder(request);
+        obj = services.deleteFolder(new ObjectByIdRequest((String) data.get("objectId")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -379,7 +350,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
 
         String content = "Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?";
-        RestRequest request = new RestRequest();
+        DocumentRequest request = new DocumentRequest();
         request.setDocumentId(document.getId());
         request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
         request.setMimeType(VerteilungConstants.DOCUMENT_TYPE_TEXT);
@@ -390,15 +361,12 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
         Map<String, Object> doc = (Map) obj.getData();
-        request.setDocumentId((String) doc.get("objectId"));
-        request.setExtract(false);
-        obj = services.getDocumentContent(request);
+        obj = services.getDocumentContent(new ObjectByIdRequest((String) doc.get("objectId")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
         assertThat(obj.getData(), Matchers.is(content));
-        request.setDocumentId((String) doc.get("objectId"));
-        obj = services.deleteDocument(request);
+        obj = services.deleteDocument(new ObjectByIdRequest((String) doc.get("objectId")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -462,9 +430,8 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(data.get("checkinComment"), Matchers.equalTo("2. Versionskommentar"));
         assertThat(((BigDecimal) data.get("amount")).doubleValue(), Matchers.equalTo(25.33));
         assertThat(data.get("tax"), Matchers.is(true));
-
-        request.setDocumentId((String) doc.get("objectId"));
-        obj = services.deleteDocument(request);
+        
+        obj = services.deleteDocument(new ObjectByIdRequest((String) doc.get("objectId")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -483,7 +450,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("cmis:folder", p2);
         extraProperties.put("P:cm:titled", p1);
-        RestRequest request = new RestRequest();
+        PropertiesRequest request = new PropertiesRequest();
         request.setDocumentId(folder.getId());
         request.setExtraProperties(extraProperties);
         RestResponse obj = services.updateProperties(request);
@@ -534,7 +501,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         extraProperties.put("P:my:amountable", p3);
         extraProperties.put("D:my:archivContent", p4);
         extraProperties.put("P:my:idable", p5);
-        RestRequest request = new RestRequest();
+        PropertiesRequest request = new PropertiesRequest();
         request.setDocumentId(document.getId());
         request.setExtraProperties(extraProperties);
         RestResponse obj = services.updateProperties(request);
@@ -591,8 +558,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(data, Matchers.notNullValue());
 
         document.refresh();
-        request.setDocumentId(document.getId());
-        obj = services.deleteDocument(request);
+        obj = services.deleteDocument(new ObjectByIdRequest(document.getId()));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -603,7 +569,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         CmisObject folder = buildTestFolder("TestFolder", null);
         CmisObject document = buildDocument("TestDocument", folder);
         CmisObject newFolder = buildTestFolder("FolderTest", null);
-        RestRequest request = new RestRequest();
+        MoveRequest request = new MoveRequest();
         request.setDocumentId(document.getId());
         request.setCurrentLocationId(folder.getId());
         request.setDestinationId(newFolder.getId());
@@ -611,9 +577,8 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/FolderTest/TestDocument");
-        request.setDocumentId((String) services.getNodeId(request).getData());
-        RestResponse resp = services.deleteDocument(request);
+        request.setDocumentId((String) services.getNodeId(new ObjectByPathRequest("/FolderTest/TestDocument")).getData());
+        RestResponse resp = services.deleteDocument(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/FolderTest/TestDocument")).getData()));
         assertThat(resp, notNullValue());
         assertThat(resp.getData() + (resp.hasError() ? resp.getError().getMessage() : ""), resp.isSuccess(), Matchers.is(true));
         assertThat(resp.getData(), notNullValue());
@@ -626,7 +591,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(filePdf, Matchers.notNullValue());
         byte[] content = readFile(System.getProperty("user.dir") + filePdf);
         assertThat(content.length, Matchers.greaterThan(0));
-        RestRequest request = new RestRequest();
+        ExtractRequest request = new ExtractRequest();
         request.setContent(Base64.encodeBase64String(content));
         request.setFileName(filePdf);
         RestResponse obj = services.extractPDFToInternalStorage(request);
@@ -648,7 +613,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(filePdf, Matchers.notNullValue());
         byte[] content = readFile(System.getProperty("user.dir") + filePdf);
         assertThat(content.length, Matchers.greaterThan(0));
-        RestRequest request = new RestRequest();
+        ContentRequest request = new ContentRequest();
         request.setContent(Base64.encodeBase64String(content));
         RestResponse obj = services.extractPDFContent(request);
         assertThat(obj, notNullValue());
@@ -661,7 +626,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     public void testExtractPDFFile() throws Exception {
         assertThat(filePdf, Matchers.notNullValue());
         String fullPath = "file:///" + System.getProperty("user.dir").replace("\\", "/") + filePdf;
-        RestRequest request = new RestRequest();
+        ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath(fullPath);
         RestResponse obj = services.extractPDFFile(request);
         assertThat(obj, notNullValue());
@@ -675,7 +640,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(fileZip, Matchers.notNullValue());
         byte[] content = readFile(System.getProperty("user.dir") + fileZip);
         assertThat(content.length, Matchers.greaterThan(0));
-        RestRequest request = new RestRequest();
+        ContentRequest request = new ContentRequest();
         request.setContent(Base64.encodeBase64String(content));
         RestResponse obj = services.extractZIP(request);
         assertThat(obj, notNullValue());
@@ -695,7 +660,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(fileZip, Matchers.notNullValue());
         byte[] content = readFile(System.getProperty("user.dir") + fileZip);
         assertThat(content.length, Matchers.greaterThan(0));
-        RestRequest request = new RestRequest();
+        ContentRequest request = new ContentRequest();
         request.setContent(Base64.encodeBase64String(content));
         RestResponse obj = services.extractZIPToInternalStorage(request);
         assertThat(obj, notNullValue());
@@ -715,7 +680,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(fileZip, Matchers.notNullValue());
         byte[] content = readFile(System.getProperty("user.dir") + fileZip);
         assertThat(content.length, Matchers.greaterThan(0));
-        RestRequest request = new RestRequest();
+        ContentRequest request = new ContentRequest();
         request.setContent(Base64.encodeBase64String(content));
         RestResponse obj = services.extractZIPAndExtractPDFToInternalStorage(request);
         assertThat(obj, notNullValue());
@@ -756,7 +721,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         entry = (Map) data.get("Test2");
         assertThat(new String(Base64.decodeBase64((String) entry.get("data"))), equalTo(new String(new byte[]{2, 3, 4})));
         assertThat(entry.get("extractedData"), equalTo("ArchivControllerTest Inhalt 2"));
-        RestRequest request = new RestRequest();
+        FileNameRequest request = new FileNameRequest();
         request.setFileName("Test2");
         obj = services.getDataFromInternalStorage(request);
         assertThat(obj, notNullValue());
@@ -792,7 +757,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     public void testOpenFilePdf() throws Exception {
         assertThat(filePdf, Matchers.notNullValue());
         String fullPath = "file:///" + System.getProperty("user.dir").replace("\\", "/") + filePdf;
-        RestRequest request = new RestRequest();
+        ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath(fullPath);
         RestResponse obj = services.openFile(request);
         obj.setSuccess(false);
@@ -808,7 +773,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     public void testOpenFileTxt() throws Exception {
         assertThat(fileTxt, Matchers.notNullValue());
         String fullPath = "file:///" + System.getProperty("user.dir").replace("\\", "/") + fileTxt;
-        RestRequest request = new RestRequest();
+        ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath(fullPath);
         RestResponse obj = services.openFile(request);
         obj.setSuccess(false);

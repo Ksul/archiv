@@ -52,8 +52,7 @@ describe("Test für die Rest Services", function () {
             "url": "http://localhost:8080/Archiv",
             "ignoreError": true
         }, [
-            {"name": "documentId", "value": json.data},
-            {"name": "extract", "value": "false"}
+            {"name": "documentId", "value": json.data}
         ]);
 
         expect(json.success).toBe(true);
@@ -75,8 +74,7 @@ describe("Test für die Rest Services", function () {
             "url": "http://localhost:8080/Archiv",
             "ignoreError": true
         }, [
-            {"name": "documentId", "value": rulesID},
-            {"name": "extract", "value": "false"}
+            {"name": "documentId", "value": rulesID}
         ]);
 
         expect(json.success).toBe(true);
@@ -96,5 +94,41 @@ describe("Test für die Rest Services", function () {
         expect(json.data.length > 0).toBeTruthy();
 
     });
+
+    it("createDocument", function () {
+
+        var extraProperties = {
+            'P:cm:titled': {
+                'cm:title': "Test",
+                'cm:description': ""
+            },
+            'D:my:archivContent': {
+                'my:documentDate': "",
+                'my:person': ""
+            },
+            'P:my:amountable': {'my:amount': "", "my:tax": ""},
+            'P:my:idable': {'my:idvalue': ""}
+        };
+
+        var json = executeService({
+            "name": "createDocument",
+            "errorMessage": "Dokument konnte nicht erstellt werden!",
+            "ignoreError": true
+        }, [
+            {"name": "documentId", "value": "1"},
+            {"name": "fileName", "value": "Test.txt"},
+            {"name": "content", "value": "abcde"},
+            {"name": "extraProperties", "value": extraProperties},
+            {"name": "mimeType", "value": "application/pdf"},
+            {"name": "versionState", "value": "major"}
+        ]);
+        expect(json.success).toBe(true);
+        expect(json.data.length > 0).toBeTruthy();
+
+        
+
+    });
+
+
 
 });

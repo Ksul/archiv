@@ -1,8 +1,7 @@
 package de.ksul.archiv;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.ksul.archiv.request.DataTablesRequest;
-import de.ksul.archiv.request.RestRequest;
+import de.ksul.archiv.request.*;
 import net.minidev.json.JSONArray;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
@@ -80,7 +79,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testOpenDocument() throws Exception {
-        RestRequest request = new RestRequest();
+        ObjectByIdRequest request = new ObjectByIdRequest();
         request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
         this.mockMvc.perform(post("/openDocument")
                 .contentType(APPLICATION_JSON_UTF8)
@@ -106,7 +105,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetNodeId() throws Exception {
-        RestRequest request = new RestRequest();
+        ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath("/");
         this.mockMvc.perform(post("/getNodeId")
                 .contentType(APPLICATION_JSON_UTF8)
@@ -139,7 +138,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("cmis:document", p1);
         extraProperties.put("P:cm:titled", p2);
-        RestRequest request = new RestRequest();
+        DocumentRequest request = new DocumentRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("Testdocument");
         request.setContent(Base64.encodeBase64String("Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?".getBytes()));
@@ -235,7 +234,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetNode() throws Exception {
-        RestRequest request = new RestRequest();
+        ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath("/Datenverzeichnis");
         this.mockMvc.perform(post("/getNode")
                 .contentType(APPLICATION_JSON_UTF8)
@@ -276,7 +275,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetNodeById() throws Exception {
-        RestRequest request = new RestRequest();
+        ObjectByIdRequest request = new ObjectByIdRequest();
         request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
         this.mockMvc.perform(post("/getNodeById")
                 .contentType(APPLICATION_JSON_UTF8)
@@ -369,9 +368,8 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     @Test
     public void testGetDocumentContent() throws Exception {
-        RestRequest request = new RestRequest();
+        ObjectByIdRequest request = new ObjectByIdRequest();
         request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
-        request.setExtract(false);
         this.mockMvc.perform(post("/getDocumentContent")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsBytes(request))
@@ -396,7 +394,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
     @Test
     public void testUploadDocument() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
-        RestRequest request = new RestRequest();
+        UploadRequest request = new UploadRequest();
         request.setDocumentId(folder.getId());
         request.setFileName(System.getProperty("user.dir") + filePdf);
         request.setVersionState(VersioningState.MINOR.value());
@@ -445,7 +443,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
         extraProperties.put("P:my:amountable", p3);
         extraProperties.put("D:my:archivContent", p4);
         extraProperties.put("P:my:idable", p5);
-        RestRequest request = new RestRequest();
+        PropertiesRequest request = new PropertiesRequest();
         request.setDocumentId(document.getId());
         request.setExtraProperties(extraProperties);
         this.mockMvc.perform(post("/updateProperties")
@@ -504,7 +502,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
         CmisObject folder = buildTestFolder("TestFolder", null);
         CmisObject document = buildDocument("TestDocument", folder);
         CmisObject newFolder = buildTestFolder("FolderTest", null);
-        RestRequest request = new RestRequest();
+        MoveRequest request = new MoveRequest();
         request.setDocumentId(document.getId());
         request.setCurrentLocationId(folder.getId());
         request.setDestinationId(newFolder.getId());

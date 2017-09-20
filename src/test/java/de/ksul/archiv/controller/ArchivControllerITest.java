@@ -4,7 +4,8 @@ import de.ksul.archiv.AlfrescoConnector;
 import de.ksul.archiv.configuration.ArchivConfiguration;
 import de.ksul.archiv.configuration.ArchivProperties;
 import de.ksul.archiv.configuration.ArchivTestProperties;
-import de.ksul.archiv.request.RestRequest;
+import de.ksul.archiv.request.CommentRequest;
+import de.ksul.archiv.request.ObjectByIdRequest;
 import de.ksul.archiv.response.RestResponse;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.hamcrest.Matchers;
@@ -21,7 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -79,19 +81,20 @@ public class ArchivControllerITest extends  ArchivControllerAbstractTest  {
     public void testGetComments() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
         CmisObject document = buildDocument("TestDocument", folder);
-        RestRequest request = new RestRequest();
-        request.setDocumentId(document.getId());
-        request.setComment("Testkommentar");
-        RestResponse obj = services.addComment(request);
+        CommentRequest commentRequest = new CommentRequest();
+        commentRequest.setDocumentId(document.getId());
+        commentRequest.setComment("Testkommentar");
+        RestResponse obj = services.addComment(commentRequest);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
 
-        obj = services.getComments(request);
+        obj = services.getComments(new ObjectByIdRequest(document.getId()));
         Map<String, Object> comment = (Map) obj.getData();
         assertThat(((Map) ((ArrayList) comment.get("items")).get(0)).get("content"), is("Testkommentar"));
 
         document.delete();
+        folder.delete(true);
     }
 
 

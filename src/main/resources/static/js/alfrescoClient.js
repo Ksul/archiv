@@ -2521,9 +2521,8 @@ function handleAlfrescoImageClicks() {
             var tr = $(this).closest('tr');
             var tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
             var id = tabelle.row(tr).data().objectID;
-            var json = executeService({"name": "getDocumentContent", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
-                {"name": "documentId", "value": tabelle.row(tr).data().objectID},
-                {"name": "extract", "value": "true"}
+            var json = executeService({"name": "getDocumentContentExtracted", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
+                {"name": "documentId", "value": tabelle.row(tr).data().objectID}
             ]);
             if (json.success) {
                 loadText(json.data, json.data, tabelle.row(tr).data().name, tabelle.row(tr).data().contentStreamMimeType, null);
@@ -2545,34 +2544,40 @@ function handleAlfrescoImageClicks() {
             var id = data.objectID;
             if (data && data.parents) {
                 var node = tree.get_node(data.parents[0].objectId);
+                // Alle Knoten bis hinauf zum ersten geöffneten Knoten suchen
                 while (!node) {
                     var json = executeService({"name": "getNodeById", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
-                        {"name": "documentId", "value": data.parents[0].objectId}
+                        {"name": "documentId", "value": data.parentId}
                     ]);
                     if (json.success) {
                         data = json.data;
                         results.push(data);
-                        if (data && data.parents )
-                            node = tree.get_node(data.parents[0].objectId);
+                        if (data && data.parentId )
+                            node = tree.get_node(data.parentId);
                     } else {
                         break;
                     }
                 }
             }
             if (node) {
+                // keine Chain gefunden, der Knoten war schon offen und kann direkt selektiert werden
                 if (!results.length) {
                     tree.deselect_all(true);
                     tree.select_node(node, true);
                     tree.open_node(node, function(){
+                        alfrescoTabelle.on('draw', function () {
+                            alfrescoTabelle.off('draw');
+                            var row = alfrescoTabelle.row('#' + id);
+                            if (row && row.length) {
+                                row.draw().show().draw(false);
+                                row.select();
+                            }
+                        });
                         switchAlfrescoDirectory(node.data);
-                        var row = alfrescoTabelle.row('#' + id);
-                        if (row && row.length) {
-                            row.draw().show().draw(false);
-                            row.select();
-                        }    
                     });
             
                 }
+                // die Chain hoch hangeln
                 else {
                     results.push(node.data);
                     results.reverse();
@@ -2583,35 +2588,41 @@ function handleAlfrescoImageClicks() {
                         def.resolve();
                     });
 
-                    for(var index = 0; index < results.length; index++) {
-                        deffereds = (function(name, last, id, deferreds) {
+                    for (var index = 0; index < results.length; index++) {
+                        deffereds = (function (name, last, id, deferreds) {
                             return deferreds.then(function () {
-                                return $.Deferred(function(def) {
+                                return $.Deferred(function (def) {
                                     var node = tree.get_node(name.objectID);
                                     tree.open_node(node, function (last) {
-                                        def.resolve();
-                                        if (last){
-                          
+
+                                        if (last) {
+
                                             node = tree.get_node(results[results.length - 1].objectID);
                                             tree.deselect_all(true);
                                             tree.select_node(node, true);
-                                            tree.open_node(node, function(){
+                                            tree.open_node(node, function () {
+                                                alfrescoTabelle.on('draw', function () {
+                                                    alfrescoTabelle.off('draw');
+                                                    var row = alfrescoTabelle.row('#' + id);
+                                                    if (row && row.length) {
+                                                        row.draw().show().draw(false);
+                                                        row.select();
+                                                    }
+
+                                                });
                                                 switchAlfrescoDirectory(node.data);
-                                                var row = alfrescoTabelle.row('#' + id);
-                                                if (row && row.length) {
-                                                    row.draw().show().draw(false);
-                                                    row.select();
-                                                }
+
                                             });
                                         }
-                                           
+                                        def.resolve();
                                     });
                                 });
                             });
-                        })(results[index], index === results.length -1, id, deffereds);
+                        })(results[index], index === results.length - 1, id, deffereds);
                     }
        
                 }
+                // auf den Archiv Tab umschalten
                 tabLayout.tabs("option", "active", 0);
             }
 
@@ -2699,7 +2710,7 @@ function handleVerteilungImageClicks() {
             errorHandler(e);
         }
     });
-    $(document).on("click", ".pdf", function (name) {
+    $(document).on("click", ".pdf", function () {
         try {
             var tr = $(this).closest('tr');
             var row = tabelle.row(tr).data();

@@ -2,9 +2,11 @@ package de.ksul.archiv;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.configuration.ArchivConfiguration;
-import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import de.ksul.archiv.configuration.ArchivTestProperties;
 import de.ksul.archiv.controller.ArchivController;
+import de.ksul.archiv.request.CommentRequest;
+import de.ksul.archiv.request.ObjectByIdRequest;
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +17,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -69,5 +69,36 @@ public class ArchivApplicationRestControllerITest extends ArchivApplicationRestC
                 .andExpect(jsonPath("$.data.password", is("admin")));
 
     }
+
+    @Test
+    public void testGetComments() throws Exception {
+        CmisObject folder = buildTestFolder("TestFolder", null);
+        CmisObject document = buildDocument("TestDocument", folder);
+        CommentRequest commentRequest = new CommentRequest();
+        commentRequest.setDocumentId(document.getId());
+        commentRequest.setComment("Testkommentar");
+        this.mockMvc.perform(post("/addComment")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(commentRequest))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()));
+        this.mockMvc.perform(post("/getComments")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(new ObjectByIdRequest(document.getId())))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data.length()", greaterThan(0)))
+                .andExpect(jsonPath("$.data.items.length()", greaterThan(0)))
+                .andExpect(jsonPath("$.data.items[0].content", is("Testkommentar")));
+        document.delete();
+        folder.delete();
+    }
+
 
 }

@@ -738,8 +738,7 @@ function work() {
                 "name": "getDocumentContent",
                 "errorMessage": "Skript konnte nicht gelesen werden:"
             }, [
-                {"name": "documentId", "value": scriptID},
-                {"name": "extract", "value": "false"}
+                {"name": "documentId", "value": scriptID}
             ]);
             if (json.success) {
 
@@ -843,8 +842,7 @@ function work() {
                     "name": "getDocumentContent",
                     "errorMessage": "Schema konnten nicht gelesen werden:"
                 }, [
-                    {"name": "documentId", "value": rulesSchemaId},
-                    {"name": "extract", "value": "false"}
+                    {"name": "documentId", "value": rulesSchemaId}
                 ]);
                 if (json.success) {
                     schemaContent = json.data;
@@ -929,8 +927,7 @@ function getRules(rulesId, loadLocal) {
             fillMessageBox(true);
         } else {
             var json = executeService({"name": "getDocumentContent", "errorMessage": "Regeln konnten nicht gelesen werden:"}, [
-                {"name": "documentId", "value": rulesID},
-                {"name": "extract", "value": "false"}
+                {"name": "documentId", "value": rulesID}
             ]);
             if (json.success) {
                 Verteilung.rulesEditor.getSession().setValue(json.data);
@@ -1078,8 +1075,7 @@ function handleRulesSelect(evt) {
 function getScript() {
     var fetchScript = function () {
         var json = executeService({"name": "getDocumentContent", "errorMessage": "Skript konnte nicht gelesen werden:"}, [
-            {"name": "documentId", "value": scriptID},
-            {"name": "extract", "value": "false"}
+            {"name": "documentId", "value": scriptID}
         ]);
         if (json.success) {
             Verteilung.textEditor.getSession().setValue(json.data);
@@ -1135,8 +1131,7 @@ function openScript() {
             if (REC.exist(scriptID)) {
                 // ScriptID ist vorhanden, wir versuchen das Skript vom Alfresco Server zu laden
                 json = executeService({"name": "getDocumentContent", "errorMessage": "Skript konnte nicht gelesen werden:"}, [
-                    {"name": "documentId", "value": scriptID},
-                    {"name": "extract", "value": "false"}
+                    {"name": "documentId", "value": scriptID}
                 ]);
                 if (json.success) {
                     content = json.data;

@@ -1,9 +1,7 @@
 package de.ksul.archiv.controller;
 
 import de.ksul.archiv.*;
-import de.ksul.archiv.request.ConnectionRequest;
-import de.ksul.archiv.request.DataTablesRequest;
-import de.ksul.archiv.request.RestRequest;
+import de.ksul.archiv.request.*;
 import de.ksul.archiv.response.ContentResponse;
 import de.ksul.archiv.response.DataTablesResponse;
 import de.ksul.archiv.response.MoveResponse;
@@ -17,7 +15,6 @@ import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,7 +150,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/openDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    ContentResponse openDocument(@RequestBody @Valid final RestRequest model) throws Exception {
+    ContentResponse openDocument(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
 
         ContentResponse obj = new ContentResponse();
 
@@ -173,7 +170,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/getThumbnail", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse getThumbnail(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse getThumbnail(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -199,7 +196,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/getComments", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse getComments(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse getComments(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -220,7 +217,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/addComment", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse addComment(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse addComment(@RequestBody @Valid final CommentRequest model) throws Exception {
         RestResponse obj = new RestResponse();
 
         CmisObject cmisObject = con.getNodeById(model.getDocumentId());
@@ -315,7 +312,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/getNodeId", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse getNodeId(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse getNodeId(@RequestBody @Valid final ObjectByPathRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
         CmisObject cmisObject = con.getNode(model.getFilePath());
@@ -336,7 +333,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/getNode", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse getNode(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse getNode(@RequestBody @Valid final ObjectByPathRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -356,7 +353,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/getNodeById", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse getNodeById(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse getNodeById(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -435,7 +432,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/query", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse query(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse query(@RequestBody @Valid final QueryRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
         List<HashMap<String, Object>> list = new ArrayList<>();
@@ -467,20 +464,34 @@ public class ArchivController {
      */
     @RequestMapping(value = "/getDocumentContent", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse getDocumentContent(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse getDocumentContent(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
         Document document = (Document) con.getNodeById(model.getDocumentId());
         obj.setSuccess(true);
-        obj.setData(con.getDocumentContent(document));
-        if (model.getExtract()) {
-            PDFConnector con = new PDFConnector();
-            InputStream is = new ByteArrayInputStream((byte[]) obj.getData());
-            obj.setData(con.pdftoText(is));
-        } else
-            obj.setData(new String((byte[]) obj.getData(), "UTF-8"));
+        obj.setData(new String((byte[]) con.getDocumentContent(document), "UTF-8"));
 
+        return obj;
+    }
+
+    /**
+     * liefert den Inhalt eines PDFDokumentes als String
+     *
+     * @param model das Requestmodel
+     * @return obj
+     */
+    @RequestMapping(value = "/getDocumentContentExtracted", consumes = "application/json", produces = "application/json")
+    public @ResponseBody
+    RestResponse getDocumentContentExtracted(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
+
+        RestResponse obj = new RestResponse();
+
+        Document document = (Document) con.getNodeById(model.getDocumentId());
+        obj.setSuccess(true);
+        PDFConnector pdfConnector = new PDFConnector();
+        InputStream is = new ByteArrayInputStream((byte[]) con.getDocumentContent(document));
+        obj.setData(pdfConnector.pdftoText(is));
 
         return obj;
     }
@@ -493,7 +504,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/uploadDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse uploadDocument(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse uploadDocument(@RequestBody @Valid final UploadRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -523,7 +534,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/deleteDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse deleteDocument(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse deleteDocument(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -551,7 +562,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/createDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse createDocument(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse createDocument(@RequestBody @Valid final DocumentRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -590,7 +601,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/updateDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse updateDocument(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse updateDocument(@RequestBody @Valid final DocumentRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -628,7 +639,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/updateProperties", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse updateProperties(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse updateProperties(@RequestBody @Valid final PropertiesRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -637,13 +648,7 @@ public class ArchivController {
         CmisObject cmisObject = con.getNodeById(model.getDocumentId());
         if (cmisObject != null) {
 
-            if (model.getExtraProperties() != null)
-                outMap = buildProperties(model.getExtraProperties());
-
-            else {
-                obj.setSuccess(false);
-                obj.setData("keine Properties vorhanden!");
-            }
+            outMap = buildProperties(model.getExtraProperties());
 
             cmisObject = con.updateProperties(cmisObject, outMap);
 
@@ -666,7 +671,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/moveNode", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    MoveResponse moveNode(@RequestBody @Valid final RestRequest model) throws Exception {
+    MoveResponse moveNode(@RequestBody @Valid final MoveRequest model) throws Exception {
 
         MoveResponse obj = new MoveResponse();
 
@@ -709,7 +714,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/createFolder", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse createFolder(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse createFolder(@RequestBody @Valid final PropertiesRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -717,12 +722,7 @@ public class ArchivController {
         CmisObject target;
         Map<String, Object> outMap = null;
 
-        if (model.getExtraProperties() != null)
-            outMap = buildProperties(model.getExtraProperties());
-        else {
-            obj.setSuccess(false);
-            obj.setData("keine Properties vorhanden!");
-        }
+        outMap = buildProperties(model.getExtraProperties());
 
         target = con.getNodeById(model.getDocumentId());
         if (target != null && target instanceof Folder) {
@@ -756,7 +756,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/deleteFolder", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse deleteFolder(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse deleteFolder(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -826,7 +826,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/extractPDFToInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse extractPDFToInternalStorage(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse extractPDFToInternalStorage(@RequestBody @Valid final ExtractRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -850,7 +850,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/extractPDFFile", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse extractPDFFile(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse extractPDFFile(@RequestBody @Valid final ObjectByPathRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -871,7 +871,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/extractPDFContent", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse extractPDFContent(@RequestBody @Valid final RestRequest model) {
+    RestResponse extractPDFContent(@RequestBody @Valid final ContentRequest model) {
 
         RestResponse obj = new RestResponse();
 
@@ -891,7 +891,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/extractZIP", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse extractZIP(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse extractZIP(@RequestBody @Valid final ContentRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
         ArrayList<String> arrayList = new ArrayList();
@@ -942,7 +942,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/extractZIPToInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse extractZIPToInternalStorage(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse extractZIPToInternalStorage(@RequestBody @Valid final ContentRequest model) throws Exception {
         RestResponse obj = new RestResponse();
         ZipInputStream zipin = null;
         try {
@@ -995,7 +995,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/extractZIPAndExtractPDFToInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse extractZIPAndExtractPDFToInternalStorage(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse extractZIPAndExtractPDFToInternalStorage(@RequestBody @Valid final ContentRequest model) throws Exception {
 
         RestResponse obj = null;
         String extractedData;
@@ -1028,7 +1028,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/getDataFromInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse getDataFromInternalStorage(@RequestBody @Valid final RestRequest model) {
+    RestResponse getDataFromInternalStorage(@RequestBody @Valid final FileNameRequest model) {
 
         RestResponse obj = new RestResponse();
         Map<String, Object> data = new HashMap<>();
@@ -1126,7 +1126,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/openFile", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse openFile(@RequestBody @Valid final RestRequest model) throws Exception {
+    RestResponse openFile(@RequestBody @Valid final ObjectByPathRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -1322,7 +1322,7 @@ public class ArchivController {
     @RequestMapping(value = "/openPDF")
     public
     @ResponseBody
-    ContentResponse openPDF(@RequestBody @Valid final RestRequest model) {
+    ContentResponse openPDF(@RequestBody @Valid final FileNameRequest model) {
 
         ContentResponse obj = new ContentResponse();
 

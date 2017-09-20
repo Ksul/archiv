@@ -2,13 +2,6 @@ package de.ksul.archiv.controller;
 
 import de.ksul.archiv.AlfrescoConnector;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
