@@ -19,11 +19,18 @@
                 anchorClass: 'sf-with-ul',
                 menuArrowClass: 'sf-arrows'
             },
+            rootMenu = null,
+            setRootMenu = function(menu){
+                rootMenu = menu;
+            },
+            getRootMenu = function(){
+                return rootMenu;
+            },
             recursiveKeySearch = function (key, data) {
                 // not shown - perhaps validate key as non-zero length string
 
                 // Handle null edge case.
-                if (data === null) {
+                if (!data) {
                     // nothing to do here
                     return [];
                 }
@@ -205,7 +212,7 @@
                         //inputElement.attr("multiple", "multiple");
                         inputElement.attr("style", "display:none;");
                         if (obj.action)
-                            inputElement.change( obj.action);
+                            inputElement.change(obj.action);
                         menuElement.append(inputElement);
 
                     } else {
@@ -213,13 +220,20 @@
                     }
                     if (obj.className) {
                         selectElement.addClass(obj.className);
-                        if(submenus.length > 0)
+                        if (submenus.length > 0)
                             selectElement.addClass(c.anchorClass);
                     }
                     if (typeof obj.disabled === "boolean" && obj.disabled) {
                         selectElement.addClass("disableLI");
                     } else if (obj.action && !(typeof obj.file === "boolean" && obj.file)) {
-                        selectElement.on("click", obj.action);
+                        if (typeof obj.autoClose === "boolean" && obj.autoClose) {
+                            var action = obj.action;
+                            obj.action = function (event) {
+                                action(event);
+                                event.data.root.superfish('hide');
+                            };
+                        }
+                        selectElement.on("click", {root: getRootMenu()}, obj.action);
                     }
 
                     selectElement.text(obj.title);
@@ -336,11 +350,12 @@
                 element.parent().children("ul").removeClass("disableLI");
                 var obj = recursiveKeySearch(id, o.menuData);
                 if (obj && obj.length && !obj[0].file && obj[0].action)
-                    element.on("click", obj[0].action);
+                    element.on("click", {root: getRootMenu()}, obj[0].action)
             },
             init: function (op) {
                 return this.each(function () {
                     var $this = $(this);
+                    setRootMenu($this);
                     if ($this.data('sfOptions')) {
                         return false;
                     }

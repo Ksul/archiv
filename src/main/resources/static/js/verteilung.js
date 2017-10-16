@@ -1,13 +1,5 @@
 /**
  * beschreibt die Position eines gefundenem Wertes in dem Dokument
- * @param editor            der Editor
- * @param startRow          die Zeile, in der der Wert beginnt
- * @param startColumn       die Spalte, in der der Wert beginnt
- * @param endRow            die Zeile, in der der Wert endet
- * @param endColumn         die Spalte, in der der Wert endete
- * @param css               der CSS Selektor der verwendet werden soll
- * @param desc              eine Beschreibung
- * @constructor
  */
 var Position = function() {
     this.typ = arguments[0];
@@ -359,7 +351,7 @@ function loadMultiText(content, txt, name, typ,  notDeleteable, container) {
         dat["text"] = txt;
         dat["file"] = name;
         dat["content"] = content;
-        dat["log"] = REC.mess;
+        dat["log"] = Logger.getMessages(false, Level.TRACE);
         dat["result"] = REC.results;
         dat["position"] = Verteilung.positions;
         dat["xml"] = REC.currXMLName;
@@ -416,12 +408,6 @@ function readMultiFile(evt) {
  */
 function readFiles(files) {
     try {
-        if (currentRules === null || !currentRules.endsWith("doc.xml")) {
-            var open = openFile("./rules/doc.xml");
-            currentRules = open[1];
-            Verteilung.rulesEditor.getSession().setValue(open[0]);
-            Verteilung.rulesEditor.getSession().foldAll(1);
-        }
         Verteilung.textEditor.getSession().setValue("");
         tabelle.clear();
         daten = [];
@@ -530,7 +516,6 @@ function readFiles(files) {
 function doReRunAll() {
     try {
         Verteilung.textEditor.getSession().setValue("");
-        clearMessageBox();
         var tabData =  tabelle.fnGetData();
         tabelle._fnClearTable();
         for ( var i = 0; i < tabData.length; i++) {
@@ -600,13 +585,13 @@ function printResults(results) {
     }
     maxLength++;
     for (key in results) {
-        if (REC.exist(results[key])) {
+        if (results[key]) {
             ret = ret + key + blanks.substr(0, maxLength - key.length) + ": " + results[key].getValue();
-            if ( Verteilung.positions.get(key) !== null)
+            if ( Verteilung.positions.get(key))
                 new Position(Verteilung.POSITIONTYP.PROPS, pos, pos + key.length, Verteilung.positions.get(key).getCSS(), key);
-            if (REC.exist(results[key].expected)) {
+            if (results[key].expected) {
                 var tmp = eval(results[key].expected);
-                if (REC.exist(results[key].getValue()) && tmp.valueOf() === results[key].getValue().valueOf())
+                if (results[key].getValue() && tmp.valueOf() === results[key].getValue().valueOf())
                     ret = ret + " [OK]";
                 else
                     ret = ret + " [FALSE] " + tmp;
@@ -618,22 +603,6 @@ function printResults(results) {
     return ret;
 }
 
-/**
- * gibt die Meldungen im entsprechenden Fenster aus
- * @param reverse   die Reihenfolge wird umgedreht
- */
-function fillMessageBox(reverse) {
-    if (typeof Verteilung.outputEditor !== "undefined" && Verteilung.outputEditor !== null)
-        Verteilung.outputEditor.getSession().setValue(REC.getMessage(reverse));
-}
-
-/**
- * löscht den Inhalt des Meldungsfensters
- */
-function clearMessageBox(){
-    if (typeof Verteilung.outputEditor !== "undefined" && Verteilung.outputEditor !== null)
-        Verteilung.outputEditor.getSession().setValue("");
-}
 
 /**
  * stellt die Funktionalität für den Zurück Button zur Verfügung
@@ -643,7 +612,6 @@ function doBack() {
         multiMode = true;
         showMulti = false;
         Verteilung.textEditor.getSession().setValue("");
-        clearMessageBox();
         Verteilung.propsEditor.getSession().setValue("");
         Verteilung.rulesEditor.getSession().foldAll(1);
         manageControls();
@@ -694,7 +662,6 @@ function doTest() {
                     Verteilung.positions.setMarkers();
                     Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
                     Verteilung.positions.setMarkers();
-                    fillMessageBox(true);
                     testMode = true;
                     manageControls();
                 } else
@@ -732,7 +699,7 @@ function work() {
         var schemaContent;
         var validate = true;
         // aktuelles Verteilungsskript vom Server holen
-        if (REC.exist(scriptID)) {
+        if (scriptID) {
             // ScriptID ist vorhanden, wir versuchen das Skript vom Alfresco Server zu laden
             json = executeService({
                 "name": "getDocumentContent",
@@ -837,7 +804,7 @@ function work() {
             $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
             $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
             Verteilung.positions.clear();
-            if (REC.exist(rulesSchemaId)) {
+            if (rulesSchemaId) {
                 json = executeService({
                     "name": "getDocumentContent",
                     "errorMessage": "Schema konnten nicht gelesen werden:"
@@ -848,9 +815,9 @@ function work() {
                     schemaContent = json.data;
                 }
             }
-            if (REC.exist(schemaContent)) {
+            if (schemaContent) {
                 var validateErrors = xmllint.validateXML({xml: sel, schema: schemaContent}).errors;
-                    if (REC.exist(validateErrors)) {
+                    if (validateErrors) {
                         validate = false;
                         for (var i = 0; i < validateErrors.length; i++) {
                             var err = validateErrors[i];
@@ -858,7 +825,7 @@ function work() {
                                 var line = err.split(":")[1];
                                 new Position(Verteilung.POSITIONTYP.RULES, line, 0, line, 1, "ace_error", "fullLine");
                              }
-                            REC.log(ERROR, validateErrors[i]);
+                            Logger.log(Level.ERROR, validateErrors[i]);
                         }
                     }
             }
@@ -871,7 +838,6 @@ function work() {
                 message("Fehler", "Regeln sind syntaktisch nicht korrekt!");
             Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
             Verteilung.positions.setMarkers();
-            fillMessageBox(true);
             document.getElementById('inTxt').style.display = 'block';
             document.getElementById('dtable').style.display = 'none';
         }
@@ -899,10 +865,9 @@ function sendRules() {
                 {"name": "versionComment", "value": ""}
             ]);
             if (json.success) {
-                REC.log(INFORMATIONAL, "Regeln erfolgreich zum Server übertragen!");
+                Logger.log(Level.INFO, "Regeln erfolgreich zum Server übertragen!");
                 rulesID = json.data.objectId;
                 erg = true;
-                fillMessageBox(true);
             }
             return erg;
         }
@@ -923,8 +888,7 @@ function getRules(rulesId, loadLocal) {
             var open = openFile("./rules/doc.xml");
             Verteilung.rulesEditor.getSession().setValue(open);
             Verteilung.rulesEditor.getSession().foldAll(1);
-            REC.log(INFORMATIONAL, "Regeln erfolgreich lokal gelesen!");
-            fillMessageBox(true);
+            Logger.log(Level.INFO, "Regeln erfolgreich lokal gelesen!");
         } else {
             var json = executeService({"name": "getDocumentContent", "errorMessage": "Regeln konnten nicht gelesen werden:"}, [
                 {"name": "documentId", "value": rulesID}
@@ -932,8 +896,7 @@ function getRules(rulesId, loadLocal) {
             if (json.success) {
                 Verteilung.rulesEditor.getSession().setValue(json.data);
                 Verteilung.rulesEditor.getSession().foldAll(1);
-                REC.log(INFORMATIONAL, "Regeln erfolgreich vom Server übertragen!");
-                fillMessageBox(true);
+                Logger.log(Level.INFO, "Regeln erfolgreich vom Server übertragen!");
             } else
                 message("Fehler", "Fehler bei der Übertragung: " + json.data);
         }
@@ -949,7 +912,7 @@ function getRules(rulesId, loadLocal) {
 function openRules() {
     var id;
     try {
-        if (rulesID !== null && typeof rulesID === "string") {
+        if (rulesID && typeof rulesID === "string") {
             id = rulesID.substring(rulesID.lastIndexOf('/') + 1);
             getRules(id, false);
             document.getElementById('headerCenter').textContent = "Regeln (Server: doc.xml)";
@@ -976,7 +939,7 @@ function format() {
         xml = vkbeautify.xml(xml);
         Verteilung.rulesEditor.getSession().setValue(xml);
         // window.parent.frames.rules.Verteilung.rulesEditor.getSession().foldAll(1);
-        if (typeof currXMLName !== "undefined" && currXMLName !== null) {
+        if (currXMLName) {
             setXMLPosition(currXMLName);
             Verteilung.positions.setMarkers();
         }
@@ -1010,8 +973,7 @@ function openFile(file) {
             {"name": "filePath", "value": name}
         ]);
         if (json.success) {
-            REC.log(INFORMATIONAL, "Datei " + name + " erfolgreich geöffnet!");
-            fillMessageBox(true);
+            Logger.log(Level.INFO, "Datei " + name + " erfolgreich geöffnet!");
             return UTF8ArrToStr(base64DecToArr(json.data));
         }
         else
@@ -1035,8 +997,7 @@ function save(file, text) {
             {"name": "content", "value": text}
         ]);
         if (json.success) {
-            REC.log(INFORMATIONAL, file + " erfolgreich gesichert!");
-            fillMessageBox(true);
+            Logger.log(Level.INFO, file + " erfolgreich gesichert!");
         }
         return json.success;
     } catch (e) {
@@ -1079,8 +1040,7 @@ function getScript() {
         ]);
         if (json.success) {
             Verteilung.textEditor.getSession().setValue(json.data);
-            REC.log(INFORMATIONAL, "Script erfolgreich heruntergeladen!");
-            fillMessageBox(true);
+            Logger.log(Level.INFO, "Script erfolgreich heruntergeladen!");
         }
     };
     try {
@@ -1125,10 +1085,10 @@ function openScript() {
         Verteilung.oldContent = Verteilung.textEditor.getSession().getValue();
         var content, json, script;
         var read = false;
-        if (REC.exist(Verteilung.modifiedScript) && Verteilung.modifiedScript.length > 0) {
+        if (Verteilung.modifiedScript && Verteilung.modifiedScript.length > 0) {
             content = Verteilung.modifiedScript;
         } else {
-            if (REC.exist(scriptID)) {
+            if (scriptID) {
                 // ScriptID ist vorhanden, wir versuchen das Skript vom Alfresco Server zu laden
                 json = executeService({"name": "getDocumentContent", "errorMessage": "Skript konnte nicht gelesen werden:"}, [
                     {"name": "documentId", "value": scriptID}
@@ -1136,7 +1096,7 @@ function openScript() {
                 if (json.success) {
                     content = json.data;
                     read = true;
-                    REC.log(INFORMATIONAL, "Script erfolgreich vom Server geladen!");
+                    Logger.log(Level.INFO, "Script erfolgreich vom Server geladen!");
                 }
             }
             else {
@@ -1149,7 +1109,7 @@ function openScript() {
             if (script && script.length > 0) {
                 content = script;
                 read = true;
-                REC.log(INFORMATIONAL, "Script erfolgreich gelesen!");
+                Logger.log(Level.INFO, "Script erfolgreich gelesen!");
             }
         }
         if (read) {
@@ -1165,7 +1125,6 @@ function openScript() {
             Verteilung.textEditor.setShowInvisibles(false);
             Verteilung.textEditor.getSession().getUndoManager().markClean();
             scriptMode = true;
-            fillMessageBox(true);
             manageControls();
         }
     } catch (e) {
@@ -1182,8 +1141,7 @@ function activateScriptToContext() {
     try {
         Verteilung.modifiedScript = Verteilung.textEditor.getSession().getValue();
         eval("//# sourceURL=recognition.js\n\n" + Verteilung.modifiedScript);
-        REC.log(INFORMATIONAL, "Die gändeterten Skriptanweisungen sind jetzt wirksam!");
-        fillMessageBox(true);
+        Logger.log(Level.INFO, "Die gändeterten Skriptanweisungen sind jetzt wirksam!");
     } catch (e) {
         errorHandler(e);
     }
@@ -1206,10 +1164,9 @@ function sendScript() {
                 {"name": "versionComment", "value": ""}
             ]);
             if (json.success) {
-                REC.log(INFORMATIONAL, "Script erfolgreich zum Server gesendet!");
+                Logger.log(Level.INFO, "Script erfolgreich zum Server gesendet!");
                 scriptID = $.parseJSON(json.data).objectId;
                 erg = true;
-                fillMessageBox(true);
             }
         }
         return erg;
@@ -1244,7 +1201,7 @@ function closeScript() {
     try {
         verteilungLayout.sizePane("west", panelSizeReminder);
         Verteilung.textEditor.getSession().setMode("ace/mode/text");
-        if (REC.exist(Verteilung.oldContent) && Verteilung.oldContent.length > 0)
+        if (Verteilung.oldContent && Verteilung.oldContent.length > 0)
             Verteilung.textEditor.getSession().setValue(Verteilung.oldContent);
         else
             Verteilung.textEditor.getSession().setValue("");

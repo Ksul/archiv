@@ -28,9 +28,9 @@
         var runLocal = false;
         var REC;
         var tabelle;
-        var alfrescoTabelle;
-        var alfrescoFolderTabelle;
-        var alfrescoSearchTabelle;
+        var alfrescoTabelle = null;
+        var alfrescoFolderTabelle = null;
+        var alfrescoSearchTabelle = null;
         var alfrescoViewModeMenu;
         var searchViewModeMenu;
         var alfrescoDocumentSelectMenu;
@@ -55,7 +55,6 @@
         var searchLayout;
         var verteilungLayout;
         var tabLayout;
-        var globalLayout;
         var anOpen = [];
 
         window.onload = function () {
@@ -191,9 +190,9 @@
             <!--Tab Archiv-->
             <div id="tab1" class="tabPanel hidden">
                 <div id="alfrescoNorth" onmouseover="alfrescoLayout.allowOverflow(this);"
-                     class="inner-north container tabPanel hidden">
+                     class="inner-north container hidden">
                     <div id="alfrescoNorthCenter"
-                         class="inner-center container tabPanel hidden">
+                         class="inner-center container hidden">
                         <div class="breadCrumbHolder module">
                             <div id="breadcrumb" class="breadCrumb module">
                             </div>
@@ -207,39 +206,38 @@
                     </div>
                 </div>
                 <div id="alfrescoCenter" class="inner-center container hidden">
-                    <div id="alfrescoCenterCenter" class="inner-center container hidden">
-                        <div id="alfrescoCenterCenterNorth" class="inner-center container hidden">
-                            <div class="header ui-widget-header" id="alfrescoFolderTabelleHeader">Ordner</div>
-                            <div class="ui-widget-content">
-                                <div id="dtable3">
-                                    <table cellpadding="0" cellspacing="0" border="0" class="display"
-                                           id="alfrescoFolderTabelle"></table>
-                                </div>
-                                <div class="header ui-widget-header" id="alfrescoFolderTableFooter"></div>
-                            </div>
-                        </div>
-                        <div id="alfrescoCenterCenterCenter" class="inner-center container  hidden">
-                            <div class="header ui-widget-header" id="alfrescoTabelleHeader">Dokumente</div>
-                            <div class="ui-widget-content">
+                    <div id="alfrescoCenterNorth" class="inner-north container hidden">
+                        <div class="header ui-widget-header" id="alfrescoFolderTabelleHeader">Ordner</div>
+                        <div>
 
-                                <ul id="selectionMenuAlfrescoDocuments" class="sf-menu" style="height: 15px;"></ul>
-                                <ul id="actionMenuAlfrescoDocuments" class="sf-menu" style="height: 15px;"></ul>
-                                <ul id="viewMenuAlfresco" class="sf-menu" style="height: 15px;"></ul>
-                            </div>
-                            <div id="dtable2">
-                                <table cellpadding="0" cellspacing="0" border="0" class="display"
-                                       id="alfrescoTabelle"></table>
-                            </div>
-                            <div class="header ui-widget-header" id="alfrescoTableFooter"></div>
+                            <ul id="selectionMenuAlfrescoFolderDocuments" class="sf-menu" style="height: 15px;"></ul>
+                            <ul id="actionMenuAlfrescoFolderDocuments" class="sf-menu" style="height: 15px;"></ul>
                         </div>
+                        <div id="dtable3">
+                            <table cellpadding="0" cellspacing="0" border="0" class="display"
+                                   id="alfrescoFolderTabelle"></table>
+                        </div>
+                        <div class="header ui-widget-header dataTableFooter" id="alfrescoFolderTableFooter"></div>
+                    </div>
+                    <div id="alfrescoCenterCenter" class="inner-center container  hidden">
+                        <div class="header ui-widget-header" id="alfrescoTabelleHeader">Dokumente</div>
+                        <div>
+                            <ul id="selectionMenuAlfrescoDocuments" class="sf-menu" style="height: 15px;"></ul>
+                            <ul id="actionMenuAlfrescoDocuments" class="sf-menu" style="height: 15px;"></ul>
+                            <ul id="viewMenuAlfresco" class="sf-menu" style="height: 15px;"></ul>
+                        </div>
+                        <div id="dtable2">
+                            <table cellpadding="0" cellspacing="0" border="0" class="display"
+                                   id="alfrescoTabelle"></table>
+                        </div>
+                        <div class="header ui-widget-header dataTableFooter" id="alfrescoTableFooter"></div>
                     </div>
                 </div>
             </div>
             <!--Tab Suche-->
             <div id="tab2" class="tabPanel hidden">
-                <div id="searchNorth" onmouseover="searchLayout.allowOverflow(this);"
-                     class="inner-north container ui-widget-header hidden">
-                    <div id="searchNorthCenter" class="inner-center tabPanel hidden">
+                <div id="searchNorth" class="inner-north container hidden">
+                    <div id="searchNorthCenter" class="inner-center  hidden">
                         <label for="alfrescoSearch" style="float:left;margin: 5px 5px 5px 5px;">Suche </label>
                         <input id="alfrescoSearch" style="width:400px;height:auto;float:left;margin: 2px 5px 5px 5px;"
                                class="ui-autocomplete-input" autocomplete="off"/>
@@ -250,7 +248,7 @@
                 </div>
                 <div id="searchCenter" class="inner-center container hidden">
                     <div class="header ui-widget-header" id="searchTabelleHeader">Ergebnisse</div>
-                    <div class="ui-widget-content">
+                    <div>
                         <ul id="selectionMenuAlfrescoSearchDocuments" class="sf-menu" style="height: 15px;"></ul>
                         <ul id="actionMenuAlfrescoSearchDocuments" class="sf-menu" style="height: 15px;"></ul>
                         <ul id="viewMenuSearch" class="sf-menu" style="height: 15px;"></ul>
@@ -259,7 +257,7 @@
                         <table cellpadding="0" cellspacing="0" border="0" class="display"
                                id="alfrescoSearchTabelle"></table>
                     </div>
-                    <div class="header ui-widget-header" id="alfrescoSearchTableFooter"></div>
+                    <div class="header ui-widget-header dataTableFooter" id="alfrescoSearchTableFooter"></div>
                 </div>
             </div>
             <!--Tab Verteilung-->
@@ -422,15 +420,20 @@
                 </div>
             </div>
         </div>
+
     </div>
     <!--Ausgabe-->
     <div id="contentSouth" class="ui-layout-south ui-widget-header container hidden">
         <div id="headerSouth" class="header">Ausgabe</div>
         <div class="ui-widget-content">
-            <div id="inOutput" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
+            <div>
+                <ul id="actionMenuOutput" class="sf-menu" style="height: 15px;"></ul>
+            </div>
+            <div id="inOutput" style="width:100%;height:100%;"></div>
         </div>
     </div>
 </div>
+
 
 </body>
 

@@ -468,7 +468,7 @@
             <xsd:enumeration value="none"/>
             <xsd:enumeration value="error"/>
             <xsd:enumeration value="warn"/>
-            <xsd:enumeration value="informational"/>
+            <xsd:enumeration value="info"/>
             <xsd:enumeration value="error"/>
             <xsd:enumeration value="debug"/>
             <xsd:enumeration value="trace"/>

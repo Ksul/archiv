@@ -1,7 +1,7 @@
 <documentTypes
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:cm="http://www.alfresco.org/model/content/1.0"
-        xmlns:my="http://www.schulte.local/archiv"  xsi:noNamespaceSchemaLocation="doc.xsd" archivRoot="Archiv/" inBox="Inbox" mandatory="cm:title,my:documentDate,my:person" unknownBox="Unbekannt" errorBox="Fehler"  duplicateBox="Fehler/Doppelte" debugLevel="informational" maxDebugLength="40">
+        xmlns:my="http://www.schulte.local/archiv"  xsi:noNamespaceSchemaLocation="doc.xsd" archivRoot="Archiv/" inBox="Inbox" mandatory="cm:title,my:documentDate,my:person" unknownBox="Unbekannt" errorBox="Fehler"  duplicateBox="Fehler/Doppelte" debugLevel="info" maxDebugLength="40">
     <!-- LVM Gehaltsabrechnung -->
     <archivTyp name="LVMGehalt" searchString="81302">
         <archivZiel type="my:archivContent" />
@@ -255,7 +255,7 @@
                 </searchItem>
                 <searchItem name="nachzahlung" text="Nachzahlung" word="1" objectTyp="float" required="false" />
                 <searchItem name="auszahlung" text="Auszahlungsbetrag" word="2" objectTyp="float" required="false" />
-                <searchItem name="title" eval="(REC.exist({auszahlung}) ? '{tmp1}' : '{tmp1} Nachzahlung')" target="cm:title" />
+                <searchItem name="title" eval="({auszahlung} ? '{tmp1}' : '{tmp1} Nachzahlung')" target="cm:title" />
                 <searchItem name="betrag" eval="{auszahlung}||{nachzahlung}" objectTyp="float" target="my:amount">
                     <check lowerValue="0" upperValue="2500" />
                     <archivZiel aspect="my:amountable" />

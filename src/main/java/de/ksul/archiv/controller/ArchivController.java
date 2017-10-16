@@ -239,36 +239,21 @@ public class ArchivController {
     DataTablesResponse listFolderWithPagination(@RequestBody @Valid final DataTablesRequest model) throws Exception {
 
 
-        ArrayList<Map<String, Object>> list = new ArrayList();
+        ArrayList<Map<String, Object>> list = new ArrayList<>();
         DataTablesResponse resp = new DataTablesResponse();
-        long itemsToSkip;
+        long start;
         long time = System.currentTimeMillis();
         ItemIterable<CmisObject> cmisObjects;
 
         if (model.getLength() == -1) {
             model.setLength(Integer.MAX_VALUE);
-            itemsToSkip = 0;
+            start = 0;
         } else
-            itemsToSkip = model.getStart();
-        resp.setRecordsTotal(0);
-        resp.setDraw(model.getDraw());
-        resp.setRecordsFiltered(0);
-        resp.setMoreItems(false);
-        resp.setParent(null);
-        resp.setData(list);
-        resp.setSuccess(true);
+            start = model.getStart();
 
         if (model.getFolderId() != null) {
-            // das Root Object übergeben?
-            if (model.getFolderId().equals("-1")) {
-                CmisObject cmisObject = con.getNode("/Archiv");
-                if (cmisObject != null)
-                    model.setFolderId(cmisObject.getId());
-                else
-                    return resp;
-            }
 
-            cmisObjects = con.listFolder(model.getFolderId(), model.getOrders(), model.getColumns(), model.getWithFolder()).skipTo(itemsToSkip).getPage(model.getLength());
+            cmisObjects = con.listFolder(model.getFolderId().equals("-1") ? con.getNode("/Archiv").getId(): model.getFolderId(), model.getOrders(), model.getColumns(), model.getWithFolder()).skipTo(start).getPage(model.getLength());
 
             for (CmisObject cmisObject : cmisObjects) {
                 list.add(convertObjectToJson(model.getFolderId(), cmisObject));
@@ -299,6 +284,67 @@ public class ArchivController {
     DataTablesResponse listFolder(@RequestBody @Valid final DataTablesRequest model) throws Exception {
         model.setLength(-1);
         return listFolderWithPagination(model);
+    }
+
+    /**
+     * liefert eine Liste mit Documenten aus einer CMIS Query
+     *
+     * @param model das Datatables Request Model
+     * @return obj
+     */
+    @RequestMapping(value = "/findDocumentWithPagination", consumes = "application/json", produces = "application/json")
+    public @ResponseBody
+    DataTablesResponse findDocumentWithPagination(@RequestBody @Valid final DataTablesRequest model) throws Exception {
+
+        ArrayList<Map<String, Object>> list = new ArrayList<>();
+        DataTablesResponse obj = new DataTablesResponse();
+        long start;
+        ItemIterable<CmisObject> cmisObjects;
+
+
+        if (model.getLength() == -1) {
+            model.setLength(Integer.MAX_VALUE);
+            start = 0;
+        } else
+            start = model.getStart();
+
+
+        if (model.getCmisQuery() == null || model.getCmisQuery().trim().length() == 0)
+            cmisObjects = EmptyItemIterable.instance();
+        else
+            cmisObjects = con.findDocument(model.getCmisQuery(), model.getOrders(), model.getColumns()).skipTo(start).getPage(model.getLength());
+
+        for (CmisObject cmisObject : cmisObjects) {
+            list.add(convertCmisObjectToJSON(cmisObject));
+        }
+
+
+        obj.setRecordsTotal(cmisObjects.getTotalNumItems());
+        obj.setDraw(model.getDraw());
+
+        obj.setRecordsFiltered(cmisObjects.getTotalNumItems());
+        obj.setMoreItems(cmisObjects.getHasMoreItems());
+
+        obj.setSuccess(true);
+        obj.setData(list);
+
+        return obj;
+    }
+
+    /**
+     * findet Documente
+     *
+     * @param model das Requestmodel
+     * @return ein JSONObject mit den Feldern success: true     die Operation war erfolgreich
+     * false    ein Fehler ist aufgetreten
+     * result            Dokument als JSONObject
+     */
+    @RequestMapping(value = "/findDocument", consumes = "application/json", produces = "application/json")
+    public @ResponseBody
+    DataTablesResponse findDocument(@RequestBody @Valid final DataTablesRequest model) throws Exception {
+
+        model.setLength(-1);
+        return findDocumentWithPagination(model);
     }
 
 
@@ -363,66 +409,6 @@ public class ArchivController {
         return obj;
     }
 
-    /**
-     * liefert eine Liste mit Documenten aus einer CMIS Query
-     *
-     * @param model das Datatables Request Model
-     * @return obj
-     */
-    @RequestMapping(value = "/findDocumentWithPagination", consumes = "application/json", produces = "application/json")
-    public @ResponseBody
-    DataTablesResponse findDocumentWithPagination(@RequestBody @Valid final DataTablesRequest model) throws Exception {
-
-        ArrayList<Map<String, Object>> list = new ArrayList();
-        DataTablesResponse obj = new DataTablesResponse();
-        long itemsToSkip;
-        ItemIterable<CmisObject> cmisObjects;
-
-
-        if (model.getLength() == -1) {
-            model.setLength(Integer.MAX_VALUE);
-            itemsToSkip = 0;
-        } else
-            itemsToSkip = model.getStart();
-
-
-        if (model.getCmisQuery() == null || model.getCmisQuery().trim().length() == 0)
-            cmisObjects = EmptyItemIterable.instance();
-        else
-            cmisObjects = con.findDocument(model.getCmisQuery(), model.getOrders(), model.getColumns()).skipTo(itemsToSkip).getPage(model.getLength());
-
-        for (CmisObject cmisObject : cmisObjects) {
-            list.add(convertCmisObjectToJSON(cmisObject));
-        }
-
-
-        obj.setRecordsTotal(cmisObjects.getTotalNumItems());
-        obj.setDraw(model.getDraw());
-
-        obj.setRecordsFiltered(cmisObjects.getTotalNumItems());
-        obj.setMoreItems(cmisObjects.getHasMoreItems());
-
-        obj.setSuccess(true);
-        obj.setData(list);
-
-        return obj;
-    }
-
-    /**
-     * findet Documente
-     *
-     * @param model das Requestmodel
-     * @return ein JSONObject mit den Feldern success: true     die Operation war erfolgreich
-     * false    ein Fehler ist aufgetreten
-     * result            Dokument als JSONObject
-     */
-    @RequestMapping(value = "/findDocument", consumes = "application/json", produces = "application/json")
-    public @ResponseBody
-    DataTablesResponse findDocument(@RequestBody @Valid final DataTablesRequest model) throws Exception {
-
-        model.setLength(-1);
-        return findDocumentWithPagination(model);
-    }
 
     /**
      * führt eine Query durch und liefert die Ergebnisse als JSON Objekte zurück

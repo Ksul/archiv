@@ -37,7 +37,7 @@
 ./js/jquery/jquery.hotkeys.js
 ./js/jstree/jstree.js
 ./js/dataTables/dataTables.js
-./js/dataTables/dataTables.paging_with_jqui_icons.js
+./js/dataTables/dataTables.scroller.js
 ./js/moment/moment-with-locales.js
 ./js/bootstrap/bootstrap-datetimepicker.js
 ./js/bootstrap/typeahead.js

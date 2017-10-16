@@ -9,12 +9,12 @@ function BasicObject(name) {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = (d + Math.random()*16)%16 | 0;
             d = Math.floor(d/16);
-            return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+            return (c==='x' ? r : (r&0x3|0x8)).toString(16);
         });
     };
 
     this.equals = function(obj) {
-        return obj.id == this.id;
+        return obj.id === this.id;
     };
 
     this.id = this.generateUUID();
@@ -44,7 +44,7 @@ Liste.prototype = [];
 Liste.prototype.contains = function(element) {
     for (var key in this) {
         if (this.hasOwnProperty(key)) {
-            if (this[key].name == element.name)
+            if (this[key].name === element.name)
                 return true;
         }
     }
@@ -59,14 +59,14 @@ Liste.prototype.remove = function(element) {
     if (!this.contains(element))
         throw "Element " + element.name + " not available";
     for (var i = 0; i < this.length; i++) {
-        if (this[i] == element)
+        if (this[i] === element)
             delete this[i];
     }
 };
 Liste.prototype.get = function(element){
     for (var key in this) {
         if (this.hasOwnProperty(key)) {
-            if (this[key].name == element.name)
+            if (this[key].name === element.name)
                 return this[key];
         }
     }
@@ -84,7 +84,7 @@ Liste.prototype.clone = function() {
     var newList = new Liste();
     for (var key in this) {
         if (this.hasOwnProperty(key)) {
-            if (typeof this[key] == "object" && "clone" in this[key])
+            if (typeof this[key] === "object" && "clone" in this[key])
                 newList[key] = this[key].clone();
             else
                 newList[key] = this[key];
@@ -96,7 +96,7 @@ Liste.prototype.clone = function() {
 
 function Content(cont) {
     BasicObject.call(this);
-    if (typeof cont == "string")
+    if (typeof cont === "string")
         this.content = cont;
     else
         this.content = "";
@@ -132,7 +132,7 @@ function ScriptNode(name, type) {
         var parent = null;
         if (this.parent.length > 0)
             parent = this.parent[0];
-        while (parent != null) {
+        while (parent !== null) {
             path.unshift(parent.name);
             if (parent.parent.length > 0)
                 parent = parent.parent[0];
@@ -157,7 +157,7 @@ ScriptNode.prototype.childByNamePath = function (name) {
             else
                 currentNode = currentNode.children.get(part);
         }
-        if (i == parts.length - 1)
+        if (i === parts.length - 1)
             return currentNode;
     }
     return null;
@@ -176,7 +176,7 @@ ScriptNode.prototype.createAssociation = function(target, name){
 };
 
 ScriptNode.prototype.createFolder = function (name) {
-    if (this.type != "cm:folder")
+    if (this.type !== "cm:folder")
         throw "no folder!";
     var newFolder = new ScriptNode(name, "cm:folder");
     this.children.add(newFolder);
@@ -186,7 +186,7 @@ ScriptNode.prototype.createFolder = function (name) {
 };
 
 ScriptNode.prototype.isSubType = function (type) {
-    return this.subType == type;
+    return this.subType === type;
 };
 
 ScriptNode.prototype.addTag = function (tag) {
@@ -213,7 +213,7 @@ ScriptNode.prototype.checkoutForUpload = function() {
 };
 
 ScriptNode.prototype.checkin = function () {
-    if (!REC.exist(this.workingParent) || !this.hasAspect(("cm:workingcopy")))
+    if (!this.workingParent || !this.hasAspect(("cm:workingcopy")))
         throw "Node " + this.name + " is not checked out!";
     this.aspect.remove(new BasicObject("cm:workingcopy"));
     var i = 1;
@@ -243,19 +243,19 @@ ScriptNode.prototype.specializeType = function (type) {
 };
 
 ScriptNode.prototype.createNode = function (name, typ, assocType) {
-    if (this.type != "cm:folder" && this.type != "fm:forum" && this.type != "fm:topic")
+    if (this.type !== "cm:folder" && this.type !== "fm:forum" && this.type !== "fm:topic")
         throw "No Folder!";
     var newNode =  new ScriptNode(name, typ);
     this.children.add(newNode);
     newNode.parent.push(this);
     newNode.displayPath = newNode._getDisplayPath();
-    if (typeof assocType != "undefined")
+    if (typeof assocType !== "undefined")
         this.createAssociation(newNode, assocType);
     return newNode;
 };
 
 ScriptNode.prototype.addNode = function(node){
-    if (this.type != "cm:folder" && this.type != "fm:forum" && this.type != "fm:topic")
+    if (this.type !== "cm:folder" && this.type !== "fm:forum" && this.type !== "fm:topic")
         throw "No Folder!";
     this.children.add(node);
     node.parent.push(this);
@@ -269,7 +269,7 @@ ScriptNode.prototype.remove = function () {
     for (var i = 0; i < this.parent.length; i++) {
         this.parent[i].children.remove(this);
         for (assoc in this.parent[i].childAssocs) {
-            if (typeof this.parent[i].childAssocs[assoc] == "object" && this.parent[i].childAssocs[assoc][0] == this)
+            if (typeof this.parent[i].childAssocs[assoc] === "object" && this.parent[i].childAssocs[assoc][0] === this)
                 delete this.parent[i].childAssocs[assoc];
 
         }
@@ -405,7 +405,7 @@ CategoryNode.prototype.createRootCategory = function(aspect, name) {
 CategoryNode.prototype.getRootCategories = function(aspect) {
     var result = [];
     for (var key in this.rootCategories) {
-        if (key != "length" && this.rootCategories.hasOwnProperty(key)) {
+        if (key !== "length" && this.rootCategories.hasOwnProperty(key)) {
             if (this.rootCategories[key].hasAspect(aspect))
                 result.push(this.rootCategories[key]);
         }

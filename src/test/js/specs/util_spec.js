@@ -19,13 +19,24 @@ VerteilungTest.prototype.testURL = function() {
 };*/
 
 describe("Tests für util.js", function() {
-
-
+    
     it("Teste Datum parsen", function () {
         var dateString = "Thu May 22 16:23:07 CEST 2014";
         var date = parseDate(dateString);
         var vergleich = new Date(2014, 4, 22, 16, 23, 7, 0);
         expect(vergleich.getTime()).toBe(date.getTime());
     });
+
+    it("Test für startsWith", function() {
+        expect("abcde".startsWith("ab")).toBe(true);
+        expect("abcde".startsWith("a")).toBe(true);
+        expect("abcde".startsWith("ba")).toBe(false);
+    }) ;
+
+    it("Test für endsWith", function() {
+        expect("abcde".endsWith("de")).toBe(true);
+        expect("abcde".endsWith("e")).toBe(true);
+        expect("abcde".startsWith("ba")).toBe(false);
+    }) ;
 });
 

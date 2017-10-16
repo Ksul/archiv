@@ -142,8 +142,7 @@ function startSettingsDialog(modal) {
                                     };
                                     if (store) {
                                         $.cookie("settings", JSON.stringify(settings), {expires: 9999});
-                                        REC.log(INFORMATIONAL, "Einstellungen gesichert");
-                                        fillMessageBox(true);
+                                        Logger.log(Level.INFO, "Einstellungen gesichert");
                                     }
                                     closeDialog();
                                     initApplication();
@@ -185,7 +184,7 @@ function startDocumentDialog(data, modus, modal) {
             data.amountDisplay = $.format.number(data.amount, '#,##0.00');
         else
             data.amountDisplay = "";
-        if (!exist(data.tax))
+        if (!data.tax)
             data.tax = false;
         if (!data.person)
             data.person = "Klaus";
@@ -802,8 +801,7 @@ function startMoveDialog(rowData, table) {
                             }
                         },
                         error : function (err) {
-                            REC.log(DEBUG, err.reason);
-                            fillMessageBox(true);
+                            Logger.log(Level.DEBUG, err.reason);
                         },
                         'themes': {
                             'responsive': true,
@@ -882,8 +880,7 @@ function startMoveDialog(rowData, table) {
                                             var newData = json.data;
                                             var source = json.source;
                                             var target = json.target;
-                                            REC.log(INFORMATIONAL, "Dokument " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
-                                            fillMessageBox(true);
+                                            Logger.log(Level.INFO, "Dokument " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
                                             // nur wenn die Tabelle angeben ist werden die Zeilen gelöscht. Bei der Tabelle mit den Suchergebnissen
                                             // werden keine Einträge gelöscht und deshalb sollte die Tabelle dort auch nicht für diese Funktion mit
                                             // angegeben werden.

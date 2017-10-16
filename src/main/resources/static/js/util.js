@@ -13,7 +13,7 @@ function checkServerStatus(url) {
         "name": "server",
         "value": url
     }, {"name": "timeout", "value": "5000"}]);
-    return obj.data.toString() == "true";
+    return obj.data.toString() === "true";
 }
 
 /**
@@ -39,20 +39,19 @@ function checkServerStatus(url) {
  * benutzt werden. Dies ist unter anderem jQuery.
  */
 function executeService(service, params) {
-    var json;
+    var json = null;
     var index;
     var errorMessage;
     var successMessage;
     var done;
-    var url = window.location.pathname == "/context.html" ? "http://localhost:8080/Archiv/" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)) + "/";
-    var longParameter = false;
+    var url = window.location.pathname === "/context.html" ? "http://localhost:8080/Archiv/" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2)) + "/";
     var times = [];
     try {
         if (service.errorMessage)
             errorMessage = service.errorMessage;
         if (service.successMessage)
             successMessage = service.successMessage;
-        REC.log(DEBUG, "Execute: " + service.name);
+        Logger.log(Level.DEBUG, "Execute: " + service.name);
         times.push(new Date().getTime());
         var asynchron = true;
         if (!service.callback) {
@@ -69,10 +68,10 @@ function executeService(service, params) {
                 url = url + "/";
         }
         var dataString = {};
-        if (exist(params)) {
+        if (params) {
             for (index = 0; index < params.length; ++index) {
                 // falls Bytecode übertragen werden soll, dann Umwandlung damit es nicht zu Konvertierungsproblemen kommt
-                if (exist(params[index].type) && params[index].type == "byte")
+                if (params[index].type && params[index].type === "byte")
                     // Hier nicht btoa verwenden, weil es sonst Probleme mit Umlauten gibt
                     params[index].value = base64EncArr(strToUTF8Arr((params[index].value)));
                 dataString[params[index].name] = params[index].value;
@@ -103,11 +102,11 @@ function executeService(service, params) {
                         if (!txt) {
                             txt = "Unknown Error \n.";
                         }
-                    } else if (error == 'parsererror') {
+                    } else if (error === 'parsererror') {
                         txt = "Error.\nParsing JSON Request failed.";
-                    } else if (error == 'timeout') {
+                    } else if (error === 'timeout') {
                         txt = "Request Time out.";
-                    } else if (error == 'abort') {
+                    } else if (error === 'abort') {
                         txt = "Request was aborted by the server";
                     } else {
                         txt = "Unknown Error \n.";
@@ -134,7 +133,7 @@ function executeService(service, params) {
                         // es kommt keine JSON Struktur zurück
                         json = data;
                     } else if (!data.success) {
-                        if (exist(errorMessage))
+                        if (errorMessage)
                             errorString = errorMessage + "<br>";
                         else {
                             if (data.data)
@@ -145,22 +144,18 @@ function executeService(service, params) {
                         // gibt es eine Fehlermeldung aus dem Service?
                         if (data.error && !service.ignoreError) {
                             errorString = errorString + "<br>" + data.error.message;
-                            REC.log(ERROR, data.error.message);
-                            fillMessageBox(true);
+                            Logger.log(Level.ERROR, data.error.message);
                         }
                         if (!service.ignoreError && data.data) {
-                            REC.log(ERROR, data.data);
-                            fillMessageBox(true);
+                            Logger.log(Level.ERROR, data.data);
                         }
                         json = data;
                     } else {
                         times.push(new Date().getTime());
                         data.duration = times[1] - times[0];
-                        REC.log(INFORMATIONAL, "Execution of Service: " + service.name + " duration " + (times[1] - times[0]) + " ms");
-                        fillMessageBox(true);
-                        if (exist(successMessage)) {
-                            REC.log(INFORMATIONAL, successMessage);
-                            fillMessageBox(true);
+                        Logger.log(Level.INFO, "Execution of Service: " + service.name + " duration " + (times[1] - times[0]) + " ms");
+                        if (successMessage) {
+                            Logger.log(Level.INFO, successMessage);
                         }
                         done(data);
                     }
@@ -172,16 +167,16 @@ function executeService(service, params) {
         return json;
     } catch (e) {
         var p = "Service: " + service.name + "<br>";
-        if (exist(params)) {
+        if (params) {
             for (index = 0; index < params.length; ++index) {
                 p = p + "Parameter: " + params[index].name;
-                if (exist(params[index].value) && typeof params[index].value == "string")
+                if (params[index].value && typeof params[index].value === "string")
                     p = p + " : " + params[index].value.substr(0, 40) + "<br>";
                 else
                     p = p + " : Parameter Value fehlt!<br>";
             }
         }
-        if (exist(errorMessage))
+        if (errorMessage)
             p = errorMessage + "<br>" + e.toString() + "<br>" + p;
         else
             p = errorMessage + "<br>" + e.toString();
@@ -200,12 +195,12 @@ function executeService(service, params) {
  * @returns {*}  Den Wert der Einstellung
  */
 function getSettings(key) {
-    var ret;
-    if (!exist(settings) || settings.settings.filter(function (o) {
+
+    if (!settings || settings.settings.filter(function (o) {
             return o.key.indexOf(key) >= 0;
-        }).length == 0) {
+        }).length === 0) {
         var urlPar = getUrlParam(key);
-        if (urlPar == null)
+        if (!urlPar)
             return null;
         else {
             if (!settings)
@@ -252,15 +247,15 @@ function searchJson(obj, key, val) {
     var objects = [];
     for (var i in obj) {
         if (!obj.hasOwnProperty(i)) continue;
-        if (typeof obj[i] == 'object') {
+        if (typeof obj[i] === 'object') {
             objects = objects.concat(searchJson(obj[i], key, val));
         } else
 //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
-        if (i == key && obj[i] == val || i == key && val == '') { //
+        if (i === key && obj[i] === val || i === key && val === '') { //
             objects.push(obj);
-        } else if (obj[i] == val && key == '') {
+        } else if (obj[i] === val && key === '') {
 //only add if the object is not already in the array
-            if (objects.lastIndexOf(obj) == -1) {
+            if (objects.lastIndexOf(obj) === -1) {
                 objects.push(obj);
             }
         }
@@ -275,18 +270,18 @@ function searchJson(obj, key, val) {
  */
 function changeCss(className, classValue) {
     var cssMainContainer = $('#css-modifier-container');
-    if (cssMainContainer.length == 0) {
-        var cssMainContainer = $('<div id="css-modifier-container"></div>');
+    if (cssMainContainer.length === 0) {
+        cssMainContainer = $('<div id="css-modifier-container"></div>');
         cssMainContainer.hide();
         cssMainContainer.appendTo($('body'));
     }
     classContainer = cssMainContainer.find('div[data-class="' + className + '"]');
-    if (classContainer.length == 0) {
+    if (classContainer.length === 0) {
         classContainer = $('<div data-class="' + className + '"></div>');
         classContainer.appendTo(cssMainContainer);
     }
     classContainer.html('<style>' + className + ' {' + classValue + '}</style>');
-};
+}
 
 /**
  * prüft, ob ein String mit einem Vergleichsstring endet
@@ -322,8 +317,7 @@ function parseDate(dateString) {
         var hours = parts[0];
         var minutes = parts[1];
         var seconds = parts[2];
-        var date = new Date(year, months.indexOf(month), day, hours, minutes, seconds, 0);
-        return date;
+        return new Date(year, months.indexOf(month), day, hours, minutes, seconds, 0);
     } catch (e) {
         return null;
     }
@@ -336,7 +330,7 @@ function parseDate(dateString) {
  */
 function getCurrentDate(formatString) {
     {
-        return REC.dateFormat(new Date(), formatString)
+        return Formatter.dateFormat(new Date(), formatString)
     }
 }
 
@@ -350,7 +344,7 @@ function getUrlParam(name) {
     var regexS = "[\\?&]" + name + "=([^&#]*)";
     var regex = new RegExp(regexS);
     var results = regex.exec(this.location.href);
-    if (results == null)
+    if (!results)
         return null;
     else
         return decodeURIComponent(results[1]);
@@ -362,7 +356,7 @@ function getUrlParam(name) {
  * @returns {boolean}
  */
 function hasUrlParam() {
-    return this.location.href.search(/\?/) != -1;
+    return this.location.href.search(/\?/) !== -1;
 }
 
 /**
@@ -388,14 +382,6 @@ function convertPath(name) {
     return "file://" + window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/") + 1) + name;
 }
 
-/**
- * prüft, ob eine Variable vorhanden ist
- * @param val   die zu prüfende Variable
- * @returns {boolean}    true, wenn sie vorhanden ist
- */
-function exist(val) {
-    return typeof val != "undefined" && val != null;
-}
 
 /**
  * Globale Fehlerroutine
@@ -404,7 +390,7 @@ function exist(val) {
  */
 function errorHandler(e, description) {
     var str;
-    if (exist(description))
+    if (description)
         str = description + "<br>FEHLER:<br>";
     else
         str = "FEHLER:<br>";
@@ -425,9 +411,9 @@ function errorHandler(e, description) {
  * TODO Message für einfachen Dialog mit Ja/Nein oder Ok/Cancel aufbohren
  */
 function message(title, str, autoClose, height, width) {
-    if (!exist(height))
+    if (!height)
         height = 200;
-    if (!exist(width))
+    if (!width)
         width = 800;
     var dialogSettings = {
         autoOpen: false,
@@ -437,7 +423,7 @@ function message(title, str, autoClose, height, width) {
         width: width
     };
     var div = $("<div></div>");
-    if (exist(autoClose)) {
+    if (autoClose) {
         dialogSettings.open = function (event, ui) {
             setTimeout("$('#messageBox').dialog('close')", autoClose);
         }
@@ -516,11 +502,26 @@ function uuid() {
     for (var i = 0; i < 36; i++) {
         if (!uuid[i]) {
             r = 0 | rnd() * 16;
-            uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r & 0xf];
+            uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r & 0xf];
         }
     }
     return uuid.join('');
 }
+
+
+/**
+ * gibt die Meldungen im entsprechenden Fenster aus
+ * @param reverse   die Reihenfolge wird umgedreht
+ * @param level     der Mindestlevel
+ */
+function fillMessageBox(reverse, level) {
+    if (Verteilung.outputEditor) {
+        if (!level)
+            level = Logger.getLevel();
+        Verteilung.outputEditor.getSession().setValue(Logger.getMessages(reverse, level));
+    }
+}
+
 
 
 

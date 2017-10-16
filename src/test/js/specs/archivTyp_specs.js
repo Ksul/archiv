@@ -37,7 +37,7 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
         var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
         archivTyp.resolve();
-        console.log(REC.getMessage(true));
+        console.log(Logger.getMessages(true));
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).not.toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Sonstige Rechnungen/2015/WebScriptTest")).not.toBeNull();
@@ -67,7 +67,7 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
         var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
         archivTyp.resolve();
-        console.log(REC.getMessage(true));
+        console.log(Logger.getMessages(true));
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).not.toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();

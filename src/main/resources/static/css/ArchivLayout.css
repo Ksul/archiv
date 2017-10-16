@@ -684,29 +684,15 @@ h2 {
     padding-top: 4px
 }
 
-#alfrescoTableFooter {
+.dataTableFooter {
     position: absolute;
     bottom: 0px;
     height: 25px;
     background-color: #ebebeb;
     width: 100%;
+    border:none;
 }
 
-#alfrescoFolderTableFooter {
-    position: absolute;
-    bottom: 0px;
-    height: 25px;
-    background-color: #ebebeb;
-    width: 100%;
-}
-
-#alfrescoSearchTableFooter {
-    position: absolute;
-    bottom: 0px;
-    height: 25px;
-    background-color: #ebebeb;
-    width: 100%;
-}
 
 div.dataTables_paginate {
     float: right;

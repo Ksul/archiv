@@ -29,7 +29,7 @@ describe("Test für die Rest Services", function () {
         }, [
             {"name": "folderId", "value": json.data},
             {"name": "withFolder", "value": "-1"},
-            {"name": "itemsToSkip", "value": "0"},
+            {"name": "start", "value": "0"},
             {"name": "length", "value": "7"}
         ]);
 
