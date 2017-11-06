@@ -1,61 +1,6 @@
 function alertt(msg) {
     alert(msg);
 }
-/**
- * startet die normalen Alfresco View
- */
-function showAlfrescoNormalView(){
-    alfrescoTabelle.settings().init().iconView = false;
-    alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class','fa fa-file-text-o fa-1x');
-    alfrescoViewModeMenu.children('li:first').superfish('hide');
-    alfrescoTabelle.column(0).visible(true);
-    alfrescoTabelle.column(1).visible(true);
-    alfrescoTabelle.column(2).visible(false);
-    //alfrescoLayout.children.center.alfrescoCenterInnerLayout.children.center.alfrescoCenterCenterInnerLayout.show("north");
-    //resizeTable("alfrescoCenterCenterCenter", "dtable2", "alfrescoTabelle", "alfrescoTabelleHeader", "alfrescoTableFooter");
-}
-
-/**
- * startet die Alfresco Icon View
- */
-function showAlfrescoIconView(){
-    alfrescoTabelle.settings().init().iconView = true;
-    alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class','fa fa-photo fa-1x');
-    alfrescoViewModeMenu.children('li:first').superfish('hide');
-    alfrescoTabelle.column(0).visible(false);
-    alfrescoTabelle.column(1).visible(false);
-    alfrescoTabelle.column(2).visible(true);
-    //alfrescoLayout.children.center.alfrescoCenterInnerLayout.children.center.alfrescoCenterCenterInnerLayout.hide("north");
-
-    //resizeTable("alfrescoCenterCenterCenter", "dtable2", "alfrescoTabelle", "alfrescoTabelleHeader", "alfrescoTableFooter");
-}
-
-
-/**
- * startet die normalen Alfresco SearchView
- */
-function showSearchNormalView(){
-    alfrescoSearchTabelle.settings().init().iconView = false;
-    searchViewModeMenu.get(0).children[0].children[0].setAttribute('class','fa fa-file-text-o fa-1x');
-    searchViewModeMenu.children('li:first').superfish('hide');
-    alfrescoSearchTabelle.column(0).visible(true);
-    alfrescoSearchTabelle.column(1).visible(true);
-    alfrescoSearchTabelle.column(2).visible(false);
-    //resizeTable("searchCenter", "dtable4", "alfrescoSearchTabelle", "alfrescoSearchTabelleHeader", "alfrescoSearchTableFooter");
-}
-
-/**
- * startet die Alfresco Search Icon View
- */
-function showSearchIconView() {
-    alfrescoSearchTabelle.settings().init().iconView = true;
-    searchViewModeMenu.get(0).children[0].children[0].setAttribute('class','fa fa-photo fa-1x');
-    searchViewModeMenu.children('li:first').superfish('hide');
-    alfrescoSearchTabelle.column(0).visible(false);
-    alfrescoSearchTabelle.column(1).visible(false);
-    alfrescoSearchTabelle.column(2).visible(true);
-    //resizeTable("searchCenter", "dtable4", "alfrescoSearchTabelle", "alfrescoSearchTabelleHeader", "alfrescoSearchTableFooter");
-}
 
 /**
  * Eventhandler der für die Verarbeitung von fallen gelassen Dateien auf die Inbox zuständig ist
@@ -280,7 +225,14 @@ function loadLayout() {
             west: {
                 paneSelector: "#alfrescoWest",
                 name: "alfrescoWestLayout",
-                size: .2
+                size: .2,
+                onresize: function(){
+                    try {
+                        $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();
+                    } catch (e) {
+                        errorHandler(e);
+                    }
+                }
             },
             center: {
                 paneSelector: "#alfrescoCenter",
@@ -300,9 +252,7 @@ function loadLayout() {
                         onresize: function () {
                             try {
                                 $("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterNorth").outerHeight() - ($("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoFolderTableFooter").outerHeight() + $("#alfrescoFolderTabelleHeader").outerHeight() +
-                                    $("div ul li, .current").outerHeight() - 1));
-                                $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterCenter").outerHeight() - ($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight() + $("#alfrescoTabelleHeader").outerHeight() +
-                                    $("div ul li, .current").outerHeight() - 1));
+                                    $("div ul li, .current").outerHeight() - 4));
                             } catch (e) {
                                 errorHandler(e);
                             }
@@ -315,7 +265,7 @@ function loadLayout() {
                         onresize: function () {
                             try {
                                 $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterCenter").outerHeight() - ($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight() + $("#alfrescoTabelleHeader").outerHeight() +
-                                    $("div ul li, .current").outerHeight() - 1));
+                                    $("div ul li, .current").outerHeight() - 4));
                             } catch (e) {
                                 errorHandler(e);
                             }
@@ -328,27 +278,21 @@ function loadLayout() {
         var searchLayoutSettings = {
             name: "searchLayout",
             size: "auto",
-            minSize: 34,
+            minSize: 36,
             spacing_open: 8,
             spacing_closed: 12,
             livePaneResizing: true,
             contentSelector: ".ui-widget-content",
+            resizerClass: "ui-widget-content",
+            togglerClass: "ui-widget-content",
             north: {
                 paneSelector: "#searchNorth",
                 name: "searchNorthLayout",
-                minSize: 34,
-                maxSize: 34,
+                minSize: 36,
+                maxSize: 36,
                 resizable: false,
                 closable: false,
-                slidable: false,
-                children: {
-                    name: "searchNorthInnerLayout",
-                    center: {
-                        size: "auto",
-                        name: "searchNorthCenterLayout",
-                        paneSelector: "#searchNorthCenter"
-                    }
-                }
+                slidable: false
             },
             center: {
                 paneSelector: "#searchCenter",
@@ -358,7 +302,7 @@ function loadLayout() {
                 onresize: function () {
                     try {
                         $("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#searchCenter").outerHeight() - ($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight() +
-                            $("div ul li, .current").outerHeight() - 1));
+                            $("div ul li, .current").outerHeight() - 4));
                     } catch (e) {
                         errorHandler(e);
                     }
@@ -439,21 +383,22 @@ function loadLayout() {
                 // bei den nicht sichtbaren Panels ist die Height zunächst 0, so dass das Scrollen nicht funktioniert.
                 // Deshalb wird die Height hier noch mal beim aktivieren gesetzt
                 if (ui.newPanel.attr('id') === "tab1") {
-                    if (!alfrescoFolderTabelle)
+                    if (!alfrescoFolderTabelle) {
                         buildAlfrescoTab();
+                    }
                 }
                 if (ui.newPanel.attr('id') === "tab2") {
                     if (!alfrescoSearchTabelle)
                         buildSearchTab();
-                    $("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#searchCenter").outerHeight() - ($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight() +
-                        $("div ul li, .current").outerHeight() - 1));
+                    // $("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#searchCenter").outerHeight() - ($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight() +
+                    //     $("div ul li, .current").outerHeight() - 1));
                     $('#alfrescoSearch').focus().select();
                 }
                 if (ui.newPanel.attr('id') === "tab3") {
                     if (!tabelle)
                         buildVerteilungTab();
                 }
-                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust().draw();
+                //$.fn.dataTable.tables({visible: true, api: true}).columns.adjust().draw();
             },
             active: -1
         });
@@ -514,8 +459,7 @@ function loadAlfrescoTable() {
         alfrescoTabelle = $('#alfrescoTabelle').DataTable({
             jQueryUI: false,
             dom: "rtiS",
-            scrollY: $("#alfrescoCenterCenter").outerHeight() -($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight()+$("#alfrescoTabelleHeader").outerHeight()+
-                $("div ul li, .current").outerHeight() - 1),
+            scrollY: 20,
             scroll: true,
             scroller: {loadingIndicator: true},
             scrollX: false,
@@ -533,15 +477,7 @@ function loadAlfrescoTable() {
                 url: "/Archiv/listFolderWithPagination",
                 type: "POST",
                 data: function (obj, meta) {
-                    Logger.log(Level.TRACE, "Alfresco:");
-                    Logger.log(Level.TRACE, "DIV:" +   $("#alfrescoCenterCenter").outerHeight());
-                    Logger.log(Level.TRACE, "ScrolllHead:" +  $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight());
-                    Logger.log(Level.TRACE, "Footer:" +  $("#alfrescoTableFooter").outerHeight());
-                    Logger.log(Level.TRACE, "Header:" + $("#alfrescoTabelleHeader").outerHeight());
-                    Logger.log(Level.TRACE, "Menu:" + $("div ul li, .current").outerHeight());
-                    Logger.log(Level.TRACE, "ScrollY:" + ($("#alfrescoCenterCenter").outerHeight() -($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight()+$("#alfrescoTabelleHeader").outerHeight()+
-                        $("div ul li, .current").outerHeight() - 1)));
-                    obj.folderId = meta.oInit.folderId;
+                     obj.folderId = meta.oInit.folderId;
                     obj.withFolder = meta.oInit.withFolder;
                     duration = new Date().getTime();
                     return JSON.stringify(obj);
@@ -805,6 +741,10 @@ function loadAlfrescoTable() {
             }
         } );
 
+        $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterCenter").outerHeight() - ($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight() + $("#alfrescoTabelleHeader").outerHeight() +
+            $("div ul li, .current").outerHeight() - 4));
+
+
         $("#alfrescoTabelle_info").detach().appendTo('#alfrescoTableFooter');
         $("#alfrescoTabelle_paginate").detach().appendTo('#alfrescoTableFooter');
 
@@ -872,8 +812,7 @@ function loadAlfrescoFolderTable() {
         alfrescoFolderTabelle = $('#alfrescoFolderTabelle').DataTable({
             jQueryUI: false,
             dom: "rtiS",
-            scrollY: $("#alfrescoCenterNorth").outerHeight() -($("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoFolderTableFooter").outerHeight()+ $("#alfrescoFolderTabelleHeader").outerHeight()+
-                $("div ul li, .current").outerHeight() - 1),
+            scrollY: 20,
             scroll: true,
             scroller: {loadingIndicator: true},
             scrollX: false,
@@ -890,14 +829,6 @@ function loadAlfrescoFolderTable() {
                 url: "/Archiv/listFolderWithPagination",
                 type: "POST",
                 data: function (obj, meta) {
-                    Logger.log(Level.TRACE, "AlfrescoFolder:");
-                    Logger.log(Level.TRACE, "DIV:" +   $("#alfrescoCenterNorth").outerHeight());
-                    Logger.log(Level.TRACE, "ScrolllHead:" +  $("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight());
-                    Logger.log(Level.TRACE, "Footer:" +  $("#alfrescoFolderTableFooter").outerHeight());
-                    Logger.log(Level.TRACE, "Header:" + $("#alfrescoFolderTabelleHeader").outerHeight());
-                    Logger.log(Level.TRACE, "Menu:" + $("div ul li, .current").outerHeight());
-                    Logger.log(Level.TRACE, "ScrollY:" + ($("#alfrescoCenterNorth").outerHeight() -($("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoFolderTableFooter").outerHeight()+ $("#alfrescoFolderTabelleHeader").outerHeight()+
-                        $("div ul li, .current").outerHeight() - 1)));
                     obj.folderId = meta.oInit.folderId;
                     obj.withFolder = meta.oInit.withFolder;
                     duration = new Date().getTime();
@@ -915,10 +846,17 @@ function loadAlfrescoFolderTable() {
                 dataSrc: function (obj) {
                     try {
                         Logger.log(Level.DEBUG, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
-                        //alfrescoFolderTabelle.clear();
-                        //resizeTable("alfrescoCenterCenterNorth", "dtable3", "alfrescoFolderTabelle", "alfrescoFolderTabelleHeader", "alfrescoFolderTableFooter");
-                        //alfrescoFolderTabelle.rows.add(json.data).draw();
                         $.fn.dataTable.makeEditable(alfrescoFolderTabelle, updateInLineFolderFieldFieldDefinition());
+                        if (obj.data.length === 0) {
+                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahl');
+                        }
+                        else {
+                            alfrescoFolderActionMenu.superfish('enable','alfrescoFolderAuswahl');
+                            alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
+                            alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
+                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlRevert');
+                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlNone');
+                        }
                         var tree = $.jstree.reference('#tree');
                         var parent = tree.get_node(obj.parent);
                         if (parent) {
@@ -1053,7 +991,28 @@ function loadAlfrescoFolderTable() {
                     }
                 }
             }
-        });
+        }).on( 'select', function ( e, dt, type, indexes ) {
+            if ( type === 'row' ) {
+                alfrescoFolderActionMenu.superfish('enable','alfrescoFolderActionMove');
+                alfrescoFolderActionMenu.superfish('enable','alfrescoFolderActionDelete');
+                alfrescoFolderSelectMenu.superfish('enable','alfrescoFolderAuswahlRevert');
+                alfrescoFolderSelectMenu.superfish('enable','alfrescoFolderAuswahlNone');
+            }
+        } ).on( 'deselect', function ( e, dt, type, indexes ) {
+            if ( type === 'row' ) {
+                if( alfrescoFolderTabelle.rows( { selected: true }).length <= 1 ) {
+                    alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
+                    alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
+                    alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlRevert');
+                    alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlNone');
+                }
+            }
+        } );
+
+
+        $("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterNorth").outerHeight() - ($("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoFolderTableFooter").outerHeight() + $("#alfrescoFolderTabelleHeader").outerHeight() +
+            $("div ul li, .current").outerHeight() - 4));
+
 
         // Drag aus Tabelle
         $(document)
@@ -1127,8 +1086,7 @@ function loadAlfrescoSearchTable() {
         alfrescoSearchTabelle = $('#alfrescoSearchTabelle').DataTable({
             jQueryUI: false,
             dom: "rtiS",
-            scrollY: $("#searchCenter").outerHeight() -($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight()+
-                $("div ul li, .current").outerHeight() - 1),
+            scrollY: 20,
             scroll: true,
             scroller: {loadingIndicator: true},
             autoWidth: true,
@@ -1144,14 +1102,6 @@ function loadAlfrescoSearchTable() {
                 url: "/Archiv/findDocumentWithPagination",
                 type: "POST",
                 data: function (obj, meta) {
-                    Logger.log(Level.TRACE, "Suche:");
-                    Logger.log(Level.TRACE, "DIV:" +  $("#searchCenter").outerHeight());
-                    Logger.log(Level.TRACE, "ScrolllHead:" +  $("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight());
-                    Logger.log(Level.TRACE, "Footer:" +  $("#alfrescoSearchTableFooter").outerHeight());
-                    Logger.log(Level.TRACE, "Header:" + $("#searchTabelleHeader").outerHeight());
-                    Logger.log(Level.TRACE, "Menu:" + $("div ul li, .current").outerHeight());
-                    Logger.log(Level.TRACE, "ScrollY:" + ($("#searchCenter").outerHeight() -($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight()+
-                        $("div ul li, .current").outerHeight() - 1)));
                     obj.cmisQuery = meta.oInit.cmisQuery;
                     duration = new Date().getTime();
                     return JSON.stringify(obj);
@@ -1423,7 +1373,11 @@ function loadAlfrescoSearchTable() {
                 }
             }
         } );
-        
+
+        $("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#searchCenter").outerHeight() - ($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight() +
+            $("div ul li, .current").outerHeight() - 4));
+
+
         $("#alfrescoSearchTabelle_info").detach().appendTo('#alfrescoSearchTableFooter');
         $("#alfrescoSearchTabelle_paginate").detach().appendTo('#alfrescoSearchTableFooter');
 
@@ -2073,270 +2027,6 @@ function updateInlineDocument(value, settings) {
         errorHandler(e);
     }
 }
-
-/**
- * erstellt ein neues Dokument
- * @param input             die neu einzutragenden Daten
- * @param file              das File Objekt
- */
-function createDocument(input, file) {
-    var erg = {"success": false};
-    reader = new FileReader();
-    reader.onloadend = (function (theFile) {
-        return function (evt) {
-            try {
-                if (evt.target.readyState === FileReader.DONE) {
-                    var extraProperties = {
-                        'P:cm:titled': {
-                            'cm:title': input.title,
-                            'cm:description': input.description
-                        },
-                        'D:my:archivContent': {
-                            'my:documentDate': input.documentDate,
-                            'my:person': input.person
-                        },
-                        'P:my:amountable': {'my:amount': input.amount, "my:tax": input.tax},
-                        'P:my:idable': {'my:idvalue': input.idvalue}
-                    };
-                    var done = function (json) {
-                        if (json.success) {
-                            // Tabelle updaten
-                            alfrescoTabelle.row.add(json.data).draw();
-                        }
-                    };
-                    erg = executeService({
-                        "name": "createDocument",
-                        "callback": done,
-                        "errorMessage": "Dokument konnte nicht erstellt werden!",
-                        "ignoreError": false
-                    }, [
-                        {"name": "documentId", "value": tree.jstree("get_selected")[0]},
-                        {"name": "fileName", "value": theFile.name},
-                        // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
-                        {"name": "content", "value": btoa(evt.target.result)},
-                        {"name": "extraProperties", "value": extraProperties},
-                        // TODO Richtigen Mimetype ermitteln
-                        {"name": "mimeType", "value": "application/pdf"},
-                        {"name": "versionState", "value": "major"}
-                    ]);
-                }
-            } catch (e) {
-                errorHandler(e);
-            }
-        };
-    })(file);
-    blob = file.slice(0, file.size + 1);
-    reader.readAsBinaryString(blob);
-}
-
-/**
- * ändert ein Dokument
- * @param input             die neu einzutragenden Daten
- * @param id                die Id des Objektes
- * @return                  true, wenn erfolgreich   
- **/
-function editDocument(input, id) {
-    var erg = {"success": false};
-    try {
-        var extraProperties = {
-            'P:cm:titled': {
-                'cm:title': input.title,
-                'cm:description': input.description
-            },
-            'D:my:archivContent': {
-                'my:documentDate': input.documentDate,
-                'my:person': input.person
-            },
-            'P:my:amountable': {'my:amount': input.amount, "my:tax": input.tax},
-            'P:my:idable': {'my:idvalue': input.idvalue}
-        };
-        var done = function (json) {
-            if (json.success) {
-                var data = json.data;
-                // Tabelle updaten
-                var row = alfrescoTabelle.row('#' + data.objectID);
-                if (row && row.length)
-                    row.data(data).invalidate();
-                // Suchergebnis eventuell updaten
-                row = alfrescoSearchTabelle.row('#' + data.objectID);
-                if (row && row.length)
-                    row.data(data).invalidate();
-            }
-        };
-        erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Dokument konnte nicht aktualisiert werden!", "ignoreError": true}, [
-            {"name": "documentId", "value": id},
-            {"name": "extraProperties", "value": extraProperties}
-        ]);
-     } catch (e) {
-        errorHandler(e);
-    }
-    return erg;
-}
-
-/**
- * löscht ein Dokument
- */
-function deleteDocument() {
-    try {
-        var origData = $("#dialogBox").alpaca().data;
-        var done = function (json) {
-            if (json.success) {
-                var row = alfrescoTabelle.row('#' + origData.objectID);
-                if (row && row.length)
-                    row.remove().draw(false);
-                row = alfrescoSearchTabelle.row('#' + origData.objectID);
-                if (row && row.length)
-                    row.remove().draw(false);
-            }
-        };
-        var erg = executeService({"name": "deleteDocument", "callback": done, "errorMessage": "Dokument konnte nicht gelöscht werden!"}, [
-            {"name": "documentId", "value": origData.objectID}
-        ]);
-     } catch (e) {
-        errorHandler(e);
-    }
-}
-
-/**
- * erzeugt einen neuen Ordner
- * @param input         die Daten des neuen Ordners
- * @param origData      die übergebenen Daten
- */
-function createFolder(input, origData) {
-    try {
-        var extraProperties = {
-            'cmis:folder': {
-                'cmis:objectTypeId': 'cmis:folder',
-                'cmis:name': input.name
-            },
-            'P:cm:titled': {
-                'cm:title': input.title,
-                'cm:description': input.description
-            }
-        };
-        var done = function (json) {
-            if (json.success) {
-                var lastElement = $("#breadcrumblist").children().last();
-                var newData = json.data;
-                var tree = $.jstree.reference('#tree');
-                // Tree updaten
-                var node = tree.get_node(newData.parentId);
-                if (node) {
-                    tree.create_node(node, buildObjectForTree(newData));
-                }
-                // Tabelle updaten
-                if (lastElement && lastElement.get(0).id === newData.parentId) {
-                    alfrescoFolderTabelle.rows.add([newData]).draw();
-                }
-                // BreadCrumb aktualisieren
-                if (lastElement)
-                    fillBreadCrumb(lastElement.data().data);
-            }
-        };
-        var erg = executeService({"name": "createFolder", "callback": done, "errorMessage": "Ordner konnte nicht erstellt werden!"}, [
-            {"name": "documentId", "value": origData.objectId},
-            {"name": "extraProperties", "value": extraProperties}
-        ]);
-     } catch (e) {
-        errorHandler(e);
-    }
-}
-
-/**
- * editiert einen Ordner
- * @param input         die neuen Daten des Ordners
- * @param id            die Id des Ordners
- * @return              true, wenn erfolgreich
- */
-function editFolder(input, id) {
-    var erg = {"success": false};
-    try {
-        var extraProperties = {
-            'cmis:folder': {
-                'cmis:objectTypeId': 'cmis:folder',
-                'cmis:name': input.name
-            },
-            'P:cm:titled': {
-                'cm:title': input.title,
-                'cm:description': input.description
-            }
-        };
-        var done = function (json) {
-            if (json.success) {
-                var lastElement = $("#breadcrumblist").children().last();
-                var newData = json.data;
-                // Tree updaten
-                var tree = $.jstree.reference('#tree');
-                var node = tree.get_node(newData.objectID);
-                if (node) {
-                    tree.rename_node(node, newData.name);
-                    node.data = newData;
-                }
-                // Tabelle updaten
-                if (lastElement && lastElement.get(0).id === newData.parentId) {
-                    var row = alfrescoFolderTabelle.row('#' + newData.objectID);
-                    if (row && row.length) {
-                        row.data(newData).invalidate();
-                    }
-                }
-                // BreadCrumb aktualisieren
-                if (lastElement && lastElement.get(0).id === id) {
-                    fillBreadCrumb(input);
-                } else if (lastElement)
-                    fillBreadCrumb(lastElement.data().data);
-            }
-
-        };
-        erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Ordner konnte nicht aktualisiert werden!", "ignoreError": true}, done,[
-            {"name": "documentId", "value": id},
-            {"name": "extraProperties", "value": extraProperties}
-        ]);
-      } catch (e) {
-        errorHandler(e);
-    }
-    return erg;
-}
-
-/**
- * löscht einen Ordner
- * TODO Was passiert hier mit den eventuell vorhandenen Suchergebnissen
- * TODO der sollte die Dialogbox hier nicht kennen
- */
-function deleteFolder() {
-    try {
-        var origData = $("#dialogBox").alpaca().data;
-        var done = function (json) {
-            if (json.success) {
-                var lastElement = $("#breadcrumblist").children().last();
-                // Tree updaten
-                var tree = $.jstree.reference('#tree');
-                tree.delete_node(origData.objectID);
-                // Tabelle updaten
-                if (lastElement && lastElement.get(0).id === origData.parentId) {
-                    var row = alfrescoFolderTabelle.row('#' + origData.objectID);
-                    if (row && row.length) {
-                        row.remove().draw();
-                    }
-                }
-                // der aktuelle Ordner ist der zu löschende
-                if (lastElement && lastElement.get(0).id === origData.objectID) {
-                    tree.select_node(origData.parentId);
-                } else {
-                    // BreadCrumb aktualisieren
-                    if (lastElement)
-                        fillBreadCrumb(lastElement.data().data);
-                }
-            }
-
-        };
-        var erg = executeService({"name": "deleteFolder", "callback": done, "errorMessage": "Ordner konnte nicht gelöscht werden!"}, [
-            {"name": "documentId", "value": origData.objectID}
-        ]);
-    } catch (e) {
-        errorHandler(e);
-    }
-}
-
 
 /**
  * führt die Aktualisierungen für eine Verzeichniswechsel im Alfresco durch
@@ -3682,7 +3372,7 @@ function createAlfrescoMenus() {
                     action: function () {
                         try {
                             var data = alfrescoTabelle.rows({selected: true}).data();
-                            startMoveDialog(data, alfrescoTabelle);
+                            startMoveDialog(data, alfrescoTabelle, "Dokumente");
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -3709,14 +3399,33 @@ function createAlfrescoMenus() {
                     title: "Normal",
                     className: "fa fa-file-text-o fa-1x",
                     action: function () {
-                        showAlfrescoNormalView();
+                        try {
+                            alfrescoTabelle.settings().init().iconView = false;
+                            alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-file-text-o fa-1x');
+                            alfrescoViewModeMenu.children('li:first').superfish('hide');
+                            alfrescoTabelle.column(0).visible(true);
+                            alfrescoTabelle.column(1).visible(true);
+                            alfrescoTabelle.column(2).visible(false);
+                        } catch (e) {
+                            errorHandler(e);
+                        }
                     }
                 },
                 alfrescoViewModeMenuIcon: {
                     title: "Icons",
                     className: "fa fa-photo fa-1x",
                     action: function () {
-                        showAlfrescoIconView();
+                        try {
+                            alfrescoTabelle.settings().init().iconView = true;
+                            alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-photo fa-1x');
+                            alfrescoViewModeMenu.children('li:first').superfish('hide');
+                            alfrescoTabelle.column(0).visible(false);
+                            alfrescoTabelle.column(1).visible(false);
+                            alfrescoTabelle.column(2).visible(true);
+                            alfrescoTabelle.columns(2).draw("page");
+                        } catch (e) {
+                            errorHandler(e);
+                        }
                     }
                 }
             }
@@ -3730,19 +3439,19 @@ function createAlfrescoMenus() {
  */
 function createAlfrescoFolderMenus() {
 
-     $('#selectionMenuAlfrescoFolderDocuments').superfish({
+     alfrescoFolderSelectMenu = $('#selectionMenuAlfrescoFolder').superfish({
         menuData: {
-            alfrescoDocumentAuswahl: {
+            alfrescoFolderAuswahl: {
                 title: "Auswählen",
                 className: "fa fa-check fa-1x",
-                alfrescoFolderDocumentAuswahlAll: {
+                alfrescoFolderAuswahlAll: {
                     title: "Alle",
                     className: "fa fa-check-circle-o fa-1x",
                     action: function () {
                         alfrescoFolderTabelle.rows().select();
                     }
                 },
-                alfrescoFolderDocumentAuswahlRevert: {
+                alfrescoFolderAuswahlRevert: {
                     title: "Umkehren",
                     className: "fa fa-refresh fa-1x",
                     disabled: true,
@@ -3752,7 +3461,7 @@ function createAlfrescoFolderMenus() {
                         alfrescoFolderTabelle.rows(rows).deselect();
                     }
                 },
-                alfrescoFolderDocumentAuswahlNone: {
+                alfrescoFolderAuswahlNone: {
                     title: "Keine",
                     className: "fa fa-times-circle-o fa-1x",
                     disabled: true,
@@ -3764,6 +3473,35 @@ function createAlfrescoFolderMenus() {
         }
     });
 
+    alfrescoFolderActionMenu = $('#actionMenuAlfrescoFolder').superfish({
+        menuData: {
+            "alfrescoFolderAction": {
+                title: "Aktion",
+                className: "fa fa-sign-in fa-1x",
+                alfrescoFolderActionMove: {
+                    title: "Verschieben",
+                    className: "fa fa-files-o fa-1x",
+                    disabled: true,
+                    action: function () {
+                        try {
+                            var data = alfrescoFolderTabelle.rows({selected: true}).data();
+                            startMoveDialog(data, alfrescoFolderTabelle, "Ordner");
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                alfrescoFolderActionDelete: {
+                    title: "Löschen",
+                    className: "fa fa-trash fa-1x",
+                    disabled: true,
+                    action: function () {
+                        alertt('Noch nicht implementiert!');
+                    }
+                }
+            }
+        }
+    });
 
 }
 
@@ -3781,14 +3519,33 @@ function createSearchMenus(){
                     title: "Normal",
                     className: "fa fa-file-text-o fa-1x",
                     action: function () {
-                        showSearchNormalView();
+                        try {
+                            alfrescoSearchTabelle.settings().init().iconView = false;
+                            searchViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-file-text-o fa-1x');
+                            searchViewModeMenu.children('li:first').superfish('hide');
+                            alfrescoSearchTabelle.column(0).visible(true);
+                            alfrescoSearchTabelle.column(1).visible(true);
+                            alfrescoSearchTabelle.column(2).visible(false);
+                        } catch (e) {
+                            errorHandler(e);
+                        }
                     }
                 },
                 searchViewModeMenuIcon: {
                     title: "Icons",
                     className: "fa fa-photo fa-1x",
                     action: function () {
-                        showSearchIconView();
+                        try {
+                            alfrescoSearchTabelle.settings().init().iconView = true;
+                            searchViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-photo fa-1x');
+                            searchViewModeMenu.children('li:first').superfish('hide');
+                            alfrescoSearchTabelle.column(0).visible(false);
+                            alfrescoSearchTabelle.column(1).visible(false);
+                            alfrescoSearchTabelle.column(2).visible(true);
+                            alfrescoSearchTabelle.columns(2).draw("page");
+                        } catch (e) {
+                            errorHandler(e);
+                        }
                     }
                 }
             }

@@ -13,30 +13,27 @@ public class DocumentRequest {
 
 
     @NotNull
-    private String documentId;
+    String documentId;
+
 
     @NotNull
-    private String fileName;
+    String content;
 
     @NotNull
-    private String content;
+    String mimeType;
 
     @NotNull
-    private String mimeType;
+    String versionState;
 
-    @NotNull
-    private String versionState;
+    String versionComment;
 
-    private String versionComment;
-
-    private Map<String, Object> extraProperties;
+    Map<String, Object> extraProperties;
 
     public DocumentRequest() {
     }
 
-    public DocumentRequest(String documentId, String fileName, String content, String mimeType, String versionState, String versionComment, Map<String, Object> extraProperties) {
+    public DocumentRequest(String documentId,  String content, String mimeType, String versionState, String versionComment, Map<String, Object> extraProperties) {
         this.documentId = documentId;
-        this.fileName = fileName;
         this.content = content;
         this.mimeType = mimeType;
         this.versionState = versionState;
@@ -50,14 +47,6 @@ public class DocumentRequest {
 
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public String getContent() {

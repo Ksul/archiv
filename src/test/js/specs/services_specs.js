@@ -6,7 +6,7 @@ describe("Test für die Rest Services", function () {
 
     it("getNodeId", function () {
         var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
-            {"name": "filePath", "value": "/Archiv/Unbekannt"}
+            {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
         ]);
 
         expect(json.success).toBe(true);
@@ -16,7 +16,7 @@ describe("Test für die Rest Services", function () {
     it("listFolderWithPagination", function () {
 
         var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
-            {"name": "filePath", "value": "/Archiv"}
+            {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
         ]);
 
         expect(json.success).toBe(true);
@@ -28,7 +28,7 @@ describe("Test für die Rest Services", function () {
             "ignoreError": true
         }, [
             {"name": "folderId", "value": json.data},
-            {"name": "withFolder", "value": "-1"},
+            {"name": "withFolder", "value": "1"},
             {"name": "start", "value": "0"},
             {"name": "length", "value": "7"}
         ]);
@@ -91,7 +91,7 @@ describe("Test für die Rest Services", function () {
         ]);
 
         expect(json.success).toBe(true);
-        expect(json.data.length > 0).toBeTruthy();
+        expect(json.data.objectID).toBe(rulesID);
 
     });
 
@@ -123,7 +123,8 @@ describe("Test für die Rest Services", function () {
             {"name": "versionState", "value": "major"}
         ]);
         expect(json.success).toBe(true);
-        expect(json.data.length > 0).toBeTruthy();
+        expect(json.data.name).toBe("Test.txt");
+        expect(json.data.versionLabel).toBe("1.0");
 
         
 

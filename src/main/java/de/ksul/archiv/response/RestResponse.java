@@ -10,7 +10,7 @@ import de.ksul.archiv.model.Response;
  */
 public class RestResponse implements Response {
 
-    private boolean success;
+    private boolean success = false;
 
     private Exception error;
 

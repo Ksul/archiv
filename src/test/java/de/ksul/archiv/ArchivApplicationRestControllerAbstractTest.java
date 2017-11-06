@@ -138,7 +138,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("cmis:document", p1);
         extraProperties.put("P:cm:titled", p2);
-        DocumentRequest request = new DocumentRequest();
+        DocumentCreateRequest request = new DocumentCreateRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("Testdocument");
         request.setContent(Base64.encodeBase64String("Dies ist ein Inhalt mit Umlauten: äöüßÄÖÜ/?".getBytes()));

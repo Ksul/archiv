@@ -175,13 +175,18 @@ public class ArchivController {
         RestResponse obj = new RestResponse();
 
         Document document = (Document) con.getNodeById(model.getDocumentId());
-        for (Rendition rendition : document.getRenditions()) {
-            if (rendition.getKind().equalsIgnoreCase("cmis:thumbnail")) {
-                obj.setData(Base64.encodeBase64String(IOUtils.toByteArray(rendition.getContentStream().getStream())));
-                break;
+        if (document != null ) {
+            List<Rendition> renditions = document.getRenditions();
+            if (renditions != null) {
+                for (Rendition rendition : renditions) {
+                    if (rendition.getKind().equalsIgnoreCase("cmis:thumbnail")) {
+                        obj.setData(Base64.encodeBase64String(IOUtils.toByteArray(rendition.getContentStream().getStream())));
+                        break;
+                    }
+                }
             }
+            obj.setSuccess(true);
         }
-        obj.setSuccess(true);
 
         return obj;
     }
@@ -548,7 +553,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/createDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse createDocument(@RequestBody @Valid final DocumentRequest model) throws Exception {
+    RestResponse createDocument(@RequestBody @Valid final DocumentCreateRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
@@ -630,7 +635,7 @@ public class ArchivController {
         RestResponse obj = new RestResponse();
 
 
-        Map<String, Object> outMap = null;
+        Map<String, Object> outMap;
         CmisObject cmisObject = con.getNodeById(model.getDocumentId());
         if (cmisObject != null) {
 

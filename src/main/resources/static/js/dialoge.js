@@ -748,11 +748,15 @@ function startUploadDialog() {
  * startet den Dialog zum Verschieben von Dokumenten
  * @param  rowData  Array mit den Tabellendaten
  * @param  table    die Tabelle
+ * @param  typ      Typ 'Dokumente' oder 'Ordner'
  *
  */
-function startMoveDialog(rowData, table) {
+function startMoveDialog(rowData, table, typ) {
 
     try {
+        if (!typ)
+            typ = "Dokumente";
+        
         var moveDialogSettings = { "id": "moveDialog",
             "schema": {
                 "type": "object",
@@ -851,7 +855,7 @@ function startMoveDialog(rowData, table) {
                             data.node.data.objectID !== fehlerFolderId &&
                             data.node.data.objectID !== unknownFolderId &&
                             data.node.data.objectID !== doubleFolderId &&
-                            data.node.data.objectID !== documentFolderId &&
+                                (data.node.data.objectID !== documentFolderId || typ === "Ordner") &&
                             rowData.filter(function(row){ return row.parentId ===  data.node.data.objectID }).length === 0) {
                                 form.enableSubmitButton();
                             }
@@ -880,7 +884,7 @@ function startMoveDialog(rowData, table) {
                                             var newData = json.data;
                                             var source = json.source;
                                             var target = json.target;
-                                            Logger.log(Level.INFO, "Dokument " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
+                                            Logger.log(Level.INFO, typ + " " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
                                             // nur wenn die Tabelle angeben ist werden die Zeilen gelöscht. Bei der Tabelle mit den Suchergebnissen
                                             // werden keine Einträge gelöscht und deshalb sollte die Tabelle dort auch nicht für diese Funktion mit
                                             // angegeben werden.
@@ -890,11 +894,11 @@ function startMoveDialog(rowData, table) {
                                             }
                                         }
                                     };
-                                    //Dokument verschieben....
+                                    // Verschieben....
                                     var json = executeService({
                                         "name": "moveNode",
                                         "callback": done,
-                                        "errorMessage": "Dokument konnte nicht verschoben werden:"
+                                        "errorMessage": typ + " konnte nicht verschoben werden:"
                                     }, [
                                         {"name": "documentId", "value": rowData[index].objectID},
                                         {"name": "currentLocationId", "value": rowData[index].parentId},
@@ -913,7 +917,7 @@ function startMoveDialog(rowData, table) {
         };
 
 
-        startDialog("Dokumente verschieben", moveDialogSettings, 400, true);
+        startDialog(typ + " verschieben", moveDialogSettings, 400, true);
 
 
     } catch (e) {

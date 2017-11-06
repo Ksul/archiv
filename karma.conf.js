@@ -19,6 +19,8 @@ module.exports = function(config) {
              'src/main/resources/static/js/recognition.js',
              'src/main/resources/static/js/util.js',
              'src/main/resources/static/js/verteilung.js',
+             'src/main/resources/static/js/Base64.js',
+             'src/main/resources/static/js/alfrescoClient.js',
              'src/test/js/specs/**.js'
     ],
 

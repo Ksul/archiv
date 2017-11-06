@@ -5,6 +5,8 @@ import de.ksul.archiv.model.Column;
 import de.ksul.archiv.model.Order;
 import de.ksul.archiv.model.Search;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -17,6 +19,11 @@ public class DataTablesRequest  {
 
     private String folderId;
 
+    /**
+     * mögliche Werte: -1 nur Folder  0: beides  1: nur Dokumente
+     */
+    @Min(-1)
+    @Max(1)
     private int withFolder;
 
     private String cmisQuery;
@@ -25,11 +32,13 @@ public class DataTablesRequest  {
      * Draw counter. This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence by DataTables
      * (Ajax requests are asynchronous and thus can return out of sequence). This is used as part of the draw return parameter (see below).
      */
+    @Min(0)
     private int draw;
 
     /**
      * Paging first record indicator. This is the start point in the current data set (0 index based - i.e. 0 is the first record).
      */
+    @Min(0)
     private int start;
 
     /**
@@ -37,6 +46,7 @@ public class DataTablesRequest  {
      * the server has fewer records to return. Note that this can be -1 to indicate that all records should be returned (although that negates any benefits of
      * server-side processing!)
      */
+    @Min(-1)
     private int length;
 
     /**

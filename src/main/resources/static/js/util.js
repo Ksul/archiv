@@ -522,6 +522,271 @@ function fillMessageBox(reverse, level) {
     }
 }
 
+/**
+ * erstellt ein neues Dokument
+ * @param input             die neu einzutragenden Daten
+ * @param file              das File Objekt
+ */
+function createDocument(input, file) {
+    var erg = {"success": false};
+    reader = new FileReader();
+    reader.onloadend = (function (theFile) {
+        return function (evt) {
+            try {
+                if (evt.target.readyState === FileReader.DONE) {
+                    var extraProperties = {
+                        'P:cm:titled': {
+                            'cm:title': input.title,
+                            'cm:description': input.description
+                        },
+                        'D:my:archivContent': {
+                            'my:documentDate': input.documentDate,
+                            'my:person': input.person
+                        },
+                        'P:my:amountable': {'my:amount': input.amount, "my:tax": input.tax},
+                        'P:my:idable': {'my:idvalue': input.idvalue}
+                    };
+                    var done = function (json) {
+                        if (json.success) {
+                            // Tabelle updaten
+                            alfrescoTabelle.row.add(json.data).draw();
+                        }
+                    };
+                    erg = executeService({
+                        "name": "createDocument",
+                        "callback": done,
+                        "errorMessage": "Dokument konnte nicht erstellt werden!",
+                        "ignoreError": false
+                    }, [
+                        {"name": "documentId", "value": tree.jstree("get_selected")[0]},
+                        {"name": "fileName", "value": theFile.name},
+                        // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
+                        {"name": "content", "value": btoa(evt.target.result)},
+                        {"name": "extraProperties", "value": extraProperties},
+                        // TODO Richtigen Mimetype ermitteln
+                        {"name": "mimeType", "value": "application/pdf"},
+                        {"name": "versionState", "value": "major"}
+                    ]);
+                }
+            } catch (e) {
+                errorHandler(e);
+            }
+        };
+    })(file);
+    blob = file.slice(0, file.size + 1);
+    reader.readAsBinaryString(blob);
+}
+
+/**
+ * ändert ein Dokument
+ * @param input             die neu einzutragenden Daten
+ * @param id                die Id des Objektes
+ * @return                  true, wenn erfolgreich
+ **/
+function editDocument(input, id) {
+    var erg = {"success": false};
+    try {
+        var extraProperties = {
+            'P:cm:titled': {
+                'cm:title': input.title,
+                'cm:description': input.description
+            },
+            'D:my:archivContent': {
+                'my:documentDate': input.documentDate,
+                'my:person': input.person
+            },
+            'P:my:amountable': {'my:amount': input.amount, "my:tax": input.tax},
+            'P:my:idable': {'my:idvalue': input.idvalue}
+        };
+        var done = function (json) {
+            if (json.success) {
+                var data = json.data;
+                // Tabelle updaten
+                var row = alfrescoTabelle.row('#' + data.objectID);
+                if (row && row.length)
+                    row.data(data).invalidate();
+                // Suchergebnis eventuell updaten
+                row = alfrescoSearchTabelle.row('#' + data.objectID);
+                if (row && row.length)
+                    row.data(data).invalidate();
+            }
+        };
+        erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Dokument konnte nicht aktualisiert werden!", "ignoreError": true}, [
+            {"name": "documentId", "value": id},
+            {"name": "extraProperties", "value": extraProperties}
+        ]);
+    } catch (e) {
+        errorHandler(e);
+    }
+    return erg;
+}
+
+
+/**
+ * löscht ein Dokument
+ */
+function deleteDocument() {
+    try {
+        var origData = $("#dialogBox").alpaca().data;
+        var done = function (json) {
+            if (json.success) {
+                var row = alfrescoTabelle.row('#' + origData.objectID);
+                if (row && row.length)
+                    row.remove().draw(false);
+                row = alfrescoSearchTabelle.row('#' + origData.objectID);
+                if (row && row.length)
+                    row.remove().draw(false);
+            }
+        };
+        var erg = executeService({"name": "deleteDocument", "callback": done, "errorMessage": "Dokument konnte nicht gelöscht werden!"}, [
+            {"name": "documentId", "value": origData.objectID}
+        ]);
+    } catch (e) {
+        errorHandler(e);
+    }
+}
+
+/**
+ * erzeugt einen neuen Ordner
+ * @param input         die Daten des neuen Ordners
+ * @param origData      die übergebenen Daten
+ */
+function createFolder(input, origData) {
+    try {
+        var extraProperties = {
+            'cmis:folder': {
+                'cmis:objectTypeId': 'cmis:folder',
+                'cmis:name': input.name
+            },
+            'P:cm:titled': {
+                'cm:title': input.title,
+                'cm:description': input.description
+            }
+        };
+        var done = function (json) {
+            if (json.success) {
+                var lastElement = $("#breadcrumblist").children().last();
+                var newData = json.data;
+                var tree = $.jstree.reference('#tree');
+                // Tree updaten
+                var node = tree.get_node(newData.parentId);
+                if (node) {
+                    tree.create_node(node, buildObjectForTree(newData));
+                }
+                // Tabelle updaten
+                if (lastElement && lastElement.get(0).id === newData.parentId) {
+                    alfrescoFolderTabelle.rows.add([newData]).draw();
+                }
+                // BreadCrumb aktualisieren
+                if (lastElement)
+                    fillBreadCrumb(lastElement.data().data);
+            }
+        };
+        var erg = executeService({"name": "createFolder", "callback": done, "errorMessage": "Ordner konnte nicht erstellt werden!"}, [
+            {"name": "documentId", "value": origData.objectId},
+            {"name": "extraProperties", "value": extraProperties}
+        ]);
+    } catch (e) {
+        errorHandler(e);
+    }
+}
+
+
+/**
+ * löscht einen Ordner
+ * TODO Was passiert hier mit den eventuell vorhandenen Suchergebnissen
+ * TODO der sollte die Dialogbox hier nicht kennen
+ */
+function deleteFolder() {
+    try {
+        var origData = $("#dialogBox").alpaca().data;
+        var done = function (json) {
+            if (json.success) {
+                var lastElement = $("#breadcrumblist").children().last();
+                // Tree updaten
+                var tree = $.jstree.reference('#tree');
+                tree.delete_node(origData.objectID);
+                // Tabelle updaten
+                if (lastElement && lastElement.get(0).id === origData.parentId) {
+                    var row = alfrescoFolderTabelle.row('#' + origData.objectID);
+                    if (row && row.length) {
+                        row.remove().draw();
+                    }
+                }
+                // der aktuelle Ordner ist der zu löschende
+                if (lastElement && lastElement.get(0).id === origData.objectID) {
+                    tree.select_node(origData.parentId);
+                } else {
+                    // BreadCrumb aktualisieren
+                    if (lastElement)
+                        fillBreadCrumb(lastElement.data().data);
+                }
+            }
+
+        };
+        var erg = executeService({"name": "deleteFolder", "callback": done, "errorMessage": "Ordner konnte nicht gelöscht werden!"}, [
+            {"name": "documentId", "value": origData.objectID}
+        ]);
+    } catch (e) {
+        errorHandler(e);
+    }
+}
+
+/**
+ * editiert einen Ordner
+ * @param input         die neuen Daten des Ordners
+ * @param id            die Id des Ordners
+ * @return              true, wenn erfolgreich
+ */
+function editFolder(input, id) {
+    var erg = {"success": false};
+    try {
+        var extraProperties = {
+            'cmis:folder': {
+                'cmis:objectTypeId': 'cmis:folder',
+                'cmis:name': input.name
+            },
+            'P:cm:titled': {
+                'cm:title': input.title,
+                'cm:description': input.description
+            }
+        };
+        var done = function (json) {
+            if (json.success) {
+                var lastElement = $("#breadcrumblist").children().last();
+                var newData = json.data;
+                // Tree updaten
+                var tree = $.jstree.reference('#tree');
+                var node = tree.get_node(newData.objectID);
+                if (node) {
+                    tree.rename_node(node, newData.name);
+                    node.data = newData;
+                }
+                // Tabelle updaten
+                if (lastElement && lastElement.get(0).id === newData.parentId) {
+                    var row = alfrescoFolderTabelle.row('#' + newData.objectID);
+                    if (row && row.length) {
+                        row.data(newData).invalidate();
+                    }
+                }
+                // BreadCrumb aktualisieren
+                if (lastElement && lastElement.get(0).id === id) {
+                    fillBreadCrumb(input);
+                } else if (lastElement)
+                    fillBreadCrumb(lastElement.data().data);
+            }
+
+        };
+        erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Ordner konnte nicht aktualisiert werden!", "ignoreError": true}, done,[
+            {"name": "documentId", "value": id},
+            {"name": "extraProperties", "value": extraProperties}
+        ]);
+    } catch (e) {
+        errorHandler(e);
+    }
+    return erg;
+}
+
 
 
 

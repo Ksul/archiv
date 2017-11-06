@@ -36,13 +36,13 @@ import static org.junit.Assert.assertThat;
 public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
 
-    protected ArchivController services;
+    ArchivController services;
 
-    protected String filePdf;
+    String filePdf;
 
-    protected String fileTxt;
+    String fileTxt;
 
-    protected String fileZip;
+    String fileZip;
 
 
     @Test
@@ -247,7 +247,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         p1.put("cm:description", "Testdokument");
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("P:cm:titled", p1);
-        DocumentRequest request = new DocumentRequest();
+        DocumentCreateRequest request = new DocumentCreateRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
         request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
@@ -290,7 +290,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         extraProperties.put("P:cm:emailed", p2);
         extraProperties.put("P:my:amountable", p3);
         extraProperties.put("D:my:archivContent", p4);
-        DocumentRequest request = new DocumentRequest();
+        DocumentCreateRequest request = new DocumentCreateRequest();
         request.setDocumentId(folder.getId());
         request.setFileName("TestDocument.txt");
         request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
@@ -375,13 +375,14 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         p4.put("my:documentDate", new Date().getTime());
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("D:my:archivContent", p4);
-        request.setDocumentId(folder.getId());
-        request.setFileName("TestDocument.txt");
-        request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
-        request.setMimeType(VerteilungConstants.DOCUMENT_TYPE_TEXT);
-        request.setExtraProperties(extraProperties);
-        request.setVersionState(VersioningState.MAJOR.value());
-        obj = services.createDocument(request);
+        DocumentCreateRequest documentCreateRequest = new DocumentCreateRequest();
+        documentCreateRequest.setDocumentId(folder.getId());
+        documentCreateRequest.setFileName("TestDocument.txt");
+        documentCreateRequest.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
+        documentCreateRequest.setMimeType(VerteilungConstants.DOCUMENT_TYPE_TEXT);
+        documentCreateRequest.setExtraProperties(extraProperties);
+        documentCreateRequest.setVersionState(VersioningState.MAJOR.value());
+        obj = services.createDocument(documentCreateRequest);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
