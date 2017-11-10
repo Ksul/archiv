@@ -3068,7 +3068,7 @@ function checkAndBuidAlfrescoEnvironment() {
             {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
         ]);
         if (erg.success)
-            scriptFolderId = erg.data;
+            scriptFolderId = erg.data.objectId;
         else {
             log(WARN, "Verzeichnis '/Datenverzeichnis/Skripte' auf dem Alfresco Server nicht gefunden!");
         }
@@ -3106,7 +3106,7 @@ function checkAndBuidAlfrescoEnvironment() {
                 } else
                     log(WARN, "Verteilscript (recognition.js) konnte nicht gelesen werden!");
             } else {
-                scriptID = erg.data;
+                scriptID = erg.data.objectId;
             }
         }
         if (erg.success) {
@@ -3143,7 +3143,7 @@ function checkAndBuidAlfrescoEnvironment() {
                 } else
                     log(WARN, "Verteilregeln (doc.xml) konnten nicht gelesen werden!");
             } else {
-                rulesID = erg.data;
+                rulesID = erg.data.objectId;
             }
         }
         if (erg.success) {
@@ -3180,7 +3180,7 @@ function checkAndBuidAlfrescoEnvironment() {
                 } else
                     log(WARN, "Verteilschema (doc.xsd) konnten nicht gelesen werden!");
             } else {
-                rulesSchemaId = erg.data;
+                rulesSchemaId = erg.data.objectId;
             }
         }
         if (erg.success) {
@@ -3197,7 +3197,7 @@ function checkAndBuidAlfrescoEnvironment() {
         if (erg.success) {
             erg = buildAlfrescoFolder("/Archiv", alfrescoRootFolderId, "Der Archiv Root Ordner");
             if (erg.success)
-                archivFolderId = erg.data;
+                archivFolderId = erg.data.objectId;
             else
                 log(WARN, "Archiv konnte auf dem Alfresco Server nicht gefunden werden!");
 

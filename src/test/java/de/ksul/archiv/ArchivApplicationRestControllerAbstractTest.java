@@ -32,15 +32,15 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
-    protected MockMvc mockMvc;
+    MockMvc mockMvc;
 
-    protected ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
 
-    protected String filePdf;
+    String filePdf;
 
-    protected String fileTxt;
+    String fileTxt;
 
-    protected String fileZip;
+    String fileZip;
 
     private AlfrescoConnector con;
 

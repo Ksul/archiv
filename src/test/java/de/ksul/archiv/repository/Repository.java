@@ -4,6 +4,7 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,15 +67,17 @@ public class Repository {
         if (root == null)
             throw new RuntimeException("no Root Node!");
         TreeNode<FileableCmisObject> startNode = root.findTreeNodeForId(id);
-        for (TreeNode<FileableCmisObject> node : startNode){
-           if (node.getParent() != null && node.getParent().equals(startNode)) {
-               skip--;
-               if (skip <= 0)
-                   ret.add(node.getData());
-               if (i >= maxItems)
-                   break;
-               i++;
-           }
+        if (startNode != null) {
+            for (TreeNode<FileableCmisObject> node : startNode) {
+                if (node.getParent() != null && node.getParent().equals(startNode)) {
+                    skip--;
+                    if (skip <= 0)
+                        ret.add(node.getData());
+                    if (i >= maxItems)
+                        break;
+                    i++;
+                }
+            }
         }
         return ret;
     }
@@ -108,7 +111,7 @@ public class Repository {
             throw new RuntimeException("Node with Id " +cmisObject.getId() + " not found!");
         else
         node.updateNode(cmisObjectNew);
-        logger.info(cmisObject.getName() + "[ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] im Repository geändert!");
+        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] changed in repository!");
     }
 
     List<String> deleteTree(FileableCmisObject cmisObject) {
@@ -123,7 +126,7 @@ public class Repository {
             throw new RuntimeException("cmisObject must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        logger.info(cmisObject.getName() + "[ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] aus dem Repository gelöscht!");
+        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "] [Path: " + cmisObject.getPaths().get(0) + "] deleted from repository!");
         root.findTreeNodeForId(cmisObject.getId()).removeNode();
     }
 
@@ -140,7 +143,10 @@ public class Repository {
             throw new RuntimeException("Node with Id " + cmisObject.getId() + " not found!");
         if (parent == null)
             throw new RuntimeException("Node with Id " + parentId + " not found!");
-        return node.moveNode(parent).getData();
+        TreeNode<FileableCmisObject> sourceFolder = node.getParent();
+        TreeNode<FileableCmisObject> movedNode = node.moveNode(parent);
+        logger.info(node.getName() + " [ID: " + cmisObject.getId() + "] from Path: " + sourceFolder.getName() + " [ID: " + sourceFolder.getId() + "] to Path: " + parent.getName() + " [ID: " + parent.getId() + "] moved!");
+        return movedNode.getData();
     }
 
     void insert(String parent, FileableCmisObject cmisObject) {
@@ -163,7 +169,7 @@ public class Repository {
             else
                 throw new RuntimeException("Parent " + parentPath + " not found!");
         }
-        logger.info(name + "[ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] ins Repository eingetragen!");
+        logger.info(name + " [ID: " + cmisObject.getId() + "] [Path: " + cmisObject.getPaths().get(0) + "] inserted into repository!");
     }
 
 
@@ -224,5 +230,11 @@ public class Repository {
         if (root == null)
             throw new RuntimeException("no Root Node!");
         return root.findTreeNodeForId(id.getId()).getContentStream();
+    }
+
+    void changeContent(FileableCmisObject cmisObject, ContentStream newContent) {
+        ContentStreamImpl streamCurrent = (ContentStreamImpl) getContent(new ObjectIdImpl(cmisObject.getId()));
+        streamCurrent.setStream(newContent.getStream());
+        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "] changed content!");
     }
 }

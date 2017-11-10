@@ -239,6 +239,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
         assertThat(cmisObject, Matchers.notNullValue());
         assertThat(cmisObject, Matchers.instanceOf(Folder.class));
         cmisObject = con.getNode("/Datenverzeichnis/Skripte/backup.js.sample");
+        //cmisObject = con.getNode("/Archiv/Dokumente/Banken/Deka/Volltext.pdf");
         ((FileableCmisObject) cmisObject).getPaths();
         assertThat(cmisObject, Matchers.notNullValue());
         assertThat(cmisObject, Matchers.instanceOf(Document.class));

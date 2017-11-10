@@ -54,9 +54,9 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     private SessionImpl sessionImpl;
     private SessionFactory sessionFactory;
-    private ObjectType objectType;
     private FolderTypeImpl folderType;
     private DocumentTypeImpl documentType;
+    private DocumentTypeImpl archivType;
     private RepositoryInfo repositoryInfo;
     private CmisBinding binding;
     private ObjectFactory objectFactory;
@@ -92,23 +92,29 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         folderTypeDefinition.setPropertyDefinitions(propertyDefinitionMap);
         folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
         folderType.setId("cmis:folder");
+        folderType.setBaseTypeId(BaseTypeId.CMIS_FOLDER);
 
         DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
         documentTypeDefinition.setPropertyDefinitions(propertyDefinitionMap);
         documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
-        documentType.setId("D:my:archivContent");
+        documentType.setId("cmis:document");
+        documentType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
         documentType.setIsVersionable(true);
-
+        archivType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
+        archivType.setId("D:my:archivContent");
+        archivType.setIsVersionable(true);
+        archivType.setParentTypeId("cmis:document");
+        archivType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
         secondaryTypeStore = createSecondaryTypes();
 
-        repository.insert(null, createFileableCmisObject( null, "/", true, false, null));
-        repository.insert("/", createFileableCmisObject("/", "Datenverzeichnis",  true, false, null));
-        repository.insert("/Datenverzeichnis", createFileableCmisObject("/Datenverzeichnis", "Skripte",  true, false, null));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "backup.js.sample", false, false, "application/x-javascript"), createStream("// "));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "alfresco docs.js.sample",  false, false, "application/x-javascript"), createStream("// "));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xml",  false, false, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xsd",  false, false, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "recognition.js",  false, false, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
+        repository.insert(null, createFileableCmisObject( null, "/", folderType, false, null));
+        repository.insert("/", createFileableCmisObject("/", "Datenverzeichnis",  folderType, false, null));
+        repository.insert("/Datenverzeichnis", createFileableCmisObject("/Datenverzeichnis", "Skripte",  folderType, false, null));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "backup.js.sample", documentType, false, "application/x-javascript"), createStream("// "));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "alfresco docs.js.sample",  documentType, false, "application/x-javascript"), createStream("// "));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xml",  documentType, false, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xsd",  documentType, false, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "recognition.js",  documentType, false, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
 
 
     }
@@ -377,7 +383,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         return map;
     }
 
-    private FileableCmisObject createFileableCmisObject(String path, String name, boolean folder, boolean majorVersion, String mimeType) {
+    private FileableCmisObject createFileableCmisObject(String path, String name, ObjectType objectType, boolean majorVersion, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
         String objectId = repository.getId();
@@ -397,23 +403,24 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyName.setDisplayName("Name");
         propertyName.setValue(name);
         properties.addProperty(propertyName);
-        PropertyIdImpl propertyType = new PropertyIdImpl();
-        propertyType.setId("cmis:baseTypeId");
-        propertyType.setLocalName("baseTypeId");
-        propertyType.setQueryName("cmis:baseTypeId");
-        propertyType.setDisplayName("Base Type Id");
-        propertyType.setValue(folder ? "cmis:folder" : "cmis:document");
-        properties.addProperty(propertyType);
 
+            PropertyIdImpl propertybaseType = new PropertyIdImpl();
+            propertybaseType.setId("cmis:baseTypeId");
+            propertybaseType.setLocalName("baseTypeId");
+            propertybaseType.setQueryName("cmis:baseTypeId");
+            propertybaseType.setDisplayName("Base Type Id");
+            propertybaseType.setValue(objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId());
+            properties.addProperty(propertybaseType);
+    
         PropertyIdImpl propertyObjectType = new PropertyIdImpl();
         propertyObjectType.setId("cmis:objectTypeId");
         propertyObjectType.setLocalName("objectTypeId");
         propertyObjectType.setQueryName("cmis:objectTypeId");
         propertyObjectType.setDisplayName("Object Type Id");
-        propertyObjectType.setValue(folder ? "cmis:folder" : "cmis:document");
+        propertyObjectType.setValue(objectType.getId());
         properties.addProperty(propertyObjectType);
 
-        if (folder) {
+        if (objectType.getId().equalsIgnoreCase("cmis:folder")) {
             if (path == null) {
                 parentId = "-1";
                 repository.setRootId(objectId);
@@ -434,8 +441,6 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             propertyPath.setValue((path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/")  + name);
             properties.addProperty(propertyPath);
             objectData.setProperties(properties);
-            objectType = new FolderTypeImpl(sessionImpl, folderType);
-
             fileableCmisObject = new FolderImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         } else {
             PropertyBooleanImpl propertyIsVersionCheckedOut = new PropertyBooleanImpl();
@@ -501,7 +506,6 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             propertyCreationDate.setValue(cal);
             properties.addProperty(propertyCreationDate);
             objectData.setProperties(properties);
-            objectType = new DocumentTypeImpl(sessionImpl, documentType);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         }
         return fileableCmisObject;
@@ -635,8 +639,11 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                     return documentType;
                 else if (string.equalsIgnoreCase("cmis:folder"))
                     return folderType;
+                else if (string.contains("my:archivContent"))
+                    return archivType;
                 else if (string.startsWith("P:"))
                     return secondaryTypeStore.get(string);
+                else
                 return documentType;
             }
         });
@@ -648,6 +655,8 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                     return documentType;
                 else if (string.equalsIgnoreCase("cmis:folder"))
                     return folderType;
+                else if (string.contains("my:archivContent"))
+                    return archivType;
                 else if (string.startsWith("P:"))
                     return secondaryTypeStore.get(string);
                 return documentType;
@@ -658,6 +667,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     private ObjectId createFileableCmisObject(InvocationOnMock invocation, boolean folder) {
         boolean majorVersion = false;
+        ObjectType objectType;
         Object[] args = invocation.getArguments();
         Map<String, Object> props = (Map<String, Object>) args[0];
 
@@ -667,6 +677,13 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         if (props.get(PropertyIds.NAME) == null) {
             throw new IllegalArgumentException();
         }
+        String objectTypeName = (String) props.get(PropertyIds.OBJECT_TYPE_ID);
+        if (objectTypeName.contains(BaseTypeId.CMIS_DOCUMENT.value()))
+            objectType = documentType;
+        else if (objectTypeName.contains(BaseTypeId.CMIS_FOLDER.value()))
+            objectType = folderType;
+        else
+            objectType = archivType;
         String name = (String) props.get(PropertyIds.NAME);
         FileableCmisObject cmis = (FileableCmisObject) args[1];
         String path = cmis.getPaths().get(0) ;
@@ -674,11 +691,11 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         if (!folder && invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
             majorVersion = true;
         if (!folder) {
-            newObject = createFileableCmisObject(path, name,  folder, majorVersion, ((ContentStream) invocation.getArguments()[2]).getMimeType());
+            newObject = createFileableCmisObject(path, name,  objectType, majorVersion, ((ContentStream) invocation.getArguments()[2]).getMimeType());
             repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2]);
         }
         else {
-            newObject = createFileableCmisObject(path, name, folder, majorVersion, null);
+            newObject = createFileableCmisObject(path, name, objectType, majorVersion, null);
             repository.insert(path, newObject);
         }
 
@@ -792,8 +809,25 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             public DiscoveryService answer(InvocationOnMock invocation) throws Throwable {
                 DiscoveryService discoveryService = mock(DiscoveryService.class);
                 when(discoveryService.query(any(String.class), any(String.class), any(Boolean.class), any(Boolean.class), any(IncludeRelationships.class), any(String.class), any(BigInteger.class), any(BigInteger.class), any(ExtensionsData.class))).then(new Answer<ObjectList>() {
+
+                    class ObjectTypeHelper {
+                        boolean isObjectType(FileableCmisObject cmisObject, String objectTypeId){
+                            if (objectTypeId == null)
+                                return true;
+                            ObjectType objectType = cmisObject.getType();
+                            do {
+                                if (objectType.getId().contains(objectTypeId))
+                                    return true;
+                                objectType = objectType.getParentType();
+                            } while(objectType != null);
+                            return false;
+                        }
+                    }
+
                     public ObjectList answer(InvocationOnMock invocation) throws Throwable {
                         int typen = 0;
+                        ObjectTypeHelper helper = new ObjectTypeHelper();
+                        List<FileableCmisObject> liste;
                         ObjectListImpl objectList = new ObjectListImpl();
                         Object[] args = invocation.getArguments();
                         String statement = (String) args[1];
@@ -801,25 +835,25 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         BigInteger maxItems = (BigInteger) args[6];
                         List<ObjectData> list = new ArrayList<>();
                         final String search = statement.substring(statement.indexOf("'") + 1, statement.indexOf("'", statement.indexOf("'") + 1));
+                        String typ = null;
+                        if (statement.contains("from ")) {
+                            List stmt = Arrays.asList(statement.split(" "));
+                            typ = (String) stmt.get(stmt.indexOf("from") + 1);
+                        }
+
                         if (statement.contains("IN_FOLDER")) {
-                            if (statement.contains("from my:archivContent"))
-                                typen = 1;
-                            if (statement.contains("from cmis:folder"))
-                                typen = -1;
-                            if (repository.containsId(search)) {
-                                for (FileableCmisObject cmisObject : repository.getChildren(search)) {
-                                    if (typen <= 0 && cmisObject.getType() instanceof FolderType)
-                                        list.add(getObjectDataFromCmisObject(cmisObject));
-                                    if (typen >= 0 && cmisObject.getType() instanceof DocumentType)
-                                        list.add(getObjectDataFromCmisObject(cmisObject));
-                                }
-                            }
+                            liste = repository.getChildren(search);
 
                         } else {
-                            List<FileableCmisObject> liste = repository.query(search);
-                            for (FileableCmisObject cmisObject : liste)
+                            liste = repository.query(search);
+                        }
+
+                        for (FileableCmisObject cmisObject : liste) {
+                            
+                            if (helper.isObjectType(cmisObject, typ))
                                 list.add(getObjectDataFromCmisObject(cmisObject));
                         }
+
                         if (statement.contains("ORDER BY")) {
                             String[] order = new String[2];
                             String parts = statement.substring(statement.indexOf("ORDER BY") + 9);
@@ -896,8 +930,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                             document.updateProperties(properties.getProperties());
                         }
                         if (stream != null) {
-                            ContentStreamImpl streamCurrent = (ContentStreamImpl) repository.getContent(new ObjectIdImpl(holder.getValue()));
-                            streamCurrent.setStream(stream.getStream());
+                            repository.changeContent(document, stream);
                         }
                         ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(false);
                         if (major)
@@ -946,9 +979,9 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 }
 
                 if (cmisObject.getType() instanceof FolderType)
-                    cmisObjectNew = new FolderImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
+                    cmisObjectNew = new FolderImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
                 else
-                    cmisObjectNew = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
+                    cmisObjectNew = new DocumentImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
                 repository.update(cmisObject, cmisObjectNew);
                 return null;
             }

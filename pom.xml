@@ -231,7 +231,7 @@
                     <executable>true</executable>
                 </configuration>
                 <executions>
-                    <execution>
+                    <execution>   
                         <id>pre-integration-test</id>
                         <goals>
                             <goal>start</goal>

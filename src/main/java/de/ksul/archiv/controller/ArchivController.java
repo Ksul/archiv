@@ -35,7 +35,6 @@ import java.util.zip.ZipInputStream;
  */
 @RestController
 @CrossOrigin
-
 public class ArchivController {
 
     private AlfrescoConnector con;
@@ -359,7 +358,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj          ein JSONObject mit den Feldern success: true    die Operation war erfolgreich
      * false   ein Fehler ist aufgetreten
-     * data     die Id des Knotens
+     * data    Map mit der Id des Objekts (objectId: vom Alfresco gelieferte Id, objectID: Id die im Browser verwendet werden kann)
      */
     @RequestMapping(value = "/getNodeId", consumes = "application/json", produces = "application/json")
     public @ResponseBody
@@ -369,7 +368,10 @@ public class ArchivController {
         CmisObject cmisObject = con.getNode(model.getFilePath());
         if (cmisObject != null) {
             obj.setSuccess(true);
-            obj.setData(con.getNode(model.getFilePath()).getId());
+            Map<String, Object> result = new HashMap<>();
+            result.put("objectId", cmisObject.getId());
+            result.put("objectID", VerteilungHelper.normalizeObjectId(cmisObject.getId()));
+            obj.setData(result);
         } else
             obj.setSuccess(false);
 
@@ -1253,7 +1255,7 @@ public class ArchivController {
             } else if (prop.getLocalName().equals("objectId")) {
                 String id = prop.getValueAsString();
                 props.put(prop.getLocalName(), id);
-                id = VerteilungHelper.getRealId(id);
+                id = VerteilungHelper.normalizeObjectId(id);
                 // die modifizierte ObjectId diese ist auch eindeutig und kann im DOM benutzt werden.
                 props.put("objectID", id);
                 // Row Id für Datatables

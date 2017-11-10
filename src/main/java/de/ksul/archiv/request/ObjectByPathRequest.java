@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 public class ObjectByPathRequest {
 
     @NotNull
-    private String filePath;
+    String filePath;
 
     public ObjectByPathRequest() {
     }

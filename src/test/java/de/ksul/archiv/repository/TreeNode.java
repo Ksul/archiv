@@ -69,6 +69,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         return path;
     }
 
+    public String getId() { return id;}
+
     public TreeNode<T> getParent() {
         return parent;
     }

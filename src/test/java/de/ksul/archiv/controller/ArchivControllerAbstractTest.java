@@ -170,7 +170,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        obj = services.getNodeById(new ObjectByIdRequest((String) obj.getData()));
+        obj = services.getNodeById(new ObjectByIdRequest((String) ((Map <String, Object>) obj.getData()).get("objectID")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -178,7 +178,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        obj = services.getNodeById(new ObjectByIdRequest((String) obj.getData()));
+        obj = services.getNodeById(new ObjectByIdRequest((String) ((Map <String, Object>) obj.getData()).get("objectID")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -214,7 +214,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testGetDocumentContent() throws Exception {
-        RestResponse obj = services.getDocumentContent(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/Datenverzeichnis/Skripte/backup.js.sample")).getData()));
+        RestResponse obj = services.getDocumentContent(new ObjectByIdRequest((String) ((Map <String, Object>) services.getNodeId(new ObjectByPathRequest("/Datenverzeichnis/Skripte/backup.js.sample")).getData()).get("objectID")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -233,7 +233,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        obj = services.deleteDocument(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/TestFolder/Test.pdf")).getData()));
+        obj = services.deleteDocument(new ObjectByIdRequest((String) ((Map <String, Object>) services.getNodeId(new ObjectByPathRequest("/TestFolder/Test.pdf")).getData()).get("objectID")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -267,7 +267,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj.getData(), notNullValue());
         String document = (String) obj.getData();
         assertThat(document, is(content));
-        obj = services.deleteDocument(new ObjectByIdRequest((String)  services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()));
+        obj = services.deleteDocument(new ObjectByIdRequest((String)  ((Map<String, Object>) services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()).get("objectID")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
     }
@@ -310,7 +310,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj.getData(), notNullValue());
         String document = (String) obj.getData();
         assertThat(document, Matchers.equalTo(content));
-        obj = services.deleteDocument(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()));
+        obj = services.deleteDocument(new ObjectByIdRequest((String) ((Map<String, Object>) services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()).get("objectID")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
     }
@@ -329,7 +329,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         Map<String, Object> extraProperties = new HashMap<>();
         extraProperties.put("cmis:folder", p2);
         extraProperties.put("P:cm:titled", p1);
-        obj = services.createFolder(new PropertiesRequest((String) obj.getData(), extraProperties));
+        obj = services.createFolder(new PropertiesRequest((String) ((Map<String, Object>) obj.getData()).get("objectID"), extraProperties));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -395,6 +395,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         request.setContent(Base64.encodeBase64String(content.getBytes("UTF-8")));
         request.setExtraProperties(null);
         request.setVersionComment("neuer Versionskommentar");
+        request.setVersionState(VersioningState.MAJOR.value());
         obj = services.updateDocument(request);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
@@ -578,8 +579,8 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setDocumentId((String) services.getNodeId(new ObjectByPathRequest("/FolderTest/TestDocument")).getData());
-        RestResponse resp = services.deleteDocument(new ObjectByIdRequest((String) services.getNodeId(new ObjectByPathRequest("/FolderTest/TestDocument")).getData()));
+        request.setDocumentId((String) ((Map <String, Object>) services.getNodeId(new ObjectByPathRequest("/FolderTest/TestDocument")).getData()).get("objectID"));
+        RestResponse resp = services.deleteDocument(new ObjectByIdRequest((String) ((Map <String, Object>) services.getNodeId(new ObjectByPathRequest("/FolderTest/TestDocument")).getData()).get("objectID")));
         assertThat(resp, notNullValue());
         assertThat(resp.getData() + (resp.hasError() ? resp.getError().getMessage() : ""), resp.isSuccess(), Matchers.is(true));
         assertThat(resp.getData(), notNullValue());

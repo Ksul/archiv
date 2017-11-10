@@ -16,42 +16,35 @@ public class VerteilungHelper {
 
     private static Logger logger = LoggerFactory.getLogger(VerteilungHelper.class.getName());
 
-
-
     /**
      * konvertiert die ObjectId in ein verwertbares Format
      * das bedeudet, dass die Versionsinformation und die Store Information abgeschnitten wird
-     * @param id            die übergebene Id
-     * @return              die konvertirte Id
+     * damit sie zum Beispiel im DOM Tree als Id benutzt werden kann.
+     * @param id    die ObjectId
+     * @return      die modifizierte ObjectId
      */
     public static String normalizeObjectId(String id) {
+        // Versionsinformationen entfernen
         if (id.contains(";"))
             id = id.substring(0, id.lastIndexOf(';'));
+        // 
         if (id.startsWith("workspace://SpacesStore/"))
             id = id.substring(24);
         return id;
     }
 
     /**
-     * liefert die wirkliche Id. Entfernt die Version und andere nicht benötigten Informationen
-     * @param id    die ObjectId
-     * @return      die modifizierte ObjectId
+     * prüft, ob ein Object leer ist
+     * @param o das zu prüfende Object
+     * @return true or false
      */
-    public static String getRealId(String id) {
-        if (id.contains(";"))
-            id = id.substring(0, id.lastIndexOf(';'));
-        if (id.startsWith("workspace://SpacesStore/"))
-            id = id.substring(24);
-        return id;
-    }
-
     public static boolean isEmpty(Object o) {
         if (o == null)  return true;
         if (o instanceof Collection) return ((Collection) o).size() == 0;
         if (o instanceof String) return ((String) o).length() == 0;
-        if (o instanceof Long) return ((Long) o).longValue() == 0;
-        if (o instanceof Integer) return ((Integer) o).intValue() == 0;
-        if (o instanceof Double) return ((Double) o).doubleValue() == 0;
+        if (o instanceof Long) return (Long) o == 0;
+        if (o instanceof Integer) return (Integer) o == 0;
+        if (o instanceof Double) return (Double) o == 0;
         return false;
     }
 }
