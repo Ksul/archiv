@@ -5,7 +5,7 @@
  * Dual licensed under the MIT and GPL licenses:
  *	http://www.opensource.org/licenses/mit-license.php
  *	http://www.gnu.org/licenses/gpl.html
- *Achtung Code geändert!!
+ * Achtung Code geändert!!
  */
 
 (function ($, w) {
@@ -348,9 +348,11 @@
                 var element = $(document.getElementById(id));
                 element.removeClass("disableLI");
                 element.parent().children("ul").removeClass("disableLI");
-                var obj = recursiveKeySearch(id, o.menuData);
-                if (obj && obj.length && !obj[0].file && obj[0].action)
-                    element.on("click", {root: getRootMenu()}, obj[0].action)
+                if (o && o.menuData) {
+                    var obj = recursiveKeySearch(id, o.menuData);
+                    if (obj && obj.length && !obj[0].file && obj[0].action)
+                        element.on("click", {root: getRootMenu()}, obj[0].action)
+                }
             },
             init: function (op) {
                 return this.each(function () {

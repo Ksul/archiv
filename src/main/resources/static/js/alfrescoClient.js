@@ -474,7 +474,7 @@ function loadAlfrescoTable() {
             folderId : archivFolderId,
             withFolder: 1,
             ajax: {
-                url: "/Archiv/listFolderWithPagination",
+                url: (window.location.pathname === "/context.html" ? "http://localhost:8080/Archiv" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2))) + "/listFolderWithPagination",
                 type: "POST",
                 data: function (obj, meta) {
                      obj.folderId = meta.oInit.folderId;
@@ -482,15 +482,41 @@ function loadAlfrescoTable() {
                     duration = new Date().getTime();
                     return JSON.stringify(obj);
                 },
-                error: function (obj, meta) {
-                    var error = new Error(obj.responseJSON.error.message);
-                    var stack = "";
-                    for (var i = 0; i < obj.responseJSON.error.stackTrace.length; i++)
-                        stack = stack + obj.responseJSON.error.stackTrace[i].className + ":" + obj.responseJSON.error.stackTrace[i].methodName + ":" +  obj.responseJSON.error.stackTrace[i].lineNumber + "<br>";
-                    error.stack = stack;
-                    errorHandler(error, "Server Error");
+                 error:  function (xhr, status, error) {
+                     try {
+                         var txt;
+                         var statusErrorMap = {
+                             '400': "Server understood the request, but request content was invalid.",
+                             '401': "Unauthorized access.",
+                             '403': "Forbidden resource can't be accessed.",
+                             '404': "Not found",
+                             '500': "Internal server error.",
+                             '503': "Service unavailable."
+                         };
+                         if (xhr.status) {
+                             txt = statusErrorMap[xhr.status];
+                             if (!txt) {
+                                 txt = "Unknown Error \n.";
+                             }
+                         } else if (error === 'parsererror') {
+                             txt = "Error.\nParsing JSON Request failed.";
+                         } else if (error === 'timeout') {
+                             txt = "Request Time out.";
+                         } else if (error === 'abort') {
+                             txt = "Request was aborted by the server";
+                         } else {
+                             txt = "Unknown Error \n.";
+                         }
+                         errorHandler(txt, "Server Error");
 
-                },
+                     } catch (e) {
+                         var str = "FEHLER:\n";
+                         str = str + e.toString() + "\n";
+                         for (var prop in e)
+                             str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
+                         errorHandler(str, "Server Error");
+                     }
+                 },
                 dataSrc: function (obj) {
                     Logger.log(Level.DEBUG, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
                     if (obj.data.length === 0) {
@@ -826,7 +852,7 @@ function loadAlfrescoFolderTable() {
             withFolder: -1,
             pageLength:20,
             ajax: {
-                url: "/Archiv/listFolderWithPagination",
+                url: (window.location.pathname === "/context.html" ? "http://localhost:8080/Archiv" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2))) + "/listFolderWithPagination",
                 type: "POST",
                 data: function (obj, meta) {
                     obj.folderId = meta.oInit.folderId;
@@ -834,14 +860,40 @@ function loadAlfrescoFolderTable() {
                     duration = new Date().getTime();
                     return JSON.stringify(obj);
                 },
-                error: function (obj, meta) {
-                    var error = new Error(obj.responseJSON.error.message);
-                    var stack = "";
-                    for (var i = 0; i < obj.responseJSON.error.stackTrace.length; i++)
-                        stack = stack + obj.responseJSON.error.stackTrace[i].className + ":" + obj.responseJSON.error.stackTrace[i].methodName + ":" +  obj.responseJSON.error.stackTrace[i].lineNumber + "<br>";
-                    error.stack = stack;
-                    errorHandler(error, "Server Error");
+                error:  function (xhr, status, error) {
+                    try {
+                        var txt;
+                        var statusErrorMap = {
+                            '400': "Server understood the request, but request content was invalid.",
+                            '401': "Unauthorized access.",
+                            '403': "Forbidden resource can't be accessed.",
+                            '404': "Not found",
+                            '500': "Internal server error.",
+                            '503': "Service unavailable."
+                        };
+                        if (xhr.status) {
+                            txt = statusErrorMap[xhr.status];
+                            if (!txt) {
+                                txt = "Unknown Error \n.";
+                            }
+                        } else if (error === 'parsererror') {
+                            txt = "Error.\nParsing JSON Request failed.";
+                        } else if (error === 'timeout') {
+                            txt = "Request Time out.";
+                        } else if (error === 'abort') {
+                            txt = "Request was aborted by the server";
+                        } else {
+                            txt = "Unknown Error \n.";
+                        }
+                        errorHandler(txt, "Server Error");
 
+                    } catch (e) {
+                        var str = "FEHLER:\n";
+                        str = str + e.toString() + "\n";
+                        for (var prop in e)
+                            str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
+                        errorHandler(str, "Server Error");
+                    }
                 },
                 dataSrc: function (obj) {
                     try {
@@ -1052,6 +1104,8 @@ function loadAlfrescoFolderTable() {
     $("#alfrescoFolderTabelle_paginate").detach().appendTo('#alfrescoFolderTableFooter');
 }
 
+
+
 /**
  * baut die die Tabelle für die Suchergebnisse auf.
  */
@@ -1066,7 +1120,7 @@ function loadAlfrescoSearchTable() {
         try {
             event.preventDefault();
             event.stopImmediatePropagation();
-            var erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
+            var erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnte nicht geöffnet werden!"}, [
                 {"name": "documentId", "value": alfrescoSearchTabelle.row($(obj).closest('tr')).data().objectID}
             ]);
             if (erg.success) {
@@ -1099,21 +1153,47 @@ function loadAlfrescoSearchTable() {
             cmisQuery : "",
             iconView: false,
             ajax: {
-                url: "/Archiv/findDocumentWithPagination",
+                url: (window.location.pathname === "/context.html" ? "http://localhost:8080/Archiv" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2))) + "/findDocumentWithPagination",
                 type: "POST",
                 data: function (obj, meta) {
                     obj.cmisQuery = meta.oInit.cmisQuery;
                     duration = new Date().getTime();
                     return JSON.stringify(obj);
                 },
-                error: function (obj, meta) {
-                    var error = new Error(obj.responseJSON.error.message);
-                    var stack = "";
-                    for (var i = 0; i < obj.responseJSON.error.stackTrace.length; i++)
-                        stack = stack + obj.responseJSON.error.stackTrace[i].className + ":" + obj.responseJSON.error.stackTrace[i].methodName + ":" +  obj.responseJSON.error.stackTrace[i].lineNumber + "<br>";
-                    error.stack = stack;
-                    errorHandler(error, "Server Error");
+                error:  function (xhr, status, error) {
+                    try {
+                        var txt;
+                        var statusErrorMap = {
+                            '400': "Server understood the request, but request content was invalid.",
+                            '401': "Unauthorized access.",
+                            '403': "Forbidden resource can't be accessed.",
+                            '404': "Not found",
+                            '500': "Internal server error.",
+                            '503': "Service unavailable."
+                        };
+                        if (xhr.status) {
+                            txt = statusErrorMap[xhr.status];
+                            if (!txt) {
+                                txt = "Unknown Error \n.";
+                            }
+                        } else if (error === 'parsererror') {
+                            txt = "Error.\nParsing JSON Request failed.";
+                        } else if (error === 'timeout') {
+                            txt = "Request Time out.";
+                        } else if (error === 'abort') {
+                            txt = "Request was aborted by the server";
+                        } else {
+                            txt = "Unknown Error \n.";
+                        }
+                        errorHandler(txt, "Server Error");
 
+                    } catch (e) {
+                        var str = "FEHLER:\n";
+                        str = str + e.toString() + "\n";
+                        for (var prop in e)
+                            str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
+                        errorHandler(str, "Server Error");
+                    }
                 },
                 dataSrc: function (obj) {
                     Logger.log(Level.DEBUG, "Execution of Service: findFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
@@ -1788,6 +1868,7 @@ function fillBreadCrumb(data) {
         var object;
         var id;
         var parentObj;
+        var name;
         var fill = true;
         var tree = $("#tree").jstree(true);
         var oldLi = $('#breadcrumblist');
@@ -2107,6 +2188,103 @@ function handleAlfrescoFolderImageClicks() {
     });
 }
 
+
+/**
+ * sucht ein Dokument und ofnnet die entsprechenden  Knoten im Tree und Tabelle
+ * @param data    das zu suchende Objekt
+ * @return true falls erfolgreich
+ */
+function aimNode(data) {
+    var results = [];
+    var tree = $('#tree').jstree(true);
+    var id = data.objectID;
+    if (data && data.parents) {
+        var node = tree.get_node(data.parents[0].objectId);
+        // Alle Knoten bis hinauf zum ersten geöffneten Knoten suchen
+        while (!node) {
+            var json = executeService({
+                "name": "getNodeById",
+                "errorMessage": "Dokument konnten nicht gelesen werden!"
+            }, [
+                {"name": "documentId", "value": data.parentId}
+            ]);
+            if (json.success) {
+                data = json.data;
+                results.push(data);
+                if (data && data.parentId)
+                    node = tree.get_node(data.parentId);
+            } else {
+                break;
+            }
+        }
+    }
+    if (node) {
+        // keine Chain gefunden, der Knoten war schon offen und kann direkt selektiert werden
+        if (!results.length) {
+            tree.deselect_all(true);
+            tree.select_node(node, true);
+            tree.open_node(node, function () {
+                alfrescoTabelle.on('draw', function () {
+                    alfrescoTabelle.off('draw');
+                    var row = alfrescoTabelle.row('#' + id);
+                    if (row && row.length) {
+                        row.draw().show().draw(false);
+                        row.select();
+                    }
+                });
+                switchAlfrescoDirectory(node.data);
+            });
+
+        }
+        // die Chain hoch hangeln
+        else {
+            results.push(node.data);
+            results.reverse();
+            // Hier muss mit einem Deferred Object gearbeitet werden, denn der open im Tree
+            // bewirkt einen asynchronen Aufruf, so das die nachfolgenden Operationen sonst nicht
+            // die notwendigen Daten haben.
+            var deffereds = $.Deferred(function (def) {
+                def.resolve();
+            });
+
+            for (var index = 0; index < results.length; index++) {
+                deffereds = (function (name, last, id, deferreds) {
+                    return deferreds.then(function () {
+                        return $.Deferred(function (def) {
+                            var node = tree.get_node(name.objectID);
+                            tree.open_node(node, function (last) {
+
+                                if (last) {
+
+                                    node = tree.get_node(results[results.length - 1].objectID);
+                                    tree.deselect_all(true);
+                                    tree.select_node(node, true);
+                                    tree.open_node(node, function () {
+                                        alfrescoTabelle.on('draw', function () {
+                                            alfrescoTabelle.off('draw');
+                                            var row = alfrescoTabelle.row('#' + id);
+                                            if (row && row.length) {
+                                                row.draw().show().draw(false);
+                                                 row.select();
+                                            }
+
+                                        });
+                                        switchAlfrescoDirectory(node.data);
+
+                                    });
+                                }
+                                def.resolve();
+                            });
+                        });
+                    });
+                })(results[index], index === results.length - 1, id, deffereds);
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 /**
  * behandelt die Clicks auf die Icons in der Alfrescotabelle
  */
@@ -2179,95 +2357,13 @@ function handleAlfrescoImageClicks() {
     // Ziel im Ordner suchen
     $(document).on("click", ".detailAim", function () {
         try {
-            var results = [];
-            var tree = $('#tree').jstree(true);
+           
             var tr = $(this).closest('tr');
             var tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
             var data = tabelle.row(tr).data();
-            var id = data.objectID;
-            if (data && data.parents) {
-                var node = tree.get_node(data.parents[0].objectId);
-                // Alle Knoten bis hinauf zum ersten geöffneten Knoten suchen
-                while (!node) {
-                    var json = executeService({"name": "getNodeById", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
-                        {"name": "documentId", "value": data.parentId}
-                    ]);
-                    if (json.success) {
-                        data = json.data;
-                        results.push(data);
-                        if (data && data.parentId )
-                            node = tree.get_node(data.parentId);
-                    } else {
-                        break;
-                    }
-                }
-            }
-            if (node) {
-                // keine Chain gefunden, der Knoten war schon offen und kann direkt selektiert werden
-                if (!results.length) {
-                    tree.deselect_all(true);
-                    tree.select_node(node, true);
-                    tree.open_node(node, function(){
-                        alfrescoTabelle.on('draw', function () {
-                            alfrescoTabelle.off('draw');
-                            var row = alfrescoTabelle.row('#' + id);
-                            if (row && row.length) {
-                                row.draw().show().draw(false);
-                                row.select();
-                            }
-                        });
-                        switchAlfrescoDirectory(node.data);
-                    });
-            
-                }
-                // die Chain hoch hangeln
-                else {
-                    results.push(node.data);
-                    results.reverse();
-                    // Hier muss mit einem Deferred Object gearbeitet werden, denn der open im Tree
-                    // bewirkt einen asynchronen Aufruf, so das die nachfolgenden Operationen sonst nicht
-                    // die notwendigen Daten haben.
-                    var deffereds = $.Deferred(function (def) {
-                        def.resolve();
-                    });
-
-                    for (var index = 0; index < results.length; index++) {
-                        deffereds = (function (name, last, id, deferreds) {
-                            return deferreds.then(function () {
-                                return $.Deferred(function (def) {
-                                    var node = tree.get_node(name.objectID);
-                                    tree.open_node(node, function (last) {
-
-                                        if (last) {
-
-                                            node = tree.get_node(results[results.length - 1].objectID);
-                                            tree.deselect_all(true);
-                                            tree.select_node(node, true);
-                                            tree.open_node(node, function () {
-                                                alfrescoTabelle.on('draw', function () {
-                                                    alfrescoTabelle.off('draw');
-                                                    var row = alfrescoTabelle.row('#' + id);
-                                                    if (row && row.length) {
-                                                        row.draw().show().draw(false);
-                                                        row.select();
-                                                    }
-
-                                                });
-                                                switchAlfrescoDirectory(node.data);
-
-                                            });
-                                        }
-                                        def.resolve();
-                                    });
-                                });
-                            });
-                        })(results[index], index === results.length - 1, id, deffereds);
-                    }
-       
-                }
-                // auf den Archiv Tab umschalten
-                tabLayout.tabs("option", "active", 0);
-            }
+            if (aimNode(data))
+            // auf den Archiv Tab umschalten
+               tabLayout.tabs("option", "active", 0);
 
         } catch (e) {
             errorHandler(e);
@@ -2618,12 +2714,12 @@ function loadAlfrescoTree() {
     function customMenu(node) {
         var tree = $("#tree").jstree(true);
         var items = {
-            "create": {
-                "separator_before": false,
-                "separator_after": false,
-                "label": "Erstellen",
-                "icon" : "./images/details_open.png",
-                "action": function (obj) {
+            create: {
+                separator_before: false,
+                separator_after: false,
+                label: "Erstellen",
+                icon : "./images/details_open.png",
+                action: function (obj) {
                     try {
                         startFolderDialog($.jstree.reference('#tree').get_node(obj.reference[0]).data, "web-create", true);
                     } catch (e) {
@@ -2631,12 +2727,12 @@ function loadAlfrescoTree() {
                     }
                 }
             },
-            "rename": {
-                "separator_before": false,
-                "separator_after": false,
-                "label": "Ändern",
-                "icon" : "./images/beautify16.png",
-                "action": function (obj) {
+            rename: {
+                separator_before: false,
+                separator_after: false,
+                label: "Ändern",
+                icon : "./images/beautify16.png",
+                action: function (obj) {
                     try {
                         startFolderDialog($.jstree.reference('#tree').get_node(obj.reference[0]).data, "web-edit", true);
                     } catch (e) {
@@ -2644,12 +2740,12 @@ function loadAlfrescoTree() {
                     }
                 }
             },
-            "delete": {
-                "separator_before": false,
-                "separator_after": false,
-                "label": "Löschen",
-                "icon" : "./images/deleteDocument.gif",
-                "action": function (obj) {
+            delete: {
+                separator_before: false,
+                separator_after: false,
+                label: "Löschen",
+                icon: "./images/deleteDocument.gif",
+                action: function (obj) {
                     try {
                         startFolderDialog($.jstree.reference('#tree').get_node(obj.reference[0]).data, "web-display", true);
                     } catch (e) {
@@ -2689,8 +2785,9 @@ function loadAlfrescoTree() {
      */
     try {
         tree = $("#tree").jstree({
-            'core': {
-                'data': function (node, aFunction) {
+            core: {
+                worker: window.location.pathname === "/context.html" ? false:true, // für Test die Worker abschalten!
+                data: function (node, aFunction) {
                     try {
                         // relevante Knoten im Alfresco suchen
                         loadAndConvertDataForTree(node, aFunction);
@@ -2701,7 +2798,7 @@ function loadAlfrescoTree() {
                 error : function (err) {  
                     Logger.log(Level.DEBUG, err.reason);
                 },
-                'check_callback': function (op, node, par, pos, more) {
+                check_callback: function (op, node, par, pos, more) {
                     try {
                         var erg = false;
                         // Umbenannt werden darf alles
@@ -2749,48 +2846,48 @@ function loadAlfrescoTree() {
                         errorHandler(e);
                     }
                 },
-                'themes': {
-                    'responsive': true,
-                    'variant': 'big',
-                    'stripes': false,
-                    'dots': true,
-                    'icons': true
+                themes: {
+                    responsive: true,
+                    variant: 'big',
+                    stripes: false,
+                    dots: true,
+                    icons: true
                 }
             },
-            'types' : {
+            types : {
                 '#' : {
-                    "max_children" : 1
+                    max_children : 1
                 },
                 'archivRootStandard' : {
-                    "valid_children" : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                    valid_children : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
+                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
                 },
                 'archivFolderStandard' : {
-                    "valid_children" : [],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                    valid_children : [],
+                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
                 },
                 'archivDoubleFolderStandard' : {
-                    "valid_children" : [],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                    valid_children : [],
+                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
                 },
                 'archivFehlerFolderStandard' : {
-                    "valid_children" : ["archivDoubleFolderStandard"],
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                    valid_children : ["archivDoubleFolderStandard"],
+                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
                 },
                 'archivDocumentFolderStandard' : {
-                    "valid_children" : ["documentFolderStandard"] ,
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                    valid_children : ["documentFolderStandard"] ,
+                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
                 },
                 'documentFolderStandard' : {
-                    "valid_children" : -1,
-                    "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                    valid_children : -1,
+                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
                 }
             },
-            "contextmenu": {
-                "items": customMenu,
-                "select_node" : false
+            contextmenu: {
+                items: customMenu,
+                select_node : false
             },
-            'plugins': ["dnd", "types", "contextmenu"]
+            plugins: ["dnd", "types", "contextmenu"]
         }).on("changed.jstree",  function (event, data){
             try {
                 if (data.action === "select_node") {
@@ -3068,7 +3165,7 @@ function checkAndBuidAlfrescoEnvironment() {
             {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
         ]);
         if (erg.success)
-            scriptFolderId = erg.data.objectId;
+            scriptFolderId = erg.data.objectID;
         else {
             log(WARN, "Verzeichnis '/Datenverzeichnis/Skripte' auf dem Alfresco Server nicht gefunden!");
         }
@@ -3099,14 +3196,14 @@ function checkAndBuidAlfrescoEnvironment() {
                         {"name": "versionState", "value": "major"}
                     ]);
                      if (erg.success)
-                        scriptID = erg.data.objectId;
+                        scriptID = erg.data.objectID;
                     else {
                         log(WARN, "Verteilscript (recognition.js) konnte auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
                     log(WARN, "Verteilscript (recognition.js) konnte nicht gelesen werden!");
             } else {
-                scriptID = erg.data.objectId;
+                scriptID = erg.data.objectID;
             }
         }
         if (erg.success) {
@@ -3136,14 +3233,14 @@ function checkAndBuidAlfrescoEnvironment() {
 
                     ]);
                     if (erg.success)
-                        rulesID = erg.data.objectId;
+                        rulesID = erg.data.objectID;
                     else {
                         log(WARN, "Verteilregeln (doc.xml) konnten auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
                     log(WARN, "Verteilregeln (doc.xml) konnten nicht gelesen werden!");
             } else {
-                rulesID = erg.data.objectId;
+                rulesID = erg.data.objectID;
             }
         }
         if (erg.success) {
@@ -3173,14 +3270,14 @@ function checkAndBuidAlfrescoEnvironment() {
 
                     ]);
                     if (erg.success)
-                        rulesSchemaId = erg.data.objectId;
+                        rulesSchemaId = erg.data.objectID;
                     else {
                         log(WARN, "Verteilschema (doc.xsd) konnten auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
                     log(WARN, "Verteilschema (doc.xsd) konnten nicht gelesen werden!");
             } else {
-                rulesSchemaId = erg.data.objectId;
+                rulesSchemaId = erg.data.objectID;
             }
         }
         if (erg.success) {
@@ -3189,7 +3286,7 @@ function checkAndBuidAlfrescoEnvironment() {
                 {"name": "filePath", "value": "/"}
             ]);
             if (erg.success) {
-                alfrescoRootFolderId = erg.data;
+                alfrescoRootFolderId = erg.data.objectID;
             } else {
                 log(WARN, "Root konnte auf dem Server nicht gefunden werden!");
             }
@@ -3197,7 +3294,7 @@ function checkAndBuidAlfrescoEnvironment() {
         if (erg.success) {
             erg = buildAlfrescoFolder("/Archiv", alfrescoRootFolderId, "Der Archiv Root Ordner");
             if (erg.success)
-                archivFolderId = erg.data.objectId;
+                archivFolderId = erg.data.objectID;
             else
                 log(WARN, "Archiv konnte auf dem Alfresco Server nicht gefunden werden!");
 
@@ -3206,54 +3303,43 @@ function checkAndBuidAlfrescoEnvironment() {
             // Archiv Root prüfen
             erg = buildAlfrescoFolder("/Archiv/Dokumente", archivFolderId, "Der Ordner für die abgelegten Dokumente");
             if (erg.success) {
-                documentFolderId = erg.data;
+                documentFolderId = erg.data.objectID;
             }
         }
         if (erg.success) {
             // Inbox prüfen
             erg = buildAlfrescoFolder("/Archiv/Inbox", archivFolderId, "Der Posteingangsordner");
             if (erg.success) {
-                inboxFolderId = erg.data;
+                inboxFolderId = erg.data.objectID;
             }
         }
         if (erg.success) {
             // Fehlerbox prüfen
             erg = buildAlfrescoFolder("/Archiv/Fehler", archivFolderId, "Der Ordner für nicht verteilbare Dokumente");
             if (erg.success) {
-                fehlerFolderId = erg.data;
+                fehlerFolderId = erg.data.objectID;
             }
         }
         if (erg.success) {
             // Unbekanntbox prüfen
             erg = buildAlfrescoFolder("/Archiv/Unbekannt", archivFolderId, "Der Ordner für unbekannte Dokumente");
             if (erg.success) {
-                unknownFolderId = erg.data;
+                unknownFolderId = erg.data.objectID;
             }
         }
         if (erg.success) {
             // Doppelte Box prüfen
             erg = buildAlfrescoFolder("/Archiv/Fehler/Doppelte", fehlerFolderId, "Verzeichnis für doppelte Dokumente");
             if (erg.success) {
-                doubleFolderId = erg.data;
+                doubleFolderId = erg.data.objectID;
             }
         }
-        
-        if (erg.success) {
 
-            tabLayout.tabs({
-                disabled: [],
-                active: 0
-            });
-            ret = erg.success;
-        }
+        ret = erg.success;
+
     } else {
-        if (getSettings("server"))
-            log(WARN, "Server " + getSettings("server") + " ist nicht erreichbar!");
-        tabLayout.tabs({
-            disabled: [0, 1],
-            active: 2
-        });
-        ret = true;
+
+        ret = false;
     }
     return ret;
 }
@@ -3290,7 +3376,16 @@ function initApplication() {
                 settings = {settings:[]};
             }
         }
-        checkAndBuidAlfrescoEnvironment();
+        if (!checkAndBuidAlfrescoEnvironment())
+            tabLayout.tabs({
+                disabled: [0, 1],
+                active: 2
+            });
+        else
+            tabLayout.tabs({
+                disabled: [],
+                active: 0
+            });
 
 
         $.fn.dataTable.ext.errMode = function ( settings, helpPage, error ) {

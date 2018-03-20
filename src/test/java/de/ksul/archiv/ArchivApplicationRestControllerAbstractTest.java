@@ -294,10 +294,10 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsBytes(request))
                 .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.error", notNullValue()))
+                .andExpect(jsonPath("$.error", nullValue()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
@@ -352,7 +352,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
                 .andExpect(jsonPath("$.data", isA(JSONArray.class)))
-                .andExpect(jsonPath("$.data.length()", greaterThan(1)));
+                .andExpect(jsonPath("$.data.length()", equalTo(1)));
         dataTablesRequest.setCmisQuery("SELECT * from cmis:document where cmis:name='backup.js.samples'");
         this.mockMvc.perform(post("/query")
                 .contentType(APPLICATION_JSON_UTF8)
@@ -360,9 +360,10 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
-                .andExpect(jsonPath("$.data", nullValue()));
+                .andExpect(jsonPath("$.data", isA(JSONArray.class)))
+                .andExpect(jsonPath("$.data.length()", equalTo(0)));
     }
 
 

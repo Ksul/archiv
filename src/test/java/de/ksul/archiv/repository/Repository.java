@@ -82,6 +82,24 @@ public class Repository {
         return ret;
     }
 
+    List<FileableCmisObject> getChildrenForAllLevels(String id) {
+        if (id == null)
+            throw new RuntimeException("id must be set!");
+        List<FileableCmisObject> ret = new ArrayList<>();
+        if (root == null)
+            throw new RuntimeException("no Root Node!");
+        TreeNode<FileableCmisObject> startNode = root.findTreeNodeForId(id);
+        if (startNode != null) {
+            for (TreeNode<FileableCmisObject> node : startNode) {
+                if (node.getParent() != null && node.getParent().equals(startNode)) {
+                        ret.add(node.getData());
+                        ret.addAll(getChildrenForAllLevels(node.getId()));
+                }
+            }
+        }
+        return ret;
+    }
+
     FileableCmisObject getParent(String id){
         if (id == null)
             throw new RuntimeException("id must be set!");

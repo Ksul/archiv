@@ -246,6 +246,18 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     }
 
     @Test
+    public void testGetNodeById() throws Exception {
+        CmisObject cmisObject;
+        cmisObject = con.getNode("/Datenverzeichnis");
+        assertThat(cmisObject, Matchers.notNullValue());
+        cmisObject = con.getNodeById(cmisObject.getId());
+        assertThat(cmisObject, Matchers.notNullValue());
+        assertThat(cmisObject.getName(), Matchers.equalTo("Datenverzeichnis"));
+        cmisObject = con.getNodeById("xyz");
+        assertThat(cmisObject, Matchers.nullValue());
+    }
+
+    @Test
     public void testCheckout() throws Exception {
         CmisObject cmisObject = con.getNode("/Datenverzeichnis/Skripte/backup.js.sample");
         CmisObject cmisObjectCheckedOut = con.checkOutDocument((Document) cmisObject);
@@ -265,25 +277,14 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
 
     @Test
     public void testQuery() throws Exception {
-        List<List<PropertyData<?>>> erg = con.query("SELECT cmis:name, cmis:objectId from cmis:document where cmis:name='backup.js.sample'");
+        List<QueryResult> erg = con.query("SELECT cmis:name, cmis:objectId from cmis:document where cmis:name='backup.js.sample'");
         assertThat(erg, Matchers.notNullValue());
         assertThat(erg.size(), Matchers.is(1));
-        for (int i = 0; i < erg.get(0).size(); i++) {
-            if (((AbstractPropertyData) erg.get(0).get(i)).getId().equalsIgnoreCase("cmis:name")) {
-                assertThat(erg.get(0).get(i).getFirstValue(), Matchers.equalTo("backup.js.sample"));
-                break;
-            }
-        }
+        assertThat(erg.get(0).getPropertyById("cmis:name").getFirstValue().toString(), Matchers.equalTo("backup.js.sample"));
         erg = con.query("SELECT cmis:name, cmis:objectId from cmis:document where cmis:name LIKE '%.js.sample'");
         assertThat(erg, Matchers.notNullValue());
         assertThat(erg.size(), Matchers.greaterThan(1));
-        for (int i = 0; i < erg.get(0).size(); i++) {
-            if (((AbstractPropertyData) erg.get(0).get(i)).getId().equalsIgnoreCase("cmis:name")) {
-                assertThat(erg.get(0).get(i).getFirstValue().toString(), Matchers.endsWith(".js.sample"));
-                break;
-            }
-        }
-
+        assertThat(erg.get(0).getPropertyById("cmis:name").getFirstValue().toString(), Matchers.endsWith(".js.sample"));
     }
 
 

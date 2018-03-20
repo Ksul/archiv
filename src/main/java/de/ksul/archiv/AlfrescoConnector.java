@@ -394,7 +394,10 @@ public class AlfrescoConnector {
     public CmisObject getNodeById(String nodeId) throws ArchivException {
         OperationContext operationContext = getOperationContext();
         CmisObject cmisObject = this.session.getObject(this.session.createObjectId(nodeId), operationContext);
-        logger.trace("getNodeById with " + nodeId + " found " + cmisObject.getId());
+        if (cmisObject != null)
+            logger.trace("getNodeById with " + nodeId + " found " + cmisObject.getId());
+        else
+            logger.info("getNodeById with " + nodeId + " found no object");
         return cmisObject;
     }
 
@@ -429,13 +432,12 @@ public class AlfrescoConnector {
      * @return        eine Liste mit den jeweiligen Properties
      * @throws ArchivException
      */
-    public List<List<PropertyData<?>>> query(String query) throws ArchivException {
+    public List<QueryResult> query(String query) throws ArchivException {
 
-        List<List<PropertyData<?>>> erg = new ArrayList<>();
+        List<QueryResult> erg = new ArrayList<>();
         ItemIterable<QueryResult> results =  this.session.query(query, false);
         for (Iterator<QueryResult> iterator = results.iterator(); iterator.hasNext(); ) {
-            QueryResult qResult = iterator.next();
-            erg.add(qResult.getProperties());
+            erg.add(iterator.next());
         }
         return erg;
     }

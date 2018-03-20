@@ -101,8 +101,8 @@ public class ArchivController {
         try {
             String documentFolderId = con.getNode("/Archiv/Dokumente").getId();
             if (documentFolderId != null && documentFolderId.length() > 0) {
-                for (List<PropertyData<?>> propData : con.query("SELECT T.cm:title FROM cmis:document AS D JOIN cm:titled AS T ON D.cmis:objectId = T.cmis:objectId WHERE IN_TREE(D, '" + documentFolderId + "')")) {
-                    titles.add((String) propData.get(0).getValues().get(0));
+                for (QueryResult queryResult : con.query("SELECT T.cm:title FROM cmis:document AS D JOIN cm:titled AS T ON D.cmis:objectId = T.cmis:objectId WHERE IN_TREE(D, '" + documentFolderId + "')")) {
+                    titles.add((String) queryResult.getPropertyById("cm:title").getFirstValue());
                 }
                 titles.remove("");
             }
@@ -410,8 +410,16 @@ public class ArchivController {
 
         RestResponse obj = new RestResponse();
 
-        obj.setSuccess(true);
-        obj.setData(convertCmisObjectToJSON(con.getNodeById(model.getDocumentId())));
+        CmisObject cmisObject = con.getNodeById(model.getDocumentId());
+
+        if (cmisObject != null) {
+            obj.setData(convertCmisObjectToJSON(cmisObject));
+            obj.setSuccess(true);
+        }
+        else {
+            obj.setData(null);
+            obj.setSuccess(false);
+        }
 
         return obj;
     }
@@ -428,24 +436,9 @@ public class ArchivController {
     RestResponse query(@RequestBody @Valid final QueryRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
-        List<HashMap<String, Object>> list = new ArrayList<>();
-
-        for (List<PropertyData<?>> propData : con.query(model.getCmisQuery())) {
-
-            for (PropertyData prop : propData) {
-                HashMap<String, Object> o = new HashMap<>();
-                Object propObj = prop.getFirstValue();
-                if (propObj != null) {
-                    o.put(prop.getLocalName(), propObj);
-                    list.add(o);
-                }
-
-            }
-            obj.setSuccess(true);
-            obj.setData(list);
-        }
-
-
+        obj.setSuccess(true);
+        obj.setData(con.query(model.getCmisQuery()));
+        
         return obj;
     }
 
@@ -512,8 +505,7 @@ public class ArchivController {
             obj.setSuccess(true);
             obj.setData(id);
         } else {
-            obj.setSuccess(false);
-            obj.setData("Der verwendete Pfad ist kein Folder!");
+            throw new ArchivException("Der verwendete Pfad ist kein Folder!");
         }
 
         return obj;
@@ -648,8 +640,7 @@ public class ArchivController {
             obj.setSuccess(true);
             obj.setData(convertCmisObjectToJSON(cmisObject));
         } else {
-            obj.setSuccess(false);
-            obj.setData("Ein Document mit der Id " + model.getDocumentId() + " ist nicht vorhanden!");
+            throw new ArchivException("Ein Document mit der Id " + model.getDocumentId() + " ist nicht vorhanden!");
         }
 
 

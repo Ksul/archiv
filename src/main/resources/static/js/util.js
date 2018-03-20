@@ -61,6 +61,8 @@ function executeService(service, params) {
             }
         } else {
             done = service.callback;
+            if (window.location.pathname === "/context.html" )
+                asynchron = false; // im Test immer auf synchron umschalten!
         }
         if (service.url) {
             url = service.url;

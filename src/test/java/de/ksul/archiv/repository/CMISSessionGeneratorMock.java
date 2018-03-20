@@ -1,5 +1,6 @@
 package de.ksul.archiv.repository;
 
+import de.ksul.archiv.PDFConnector;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
 import org.apache.chemistry.opencmis.client.runtime.*;
@@ -14,9 +15,11 @@ import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.*;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 import org.apache.chemistry.opencmis.commons.spi.*;
+import org.apache.commons.io.IOUtils;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
@@ -24,14 +27,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
@@ -72,7 +73,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         //       cmisBindingHelper = mock(CmisBindingHelper.class);
         //      given(cmisBindingHelper.createBinding(anyMap(), any(AuthenticationProvider.class), any(TypeDefinitionCache.class))).willReturn(binding);
         this.resourceLoader = resourceLoader;
-        propertyDefinitionMap = getStringPropertyDefinitionMap();
+        propertyDefinitionMap = getPropertyDefinitionMap();
         secondaryPropertyDefinitionMap = getSecondaryPropertyDefinitionMap();
         objectService = mockObjectService();
         binding = mockBinding();
@@ -107,14 +108,16 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         archivType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
         secondaryTypeStore = createSecondaryTypes();
 
-        repository.insert(null, createFileableCmisObject( null, "/", folderType, false, null));
-        repository.insert("/", createFileableCmisObject("/", "Datenverzeichnis",  folderType, false, null));
-        repository.insert("/Datenverzeichnis", createFileableCmisObject("/Datenverzeichnis", "Skripte",  folderType, false, null));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "backup.js.sample", documentType, false, "application/x-javascript"), createStream("// "));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "alfresco docs.js.sample",  documentType, false, "application/x-javascript"), createStream("// "));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xml",  documentType, false, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "doc.xsd",  documentType, false, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject("/Datenverzeichnis/Skripte", "recognition.js",  documentType, false, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
+        Map<String, Object> properties = new HashMap<>();
+
+        repository.insert(null, createFileableCmisObject(null,  null, "/", folderType, null));
+        repository.insert("/", createFileableCmisObject(null, "/", "Datenverzeichnis",  folderType, null));
+        repository.insert("/Datenverzeichnis", createFileableCmisObject(null, "/Datenverzeichnis", "Skripte",  folderType,  null));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "backup.js.sample", documentType, "application/x-javascript"), createStream("// "));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "alfresco docs.js.sample",  documentType, "application/x-javascript"), createStream("// "));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "doc.xml",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "doc.xsd",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
+        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "recognition.js",  documentType, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
 
 
     }
@@ -140,6 +143,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     private Map<String, SecondaryType> createSecondaryTypes() {
         Map<String, SecondaryType> map = new HashMap<String, SecondaryType>();
+        
         SecondaryTypeDefinitionImpl titled = new SecondaryTypeDefinitionImpl();
         titled.setDisplayName("Titled");
         titled.setId("P:cm:titled");
@@ -148,6 +152,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         titled.setParentTypeId("cmis:secondary");
         titled.setPropertyDefinitions(secondaryPropertyDefinitionMap);
         map.put("P:cm:titled", new SecondaryTypeImpl(sessionImpl, titled));
+
         SecondaryTypeDefinitionImpl amountable = new SecondaryTypeDefinitionImpl();
         amountable.setDisplayName("Amountable");
         amountable.setId("P:my:amountable");
@@ -156,6 +161,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         amountable.setParentTypeId("cmis:secondary");
         amountable.setPropertyDefinitions(secondaryPropertyDefinitionMap);
         map.put("P:my:amountable", new SecondaryTypeImpl(sessionImpl, amountable));
+
         SecondaryTypeDefinitionImpl idable = new SecondaryTypeDefinitionImpl();
         idable.setDisplayName("IDable");
         idable.setId("P:my:idable");
@@ -164,6 +170,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         idable.setParentTypeId("cmis:secondary");
         idable.setPropertyDefinitions(secondaryPropertyDefinitionMap);
         map.put("P:my:idable", new SecondaryTypeImpl(sessionImpl, idable));
+
         SecondaryTypeDefinitionImpl emailed = new SecondaryTypeDefinitionImpl();
         emailed.setDisplayName("Emailed");
         emailed.setId("P:cm:emailed");
@@ -172,11 +179,13 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         emailed.setParentTypeId("cmis:secondary");
         emailed.setPropertyDefinitions(secondaryPropertyDefinitionMap);
         map.put("P:cm:emailed", new SecondaryTypeImpl(sessionImpl, emailed));
+
         return map;
     }
 
     private Map<String, PropertyDefinition<?>> getSecondaryPropertyDefinitionMap() {
         Map<String, PropertyDefinition<?>> map = new HashMap<String, PropertyDefinition<?>>();
+
         PropertyStringDefinitionImpl propertyTitleDefinition = new PropertyStringDefinitionImpl();
         propertyTitleDefinition.setId("cm:title");
         propertyTitleDefinition.setDisplayName("Title");
@@ -186,6 +195,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyTitleDefinition.setPropertyType(PropertyType.STRING);
         propertyTitleDefinition.setUpdatability(Updatability.READWRITE);
         map.put("cm:title", propertyTitleDefinition);
+
         PropertyDecimalDefinitionImpl propertyAmountDefinition = new PropertyDecimalDefinitionImpl();
         propertyAmountDefinition.setId("my:amount");
         propertyAmountDefinition.setDisplayName("Amount");
@@ -195,6 +205,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyAmountDefinition.setPropertyType(PropertyType.DECIMAL);
         propertyAmountDefinition.setUpdatability(Updatability.READWRITE);
         map.put("my:amount", propertyAmountDefinition);
+
         PropertyBooleanDefinitionImpl propertyTaxDefinition = new PropertyBooleanDefinitionImpl();
         propertyTaxDefinition.setId("my:tax");
         propertyTaxDefinition.setDisplayName("Tax");
@@ -204,6 +215,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyTaxDefinition.setPropertyType(PropertyType.BOOLEAN);
         propertyTaxDefinition.setUpdatability(Updatability.READWRITE);
         map.put("my:tax", propertyTaxDefinition);
+
         PropertyDateTimeDefinitionImpl propertySentDateDefinition = new PropertyDateTimeDefinitionImpl();
         propertySentDateDefinition.setId("cm:sentdate");
         propertySentDateDefinition.setDisplayName("Sentdate");
@@ -213,15 +225,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertySentDateDefinition.setPropertyType(PropertyType.DATETIME);
         propertySentDateDefinition.setUpdatability(Updatability.READWRITE);
         map.put("cm:sentdate", propertySentDateDefinition);
-        PropertyStringDefinitionImpl propertyPersonDefinition = new PropertyStringDefinitionImpl();
-        propertyPersonDefinition.setId("my:person");
-        propertyPersonDefinition.setDisplayName("Person");
-        propertyPersonDefinition.setQueryName("my:person");
-        propertyPersonDefinition.setLocalName("person");
-        propertyPersonDefinition.setCardinality(Cardinality.SINGLE);
-        propertyPersonDefinition.setPropertyType(PropertyType.STRING);
-        propertyPersonDefinition.setUpdatability(Updatability.READWRITE);
-        map.put("my:person", propertyPersonDefinition);
+
         PropertyStringDefinitionImpl propertyIdValueDefinition = new PropertyStringDefinitionImpl();
         propertyIdValueDefinition.setId("my:idvalue");
         propertyIdValueDefinition.setDisplayName("ID Value");
@@ -231,6 +235,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyIdValueDefinition.setPropertyType(PropertyType.STRING);
         propertyIdValueDefinition.setUpdatability(Updatability.READWRITE);
         map.put("my:idvalue", propertyIdValueDefinition);
+
         PropertyStringDefinitionImpl propertyDescriptionDefinition = new PropertyStringDefinitionImpl();
         propertyDescriptionDefinition.setId("cm:description");
         propertyDescriptionDefinition.setDisplayName("Description");
@@ -240,11 +245,13 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyDescriptionDefinition.setPropertyType(PropertyType.STRING);
         propertyDescriptionDefinition.setUpdatability(Updatability.READWRITE);
         map.put("cm:description", propertyDescriptionDefinition);
+
         return map;
     }
 
-    private Map<String, PropertyDefinition<?>> getStringPropertyDefinitionMap() {
+    private Map<String, PropertyDefinition<?>> getPropertyDefinitionMap() {
         Map<String, PropertyDefinition<?>> map = new HashMap<>();
+        
         PropertyIdDefinitionImpl propertyIdDefinition = new PropertyIdDefinitionImpl();
         propertyIdDefinition.setId("cmis:objectId");
         propertyIdDefinition.setDisplayName("Object ID");
@@ -254,6 +261,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyIdDefinition.setPropertyType(PropertyType.ID);
         propertyIdDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:objectId", propertyIdDefinition);
+
         PropertyStringDefinitionImpl propertyPathDefinition = new PropertyStringDefinitionImpl();
         propertyPathDefinition.setId("cmis:path");
         propertyPathDefinition.setDisplayName("Path");
@@ -263,6 +271,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyPathDefinition.setPropertyType(PropertyType.STRING);
         propertyPathDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:path", propertyPathDefinition);
+
         PropertyStringDefinitionImpl propertyNameDefinition = new PropertyStringDefinitionImpl();
         propertyNameDefinition.setId("cmis:name");
         propertyNameDefinition.setDisplayName("Name");
@@ -272,6 +281,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyNameDefinition.setPropertyType(PropertyType.STRING);
         propertyNameDefinition.setUpdatability(Updatability.READWRITE);
         map.put("cmis:name", propertyNameDefinition);
+
         PropertyIdDefinitionImpl propertyObjectTypeIdDefinition = new PropertyIdDefinitionImpl();
         propertyObjectTypeIdDefinition.setId("cmis:objectTypeId");
         propertyObjectTypeIdDefinition.setDisplayName("Object Type Id");
@@ -281,6 +291,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyObjectTypeIdDefinition.setPropertyType(PropertyType.ID);
         propertyObjectTypeIdDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:objectTypeId", propertyObjectTypeIdDefinition);
+
         PropertyIdDefinitionImpl propertyBaseTypeIdDefinition = new PropertyIdDefinitionImpl();
         propertyBaseTypeIdDefinition.setId("cmis:baseTypeId");
         propertyBaseTypeIdDefinition.setDisplayName("Base Type Id");
@@ -290,6 +301,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyBaseTypeIdDefinition.setPropertyType(PropertyType.ID);
         propertyBaseTypeIdDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:baseTypeId", propertyBaseTypeIdDefinition);
+
         PropertyIdDefinitionImpl propertyParentIdDefinition = new PropertyIdDefinitionImpl();
         propertyParentIdDefinition.setId("cmis:parentId");
         propertyParentIdDefinition.setDisplayName("Parent Id");
@@ -299,6 +311,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyParentIdDefinition.setPropertyType(PropertyType.ID);
         propertyParentIdDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:parentId", propertyParentIdDefinition);
+
         PropertyBooleanDefinitionImpl propertyIsVersionCheckedOutDefinition = new PropertyBooleanDefinitionImpl();
         propertyIsVersionCheckedOutDefinition.setId("cmis:isVersionSeriesCheckedOut");
         propertyIsVersionCheckedOutDefinition.setDisplayName("Is version Checked Out");
@@ -308,6 +321,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyIsVersionCheckedOutDefinition.setPropertyType(PropertyType.BOOLEAN);
         propertyIsVersionCheckedOutDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:isVersionSeriesCheckedOut", propertyIsVersionCheckedOutDefinition);
+
         PropertyBooleanDefinitionImpl propertyIsPrivateWorkingCopyDefinition = new PropertyBooleanDefinitionImpl();
         propertyIsPrivateWorkingCopyDefinition.setId("cmis:isPrivateWorkingCopy");
         propertyIsPrivateWorkingCopyDefinition.setDisplayName("Is private working copy");
@@ -317,6 +331,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyIsPrivateWorkingCopyDefinition.setPropertyType(PropertyType.BOOLEAN);
         propertyIsPrivateWorkingCopyDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:isPrivateWorkingCopy", propertyIsPrivateWorkingCopyDefinition);
+
         PropertyStringDefinitionImpl propertyVersionLabelDefinition = new PropertyStringDefinitionImpl();
         propertyVersionLabelDefinition.setId("cmis:versionLabel");
         propertyVersionLabelDefinition.setDisplayName("Version Label");
@@ -326,6 +341,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyVersionLabelDefinition.setPropertyType(PropertyType.STRING);
         propertyVersionLabelDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:versionLabel", propertyVersionLabelDefinition);
+
         PropertyBooleanDefinitionImpl propertyIsMajorVersionDefinition = new PropertyBooleanDefinitionImpl();
         propertyIsMajorVersionDefinition.setId("cmis:isMajorVersion");
         propertyIsMajorVersionDefinition.setDisplayName("Is Major Version");
@@ -335,6 +351,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyIsMajorVersionDefinition.setPropertyType(PropertyType.BOOLEAN);
         propertyIsMajorVersionDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:isMajorVersion", propertyIsMajorVersionDefinition);
+
         PropertyStringDefinitionImpl propertyCheckinCommentDefinition = new PropertyStringDefinitionImpl();
         propertyCheckinCommentDefinition.setId("cmis:checkinComment");
         propertyCheckinCommentDefinition.setDisplayName("Checkin Comment");
@@ -344,6 +361,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyCheckinCommentDefinition.setPropertyType(PropertyType.STRING);
         propertyCheckinCommentDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:checkinComment", propertyCheckinCommentDefinition);
+
         PropertyStringDefinitionImpl propertyContentStreamMimeTypeDefinition = new PropertyStringDefinitionImpl();
         propertyContentStreamMimeTypeDefinition.setId("cmis:contentStreamMimeType");
         propertyContentStreamMimeTypeDefinition.setDisplayName("Content Stream MIME Type");
@@ -352,6 +370,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyContentStreamMimeTypeDefinition.setCardinality(Cardinality.SINGLE);
         propertyContentStreamMimeTypeDefinition.setPropertyType(PropertyType.STRING);
         propertyContentStreamMimeTypeDefinition.setUpdatability(Updatability.READONLY);
+
         map.put("cmis:contentStreamMimeType", propertyContentStreamMimeTypeDefinition);
         PropertyIdDefinitionImpl propertySecondaryObjectTypeIdDefinition = new PropertyIdDefinitionImpl();
         propertySecondaryObjectTypeIdDefinition.setId("cmis:secondaryObjectTypeIds");
@@ -362,6 +381,17 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertySecondaryObjectTypeIdDefinition.setPropertyType(PropertyType.ID);
         propertySecondaryObjectTypeIdDefinition.setUpdatability(Updatability.READWRITE);
         map.put("cmis:secondaryObjectTypeIds", propertySecondaryObjectTypeIdDefinition);
+
+        PropertyStringDefinitionImpl propertyPersonDefinition = new PropertyStringDefinitionImpl();
+        propertyPersonDefinition.setId("my:person");
+        propertyPersonDefinition.setDisplayName("Person");
+        propertyPersonDefinition.setQueryName("my:person");
+        propertyPersonDefinition.setLocalName("person");
+        propertyPersonDefinition.setCardinality(Cardinality.SINGLE);
+        propertyPersonDefinition.setPropertyType(PropertyType.STRING);
+        propertyPersonDefinition.setUpdatability(Updatability.READWRITE);
+        map.put("my:person", propertyPersonDefinition);
+
         PropertyDateTimeDefinitionImpl propertyDocumentDateDefinition = new PropertyDateTimeDefinitionImpl();
         propertyDocumentDateDefinition.setId("my:documentDate");
         propertyDocumentDateDefinition.setDisplayName("Documentdate");
@@ -371,6 +401,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyDocumentDateDefinition.setPropertyType(PropertyType.DATETIME);
         propertyDocumentDateDefinition.setUpdatability(Updatability.READWRITE);
         map.put("my:documentDate", propertyDocumentDateDefinition);
+
         PropertyDateTimeDefinitionImpl propertyCreateDateDefinition = new PropertyDateTimeDefinitionImpl();
         propertyCreateDateDefinition.setId("cmis:creationDate");
         propertyCreateDateDefinition.setDisplayName("Creation Date");
@@ -380,131 +411,87 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyCreateDateDefinition.setPropertyType(PropertyType.DATETIME);
         propertyCreateDateDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:creationDate", propertyCreateDateDefinition);
+
+        PropertyDateTimeDefinitionImpl propertyLastModificationDateDefinition = new PropertyDateTimeDefinitionImpl();
+        propertyLastModificationDateDefinition.setId("cmis:lastModificationDate");
+        propertyLastModificationDateDefinition.setDisplayName("Last Modified Date");
+        propertyLastModificationDateDefinition.setQueryName("cmis:lastModificationDate");
+        propertyLastModificationDateDefinition.setLocalName("lastModificationDate");
+        propertyLastModificationDateDefinition.setCardinality(Cardinality.SINGLE);
+        propertyLastModificationDateDefinition.setPropertyType(PropertyType.DATETIME);
+        propertyLastModificationDateDefinition.setUpdatability(Updatability.READONLY);
+        map.put("cmis:lastModificationDate", propertyLastModificationDateDefinition);
         return map;
     }
 
-    private FileableCmisObject createFileableCmisObject(String path, String name, ObjectType objectType, boolean majorVersion, String mimeType) {
+
+    private FileableCmisObject createFileableCmisObject(Map<String, Object> props, String path, String name, ObjectType objectType, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
         String objectId = repository.getId();
+        PropertiesImpl properties;
         ObjectDataImpl objectData = new ObjectDataImpl();
-        PropertiesImpl properties = new PropertiesImpl();
-        PropertyIdImpl propertyId = new PropertyIdImpl();
-        propertyId.setId("cmis:objectId");
-        propertyId.setLocalName("objectId");
-        propertyId.setQueryName("cmis:objectId");
-        propertyId.setDisplayName("Object Id");
-        propertyId.setValue(objectId);
-        properties.addProperty(propertyId);
-        PropertyStringImpl propertyName = new PropertyStringImpl();
-        propertyName.setId("cmis:name");
-        propertyName.setLocalName("name");
-        propertyName.setQueryName("cmis:name");
-        propertyName.setDisplayName("Name");
-        propertyName.setValue(name);
-        properties.addProperty(propertyName);
+        if (props == null)
+            properties = new PropertiesImpl();
+        else
+            properties = (PropertiesImpl) convertProperties(props);
+        if (!properties.getProperties().containsKey("cmis:objectId")) {
 
-            PropertyIdImpl propertybaseType = new PropertyIdImpl();
-            propertybaseType.setId("cmis:baseTypeId");
-            propertybaseType.setLocalName("baseTypeId");
-            propertybaseType.setQueryName("cmis:baseTypeId");
-            propertybaseType.setDisplayName("Base Type Id");
-            propertybaseType.setValue(objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId());
-            properties.addProperty(propertybaseType);
-    
-        PropertyIdImpl propertyObjectType = new PropertyIdImpl();
-        propertyObjectType.setId("cmis:objectTypeId");
-        propertyObjectType.setLocalName("objectTypeId");
-        propertyObjectType.setQueryName("cmis:objectTypeId");
-        propertyObjectType.setDisplayName("Object Type Id");
-        propertyObjectType.setValue(objectType.getId());
-        properties.addProperty(propertyObjectType);
-
+            properties.addProperty(fillProperty("cmis:objectId", objectId));
+        }
+        if (!properties.getProperties().containsKey("cmis:name")) {
+            properties.addProperty(fillProperty("cmis:name", name));
+        }
+        if (!properties.getProperties().containsKey("cmis:baseTypeId")) {
+            properties.addProperty(fillProperty("cmis:baseTypeId", objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
+        }
+        if (!properties.getProperties().containsKey("cmis:objectTypeId")) {
+            properties.addProperty(fillProperty("cmis:objectTypeId", objectType.getId()));
+        }
+        if (!properties.getProperties().containsKey("cmis:creationDate")) {
+            properties.addProperty(fillProperty("cmis:creationDate", new Date().getTime()));
+        }
+        if (!properties.getProperties().containsKey("cmis:lastModificationDate")) {
+            properties.addProperty(fillProperty("cmis:lastModificationDate", new Date().getTime()));
+        }
+        if (!properties.getProperties().containsKey("cmis:secondaryObjectTypeIds")) {
+            properties.addProperty(fillProperty("cmis:secondaryObjectTypeIds", Collections.emptyList()));
+        }
         if (objectType.getId().equalsIgnoreCase("cmis:folder")) {
             if (path == null) {
                 parentId = "-1";
                 repository.setRootId(objectId);
             } else
                 parentId = repository.getByPath(path).getId();
-            PropertyIdImpl propertyParentId = new PropertyIdImpl();
-            propertyParentId.setId("cmis:parentId");
-            propertyParentId.setLocalName("parentId");
-            propertyParentId.setQueryName("cmis:parentId");
-            propertyParentId.setDisplayName("Parent Id");
-            propertyParentId.setValue(parentId);
-            properties.addProperty(propertyParentId);
-            PropertyStringImpl propertyPath = new PropertyStringImpl();
-            propertyPath.setId("cmis:path");
-            propertyPath.setLocalName("path");
-            propertyPath.setQueryName("cmis:path");
-            propertyPath.setDisplayName("Path");
-            propertyPath.setValue((path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/")  + name);
-            properties.addProperty(propertyPath);
+            if (!properties.getProperties().containsKey("cmis:parentId")) {
+                properties.addProperty(fillProperty("cmis:parentId", parentId));
+            }
+            if (!properties.getProperties().containsKey("cmis:path")) {
+                properties.addProperty(fillProperty("cmis:path", (path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/") + name));
+            }
+
             objectData.setProperties(properties);
             fileableCmisObject = new FolderImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         } else {
-            PropertyBooleanImpl propertyIsVersionCheckedOut = new PropertyBooleanImpl();
-            propertyIsVersionCheckedOut.setId("cmis:isVersionSeriesCheckedOut");
-            propertyIsVersionCheckedOut.setLocalName("isVersionSeriesCheckedOut");
-            propertyIsVersionCheckedOut.setQueryName("cmis:isVersionSeriesCheckedOut");
-            propertyIsVersionCheckedOut.setDisplayName("Is Version Checked Out");
-            propertyIsVersionCheckedOut.setValue(false);
-            properties.addProperty(propertyIsVersionCheckedOut);
-            PropertyBooleanImpl propertyIsPrivateWorkingCopy = new PropertyBooleanImpl();
-            propertyIsPrivateWorkingCopy.setId("cmis:isPrivateWorkingCopy");
-            propertyIsPrivateWorkingCopy.setLocalName("isPrivateWorkingCopy");
-            propertyIsPrivateWorkingCopy.setQueryName("cmis:isPrivateWorkingCopy");
-            propertyIsPrivateWorkingCopy.setDisplayName("Is private working copy");
-            propertyIsPrivateWorkingCopy.setValue(false);
-            properties.addProperty(propertyIsPrivateWorkingCopy);
-            PropertyStringImpl propertyVersionLabel = new PropertyStringImpl();
-            propertyVersionLabel.setId("cmis:versionLabel");
-            propertyVersionLabel.setDisplayName("Version Label");
-            propertyVersionLabel.setQueryName("cmis:versionLabel");
-            propertyVersionLabel.setLocalName("versionLabel");
-            propertyVersionLabel.setValue(majorVersion ? "1.0" : "0.1");
-            properties.addProperty(propertyVersionLabel);
-            PropertyStringImpl propertyMimeType = new PropertyStringImpl();
-            propertyMimeType.setId("cmis:contentStreamMimeType");
-            propertyMimeType.setDisplayName("Content Stream MIME Type");
-            propertyMimeType.setQueryName("cmis:contentStreamMimeType");
-            propertyMimeType.setLocalName("contentStreamMimeType");
-            propertyMimeType.setValue(mimeType);
-            properties.addProperty(propertyMimeType);
-            PropertyStringImpl propertyCheckinComment = new PropertyStringImpl();
-            propertyCheckinComment.setId("cmis:checkinComment");
-            propertyCheckinComment.setDisplayName("Checkin Comment");
-            propertyCheckinComment.setQueryName("cmis:checkinComment");
-            propertyCheckinComment.setLocalName("checkinComment");
-            propertyCheckinComment.setValue("Initial Version");
-            properties.addProperty(propertyCheckinComment);
-            PropertyIdImpl propertySecondaryObjectTypeIds = new PropertyIdImpl();
-            propertySecondaryObjectTypeIds.setId("cmis:secondaryObjectTypeIds");
-            propertySecondaryObjectTypeIds.setDisplayName("Secondary Object Type Ids");
-            propertySecondaryObjectTypeIds.setQueryName("cmis:secondaryObjectTypeIds");
-            propertySecondaryObjectTypeIds.setLocalName("secondaryObjectTypeIds");
-            ArrayList<String> secondaryObjectTypeIds = new ArrayList<>();
-            secondaryObjectTypeIds.add("P:cm:titled");
-            secondaryObjectTypeIds.add("P:sys:localized");
-            secondaryObjectTypeIds.add("P:cm:author");
-            secondaryObjectTypeIds.add("P:my:idable");
-            secondaryObjectTypeIds.add("P:my:amountable");
-            secondaryObjectTypeIds.add("P:cm:emailed");
-            propertySecondaryObjectTypeIds.setValues(secondaryObjectTypeIds);
-            properties.addProperty(propertySecondaryObjectTypeIds);
-            PropertyDateTimeImpl propertyCreationDate = new PropertyDateTimeImpl();
-            propertyCreationDate.setId("cmis:creationDate");
-            propertyCreationDate.setLocalName("creationDate");
-            propertyCreationDate.setQueryName("cmis:objectTypeId");
-            propertyCreationDate.setDisplayName("Creation Date ");
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(new Date());
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
             }
-            propertyCreationDate.setValue(cal);
-            properties.addProperty(propertyCreationDate);
+            if (!properties.getProperties().containsKey("cmis:isVersionSeriesCheckedOut")) {
+                properties.addProperty(fillProperty("cmis:isVersionSeriesCheckedOut", false));
+            }
+            if (!properties.getProperties().containsKey("cmis:isPrivateWorkingCopy")) {
+                properties.addProperty(fillProperty("cmis:isPrivateWorkingCopy", false));
+            }
+            if (!properties.getProperties().containsKey("cmis:versionLabel")) {
+                properties.addProperty(fillProperty("cmis:versionLabel", "1.0"));
+            }
+            if (!properties.getProperties().containsKey("cmis:contentStreamMimeType")) {
+                properties.addProperty(fillProperty("cmis:contentStreamMimeType", mimeType));
+            }
+            if (!properties.getProperties().containsKey("cmis:checkinComment")) {
+                properties.addProperty(fillProperty("cmis:checkinComment", "Initial Version"));
+            }
             objectData.setProperties(properties);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         }
@@ -689,13 +676,15 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         String path = cmis.getPaths().get(0) ;
         FileableCmisObject newObject;
         if (!folder && invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
-            majorVersion = true;
+           props.put("cmis:versionLabel", "1.0");
+        else
+            props.put("cmis:versionLabel", "0.1");
         if (!folder) {
-            newObject = createFileableCmisObject(path, name,  objectType, majorVersion, ((ContentStream) invocation.getArguments()[2]).getMimeType());
+            newObject = createFileableCmisObject(props, path, name,  objectType,  ((ContentStream) invocation.getArguments()[2]).getMimeType());
             repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2]);
         }
         else {
-            newObject = createFileableCmisObject(path, name, objectType, majorVersion, null);
+            newObject = createFileableCmisObject(props, path, name, objectType, null);
             repository.insert(path, newObject);
         }
 
@@ -822,12 +811,46 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                             } while(objectType != null);
                             return false;
                         }
+
+                        boolean isObjectInSearch(FileableCmisObject cmisObject, List<String> contains) {
+                            if (contains == null || contains.isEmpty())
+                                return true;
+                            else {
+
+                                for (String x: contains){
+                                    List<String> liste = Arrays.asList(new StringBuilder(x).reverse().toString().split(":", 2)).stream().map(element -> new StringBuilder(element).reverse().toString()).collect(Collectors.toList());
+                                    Collections.reverse(liste);
+                                    if (!liste.get(0).contains("TEXT") && cmisObject.getPropertyValue(liste.get(0)).toString().contains(liste.get(1)))
+                                        return true;
+                                    if (liste.get(0).contains("TEXT") && cmisObject instanceof Document &&  ((Document) cmisObject).getContentStream() != null )   {
+                                        byte[] content = new byte[0];
+                                        try {
+                                            content = IOUtils.toByteArray(((Document) cmisObject).getContentStream().getStream());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        if ( ((Document) cmisObject).getContentStream().getMimeType().contains("text/plain") && new String(content).contains(liste.get(1)))
+                                            return true;
+                                        if ( ((Document) cmisObject).getContentStream().getMimeType().contains("application/pdf")) {
+                                            PDFConnector con = new PDFConnector();
+                                            if (con.pdftoText(new ByteArrayInputStream(content)).contains(liste.get(1)))
+                                                return true;
+                                        }
+                                    }
+                                }
+                            }
+
+                            return false;
+                        }
                     }
 
                     public ObjectList answer(InvocationOnMock invocation) throws Throwable {
                         int typen = 0;
+                        int i = 0;
                         ObjectTypeHelper helper = new ObjectTypeHelper();
                         List<FileableCmisObject> liste;
+                        List<String> contains = new ArrayList<>();
                         ObjectListImpl objectList = new ObjectListImpl();
                         Object[] args = invocation.getArguments();
                         String statement = (String) args[1];
@@ -836,21 +859,31 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         List<ObjectData> list = new ArrayList<>();
                         final String search = statement.substring(statement.indexOf("'") + 1, statement.indexOf("'", statement.indexOf("'") + 1));
                         String typ = null;
+                        List stmt = Arrays.asList(statement.split(" "));
+                        Iterator<String> stmtIt = stmt.iterator();
+                        while (stmtIt.hasNext()) {
+                            String part = stmtIt.next();
+                            if (part.contains("CONTAINS"))
+                                contains.add(stmtIt.next().replaceAll("[']|[)]|[)]|[*]", ""));
+                            if (part.contains("TEXT:"))
+                                contains.add(part.replaceAll("[']|[)]|[)]|[*]", ""));
+                        }
+
                         if (statement.contains("from ")) {
-                            List stmt = Arrays.asList(statement.split(" "));
                             typ = (String) stmt.get(stmt.indexOf("from") + 1);
                         }
 
                         if (statement.contains("IN_FOLDER")) {
                             liste = repository.getChildren(search);
-
+                        } else if (statement.contains("IN_TREE")) {
+                            liste = repository.getChildrenForAllLevels(search);
                         } else {
                             liste = repository.query(search);
                         }
 
                         for (FileableCmisObject cmisObject : liste) {
                             
-                            if (helper.isObjectType(cmisObject, typ))
+                            if (helper.isObjectType(cmisObject, typ) && helper.isObjectInSearch(cmisObject, contains))
                                 list.add(getObjectDataFromCmisObject(cmisObject));
                         }
 
@@ -939,6 +972,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                             ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString());
                         if (checkinComment != null && !checkinComment.isEmpty())
                             ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);
+                        ((PropertyImpl) document.getProperty("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
                         return null;
                     }
                 }).when(versioningService).checkIn(anyString(), any(Holder.class), anyBoolean(), any(Properties.class), any(ContentStream.class), anyString(), anyListOf(String.class), any(Acl.class), any(Acl.class), any(ExtensionsData.class));
@@ -980,8 +1014,11 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
                 if (cmisObject.getType() instanceof FolderType)
                     cmisObjectNew = new FolderImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
-                else
+                else {
+
                     cmisObjectNew = new DocumentImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
+                    ((PropertyImpl) cmisObjectNew.getProperty("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
+                }
                 repository.update(cmisObject, cmisObjectNew);
                 return null;
             }
@@ -1067,5 +1104,183 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         when(info.getRootFolderId()).thenReturn(repository.getRootId());
         return info;
     }
+
+    private  Properties convertProperties(final Map<String, Object> props) {
+
+        PropertiesImpl result = new PropertiesImpl();
+        PropertyDefinition<?> definition;
+
+        for (String id : props.keySet()) {
+
+            result.addProperty(fillProperty(id, props.get(id)));
+
+        }
+
+        return result;
+    }
+
+    private AbstractPropertyData<?> fillProperty(String id, Object value) {
+
+        PropertyDefinition<?> definition;
+        AbstractPropertyData<?> property = null;
+
+
+            if (!propertyDefinitionMap.containsKey(id) && !secondaryPropertyDefinitionMap.containsKey(id))
+                throw new CmisRuntimeException(("Invalid properties " + id));
+            if (propertyDefinitionMap.containsKey(id))
+                definition = propertyDefinitionMap.get(id);
+            else
+                definition = secondaryPropertyDefinitionMap.get(id);
+
+            switch (definition.getPropertyType()) {
+                case STRING:
+                    property = new PropertyStringImpl();
+                    ((PropertyStringImpl) property).setValue(copyStringValue(value));
+                    break;
+                case ID:
+                    property = new PropertyIdImpl();
+                    if (value instanceof  List)
+                        ((PropertyIdImpl) property).setValues(copyStringValues((List) value));
+                    else
+                     ((PropertyIdImpl) property).setValue(copyStringValue(value));
+                    break;
+                case BOOLEAN:
+                    property = new PropertyBooleanImpl();
+                    ((PropertyBooleanImpl) property).setValue(copyBooleanValue(value));
+                    break;
+                case INTEGER:
+                    property = new PropertyIntegerImpl();
+                    ((PropertyIntegerImpl) property).setValue(copyIntegerValue(value));
+                    break;
+                case DECIMAL:
+                    property = new PropertyDecimalImpl();
+                    ((PropertyDecimalImpl) property).setValue(copyDecimalValue(value));
+                    break;
+                case DATETIME:
+                    property = new PropertyDateTimeImpl();
+                    ((PropertyDateTimeImpl) property).setValue(copyDateTimeValue(value));
+                    break;
+                case HTML:
+                    property = new PropertyHtmlImpl();
+                    ((PropertyHtmlImpl) property).setValue(copyStringValue(value));
+                    break;
+                case URI:
+                    property = new PropertyUriImpl();
+                    ((PropertyUriImpl) property).setValue(copyStringValue(value));
+                    break;
+                default:
+                    throw new CmisRuntimeException("Unknown property data type!");
+            }
+
+            property.setId(id);
+            property.setDisplayName(definition.getDisplayName());
+            property.setQueryName(definition.getQueryName());
+            property.setLocalName(definition.getLocalName());
+
+
+        return property;
+    }
+
+    private List<String> copyStringValues(List<Object> source) {
+        List<String> result = null;
+        if (source != null) {
+            result = new ArrayList<String>(source.size());
+            for (Object obj : source) {
+                if (obj instanceof String) {
+                    result.add(obj.toString());
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + obj);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private String copyStringValue(Object source) {
+       String result = null;
+        if (source != null) {
+                if (source instanceof String) {
+                    result = source.toString();
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + source);
+                }
+            }
+
+        return result;
+    }
+
+    private Boolean copyBooleanValue(Object source) {
+        Boolean result = null;
+        if (source != null) {
+            if (source instanceof Boolean) {
+                result = (Boolean) source;
+            } else if (source instanceof String) {
+                result =  Boolean.parseBoolean((String) source);
+            } else {
+                throw new CmisRuntimeException("Invalid property value: " + source);
+            }
+        }
+
+        return result;
+    }
+
+    private BigInteger copyIntegerValue(Object source) {
+        BigInteger result = null;
+        if (source != null) {
+            if (source instanceof BigInteger) {
+                result = (BigInteger) source;
+            } else if (source instanceof String) {
+                result = new BigInteger((String) source);
+            } else {
+                throw new CmisRuntimeException("Invalid property value: " + source);
+            }
+        }
+
+        return result;
+    }
+
+    private BigDecimal copyDecimalValue(Object source) {
+        BigDecimal result = null;
+        if (source != null) {
+                if (source instanceof BigDecimal) {
+                    result = (BigDecimal) source;
+                } else if (source instanceof BigInteger) {
+                    result = new BigDecimal((BigInteger) source);
+                } else if(source instanceof String) {
+                    result = new BigDecimal((String) source);
+                } else if(source instanceof Double) {
+                    result = new BigDecimal((Double) source);
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + source);
+                }
+            }
+
+        return result;
+    }
+
+    private GregorianCalendar copyDateTimeValue(Object source) {
+        GregorianCalendar result = null;
+        if (source != null) {
+            GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+                if (source instanceof Number) {
+                    cal.setTimeInMillis(((Number) source).longValue());
+                    result = cal;
+                } else if (source instanceof Date){
+                    cal.setTime((Date) source);
+                    result = cal;
+                } else if (source instanceof String) {
+                    Long value = Long.parseLong((String) source);
+                    cal.setTime(new Date(value));
+                    result = cal;
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + source);
+                }
+            }
+
+
+        return result;
+    }
+
 
 }

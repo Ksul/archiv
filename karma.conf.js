@@ -10,17 +10,24 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine-jquery', 'jasmine'],
 
 
     // list of files / patterns to load in the browser
     files: [ 'src/main/resources/static/js/jquery/jquery-1.12.1.js',
+        'src/main/resources/static/js/jquery-ui/jquery-ui.js',
              'src/main/resources/static/js/alfrescoMock.js',
              'src/main/resources/static/js/recognition.js',
              'src/main/resources/static/js/util.js',
              'src/main/resources/static/js/verteilung.js',
              'src/main/resources/static/js/Base64.js',
+             'src/main/resources/static/js/superfish.js',
              'src/main/resources/static/js/alfrescoClient.js',
+             'src/main/resources/static/js/dataTables/dataTables.js',
+             'src/main/resources/static/js/dataTables/dataTables.scroller.js',
+             'src/main/resources/static/js/dataTables/dataTables.editable.js',
+             'src/main/resources/static/js/dataTables/datetime-moment.js',
+             'src/main/resources/static/js/jstree/jstree.js',
              'src/test/js/specs/**.js'
     ],
 
@@ -32,14 +39,18 @@ module.exports = function(config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-    },
+      preprocessors: {
+          // source files, that you wanna generate coverage for
+          // do not include tests or libraries
+          // (these files will be instrumented by Istanbul)
+          'src/main/resources/static/js/*.js': ['coverage']
+      },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+      reporters: ['progress', 'coverage'],
 
 
     // web server port
