@@ -46,8 +46,8 @@ describe("Tests für alfrescoClient.js", function() {
 
     it("testLoadTable", function() {
 
-        archivFolderId = 0;
-        documentFolderId = 0;
+        archivFolderId = 8;
+        documentFolderId = 9;
 
         alfrescoViewModeMenu = null;
         alfrescoDocumentSelectMenu=null;

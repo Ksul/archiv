@@ -23,8 +23,13 @@ public class ArchivConfiguration {
 
     private static Logger logger = LoggerFactory.getLogger(ArchivConfiguration.class.getName());
 
-    @Autowired
+
     private ArchivProperties archivProperties;
+
+    @Autowired
+    public ArchivConfiguration(ArchivProperties archivProperties) {
+        this.archivProperties = archivProperties;
+    }
 
     @Bean
     public Session getSession() {

@@ -475,7 +475,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         } else {
             try {
                 Thread.sleep(1);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
             if (!properties.getProperties().containsKey("cmis:isVersionSeriesCheckedOut")) {
                 properties.addProperty(fillProperty("cmis:isVersionSeriesCheckedOut", false));
@@ -528,8 +528,8 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return new QueryStatementImpl(sessionImpl, (String) invocation.getArguments()[0]);
             }
         });
-        when(session.query(any(String.class), any(Boolean.class), any(OperationContext.class))).thenCallRealMethod();
-        when(session.query(any(String.class), any(Boolean.class))).thenCallRealMethod();
+        when(session.query(anyString(), any(Boolean.class), any(OperationContext.class))).thenCallRealMethod();
+        when(session.query(anyString(), any(Boolean.class))).thenCallRealMethod();
         when(session.queryObjects(anyString(), anyString(), anyBoolean(),any(OperationContext.class))).thenCallRealMethod();
 
         when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class))).thenAnswer(new Answer<ObjectId>() {
@@ -538,15 +538,15 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return createFileableCmisObject(invocation, false);
             }
         });
-        when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class), anyList(), anyList(), anyList())).thenAnswer(new Answer<ObjectId>() {
+        when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class), any(), any(), any())).thenAnswer(new Answer<ObjectId>() {
 
             public ObjectId answer(InvocationOnMock invocation) throws Throwable {
                 return createFileableCmisObject(invocation, false);
             }
         });
-        when(session.createFolder(anyMap(), any(ObjectId.class), anyList(), anyList(), anyList())).thenAnswer(new Answer<ObjectId>() {
+        when(session.createFolder(anyMap(), any(ObjectId.class), any(), any(), any())).thenAnswer(new Answer<ObjectId>() {
 
-            public ObjectId answer(InvocationOnMock invocation) throws Throwable {
+            public ObjectId answer(InvocationOnMock invocation)  {
 
                 return createFileableCmisObject(invocation, true);
             }
@@ -574,7 +574,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return repository.deleteTree(cmisObject);
             }
         });
-        when(session.createObjectId(any(String.class))).thenAnswer(new Answer<ObjectId>() {
+        when(session.createObjectId(anyString())).thenAnswer(new Answer<ObjectId>() {
 
             public ObjectId answer(InvocationOnMock invocation) throws Throwable {
                 return new ObjectIdImpl((String) invocation.getArguments()[0]);
@@ -585,7 +585,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return repository.getById(((ObjectId) invocation.getArguments()[0]).getId());
             }
         });
-        when(session.getObject(any(String.class), any(OperationContext.class))).thenAnswer(new Answer<FileableCmisObject>() {
+        when(session.getObject(anyString(), any(OperationContext.class))).thenAnswer(new Answer<FileableCmisObject>() {
             public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
                 return repository.getById((String) invocation.getArguments()[0]);
             }
@@ -595,7 +595,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return repository.getById(((ObjectId) invocation.getArguments()[0]).getId());
             }
         });
-        when(session.getObjectByPath(any(String.class))).thenAnswer(new Answer<FileableCmisObject>() {
+        when(session.getObjectByPath(anyString())).thenAnswer(new Answer<FileableCmisObject>() {
             public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
                 FileableCmisObject cmisObject = repository.getByPath((String) invocation.getArguments()[0]);
                 if (cmisObject == null)
@@ -604,21 +604,21 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             }
         });
         when(session.getObjectByPath(any(String.class), any(OperationContext.class))).thenAnswer(new Answer<FileableCmisObject>() {
-            public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
+            public FileableCmisObject answer(InvocationOnMock invocation)  {
                 FileableCmisObject cmisObject = repository.getByPath((String) invocation.getArguments()[0]);
                 if (cmisObject == null)
                     throw new CmisObjectNotFoundException((String) invocation.getArguments()[0] + " not found!");
                 return cmisObject;
             }
         });
-        when(session.getContentStream(any(ObjectId.class), any(String.class), any(BigInteger.class), any(BigInteger.class))).thenAnswer(new Answer<ContentStream>() {
-            public ContentStream answer(InvocationOnMock invocation) throws Throwable {
+        when(session.getContentStream(any(ObjectId.class), any(), any(), any())).thenAnswer(new Answer<ContentStream>() {
+            public ContentStream answer(InvocationOnMock invocation) {
                 Object[] args = invocation.getArguments();
                 Document document = (Document) args[0];
                 return repository.getContent(document);
             }
         });
-        when(session.getTypeDefinition(any(String.class))).thenAnswer(new Answer<ObjectType>() {
+        when(session.getTypeDefinition(anyString())).thenAnswer(new Answer<ObjectType>() {
             public ObjectType answer(InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
                 String string = (String) args[0];
@@ -634,7 +634,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return documentType;
             }
         });
-        when(session.getTypeDefinition(any(String.class), anyBoolean())).thenAnswer(new Answer<ObjectType>() {
+        when(session.getTypeDefinition(anyString(), anyBoolean())).thenAnswer(new Answer<ObjectType>() {
             public ObjectType answer(InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
                 String string = (String) args[0];
@@ -705,7 +705,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         when(binding.getNavigationService()).then(new Answer<NavigationService>() {
             public NavigationService answer(InvocationOnMock invocation) throws Throwable {
                 NavigationService navigationService = mock(NavigationService.class);
-                when(navigationService.getFolderParent(any(String.class), any(String.class), any(String.class), any(ExtensionsData.class))).then(new Answer<ObjectData>() {
+                when(navigationService.getFolderParent(anyString(), anyString(), anyString(), any())).then(new Answer<ObjectData>() {
                     public ObjectData answer(InvocationOnMock invocation) throws Throwable {
                         Object[] args = invocation.getArguments();
                         String id = (String) args[1];
@@ -717,7 +717,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                             return null;
                     }
                 });
-                when(navigationService.getObjectParents(anyString(), anyString(), anyString(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), any(ExtensionsData.class))).then(new Answer<List<ObjectParentData>>() {
+                when(navigationService.getObjectParents(anyString(), anyString(), anyString(), anyBoolean(), any(IncludeRelationships.class), any(), anyBoolean(), any())).then(new Answer<List<ObjectParentData>>() {
                     public List<ObjectParentData> answer(InvocationOnMock invocation) throws Throwable {
                         List<ObjectParentData> result = new ArrayList<>();
                         FileableCmisObject cmisObject = repository.getById((String) invocation.getArguments()[1]);
@@ -733,7 +733,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         return result;
                     }
                 });
-                when(navigationService.getChildren(anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), any(BigInteger.class), any(BigInteger.class), any(ExtensionsData.class))).then(new Answer<ObjectInFolderList>() {
+                when(navigationService.getChildren(anyString(), anyString(), any(), anyString(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), any(BigInteger.class), any(BigInteger.class), any())).then(new Answer<ObjectInFolderList>() {
                     public ObjectInFolderList answer(InvocationOnMock invocation) throws Throwable {
                         ObjectInFolderListImpl objectInFolderList = new ObjectInFolderListImpl();
                         BigInteger skip = (BigInteger) invocation.getArguments()[9];
@@ -797,7 +797,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         when(binding.getDiscoveryService()).then(new Answer<DiscoveryService>() {
             public DiscoveryService answer(InvocationOnMock invocation) throws Throwable {
                 DiscoveryService discoveryService = mock(DiscoveryService.class);
-                when(discoveryService.query(any(String.class), any(String.class), any(Boolean.class), any(Boolean.class), any(IncludeRelationships.class), any(String.class), any(BigInteger.class), any(BigInteger.class), any(ExtensionsData.class))).then(new Answer<ObjectList>() {
+                when(discoveryService.query(any(String.class), any(String.class), any(Boolean.class), any(Boolean.class), any(IncludeRelationships.class), any(String.class), any(BigInteger.class), any(BigInteger.class), any())).then(new Answer<ObjectList>() {
 
                     class ObjectTypeHelper {
                         boolean isObjectType(FileableCmisObject cmisObject, String objectTypeId){
@@ -948,7 +948,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(true);
                         return null;
                     }
-                }).when(versioningService).checkOut(anyString(), any(Holder.class), any(ExtensionsData.class), any(Holder.class));
+                }).when(versioningService).checkOut(anyString(), any(Holder.class), any(), any());
                 doAnswer(new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -975,7 +975,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         ((PropertyImpl) document.getProperty("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
                         return null;
                     }
-                }).when(versioningService).checkIn(anyString(), any(Holder.class), anyBoolean(), any(Properties.class), any(ContentStream.class), anyString(), anyListOf(String.class), any(Acl.class), any(Acl.class), any(ExtensionsData.class));
+                }).when(versioningService).checkIn(anyString(), any(Holder.class), anyBoolean(), any(Properties.class), any(), any(), any(), any(), any(), any());
                 return versioningService;
             }
         });
@@ -993,8 +993,8 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return null;
             }
 
-        }).when(objectService).setContentStream(anyString(), any(Holder.class), anyBoolean(), any(Holder.class), any(ContentStream.class), any(ExtensionsData.class));
-        when(objectService.getObject(anyString(), anyString(), anyString(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), anyBoolean(), any(ExtensionsData.class))).thenAnswer(new Answer<ObjectData>() {
+        }).when(objectService).setContentStream(anyString(), any(), anyBoolean(), any(), any(ContentStream.class), any());
+        when(objectService.getObject(anyString(), anyString(), any(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), anyBoolean(), any())).thenAnswer(new Answer<ObjectData>() {
             public ObjectData answer(InvocationOnMock invocation) throws Throwable {
                 String objectId = (String) invocation.getArguments()[1];
                 return getObjectDataFromCmisObject(repository.getById(objectId));
@@ -1022,7 +1022,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 repository.update(cmisObject, cmisObjectNew);
                 return null;
             }
-        }).when(objectService).updateProperties(anyString(), any(Holder.class), any(Holder.class), any(Properties.class), any(ExtensionsData.class));
+        }).when(objectService).updateProperties(anyString(), any(Holder.class), any(Holder.class), any(Properties.class), any());
         doAnswer(new Answer() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
@@ -1039,7 +1039,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 }
                 return null;
             }
-        }).when(objectService).moveObject(anyString(), any(Holder.class), anyString(), anyString(), any(ExtensionsData.class));
+        }).when(objectService).moveObject(anyString(), any(Holder.class), anyString(), anyString(), any());
 /*        when(objectService.createFolder(anyString(), any(Properties.class), anyString(), anyListOf(String.class), any(Acl.class), any(Acl.class), any(ExtensionsData.class))).thenAnswer(new Answer<ObjectId>() {
 
             public ObjectId answer(InvocationOnMock invocation) throws Throwable {
@@ -1080,7 +1080,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     private BindingsObjectFactory mockBindingsObjectFactory() {
         BindingsObjectFactory bindingsObjectFactory = mock(BindingsObjectFactory.class);
-        when(bindingsObjectFactory.createContentStream(any(String.class), any(BigInteger.class), any(String.class), any(InputStream.class))).thenAnswer(
+        when(bindingsObjectFactory.createContentStream(anyString(), any(BigInteger.class), anyString(), any(InputStream.class))).thenAnswer(
                 new Answer<ContentStream>() {
 
                     public ContentStream answer(InvocationOnMock invocation) throws Throwable {

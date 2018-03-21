@@ -25,10 +25,10 @@ import java.util.Map;
 public class CMISSessionGeneratorImpl implements CMISSessionGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(CMISSessionGeneratorImpl.class.getName());
-        private String user;
-        private String password;
-        private String atomPubURL;
-        private String repositoryName;
+    private String user;
+    private String password;
+    private String atomPubURL;
+    private String repositoryName;
 
     public CMISSessionGeneratorImpl(String user, String password, String atomPubURL, String repositoryName) {
         this.user = user;
@@ -38,33 +38,43 @@ public class CMISSessionGeneratorImpl implements CMISSessionGenerator {
     }
 
     public String getUser() {
-            return user;
-        }
-        public void setUser(String user) {
-            this.user = user;
-        }
-        public String getPassword() {
-            return password;
-        }
-        public void setPassword(String password) {
-            this.password = password;
-        }
-        public String getAtomPubURL() {
-            return atomPubURL;
-        }
-        public void setAtomPubURL(String atomPubURL){
-            this.atomPubURL = atomPubURL;
-        }
-        public String getRepositoryName() {
-            return repositoryName;
-        }
-        public void setRepositoryName(String repositoryName) {
-            this.repositoryName = repositoryName;
-        }
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    private String getAtomPubURL() {
+        return atomPubURL;
+    }
+
+    @SuppressWarnings("unused")
+    public void setAtomPubURL(String atomPubURL) {
+        this.atomPubURL = atomPubURL;
+    }
+
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    @SuppressWarnings("unused")
+    public void setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
+    }
 
     /**
      * baut die Session auf
-     * @return
+     *
+     * @return die Session
      */
     @Override
     public Session generateSession() {
@@ -76,14 +86,14 @@ public class CMISSessionGeneratorImpl implements CMISSessionGenerator {
             // From: http://chemistry.apache.org/java/examples/example-create-session.html
             // default factory implementation
             SessionFactory factory = SessionFactoryImpl.newInstance();
-            Map<String, String> parameter = new HashMap<String, String>();
+            Map<String, String> parameter = new HashMap<>();
 
             // user credentials
-            parameter.put(SessionParameter.USER, this.user);
-            parameter.put(SessionParameter.PASSWORD, this.password);
+            parameter.put(SessionParameter.USER, getUser());
+            parameter.put(SessionParameter.PASSWORD, getPassword());
 
             // connection settings
-            parameter.put(SessionParameter.ATOMPUB_URL, this.atomPubURL);
+            parameter.put(SessionParameter.ATOMPUB_URL, getAtomPubURL());
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
 //		parameter.put(SessionParameter.REPOSITORY_ID, this.repositoryName);
 //		Session session = factory.createSession(parameter);
@@ -96,12 +106,12 @@ public class CMISSessionGeneratorImpl implements CMISSessionGenerator {
             List<Repository> repositories = factory.getRepositories(parameter);
             session = repositories.get(0).createSession();
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Session konnte nicht aufgebaut werden: " + e.getMessage());
             throw e;
         }
         return session;
     }
 
-    }
+}
 

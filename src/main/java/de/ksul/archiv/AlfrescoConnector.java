@@ -110,16 +110,17 @@ public class AlfrescoConnector {
         this.password = password;
     }
 
-    /*
-    liefert den User
-     */
+    /**
+    * liefert den User
+    * @return der User
+    */
     public String getUser() {
         return user;
     }
 
     /**
      * liefert das Password
-     * @return
+     * @return das Password
      */
     public String getPassword() {
         return password;
@@ -127,7 +128,7 @@ public class AlfrescoConnector {
 
     /**
      * liefert das Binding
-      * @return
+      * @return das Binding
      */
     public String getBinding() {
         return binding;
@@ -135,7 +136,7 @@ public class AlfrescoConnector {
 
     /**
      * liefert den Server
-     * @return
+     * @return der Server
      */
     public String getServer() {
         return server;

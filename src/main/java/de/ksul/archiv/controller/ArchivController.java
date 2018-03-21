@@ -9,7 +9,6 @@ import de.ksul.archiv.response.RestResponse;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.util.EmptyItemIterable;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.enums.PropertyType;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
@@ -97,6 +96,7 @@ public class ArchivController {
     /**
      * sucht alle Titel und stellt sie in einer Liste zur Verfügung
      */
+    @SuppressWarnings("unused")
     private void collectTitle() {
         try {
             String documentFolderId = con.getNode("/Archiv/Dokumente").getId();
@@ -106,7 +106,7 @@ public class ArchivController {
                 }
                 titles.remove("");
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -125,7 +125,7 @@ public class ArchivController {
         RestResponse obj = new RestResponse();
         obj.setSuccess(true);
         if (this.con.isConnected()) {
-            Map<String, String> map = new HashMap();
+            Map<String, String> map = new HashMap<>();
             map.put("server", this.con.getServer());
             map.put("binding", this.con.getBinding());
             map.put("user", this.con.getUser());
@@ -456,7 +456,7 @@ public class ArchivController {
 
         Document document = (Document) con.getNodeById(model.getDocumentId());
         obj.setSuccess(true);
-        obj.setData(new String((byte[]) con.getDocumentContent(document), "UTF-8"));
+        obj.setData(new String(con.getDocumentContent(document), "UTF-8"));
 
         return obj;
     }
@@ -476,7 +476,7 @@ public class ArchivController {
         Document document = (Document) con.getNodeById(model.getDocumentId());
         obj.setSuccess(true);
         PDFConnector pdfConnector = new PDFConnector();
-        InputStream is = new ByteArrayInputStream((byte[]) con.getDocumentContent(document));
+        InputStream is = new ByteArrayInputStream(con.getDocumentContent(document));
         obj.setData(pdfConnector.pdftoText(is));
 
         return obj;
@@ -592,7 +592,6 @@ public class ArchivController {
 
 
         Map<String, Object> outMap = new HashMap<>();
-        List<String> asp = null;
         CmisObject cmisObject = con.getNodeById(model.getDocumentId());
 
         if (cmisObject != null && cmisObject instanceof Document) {
@@ -704,7 +703,7 @@ public class ArchivController {
 
         Folder folder;
         CmisObject target;
-        Map<String, Object> outMap = null;
+        Map<String, Object> outMap;
 
         outMap = buildProperties(model.getExtraProperties());
 
@@ -810,7 +809,7 @@ public class ArchivController {
      */
     @RequestMapping(value = "/extractPDFToInternalStorage", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse extractPDFToInternalStorage(@RequestBody @Valid final ExtractRequest model) throws Exception {
+    RestResponse extractPDFToInternalStorage(@RequestBody @Valid final ExtractRequest model)  {
 
         RestResponse obj = new RestResponse();
 
@@ -878,7 +877,7 @@ public class ArchivController {
     RestResponse extractZIP(@RequestBody @Valid final ContentRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
-        ArrayList<String> arrayList = new ArrayList();
+        ArrayList<String> arrayList = new ArrayList<>();
         ZipInputStream zipin = null;
         try {
 
@@ -981,7 +980,7 @@ public class ArchivController {
     public @ResponseBody
     RestResponse extractZIPAndExtractPDFToInternalStorage(@RequestBody @Valid final ContentRequest model) throws Exception {
 
-        RestResponse obj = null;
+        RestResponse obj;
         String extractedData;
         int counter = 0;
 
@@ -1127,8 +1126,8 @@ public class ArchivController {
      *
      * @param filePath der Pfad zur Datei
      * @return der Inhalt als Byte Array
-     * @throws URISyntaxException
-     * @throws IOException
+     * @throws URISyntaxException wird geworfen wenn Path eine ungültige URI enthält
+     * @throws IOException wird geworfen wenn das File nich geöffnet werden kann
      */
 
     private byte[] readFile(String filePath) throws URISyntaxException, IOException {
@@ -1155,9 +1154,8 @@ public class ArchivController {
      * bereitet die Properties auf
      *
      * @param extraCMSProperties der String mit den Properties im JSON Format
-     * @throws IOException
      */
-    protected Map<String, Object> buildProperties(Map<String, Object> extraCMSProperties) throws IOException {
+    private Map<String, Object> buildProperties(Map<String, Object> extraCMSProperties) {
 
         Iterator nameItr = extraCMSProperties.keySet().iterator();
         Map<String, Object> outMap = new HashMap<>();
@@ -1173,9 +1171,8 @@ public class ArchivController {
             if (name.toUpperCase().startsWith("D:")) {
                 outMap.put(PropertyIds.OBJECT_TYPE_ID, name);
             }
-            Iterator innerItr = ((Map) extraCMSProperties.get(name)).keySet().iterator();
-            while (innerItr.hasNext()) {
-                String innerName = (String) innerItr.next();
+            for (Object o : ((Map) extraCMSProperties.get(name)).keySet()) {
+                String innerName = (String) o;
                 outMap.put(innerName, ((Map) extraCMSProperties.get(name)).get(innerName));
             }
         }
@@ -1211,7 +1208,7 @@ public class ArchivController {
     private Map<String, Object> convertCmisObjectToJSON(CmisObject cmisObject) {
 
         List<Property<?>> properties = cmisObject.getProperties();
-        Map<String, Object> props = convPropertiesToJSON(properties);
+        Map<String, Object> props = convProperties(properties);
 
         // Parents suchen
         List<Folder> parents = ((FileableCmisObject) cmisObject).getParents();
@@ -1219,7 +1216,7 @@ public class ArchivController {
             Map<String, Object> obj = new HashMap<>();
             int i = 0;
             for (Folder folder : parents) {
-                obj.put(Integer.toString(i++), convPropertiesToJSON(folder.getProperties()));
+                obj.put(Integer.toString(i++), convProperties(folder.getProperties()));
             }
             props.put("parents", obj);
             props.put("parentId", parents.get(0).getId());
@@ -1228,10 +1225,11 @@ public class ArchivController {
     }
 
     /**
-     * @param properties
-     * @return
+     * konvertiert die Properties in einen passenden Typ
+     * @param properties  die Properties
+     * @return  eine Hasmap mit den Namen des Propitiers und dem Property selber im passenden Typ
      */
-    private Map<String, Object> convPropertiesToJSON(List<Property<?>> properties) {
+    private Map<String, Object> convProperties(List<Property<?>> properties) {
         Map<String, Object> props = new HashMap<>();
         for (Property prop : properties) {
             // falls Datumswert dann konvertieren

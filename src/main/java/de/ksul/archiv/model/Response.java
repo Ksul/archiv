@@ -8,17 +8,17 @@ package de.ksul.archiv.model;
  */
 public interface Response {
 
-    public boolean isSuccess();
+    boolean isSuccess();
 
-    public void setSuccess(boolean success);
+    void setSuccess(boolean success);
 
-    public Exception getError();
+    Exception getError();
 
-    public void setError(Exception error);
+    void setError(Exception error);
 
-    public boolean hasError();
+    boolean hasError();
 
-    public Object getData();
+    Object getData();
 
-    public void setData(Object data);
+    void setData(Object data);
 }

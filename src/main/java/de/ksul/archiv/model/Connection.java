@@ -8,23 +8,23 @@ package de.ksul.archiv.model;
  */
 public interface Connection {
 
-    public String getServer();
+    String getServer();
 
-    public void setServer(String server);
+    void setServer(String server);
 
-    public String getBinding();
+    String getBinding();
 
-    public void setBinding(String binding);
+    void setBinding(String binding);
 
-    public String getUser();
+    String getUser();
 
-    public void setUser(String user);
+    void setUser(String user);
 
-    public String getPassword();
+    String getPassword();
 
-    public void setPassword(String password);
+    void setPassword(String password);
 
-    public int getTimeout();
+    int getTimeout();
 
-    public void setTimeout(int timeout);
+    void setTimeout(int timeout);
 }

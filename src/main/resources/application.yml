@@ -17,19 +17,24 @@ ksul:
     password: admin
 
 server:
-  contextPath: /Archiv
+  servlet:
+    context-path: /Archiv
   port: 8080
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
   security:
-    enabled: false
     info:
       git:
         mode: full
 
 logging:
   path: ./
-  level: info
+  level:
+    root: info
 
 spring:
   devtools:
