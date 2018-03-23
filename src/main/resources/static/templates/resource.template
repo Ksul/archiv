@@ -29,6 +29,7 @@
 ./js/recognition.js
 ./js/verteilung.js
 ./js/xmllint.js
+./js/jshashtable.js
 ./js/jquery-ui/jquery-ui.js
 ./js/jquery/jquery.tmpl.js
 ./js/jquery/jquery.layout.js
@@ -52,6 +53,7 @@
 ./js/jquery/jquery.jBreadCrumb.1.1.js
 ./js/jquery/jquery.formatDateTime.js
 ./js/jquery/jquery.format-1.3.js
+./js/jquery/jquery.numberformatter-1.2.4.js
 ./js/jquery/jquery.wysiwyg.js
 ./js/superfish.js
 ./js/hoverIntent.js

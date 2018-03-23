@@ -1856,7 +1856,7 @@ function formatVerteilungTabelleDetailRow(data) {
  * @returns {string}   HTML für die extra Zeile
  */
 function formatAlfrescoTabelleDetailRow(data) {
-    return 'Name: ' + data.name + ' erstellt am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.creationDate))) + ' von: ' + data.createdBy + (data.lastModificationDate == data.creationDate ? '' : ' modifiziert am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.lastModificationDate))) + ' von: ' + data.lastModifiedBy) + ' Version: ' + data.versionLabel + ' ' + (data.checkinComment ? data.checkinComment : '');
+    return 'Name: ' + data.name + ' erstellt am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.creationDate))) + ' von: ' + data.createdBy + (data.lastModificationDate == data.creationDate ? '' : ' modifiziert am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.lastModificationDate))) + ' von: ' + data.lastModifiedBy) + ' Version: ' + data.versionLabel + ' ' + (data.checkinComment ? data.checkinComment : '') + ' Größe: ' + $.formatNumber(data.contentStreamLength, {format:"#,###", locale:"de"}) + ' Bytes';
 }
 
 /**
@@ -3803,9 +3803,9 @@ function buildVerteilungTab(){
  */
 function start() {
     try {
-        Logger.setCallback(function(level) {
+        Logger.setCallback(function() {
             if (Verteilung.outputEditor)
-                Verteilung.outputEditor.getSession().setValue(Logger.getMessages(true, level));
+                Verteilung.outputEditor.getSession().setValue(Logger.getMessages(true));
         });
         $(document).tooltip();
         $('.ui-dialog-titlebar-close').tooltip('disable');
