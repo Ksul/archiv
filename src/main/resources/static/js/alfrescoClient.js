@@ -638,7 +638,7 @@ function loadAlfrescoTable() {
                                     var span = document.createElement("span");
                                     var image = document.createElement('div');
                                     image.id = "alfrescoTableIcon" + row.objectID;
-                                    image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable fa fa-file-pdf-o fa-15x awesomeEntity";
+                                    image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable far fa-file-pdf fa-15x awesomeEntity";
                                     image.title = "PDF Dokument";
                                     image.draggable = true;
                                     image.style.cursor = "pointer";
@@ -908,6 +908,22 @@ function loadAlfrescoFolderTable() {
                             alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
                             alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlRevert');
                             alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlNone');
+                            if (// der zu verschiebene Ordner darf nicht der ArchivRootFolder sein
+                                obj.data.objectID !== archivFolderId &&
+                                // der zu verschiebene Ordner darf nicht der Dokumenten Folder sein
+                                obj.data.objectID !== documentFolderId &&
+                                // der zu verschiebene Ordner darf nicht derFehler Folder sein
+                                obj.data.objectID !== fehlerFolderId &&
+                                // der zu verschiebene Ordner darf nicht der Inbox Folder sein
+                                obj.data.objectID !== inboxFolderId &&
+                                // der zu verschiebene Ordner darf nicht der Unknown Folder sein
+                                obj.data.objectID !== unknownFolderId &&
+                                // der zu verschiebene Ordner darf nicht der Doppelte Folder sein
+                                obj.data.objectID !== doubleFolderId ) {
+                                alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionCreate');
+                            } else {
+                                alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
+                            }
                         }
                         var tree = $.jstree.reference('#tree');
                         var parent = tree.get_node(obj.parent);
@@ -1312,7 +1328,7 @@ function loadAlfrescoSearchTable() {
                                 var span = document.createElement("span");
                                 var image = document.createElement('div');
                                 image.id = "alfrescoSearchTableIcon" + row.objectID;
-                                image.className = "alfrescoSearchTableIconEvent fa fa-file-pdf-o fa-15x awesomeEnity";
+                                image.className = "alfrescoSearchTableIconEvent far fa-file-pdf fa-15x awesomeEnity";
                                 image.title = "PDF Dokument";
                                 image.draggable = true;
                                 image.style.cursor = "pointer";
@@ -1608,7 +1624,7 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
         // Ordner bearbeiten
         image = document.createElement("i");
         image.href = "#";
-        image.className = "folderEdit fa fa-pencil fa-15x awesomeEntity";
+        image.className = "folderEdit fas fa-pencil-alt fa-15x awesomeEntity";
         image.title = "Ordner Details bearbeiten";
         image.style.cursor = "pointer";
         image.style.cssFloat = "left";
@@ -1627,9 +1643,9 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
             //image.style.fontSize ="xx-small";
             image.className = "folderCreate fa-stack fa-09x";
             inner1 = document.createElement("i");
-            inner1.className = "fa fa-folder-o fa-stack-2x awesomeEntity" ;
+            inner1.className = "far fa-folder fa-stack-2x awesomeEntity" ;
             inner2 = document.createElement("i");
-            inner2.className = " fa fa-plus fa-stack-1x awesomeAction";
+            inner2.className = " fas fa-plus fa-stack-1x awesomeAction";
             inner2.style.color = "green";
             image.appendChild(inner1);
             image.appendChild(inner2);
@@ -1653,9 +1669,9 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
             //image.style.fontSize ="xx-small";
             image.className = "folderRemove fa-stack fa-09x";
             inner1 = document.createElement("i");
-            inner1.className = "fa fa-folder-o fa-stack-2x awesomeEntity" ;
+            inner1.className = "far fa-folder fa-stack-2x awesomeEntity" ;
             inner2 = document.createElement("i");
-            inner2.className = " fa fa-remove fa-stack-1x awesomeAction";
+            inner2.className = " fas fa-minus fa-stack-1x awesomeAction";
             inner2.style.color = "red";
             image.appendChild(inner1);
             image.appendChild(inner2);
@@ -1684,7 +1700,7 @@ function alfrescoAktionFieldFormatter(data, type, full) {
         var container = document.createElement("div");
         var image = document.createElement("i");
         image.href = "#";
-        image.className = "detailEdit fa fa-pencil fa-15x awesomeEntity";
+        image.className = "detailEdit fas fa-pencil-alt fa-15x awesomeEntity";
         image.title = "Details bearbeiten";
         image.style.cursor = "pointer";
         image.style.cssFloat = "left";
@@ -1697,12 +1713,12 @@ function alfrescoAktionFieldFormatter(data, type, full) {
         if (data.commentCount > 0) {
             image.style.cursor = "pointer";
             if (data.commentCount === 1)
-                image.className = "showComments fa fa-comment fa-15x awesomeEntity";
+                image.className = "showComments fas fa-comment fa-15x awesomeEntity";
             else
-                image.className = "showComments fa fa-comments fa-15x awesomeEntity";
+                image.className = "showComments fas fa-comments fa-15x awesomeEntity";
         }
         else {
-             image.className = "showComments fa fa-comment-o fa-15x awesomeEntity";
+             image.className = "showComments far fa-comment fa-15x awesomeEntity";
             image.style.cursor = "none";
         }
         image.title = "Kommentare";
@@ -1712,7 +1728,7 @@ function alfrescoAktionFieldFormatter(data, type, full) {
 
         image = document.createElement("i");
         image.href = "#";
-        image.className = "moveDocument fa fa-files-o fa-15x awesomeEntity";
+        image.className = "moveDocument far fa-copy fa-15x awesomeEntity";
         image.title = "Dokument verschieben";
         image.style.cursor = "pointer";
         image.style.cssFloat = "left";
@@ -1721,7 +1737,7 @@ function alfrescoAktionFieldFormatter(data, type, full) {
 
         image = document.createElement("i");
         image.href = "#";
-        image.className = "deleteDocument fa fa-trash fa-15x awesomeEntity";
+        image.className = "deleteDocument far fa-trash-alt fa-15x awesomeEntity";
         image.title = "Dokument löschen";
         image.style.cursor = "pointer";
         image.style.cssFloat = "left";
@@ -1730,7 +1746,7 @@ function alfrescoAktionFieldFormatter(data, type, full) {
 
         image = document.createElement("i");
         image.href = "#";
-        image.className = "rulesDocument fa fa-wpforms fa-15x awesomeEntity";
+        image.className = "rulesDocument fab fa-wpforms fa-15x awesomeEntity";
         image.title = "Dokument Regel erstellen";
         image.style.cursor = "pointer";
         image.style.cssFloat = "left";
@@ -2718,7 +2734,7 @@ function loadAlfrescoTree() {
                 separator_before: false,
                 separator_after: false,
                 label: "Erstellen",
-                icon : "./images/details_open.png",
+                icon : "fas fa-plus-circle fa-1x",
                 action: function (obj) {
                     try {
                         startFolderDialog($.jstree.reference('#tree').get_node(obj.reference[0]).data, "web-create", true);
@@ -2731,7 +2747,7 @@ function loadAlfrescoTree() {
                 separator_before: false,
                 separator_after: false,
                 label: "Ändern",
-                icon : "./images/beautify16.png",
+                icon : "fas fa-pencil-alt fa-1x",
                 action: function (obj) {
                     try {
                         startFolderDialog($.jstree.reference('#tree').get_node(obj.reference[0]).data, "web-edit", true);
@@ -2744,7 +2760,7 @@ function loadAlfrescoTree() {
                 separator_before: false,
                 separator_after: false,
                 label: "Löschen",
-                icon: "./images/deleteDocument.gif",
+                icon: "far fa-trash-alt fa-1x",
                 action: function (obj) {
                     try {
                         startFolderDialog($.jstree.reference('#tree').get_node(obj.reference[0]).data, "web-display", true);
@@ -2860,27 +2876,27 @@ function loadAlfrescoTree() {
                 },
                 'archivRootStandard' : {
                     valid_children : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
-                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
+                    icon: "far fa-folder fa-15x awesomeEntity"
                 },
                 'archivFolderStandard' : {
                     valid_children : [],
-                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
+                    icon: "far fa-folder fa-15x awesomeEntity"
                 },
                 'archivDoubleFolderStandard' : {
                     valid_children : [],
-                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
+                    icon: "far fa-folder fa-15x awesomeEntity"
                 },
                 'archivFehlerFolderStandard' : {
                     valid_children : ["archivDoubleFolderStandard"],
-                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
+                    icon: "far fa-folder fa-15x awesomeEntity"
                 },
                 'archivDocumentFolderStandard' : {
                     valid_children : ["documentFolderStandard"] ,
-                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
+                    icon: "far fa-folder fa-15x awesomeEntity"
                 },
                 'documentFolderStandard' : {
                     valid_children : -1,
-                    icon: "fa fa-file-text-o fa-15x awesomeEntity"
+                    icon: "far fa-folder fa-15x awesomeEntity"
                 }
             },
             contextmenu: {
@@ -2962,6 +2978,20 @@ function loadAlfrescoTree() {
             try {
                 loadAlfrescoTable();
                 loadAlfrescoFolderTable();
+            } catch (e) {
+                errorHandler(e);
+            }
+        }).on('open_node.jstree', function (event, data) {
+            try {
+                var icon = $('#' + data.node.id).find('i.jstree-icon.jstree-themeicon').first();
+                icon.removeClass('fa-folder').addClass('fa-folder-open');
+            } catch (e) {
+                errorHandler(e);
+            }
+        }).on('close_node.jstree', function (event, data) {
+            try {
+                var icon = $('#' + data.node.id).find('i.jstree-icon.jstree-themeicon').first();
+                icon.removeClass('fa-folder-open').addClass('fa-folder');
             } catch (e) {
                 errorHandler(e);
             }
@@ -3462,7 +3492,7 @@ function createAlfrescoMenus() {
                 },
                 alfrescoDocumentActionMove: {
                     title: "Verschieben",
-                    className: "fa fa-files-o fa-1x",
+                    className: "far fa-copy fa-1x",
                     disabled: true,
                     action: function () {
                         try {
@@ -3475,7 +3505,7 @@ function createAlfrescoMenus() {
                 },
                 alfrescoDocumentActionDelete: {
                     title: "Löschen",
-                    className: "fa fa-trash fa-1x",
+                    className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
                         alertt('Noch nicht implementiert!');
@@ -3573,9 +3603,22 @@ function createAlfrescoFolderMenus() {
             "alfrescoFolderAction": {
                 title: "Aktion",
                 className: "fa fa-sign-in fa-1x",
+                alfrescoFolderActionCreate: {
+                    title: "Erstellen",
+                    className: "fas fa-plus-circle fa-1x",
+                    disabled: true,
+                    action: function () {
+                        try {
+                            var data = alfrescoFolderTabelle.rows({selected: true}).data();
+                            startFolderDialog(data, "web-create", true);
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
                 alfrescoFolderActionMove: {
                     title: "Verschieben",
-                    className: "fa fa-files-o fa-1x",
+                    className: "far fa-copy fa-1x",
                     disabled: true,
                     action: function () {
                         try {
@@ -3588,7 +3631,7 @@ function createAlfrescoFolderMenus() {
                 },
                 alfrescoFolderActionDelete: {
                     title: "Löschen",
-                    className: "fa fa-trash fa-1x",
+                    className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
                         alertt('Noch nicht implementiert!');
@@ -3616,7 +3659,7 @@ function createSearchMenus(){
                     action: function () {
                         try {
                             alfrescoSearchTabelle.settings().init().iconView = false;
-                            searchViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-file-text-o fa-1x');
+                            searchViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'far fa-file-alt fa-1x');
                             searchViewModeMenu.children('li:first').superfish('hide');
                             alfrescoSearchTabelle.column(0).visible(true);
                             alfrescoSearchTabelle.column(1).visible(true);
@@ -3628,7 +3671,7 @@ function createSearchMenus(){
                 },
                 searchViewModeMenuIcon: {
                     title: "Icons",
-                    className: "fa fa-photo fa-1x",
+                    className: "far fa-image fa-1x",
                     action: function () {
                         try {
                             alfrescoSearchTabelle.settings().init().iconView = true;
@@ -3666,7 +3709,7 @@ function createSearchMenus(){
                 },
                 alfrescoSearchDocumentActionDelete: {
                     title: "Löschen",
-                    className: "fa fa-trash fa-1x",
+                    className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
                         alertt('Noch nicht implementiert!');
@@ -3835,7 +3878,7 @@ function start() {
                     autoClose: true,
                     actionMenuOutputClear: {
                         title: "Löschen",
-                        className: "fa fa-trash-o fa-1x",
+                        className: "far fa-trash-alt fa-1x",
                         disabled: false,
                         action: function () {
                             try {

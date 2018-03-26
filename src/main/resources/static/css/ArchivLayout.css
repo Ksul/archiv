@@ -36,21 +36,21 @@ th {
 }*/
 
 td.folder-control:before  {
-    content: "\f115";
+    content: "\f07c";
     /* fa-folder-open-o */
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
     font-size: 1.5em;
 }
 
  td.details-control:before  {
     content: "\f0a4";
-    font-family: FontAwesome;
+    font-family:'Font Awesome 5 Free';
     font-size: 1.5em;
 }
 
 td.shown.details-control:before {
     content: "\f0a6";
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
     font-size: 1.5em;
 }
 
@@ -710,7 +710,7 @@ table.dataTable thead th.sorting_desc:after {
     top: 12px;
     right: 8px;
     display: block;
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
 }
 
 table.dataTable thead th.sorting:after {
@@ -755,7 +755,7 @@ div.dataTables_paginate a.previous:before {
     top: 8px;
     left: 10px;
     display: block;
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
 }
 
 div.dataTables_paginate a.next:after,
@@ -764,7 +764,7 @@ div.dataTables_paginate a.last:after {
     top: 8px;
     right: 10px;
     display: block;
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
 }
 
 div.dataTables_paginate a.first:before {
