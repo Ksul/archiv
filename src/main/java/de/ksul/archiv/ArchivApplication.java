@@ -2,6 +2,7 @@ package de.ksul.archiv;
 
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 
@@ -26,8 +27,8 @@ public class ArchivApplication {
 						" / ____ \\| | | (__| | | | |\\ V /\n" +
 						"/_/    \\_\\_|  \\___|_| |_|_| \\_/\n" +
 						"================================\n" +
-						"${info.app.name}:${info.version}:${info.build.date}\n" +
-						"Spring Boot:${spring-boot.version}");
+						"Version:" +environment.getProperty("info.version") + ":" + environment.getProperty("info.build.date") + "\n" +
+						"Spring Boot:" + SpringBootVersion.getVersion());
 			}
 		});
 		app.run( args);

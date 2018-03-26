@@ -43,14 +43,14 @@ module.exports = function(config) {
           // source files, that you wanna generate coverage for
           // do not include tests or libraries
           // (these files will be instrumented by Istanbul)
-          'src/main/resources/static/js/*.js': ['coverage']
+          //'src/main/resources/static/js/*.js': ['coverage']
       },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-      reporters: ['progress', 'coverage'],
+      reporters: ['progress'],
 
 
     // web server port
