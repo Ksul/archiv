@@ -3519,14 +3519,14 @@ function createAlfrescoMenus() {
         menuData: {
             alfrescoAnsicht: {
                 title: "Ansicht",
-                className: "fa fa-file-text-o fa-1x",
+                className: "far fa-file-alt fa-1x",
                 alfrescoViewModeMenuNormal: {
                     title: "Normal",
-                    className: "fa fa-file-text-o fa-1x",
+                    className: "far fa-file-alt fa-1x",
                     action: function () {
                         try {
                             alfrescoTabelle.settings().init().iconView = false;
-                            alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-file-text-o fa-1x');
+                            alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'far fa-file fa-1x');
                             alfrescoViewModeMenu.children('li:first').superfish('hide');
                             alfrescoTabelle.column(0).visible(true);
                             alfrescoTabelle.column(1).visible(true);
@@ -3538,11 +3538,11 @@ function createAlfrescoMenus() {
                 },
                 alfrescoViewModeMenuIcon: {
                     title: "Icons",
-                    className: "fa fa-photo fa-1x",
+                    className: "far fa-image fa-1x",
                     action: function () {
                         try {
                             alfrescoTabelle.settings().init().iconView = true;
-                            alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-photo fa-1x');
+                            alfrescoViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'far fa-image fa-1x');
                             alfrescoViewModeMenu.children('li:first').superfish('hide');
                             alfrescoTabelle.column(0).visible(false);
                             alfrescoTabelle.column(1).visible(false);
@@ -3652,10 +3652,10 @@ function createSearchMenus(){
         menuData: {
             searchAnsicht: {
                 title: "Ansicht",
-                className: "fa fa-file-text-o fa-1x",
+                className: "far fa-file-alt fa-1x",
                 searchViewModeMenuNormal: {
                     title: "Normal",
-                    className: "fa fa-file-text-o fa-1x",
+                    className: "far fa-file-alt fa-1x",
                     action: function () {
                         try {
                             alfrescoSearchTabelle.settings().init().iconView = false;
@@ -3675,7 +3675,7 @@ function createSearchMenus(){
                     action: function () {
                         try {
                             alfrescoSearchTabelle.settings().init().iconView = true;
-                            searchViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'fa fa-photo fa-1x');
+                            searchViewModeMenu.get(0).children[0].children[0].setAttribute('class', 'far fa-image fa-1x');
                             searchViewModeMenu.children('li:first').superfish('hide');
                             alfrescoSearchTabelle.column(0).visible(false);
                             alfrescoSearchTabelle.column(1).visible(false);
