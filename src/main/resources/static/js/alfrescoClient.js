@@ -904,26 +904,11 @@ function loadAlfrescoFolderTable() {
                         }
                         else {
                             alfrescoFolderActionMenu.superfish('enable','alfrescoFolderAuswahl');
+                            alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
                             alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
                             alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
-                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlRevert');
-                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlNone');
-                            if (// der zu verschiebene Ordner darf nicht der ArchivRootFolder sein
-                                obj.data.objectID !== archivFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Dokumenten Folder sein
-                                obj.data.objectID !== documentFolderId &&
-                                // der zu verschiebene Ordner darf nicht derFehler Folder sein
-                                obj.data.objectID !== fehlerFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Inbox Folder sein
-                                obj.data.objectID !== inboxFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Unknown Folder sein
-                                obj.data.objectID !== unknownFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Doppelte Folder sein
-                                obj.data.objectID !== doubleFolderId ) {
-                                alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionCreate');
-                            } else {
-                                alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
-                            }
+                            alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlRevert');
+                            alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlNone');
                         }
                         var tree = $.jstree.reference('#tree');
                         var parent = tree.get_node(obj.parent);
@@ -1059,21 +1044,48 @@ function loadAlfrescoFolderTable() {
                     }
                 }
             }
-        }).on( 'select', function ( e, dt, type, indexes ) {
-            if ( type === 'row' ) {
-                alfrescoFolderActionMenu.superfish('enable','alfrescoFolderActionMove');
-                alfrescoFolderActionMenu.superfish('enable','alfrescoFolderActionDelete');
-                alfrescoFolderSelectMenu.superfish('enable','alfrescoFolderAuswahlRevert');
-                alfrescoFolderSelectMenu.superfish('enable','alfrescoFolderAuswahlNone');
-            }
-        } ).on( 'deselect', function ( e, dt, type, indexes ) {
-            if ( type === 'row' ) {
-                if( alfrescoFolderTabelle.rows( { selected: true }).length <= 1 ) {
-                    alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
-                    alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
-                    alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlRevert');
-                    alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlNone');
+        }).on('select', function (e, dt, type, indexes) {
+            try {
+                if (type === 'row') {
+                    if (
+                    // der Ordner darf nicht der ArchivRootFolder sein
+                    dt.data().objectID !== archivFolderId &&
+                    // der Ordner darf nicht der Fehler Folder sein
+                    dt.data().objectID !== fehlerFolderId &&
+                    // der Ordner darf nicht der Inbox Folder sein
+                    dt.data().objectID !== inboxFolderId &&
+                    // der Ordner darf nicht der Unknown Folder sein
+                    dt.data().objectID !== unknownFolderId &&
+                    // der Ordner darf nicht der Doppelte Folder sein
+                    dt.data().objectID !== doubleFolderId) {
+                        alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionCreate');
+                        if (
+                        // der Ordner darf nicht der Dokumenten Folder sein
+                        dt.data().objectID !== documentFolderId
+                        ) {
+                            alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionMove');
+                            alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionDelete');
+                        }
+                    }
+                    alfrescoFolderSelectMenu.superfish('enable', 'alfrescoFolderAuswahlRevert');
+                    alfrescoFolderSelectMenu.superfish('enable', 'alfrescoFolderAuswahlNone');
                 }
+            } catch (e) {
+                errorHandler(e);
+            }
+        }).on( 'deselect', function ( e, dt, type, indexes ) {
+            try {
+                if (type === 'row') {
+                    if (alfrescoFolderTabelle.rows({selected: true}).length <= 1) {
+                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
+                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
+                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
+                        alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlRevert');
+                        alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlNone');
+                    }
+                }
+            } catch (e) {
+                errorHandler(e);
             }
         } );
 
@@ -2181,7 +2193,8 @@ function handleAlfrescoFolderImageClicks() {
     $(document).on("click", ".folderCreate", function () {
         try {
             var tr = $(this).closest('tr');
-            startFolderDialog(alfrescoFolderTabelle.row(tr).data(), "web-create", true);
+            var data = alfrescoFolderTabelle.row(tr).data();
+            startFolderDialog(data[0], "web-create", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -2189,7 +2202,8 @@ function handleAlfrescoFolderImageClicks() {
     $(document).on("click", ".folderRemove", function () {
         try {
             var tr = $(this).closest('tr');
-            startFolderDialog(alfrescoFolderTabelle.row(tr).data(), "web-display", true);
+            var data = alfrescoFolderTabelle.row(tr).data();
+            startFolderDialog(data[0], "web-display", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -2197,7 +2211,8 @@ function handleAlfrescoFolderImageClicks() {
     $(document).on("click", ".folderEdit", function () {
         try {
             var tr = $(this).closest('tr');
-            startFolderDialog(alfrescoFolderTabelle.row(tr).data(), "web-edit", true);
+            var data = alfrescoFolderTabelle.row(tr).data();
+            startFolderDialog(data[0], "web-edit", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -3381,6 +3396,7 @@ function checkAndBuidAlfrescoEnvironment() {
  */
 function initApplication() {
     var erg;
+    Logger.setLevel(Level.WARN);
     try {
         erg = executeService({"name": "isConnected", "ignoreError": true});
         if (erg.success && erg.data) {
@@ -3610,7 +3626,7 @@ function createAlfrescoFolderMenus() {
                     action: function () {
                         try {
                             var data = alfrescoFolderTabelle.rows({selected: true}).data();
-                            startFolderDialog(data, "web-create", true);
+                            startFolderDialog(data[0], "web-create", true);
                         } catch (e) {
                             errorHandler(e);
                         }
