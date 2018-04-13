@@ -22,7 +22,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     private TreeNode<T> parent;
     Map<String, TreeNode<T>> children;
 
-    public boolean isRoot() {
+    private boolean isRoot() {
         return parent == null;
     }
 
@@ -32,7 +32,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
     private List<TreeNode<T>> elementsIndex;
 
-    public TreeNode(String id, String name, T data) {
+    TreeNode(String id, String name, T data) {
         this.id = id;
         this.name = name;
         this.path ="/";
@@ -42,7 +42,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.elementsIndex.add(this);
     }
 
-    public TreeNode(String id, String name,  T data, ContentStream contentStream) {
+    TreeNode(String id, String name,  T data, ContentStream contentStream) {
         this.id = id;
         this.name = name;
         this.path ="/";
@@ -57,7 +57,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         return data;
     }
 
-    public ContentStream getContentStream() {
+    ContentStream getContentStream() {
         return contentStream;
     }
 
@@ -71,11 +71,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
     public String getId() { return id;}
 
-    public TreeNode<T> getParent() {
+    TreeNode<T> getParent() {
         return parent;
     }
+    
 
-    public TreeNode<T> addNode(String id, String name, T child, ContentStream contentStream) {
+    TreeNode<T> addNode(String id, String name, T child, ContentStream contentStream) {
         TreeNode<T> childNode = new TreeNode<T>(id, name, child, contentStream);
         childNode.parent = this;
         this.children.put(name, childNode);
@@ -87,15 +88,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
             parentNode = parentNode.parent;
         }
         childNode.path = pfad.toString();
-        this.registerChildForSearch(childNode);
+        this.registerChild(childNode);
         return childNode;
     }
 
-    public void removeNode() {
-        deRegisterChildForSearch(this);
+    void removeNode() {
+        if (this.parent!= null)
+            this.getParent().children.remove(this.name);
+        deRegisterChild(this);
     }
 
-    public TreeNode<T> moveNode(TreeNode<T> newParent) {
+    TreeNode<T> moveNode(TreeNode<T> newParent) {
         this.parent = newParent;
         newParent.children.put(name, this);
         StringBuilder pfad = new StringBuilder(name);
@@ -106,35 +109,35 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
             parentNode = parentNode.parent;
         }
         this.path = pfad.toString();
-        deRegisterChildForSearch(this);
-        newParent.registerChildForSearch(this);
+        deRegisterChild(this);
+        newParent.registerChild(this);
         return this;
     }
 
-    public void updateNode(T child) {
+    void updateNode(T child) {
         this.data = child;
     }
 
-    public int getLevel() {
+    int getLevel() {
         if (this.isRoot())
             return 0;
         else
             return parent.getLevel() + 1;
     }
 
-    private void registerChildForSearch(TreeNode<T> node) {
+    private void registerChild(TreeNode<T> node) {
         elementsIndex.add(node);
         if (parent != null)
-            parent.registerChildForSearch(node);
+            parent.registerChild(node);
     }
 
-    private void deRegisterChildForSearch(TreeNode<T> node) {
+    private void deRegisterChild(TreeNode<T> node) {
         elementsIndex.remove(node);
         if (parent != null)
-            parent.deRegisterChildForSearch(node);
+            parent.deRegisterChild(node);
     }
 
-    public TreeNode<T> findTreeNodeForId (String id) {
+    TreeNode<T> findTreeNodeForId(String id) {
         if (id == null)
             throw new RuntimeException("Id must be set!");
         for (TreeNode<T> element : this.elementsIndex) {
@@ -146,7 +149,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
 
-    public TreeNode<T> findTreeNodeForPath (String path) {
+    TreeNode<T> findTreeNodeForPath (String path) {
         if (path == null)
             throw new RuntimeException("Path must be set!");
         for (TreeNode<T> element : this.elementsIndex) {
@@ -157,7 +160,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         return null;
     }
 
-    public boolean containsPath( String path){
+    boolean containsPath( String path){
         for (TreeNode<T> element : this.elementsIndex) {
             if (element.path.matches(path)){
                 return true;
@@ -166,7 +169,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         return false;
     }
 
-    public boolean containsId( String id){
+    boolean containsId( String id){
         for (TreeNode<T> element : this.elementsIndex) {
             if (element.id.matches(id)){
                 return true;
@@ -219,8 +222,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
     @Override
     public Iterator<TreeNode<T>> iterator() {
-        TreeNodeIter<T> iter = new TreeNodeIter<T>(this);
-        return iter;
+        return new TreeNodeIter<T>(this);
     }
 
 }
