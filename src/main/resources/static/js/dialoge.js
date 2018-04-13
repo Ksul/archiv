@@ -589,7 +589,7 @@ function startFolderDialog(data, modus, modal) {
                 }
             }
         };
-        var additionalButton =[{"id":".alpaca-form-button-delete", "function": deleteFolder }];
+        var additionalButton =[{"id":".alpaca-form-button-delete", "function": 'deleteFolder(data);' }];
         startDialog(modus === "web-display" ? "Ordner löschen?" : "Ordner Eigenschaften", folderDialogSettings, 460, modal, additionalButton);
     } catch (e) {
         errorHandler(e);

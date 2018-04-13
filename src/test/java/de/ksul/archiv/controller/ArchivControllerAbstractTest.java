@@ -18,10 +18,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -368,7 +365,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         Map<String, Object> data = (Map) obj.getData();
         assertThat(data, notNullValue());
         assertThat((String) data.get("name"), Matchers.equalToIgnoringCase("TestFolder"));
-        obj = services.deleteFolder(new ObjectByIdRequest((String) data.get("objectId")));
+        obj = services.deleteFolder(new ObjectByIdsRequest(new String[] {(String) data.get("objectId")}));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());

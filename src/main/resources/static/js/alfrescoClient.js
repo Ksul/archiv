@@ -3650,7 +3650,22 @@ function createAlfrescoFolderMenus() {
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        alertt('Noch nicht implementiert!');
+                        var txt = "";
+                        var selected = alfrescoFolderTabelle.rows({selected: true}).data();
+                        for ( var i = 0; i < selected.length; i++) {
+                            txt =  txt + "<br>" + selected[i].name;
+                        }
+                        alertify.confirm("Ordner löschen...", "Die folgenden Ordner werden gelöscht: " + txt,
+                            function() {
+                                var data = [];
+                                for ( var i = 0; i < selected.length; i++) {
+                                    data.push(selected[i]);
+                                }
+                                deleteFolder(data);
+                            },
+                            function(){
+
+                            });
                     }
                 }
             }

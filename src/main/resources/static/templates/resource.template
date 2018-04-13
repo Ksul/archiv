@@ -13,6 +13,7 @@
 ./css/style.css
 ./css/ArchivLayout.css
 ./css/simplegrid.css
+./css/alertify.css
 
 
 ./js/jquery/jquery-1.12.1.js
@@ -22,6 +23,7 @@
 ./js/ace/mode-xml.js
 ./js/ace/mode-javascript.js
 ./js/ace/mode-text.js
+./js/alertify/alertify.js
 ./js/alfrescoClient.js
 ./js/dialoge.js
 ./js/util.js
