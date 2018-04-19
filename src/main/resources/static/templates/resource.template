@@ -2,6 +2,7 @@
 ./css/bootstrap-datetimepicker.css
 ./css/font-awesome.css
 ./css/dataTables.css
+./css/alertify.css
 ./css/Base.css
 ./css/BreadCrumb.css
 ./css/select.jqueryui.css
@@ -11,12 +12,12 @@
 ./css/jquery.wysiwyg.css
 ./css/alpaca.css
 ./css/style.css
-./css/ArchivLayout.css
 ./css/simplegrid.css
-./css/alertify.css
+./css/ArchivLayout.css
 
 
 ./js/jquery/jquery-1.12.1.js
+./js/bootstrap/bootstrap.js
 ./js/ace/ace.js
 ./js/ace/theme-chrome.js
 ./js/ace/theme-eclipse.js

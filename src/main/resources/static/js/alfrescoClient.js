@@ -2194,7 +2194,7 @@ function handleAlfrescoFolderImageClicks() {
         try {
             var tr = $(this).closest('tr');
             var data = alfrescoFolderTabelle.row(tr).data();
-            startFolderDialog(data[0], "web-create", true);
+            startFolderDialog(data[0], "bootstrap-create", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -3655,7 +3655,7 @@ function createAlfrescoFolderMenus() {
                         for ( var i = 0; i < selected.length; i++) {
                             txt =  txt + "<br>" + selected[i].name;
                         }
-                        alertify.confirm("Ordner löschen...", "Die folgenden Ordner werden gelöscht: " + txt,
+                        alertify.confirm("Ordner löschen", "Die folgenden Ordner werden gelöscht: " + txt,
                             function() {
                                 var data = [];
                                 for ( var i = 0; i < selected.length; i++) {
