@@ -626,22 +626,40 @@ function editDocument(input, id) {
 
 /**
  * löscht ein Dokument
+ * @param data Entweder ein Data Objekt mit den zu löschenden Daten oder ein Array von diesen
  */
-function deleteDocument() {
+function deleteDocument(data) {
     try {
-        var origData = $("#dialogBox").alpaca().data;
+
         var done = function (json) {
+            function manage(data) {
+                var row = alfrescoTabelle.row('#' + data.objectID);
+                if (row && row.length)
+                    row.remove().draw(false);
+                if (alfrescoSearchTabelle) {
+                    row = alfrescoSearchTabelle.row('#' + data.objectID);
+                    if (row && row.length)
+                        row.remove().draw(false);
+                }
+            }
+
             if (json.success) {
-                var row = alfrescoTabelle.row('#' + origData.objectID);
-                if (row && row.length)
-                    row.remove().draw(false);
-                row = alfrescoSearchTabelle.row('#' + origData.objectID);
-                if (row && row.length)
-                    row.remove().draw(false);
+                if (data instanceof Array) {
+                    for ( var i = 0; i < data.length; i++)
+                        manage(data[i]);
+                } else
+                    manage(data);
             }
         };
-        var erg = executeService({"name": "deleteDocument", "callback": done, "errorMessage": "Dokument konnte nicht gelöscht werden!"}, [
-            {"name": "documentId", "value": origData.objectID}
+        var ids = [];
+        if (data instanceof Array) {
+            for ( var i = 0; i < data.length; i++)
+                ids.push(data[i].objectID);
+        } else
+            ids.push(data.objectID);
+
+        var erg = executeService({"name": "deleteDocument", "callback": done, "errorMessage": "Dokument(e) konnte nicht gelöscht werden!"}, [
+            {"name": "documentId", "value": ids}
         ]);
     } catch (e) {
         errorHandler(e);

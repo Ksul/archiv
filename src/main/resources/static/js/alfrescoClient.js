@@ -3524,7 +3524,22 @@ function createAlfrescoMenus() {
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        alertt('Noch nicht implementiert!');
+                        var txt = "";
+                        var selected = alfrescoTabelle.rows({selected: true}).data();
+                        for ( var i = 0; i < selected.length; i++) {
+                            txt =  txt + "<br>" + selected[i].name + (selected[i].title ? " [" + selected[i].title + "]" : "");
+                        }
+                        alertify.confirm("Dokumente löschen", "Die folgenden Dokuemente werden gelöscht: " + txt,
+                            function() {
+                        var data = [];
+                        for ( var i = 0; i < selected.length; i++) {
+                            data.push(selected[i]);
+                        }
+                        deleteDocument(data);
+                    },
+                    function(){
+
+                    });
                     }
                 }
             }

@@ -519,21 +519,24 @@ public class ArchivController {
      */
     @RequestMapping(value = "/deleteDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse deleteDocument(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
+    RestResponse deleteDocument(@RequestBody @Valid final ObjectByIdsRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
         CmisObject document;
-        document = con.getNodeById(model.getDocumentId());
-        if (document != null && document instanceof Document) {
-            if (((Document) document).isVersionSeriesCheckedOut())
-                ((Document) document).cancelCheckOut();
-            document.delete(true);
-            obj.setSuccess(true);
-            obj.setData("");
-        } else {
-            obj.setSuccess(false);
-            obj.setData(document == null ? "Das Document ist nicht vorhanden!" : "Das Document ist nicht vom Typ Document!");
+        for (String id : model.getDocumentId()) {
+            document = con.getNodeById(id);
+            if (document != null && document instanceof Document) {
+                if (((Document) document).isVersionSeriesCheckedOut())
+                    ((Document) document).cancelCheckOut();
+                document.delete(true);
+                obj.setSuccess(true);
+                obj.setData("");
+            } else {
+                obj.setSuccess(false);
+                obj.setData(document == null ? "Das Dokument ist nicht vorhanden!" : "Das Dokument ist nicht vom Typ Dokument!");
+                return obj;
+            }
         }
 
         return obj;
