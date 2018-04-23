@@ -6,7 +6,7 @@
 function startSettingsDialog(modal) {
     try {
 
-        var data =  {
+        const data =  {
                 server: getSettings("server"),
                 binding: getSettings("binding"),
                 user: getSettings("user"),
@@ -17,7 +17,7 @@ function startSettingsDialog(modal) {
             data.store = false;
 
         // Einstellungen für den Settings Dialog
-        var dialogSettings = { id: "settingsDialog",
+        const dialogSettings = { id: "settingsDialog",
             schema: {
                 type: "object",
                 properties: {
@@ -116,19 +116,19 @@ function startSettingsDialog(modal) {
 
             postRender: function (renderedField) {
                 try {
-                    var server = renderedField.childrenByPropertyId["server"];
-                    var binding = renderedField.childrenByPropertyId["binding"];
-                    binding.subscribe(server, function (val) {
+                    const server = renderedField.childrenByPropertyId["server"];
+                    const binding = renderedField.childrenByPropertyId["binding"];
+                    binding.subscribe(server, function () {
                         if (!this.getValue().trim().length)
                             this.setValue(server.data + "api/-default-/public/cmis/versions/1.0/atom");
                         this.refresh();
                     });
-                    var form = renderedField.form;
+                    const form = renderedField.form;
                     if (form) {
                         form.registerSubmitHandler(function () {
                             if (form.isFormValid()) {
                                 try {
-                                    var input = $("#dialogBox").alpaca().getValue();
+                                    const input = $("#dialogBox").alpaca().getValue();
                                     if (!input.server.endsWith("/"))
                                         input.server = input.server + "/";
                                     settings = {
@@ -190,7 +190,7 @@ function startDocumentDialog(data, modus, modal) {
             data.person = "Klaus";
 
         // Einstellungen für den Dokumentendialog
-        var dialogDocumentDetailsSettings = { id: "detailDialog",
+        const dialogDocumentDetailsSettings = { id: "detailDialog",
             schema: {
                 type: "object",
                 title: function() {
@@ -282,6 +282,7 @@ function startDocumentDialog(data, modus, modal) {
                 fields: {
                     title: {
                         size: 30,
+                        focus: true,
                         typeahead: {
                             config: {
                                 autoselect: true,
@@ -291,10 +292,10 @@ function startDocumentDialog(data, modus, modal) {
                             },
                             datasets: {
                                 type: "local",
-                                source: function(query) {
-                                    var results = [];
-                                    var json = executeService({name: "getTitles", ignoreError: true});
-                                    for (var i = 0; i < json.data.length; i++) {
+                                source: function() {
+                                    const results = [];
+                                    const json = executeService({name: "getTitles", ignoreError: true});
+                                    for (let i = 0; i < json.data.length; i++) {
                                         results.push({
                                             value: json.data[i]
                                         });
@@ -400,17 +401,16 @@ function startDocumentDialog(data, modus, modal) {
             data: data,
             ui: "jquery-ui",
             postRender: function (renderedField) {
-                var form = renderedField.form;
+                const form = renderedField.form;
                 if (form) {
                     form.registerSubmitHandler(function () {
                         if (form.isFormValid()) {
                             try {
-                                var erg;
-                                var alpaca = $("#dialogBox").alpaca();
+                                const alpaca = $("#dialogBox").alpaca();
                                 // Werte übertragen
-                                var input = alpaca.getValue();
+                                const input = alpaca.getValue();
                                 // die original Daten sichern.
-                                var origData = alpaca.data;
+                                const origData = alpaca.data;
                                 if (modus === "web-edit") {
                                     // Konvertierung
                                     if (input.amountDisplay && typeof input.amountDisplay === "string")
@@ -440,7 +440,7 @@ function startDocumentDialog(data, modus, modal) {
                 }
             }
         };
-        var additionalButton =[{id:".alpaca-form-button-delete", function: deleteDocument }];
+        const additionalButton =[{id:".alpaca-form-button-delete", function: deleteDocument }];
         startDialog(modus === "web-display" ? "Dokument löschen?" : "Dokument Eigenschaften", dialogDocumentDetailsSettings, 450, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
@@ -460,7 +460,7 @@ function startFolderDialog(data, modus, modal) {
     try {
 
         // Einstellungen für den Folder Dialog
-        var folderDialogSettings = { id: "detailDialog",
+        const folderDialogSettings = { id: "detailDialog",
             schema: {
                 type: "object",
                 properties: {
@@ -554,17 +554,16 @@ function startFolderDialog(data, modus, modal) {
             ui: "bootstrap",
             postRender: function (renderedField) {
 
-                var form = renderedField.form;
+                const form = renderedField.form;
                 if (form) {
                     form.registerSubmitHandler(function () {
                         if (form.isFormValid()) {
-                            var erg;
                             try {
-                                var alpaca = $("#dialogBox").alpaca();
+                                const alpaca = $("#dialogBox").alpaca();
                                 // Werte übertragen
-                                var input = alpaca.getValue();
+                                const input = alpaca.getValue();
                                 // die original Daten sichern.
-                                var origData = alpaca.data;
+                                const origData = alpaca.data;
                                 if (modus === "web-create") {
                                     // ein neuer Ordner wird erstellt
                                     createFolder(input, origData);
@@ -575,7 +574,7 @@ function startFolderDialog(data, modus, modal) {
                                     if ((input.name && input.name !== origData.name) ||
                                         (input.title && input.title !== origData.title) ||
                                         (input.description && input.description !== origData.description)) {
-                                        erg = editFolder(input, origData.objectID);
+                                        const erg = editFolder(input, origData.objectID);
                                         if (!erg.success)
                                             message("Fehler", erg.error);
                                     }
@@ -589,7 +588,7 @@ function startFolderDialog(data, modus, modal) {
                 }
             }
         };
-        var additionalButton =[{id:".alpaca-form-button-delete", function: 'deleteFolder(data);' }];
+        const additionalButton = [{id: ".alpaca-form-button-delete", function: deleteFolder}];
         startDialog(modus === "web-display" ? "Ordner löschen?" : "Ordner Eigenschaften", folderDialogSettings, 460, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
@@ -601,7 +600,7 @@ function startFolderDialog(data, modus, modal) {
  */
 function startCommentsDialog(comments) {
     try {
-        var data = comments.items;
+        const data = comments.items;
 
         $dialog = $('<div> <table cellpadding="0" cellspacing="0" border="0" class="display" id="custTabelle"></table> </div>').dialog({
             autoOpen: false,
@@ -675,9 +674,9 @@ function startCommentsDialog(comments) {
  */
 function startUploadDialog() {
     try {
-        var data = comments.items;
+        const data = comments.items;
 
-        $dialog = $('<div> <input type="file" multiple="" name="files[]" class="dnd-file-selection-button"> </div>').dialog({
+        const $dialog = $('<div> <input type="file" multiple="" name="files[]" class="dnd-file-selection-button"> </div>').dialog({
             autoOpen: false,
             title: "Kommentare",
             modal: true,
@@ -757,7 +756,7 @@ function startMoveDialog(rowData, table, typ) {
         if (!typ)
             typ = "Dokumente";
         
-        var moveDialogSettings = { id: "moveDialog",
+        const moveDialogSettings = { id: "moveDialog",
             schema: {
                 type: "object",
                 properties: {
@@ -792,9 +791,9 @@ function startMoveDialog(rowData, table, typ) {
             },
             ui: "jquery-ui",
             postRender: function (renderedField) {
-                var form = renderedField.form;
+                const form = renderedField.form;
                 form.disableSubmitButton();
-                var dialogTree = $("#dialogTree").jstree({
+                $("#dialogTree").jstree({
                     core: {
                         data: function (node, aFunction) {
                             try {
@@ -875,15 +874,15 @@ function startMoveDialog(rowData, table, typ) {
                         if (form.isFormValid()) {
 
                             try {
-                                var dialogTree = $.jstree.reference('#dialogTree');
-                                var nodeIds = dialogTree.get_selected();
+                                const dialogTree = $.jstree.reference('#dialogTree');
+                                const nodeIds = dialogTree.get_selected();
                                 // über alle selektierten Zeilen iterieren
-                                for (var index = 0; index < rowData.length; ++index) {
-                                     var done = function (json) {
+                                for (let index = 0; index < rowData.length; ++index) {
+                                    const done = function (json) {
                                         if (json.success) {
-                                            var newData = json.data;
-                                            var source = json.source;
-                                            var target = json.target;
+                                            const newData = json.data;
+                                            const source = json.source;
+                                            const target = json.target;
                                             Logger.log(Level.INFO, typ + " " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
                                             // nur wenn die Tabelle angeben ist werden die Zeilen gelöscht. Bei der Tabelle mit den Suchergebnissen
                                             // werden keine Einträge gelöscht und deshalb sollte die Tabelle dort auch nicht für diese Funktion mit
@@ -895,7 +894,7 @@ function startMoveDialog(rowData, table, typ) {
                                         }
                                     };
                                     // Verschieben....
-                                    var json = executeService({
+                                    executeService({
                                         name: "moveNode",
                                         callback: done,
                                         errorMessage: typ + " konnte nicht verschoben werden:"
@@ -929,7 +928,7 @@ function startMoveDialog(rowData, table, typ) {
  * schliesst den Dialog
  */
 function closeDialog() {
-    var dialogBox = $('#dialogBox');
+    const dialogBox = $('#dialogBox');
     if (dialogBox) {
         dialogBox.dialog("close");
         dialogBox.remove();
@@ -961,7 +960,7 @@ function startDialog(title, dialogSettings, width, modal, callbacks) {
             collision: "fit",
             // Ensure the titlebar is always visible
             using: function (pos) {
-                var topOffset = $(this).css(pos).offset().top;
+                const topOffset = $(this).css(pos).offset().top;
                 if (topOffset < 0) {
                     $(this).css("top", pos.top - topOffset);
                 }
@@ -974,10 +973,10 @@ function startDialog(title, dialogSettings, width, modal, callbacks) {
                 closeDialog();
             });
             if (callbacks) {
-                for (var i = 0; i < callbacks.length; i++) {
-                    var obj = callbacks[i];
+                for (let i = 0; i < callbacks.length; i++) {
+                    const obj = callbacks[i];
                     $(obj.id).button().click(function () {
-                        obj.function();
+                        obj.function($("#dialogBox").alpaca().data);
                         closeDialog();
                     });
                 }

@@ -3395,7 +3395,7 @@ function checkAndBuidAlfrescoEnvironment() {
  * initialisiert die Anwendung
  */
 function initApplication() {
-    var erg;
+    let erg;
     Logger.setLevel(Level.WARN);
     try {
         erg = executeService({"name": "isConnected", "ignoreError": true});
@@ -3413,7 +3413,7 @@ function initApplication() {
         }
         // Settings schon vorhanden?
         if (!getSettings("server") || !getSettings("binding") || !getSettings("user") || !getSettings("password")) {
-            var cookie = $.cookie("settings");
+            const cookie = $.cookie("settings");
             // prüfen, ob ein Cookie vorhanden ist
             if (cookie) {
                 // Cookie ist vorhanden, also die Daten aus diesem verwenden
@@ -3463,7 +3463,7 @@ function createAlfrescoMenus() {
                     className: "fa fa-refresh fa-1x",
                     disabled: true,
                     action: function () {
-                        var rows = alfrescoTabelle.rows({selected: true})[0];
+                        const rows = alfrescoTabelle.rows({selected: true})[0];
                         alfrescoTabelle.rows().select();
                         alfrescoTabelle.rows(rows).deselect();
                     }
@@ -3493,8 +3493,8 @@ function createAlfrescoMenus() {
                         try {
                             evt.stopPropagation();
                             evt.preventDefault();
-                            var files = evt.target.files;
-                            var data = {
+                            const files = evt.target.files;
+                            const data = {
                                 "name": files[0].name,
                                 "title": files[0].name,
                                 "file": files[0],
@@ -3512,7 +3512,7 @@ function createAlfrescoMenus() {
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoTabelle.rows({selected: true}).data();
+                            const data = alfrescoTabelle.rows({selected: true}).data();
                             startMoveDialog(data, alfrescoTabelle, "Dokumente");
                         } catch (e) {
                             errorHandler(e);
@@ -3524,22 +3524,24 @@ function createAlfrescoMenus() {
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        var txt = "";
-                        var selected = alfrescoTabelle.rows({selected: true}).data();
-                        for ( var i = 0; i < selected.length; i++) {
-                            txt =  txt + "<br>" + selected[i].name + (selected[i].title ? " [" + selected[i].title + "]" : "");
+                        let txt = "";
+                        const selected = alfrescoTabelle.rows({selected: true}).data();
+                        for (let i = 0; i < selected.length; i++) {
+                            txt = txt + "<br>" + selected[i].name + (selected[i].title ? " [" + selected[i].title + "]" : "");
                         }
-                        alertify.confirm("Dokumente löschen", "Die folgenden Dokuemente werden gelöscht: " + txt,
-                            function() {
-                        var data = [];
-                        for ( var i = 0; i < selected.length; i++) {
-                            data.push(selected[i]);
-                        }
-                        deleteDocument(data);
-                    },
-                    function(){
+                        const titel = (selected.length > 1 ? "Dokumente löschen" : "Dokument löschen");
+                        const text = (selected.length > 1 ? "Die folgenden Dokumente werden gelöscht:"  : "Das folgende Dokument wird gelöscht:") + txt;
+                        alertify.confirm(titel, text,
+                            function () {
+                                let data = [];
+                                for (let i = 0; i < selected.length; i++) {
+                                    data.push(selected[i]);
+                                }
+                                deleteDocument(data);
+                            },
+                            function () {
 
-                    });
+                            });
                     }
                 }
             }
@@ -3612,7 +3614,7 @@ function createAlfrescoFolderMenus() {
                     className: "fa fa-refresh fa-1x",
                     disabled: true,
                     action: function () {
-                        var rows = alfrescoFolderTabelle.rows({selected: true})[0];
+                        const rows = alfrescoFolderTabelle.rows({selected: true})[0];
                         alfrescoFolderTabelle.rows().select();
                         alfrescoFolderTabelle.rows(rows).deselect();
                     }
@@ -3640,7 +3642,7 @@ function createAlfrescoFolderMenus() {
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoFolderTabelle.rows({selected: true}).data();
+                            const data = alfrescoFolderTabelle.rows({selected: true}).data();
                             startFolderDialog(data[0], "web-create", true);
                         } catch (e) {
                             errorHandler(e);
@@ -3653,7 +3655,7 @@ function createAlfrescoFolderMenus() {
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoFolderTabelle.rows({selected: true}).data();
+                            const data = alfrescoFolderTabelle.rows({selected: true}).data();
                             startMoveDialog(data, alfrescoFolderTabelle, "Ordner");
                         } catch (e) {
                             errorHandler(e);
@@ -3665,15 +3667,17 @@ function createAlfrescoFolderMenus() {
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        var txt = "";
-                        var selected = alfrescoFolderTabelle.rows({selected: true}).data();
-                        for ( var i = 0; i < selected.length; i++) {
+                        let txt = "";
+                        const selected = alfrescoFolderTabelle.rows({selected: true}).data();
+                        for ( let i = 0; i < selected.length; i++) {
                             txt =  txt + "<br>" + selected[i].name;
                         }
-                        alertify.confirm("Ordner löschen", "Die folgenden Ordner werden gelöscht: " + txt,
+                        const titel = "Ordner löschen";
+                        const text = (selected.length > 1 ? "Die folgenden Ordner werden gelöscht:"  : "Der folgende Ordner wird gelöscht:") + txt;
+                        alertify.confirm(titel, text,
                             function() {
-                                var data = [];
-                                for ( var i = 0; i < selected.length; i++) {
+                                let data = [];
+                                for ( let i = 0; i < selected.length; i++) {
                                     data.push(selected[i]);
                                 }
                                 deleteFolder(data);
@@ -3746,7 +3750,7 @@ function createSearchMenus(){
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoSearchTabelle.rows({selected: true}).data();
+                            const data = alfrescoSearchTabelle.rows({selected: true}).data();
                             startMoveDialog(data);
                         } catch (e) {
                             errorHandler(e);
@@ -3758,7 +3762,24 @@ function createSearchMenus(){
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        alertt('Noch nicht implementiert!');
+                        let txt = "";
+                        const selected = alfrescoSearchTabelle.rows({selected: true}).data();
+                        for (let i = 0; i < selected.length; i++) {
+                            txt = txt + "<br>" + selected[i].name + (selected[i].title ? " [" + selected[i].title + "]" : "");
+                        }
+                        const titel = (selected.length > 1 ? "Dokumente löschen" : "Dokument löschen");
+                        const text = (selected.length > 1 ? "Die folgenden Dokumente werden gelöscht:"  : "Das folgende Dokument wird gelöscht:") + txt;
+                        alertify.confirm(titel, text,
+                            function () {
+                                let data = [];
+                                for (let i = 0; i < selected.length; i++) {
+                                    data.push(selected[i]);
+                                }
+                                deleteDocument(data);
+                            },
+                            function () {
+
+                            });
                     }
                 }
             }
@@ -3781,7 +3802,7 @@ function createSearchMenus(){
                     className: "fa fa-refresh fa-1x",
                     disabled: true,
                     action: function () {
-                        var rows = alfrescoSearchTabelle.rows({selected: true})[0];
+                        const rows = alfrescoSearchTabelle.rows({selected: true})[0];
                         alfrescoSearchTabelle.rows().select();
                         alfrescoSearchTabelle.rows(rows).deselect();
                     }
