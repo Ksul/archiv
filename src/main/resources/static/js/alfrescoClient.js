@@ -904,26 +904,11 @@ function loadAlfrescoFolderTable() {
                         }
                         else {
                             alfrescoFolderActionMenu.superfish('enable','alfrescoFolderAuswahl');
+                            alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
                             alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
                             alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
-                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlRevert');
-                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlNone');
-                            if (// der zu verschiebene Ordner darf nicht der ArchivRootFolder sein
-                                obj.data.objectID !== archivFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Dokumenten Folder sein
-                                obj.data.objectID !== documentFolderId &&
-                                // der zu verschiebene Ordner darf nicht derFehler Folder sein
-                                obj.data.objectID !== fehlerFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Inbox Folder sein
-                                obj.data.objectID !== inboxFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Unknown Folder sein
-                                obj.data.objectID !== unknownFolderId &&
-                                // der zu verschiebene Ordner darf nicht der Doppelte Folder sein
-                                obj.data.objectID !== doubleFolderId ) {
-                                alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionCreate');
-                            } else {
-                                alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
-                            }
+                            alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlRevert');
+                            alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlNone');
                         }
                         var tree = $.jstree.reference('#tree');
                         var parent = tree.get_node(obj.parent);
@@ -1059,21 +1044,48 @@ function loadAlfrescoFolderTable() {
                     }
                 }
             }
-        }).on( 'select', function ( e, dt, type, indexes ) {
-            if ( type === 'row' ) {
-                alfrescoFolderActionMenu.superfish('enable','alfrescoFolderActionMove');
-                alfrescoFolderActionMenu.superfish('enable','alfrescoFolderActionDelete');
-                alfrescoFolderSelectMenu.superfish('enable','alfrescoFolderAuswahlRevert');
-                alfrescoFolderSelectMenu.superfish('enable','alfrescoFolderAuswahlNone');
-            }
-        } ).on( 'deselect', function ( e, dt, type, indexes ) {
-            if ( type === 'row' ) {
-                if( alfrescoFolderTabelle.rows( { selected: true }).length <= 1 ) {
-                    alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
-                    alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
-                    alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlRevert');
-                    alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahlNone');
+        }).on('select', function (e, dt, type, indexes) {
+            try {
+                if (type === 'row') {
+                    if (
+                    // der Ordner darf nicht der ArchivRootFolder sein
+                    dt.data().objectID !== archivFolderId &&
+                    // der Ordner darf nicht der Fehler Folder sein
+                    dt.data().objectID !== fehlerFolderId &&
+                    // der Ordner darf nicht der Inbox Folder sein
+                    dt.data().objectID !== inboxFolderId &&
+                    // der Ordner darf nicht der Unknown Folder sein
+                    dt.data().objectID !== unknownFolderId &&
+                    // der Ordner darf nicht der Doppelte Folder sein
+                    dt.data().objectID !== doubleFolderId) {
+                        alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionCreate');
+                        if (
+                        // der Ordner darf nicht der Dokumenten Folder sein
+                        dt.data().objectID !== documentFolderId
+                        ) {
+                            alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionMove');
+                            alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionDelete');
+                        }
+                    }
+                    alfrescoFolderSelectMenu.superfish('enable', 'alfrescoFolderAuswahlRevert');
+                    alfrescoFolderSelectMenu.superfish('enable', 'alfrescoFolderAuswahlNone');
                 }
+            } catch (e) {
+                errorHandler(e);
+            }
+        }).on( 'deselect', function ( e, dt, type, indexes ) {
+            try {
+                if (type === 'row') {
+                    if (alfrescoFolderTabelle.rows({selected: true}).length <= 1) {
+                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
+                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
+                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
+                        alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlRevert');
+                        alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlNone');
+                    }
+                }
+            } catch (e) {
+                errorHandler(e);
             }
         } );
 
@@ -2181,7 +2193,8 @@ function handleAlfrescoFolderImageClicks() {
     $(document).on("click", ".folderCreate", function () {
         try {
             var tr = $(this).closest('tr');
-            startFolderDialog(alfrescoFolderTabelle.row(tr).data(), "web-create", true);
+            var data = alfrescoFolderTabelle.row(tr).data();
+            startFolderDialog(data[0], "bootstrap-create", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -2189,7 +2202,8 @@ function handleAlfrescoFolderImageClicks() {
     $(document).on("click", ".folderRemove", function () {
         try {
             var tr = $(this).closest('tr');
-            startFolderDialog(alfrescoFolderTabelle.row(tr).data(), "web-display", true);
+            var data = alfrescoFolderTabelle.row(tr).data();
+            startFolderDialog(data[0], "web-display", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -2197,7 +2211,8 @@ function handleAlfrescoFolderImageClicks() {
     $(document).on("click", ".folderEdit", function () {
         try {
             var tr = $(this).closest('tr');
-            startFolderDialog(alfrescoFolderTabelle.row(tr).data(), "web-edit", true);
+            var data = alfrescoFolderTabelle.row(tr).data();
+            startFolderDialog(data[0], "web-edit", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -3380,7 +3395,8 @@ function checkAndBuidAlfrescoEnvironment() {
  * initialisiert die Anwendung
  */
 function initApplication() {
-    var erg;
+    let erg;
+    Logger.setLevel(Level.WARN);
     try {
         erg = executeService({"name": "isConnected", "ignoreError": true});
         if (erg.success && erg.data) {
@@ -3397,7 +3413,7 @@ function initApplication() {
         }
         // Settings schon vorhanden?
         if (!getSettings("server") || !getSettings("binding") || !getSettings("user") || !getSettings("password")) {
-            var cookie = $.cookie("settings");
+            const cookie = $.cookie("settings");
             // prüfen, ob ein Cookie vorhanden ist
             if (cookie) {
                 // Cookie ist vorhanden, also die Daten aus diesem verwenden
@@ -3447,7 +3463,7 @@ function createAlfrescoMenus() {
                     className: "fas fa-sync-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        var rows = alfrescoTabelle.rows({selected: true})[0];
+                        const rows = alfrescoTabelle.rows({selected: true})[0];
                         alfrescoTabelle.rows().select();
                         alfrescoTabelle.rows(rows).deselect();
                     }
@@ -3477,8 +3493,8 @@ function createAlfrescoMenus() {
                         try {
                             evt.stopPropagation();
                             evt.preventDefault();
-                            var files = evt.target.files;
-                            var data = {
+                            const files = evt.target.files;
+                            const data = {
                                 "name": files[0].name,
                                 "title": files[0].name,
                                 "file": files[0],
@@ -3496,7 +3512,7 @@ function createAlfrescoMenus() {
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoTabelle.rows({selected: true}).data();
+                            const data = alfrescoTabelle.rows({selected: true}).data();
                             startMoveDialog(data, alfrescoTabelle, "Dokumente");
                         } catch (e) {
                             errorHandler(e);
@@ -3508,7 +3524,24 @@ function createAlfrescoMenus() {
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        alertt('Noch nicht implementiert!');
+                        let txt = "";
+                        const selected = alfrescoTabelle.rows({selected: true}).data();
+                        for (let i = 0; i < selected.length; i++) {
+                            txt = txt + "<br>" + selected[i].name + (selected[i].title ? " [" + selected[i].title + "]" : "");
+                        }
+                        const titel = (selected.length > 1 ? "Dokumente löschen" : "Dokument löschen");
+                        const text = (selected.length > 1 ? "Die folgenden Dokumente werden gelöscht:"  : "Das folgende Dokument wird gelöscht:") + txt;
+                        alertify.confirm(titel, text,
+                            function () {
+                                let data = [];
+                                for (let i = 0; i < selected.length; i++) {
+                                    data.push(selected[i]);
+                                }
+                                deleteDocument(data);
+                            },
+                            function () {
+
+                            });
                     }
                 }
             }
@@ -3581,7 +3614,7 @@ function createAlfrescoFolderMenus() {
                     className: "fas fa-sync-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        var rows = alfrescoFolderTabelle.rows({selected: true})[0];
+                        const rows = alfrescoFolderTabelle.rows({selected: true})[0];
                         alfrescoFolderTabelle.rows().select();
                         alfrescoFolderTabelle.rows(rows).deselect();
                     }
@@ -3609,8 +3642,8 @@ function createAlfrescoFolderMenus() {
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoFolderTabelle.rows({selected: true}).data();
-                            startFolderDialog(data, "web-create", true);
+                            const data = alfrescoFolderTabelle.rows({selected: true}).data();
+                            startFolderDialog(data[0], "web-create", true);
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -3622,7 +3655,7 @@ function createAlfrescoFolderMenus() {
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoFolderTabelle.rows({selected: true}).data();
+                            const data = alfrescoFolderTabelle.rows({selected: true}).data();
                             startMoveDialog(data, alfrescoFolderTabelle, "Ordner");
                         } catch (e) {
                             errorHandler(e);
@@ -3634,7 +3667,24 @@ function createAlfrescoFolderMenus() {
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        alertt('Noch nicht implementiert!');
+                        let txt = "";
+                        const selected = alfrescoFolderTabelle.rows({selected: true}).data();
+                        for ( let i = 0; i < selected.length; i++) {
+                            txt =  txt + "<br>" + selected[i].name;
+                        }
+                        const titel = "Ordner löschen";
+                        const text = (selected.length > 1 ? "Die folgenden Ordner werden gelöscht:"  : "Der folgende Ordner wird gelöscht:") + txt;
+                        alertify.confirm(titel, text,
+                            function() {
+                                let data = [];
+                                for ( let i = 0; i < selected.length; i++) {
+                                    data.push(selected[i]);
+                                }
+                                deleteFolder(data);
+                            },
+                            function(){
+
+                            });
                     }
                 }
             }
@@ -3700,7 +3750,7 @@ function createSearchMenus(){
                     disabled: true,
                     action: function () {
                         try {
-                            var data = alfrescoSearchTabelle.rows({selected: true}).data();
+                            const data = alfrescoSearchTabelle.rows({selected: true}).data();
                             startMoveDialog(data);
                         } catch (e) {
                             errorHandler(e);
@@ -3712,7 +3762,24 @@ function createSearchMenus(){
                     className: "far fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        alertt('Noch nicht implementiert!');
+                        let txt = "";
+                        const selected = alfrescoSearchTabelle.rows({selected: true}).data();
+                        for (let i = 0; i < selected.length; i++) {
+                            txt = txt + "<br>" + selected[i].name + (selected[i].title ? " [" + selected[i].title + "]" : "");
+                        }
+                        const titel = (selected.length > 1 ? "Dokumente löschen" : "Dokument löschen");
+                        const text = (selected.length > 1 ? "Die folgenden Dokumente werden gelöscht:"  : "Das folgende Dokument wird gelöscht:") + txt;
+                        alertify.confirm(titel, text,
+                            function () {
+                                let data = [];
+                                for (let i = 0; i < selected.length; i++) {
+                                    data.push(selected[i]);
+                                }
+                                deleteDocument(data);
+                            },
+                            function () {
+
+                            });
                     }
                 }
             }
@@ -3735,7 +3802,7 @@ function createSearchMenus(){
                     className: "fas fa-sync-alt fa-1x",
                     disabled: true,
                     action: function () {
-                        var rows = alfrescoSearchTabelle.rows({selected: true})[0];
+                        const rows = alfrescoSearchTabelle.rows({selected: true})[0];
                         alfrescoSearchTabelle.rows().select();
                         alfrescoSearchTabelle.rows(rows).deselect();
                     }

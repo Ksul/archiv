@@ -111,6 +111,13 @@ h1 {
     height: 100%;
 }
 
+.ui-widget-header, .alertify .ajs-header {
+    font-weight: bold;
+    background-color: #BDD2FF;
+    border-color: #DDDDDD;
+    color: #333333;
+}
+
 .progress-label {
     float: left;
     margin-left: 50%;
@@ -844,4 +851,62 @@ span.awesomeBlue i.awesomeAction {
 
 a:before, label:before {
     margin-right: 15px;
+}
+
+.no-close .ui-dialog-titlebar-close {
+    display: none;
+}
+
+.alertify .ajs-header {
+    border-radius: 6px 6px 0px 0px;
+    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); /* Safari 4 */
+    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3); /* Firefox 3.6 */
+    -webkit-border-radius: 4px; /* Safari 4 */
+    -moz-border-radius: 4px; /* Firefox 3.6 */
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    font-size: 18px;
+}
+
+.alertify .ajs-footer {
+    border-radius: 0px 0px 6px 6px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+
+.alertify .ajs-dialog {
+    border-radius: 6px 6px 6px 6px;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+
+.alertify .ajs-body {
+    margin-left: -24px;
+    margin-right: -24px;
+    background-color: white;
+}
+
+.ui-dialog {
+    padding: 0em;
+}
+
+.alertify .ajs-button {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border: 1px solid #ccc;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    min-height: inherit;
 }

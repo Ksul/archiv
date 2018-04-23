@@ -626,22 +626,40 @@ function editDocument(input, id) {
 
 /**
  * löscht ein Dokument
+ * @param data Entweder ein Data Objekt mit den zu löschenden Daten oder ein Array von diesen
  */
-function deleteDocument() {
+function deleteDocument(data) {
     try {
-        var origData = $("#dialogBox").alpaca().data;
+
         var done = function (json) {
+            function manage(data) {
+                var row = alfrescoTabelle.row('#' + data.objectID);
+                if (row && row.length)
+                    row.remove().draw(false);
+                if (alfrescoSearchTabelle) {
+                    row = alfrescoSearchTabelle.row('#' + data.objectID);
+                    if (row && row.length)
+                        row.remove().draw(false);
+                }
+            }
+
             if (json.success) {
-                var row = alfrescoTabelle.row('#' + origData.objectID);
-                if (row && row.length)
-                    row.remove().draw(false);
-                row = alfrescoSearchTabelle.row('#' + origData.objectID);
-                if (row && row.length)
-                    row.remove().draw(false);
+                if (data instanceof Array) {
+                    for ( var i = 0; i < data.length; i++)
+                        manage(data[i]);
+                } else
+                    manage(data);
             }
         };
-        var erg = executeService({"name": "deleteDocument", "callback": done, "errorMessage": "Dokument konnte nicht gelöscht werden!"}, [
-            {"name": "documentId", "value": origData.objectID}
+        var ids = [];
+        if (data instanceof Array) {
+            for ( var i = 0; i < data.length; i++)
+                ids.push(data[i].objectID);
+        } else
+            ids.push(data.objectID);
+
+        var erg = executeService({"name": "deleteDocument", "callback": done, "errorMessage": "Dokument(e) konnte nicht gelöscht werden!"}, [
+            {"name": "documentId", "value": ids}
         ]);
     } catch (e) {
         errorHandler(e);
@@ -696,38 +714,54 @@ function createFolder(input, origData) {
 
 /**
  * löscht einen Ordner
+ * @param data Entweder ein Data Objekt mit den zu löschenden Daten oder ein Array von diesen
  * TODO Was passiert hier mit den eventuell vorhandenen Suchergebnissen
- * TODO der sollte die Dialogbox hier nicht kennen
  */
-function deleteFolder() {
+function deleteFolder(data) {
     try {
-        var origData = $("#dialogBox").alpaca().data;
+
         var done = function (json) {
-            if (json.success) {
-                var lastElement = $("#breadcrumblist").children().last();
-                // Tree updaten
-                var tree = $.jstree.reference('#tree');
-                tree.delete_node(origData.objectID);
+            function manage(data) {
+                tree.delete_node(data.objectID);
                 // Tabelle updaten
-                if (lastElement && lastElement.get(0).id === origData.parentId) {
-                    var row = alfrescoFolderTabelle.row('#' + origData.objectID);
+                if (lastElement && lastElement.get(0).id === data.parentId) {
+                    var row = alfrescoFolderTabelle.row('#' + data.objectID);
                     if (row && row.length) {
                         row.remove().draw();
                     }
                 }
                 // der aktuelle Ordner ist der zu löschende
-                if (lastElement && lastElement.get(0).id === origData.objectID) {
-                    tree.select_node(origData.parentId);
-                } else {
-                    // BreadCrumb aktualisieren
-                    if (lastElement)
-                        fillBreadCrumb(lastElement.data().data);
+                if (lastElement && lastElement.get(0).id === data.objectID) {
+                    tree.select_node(data.parentId);
                 }
             }
 
+            if (json.success) {
+                var lastElement = $("#breadcrumblist").children().last();
+                // Tree updaten
+                var tree = $.jstree.reference('#tree');
+                if (data instanceof Array) {
+                    for ( var i = 0; i < data.length; i++)
+                        manage(data[i]);
+                } else
+                    manage(data);
+
+                // BreadCrumb aktualisieren
+                if (lastElement)
+                  fillBreadCrumb(lastElement.data().data);
+
+            }
+
         };
+        var ids = [];
+        if (data instanceof Array) {
+            for ( var i = 0; i < data.length; i++) 
+                ids.push(data[i].objectID);
+        } else
+            ids.push(data.objectID);
+
         var erg = executeService({"name": "deleteFolder", "callback": done, "errorMessage": "Ordner konnte nicht gelöscht werden!"}, [
-            {"name": "documentId", "value": origData.objectID}
+            {"name": "documentId", "value": ids}
         ]);
     } catch (e) {
         errorHandler(e);

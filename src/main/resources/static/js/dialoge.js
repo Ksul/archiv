@@ -6,65 +6,65 @@
 function startSettingsDialog(modal) {
     try {
 
-        var data =  {
-                "server": getSettings("server"),
-                "binding": getSettings("binding"),
-                "user": getSettings("user"),
-                "password": getSettings("password"), 
-                "store": getSettings("store")
+        const data =  {
+                server: getSettings("server"),
+                binding: getSettings("binding"),
+                user: getSettings("user"),
+                password: getSettings("password"),
+                store: getSettings("store")
         };
         if (!data.store)
             data.store = false;
 
         // Einstellungen für den Settings Dialog
-        var dialogSettings = { "id": "settingsDialog",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "user": {
-                        "type": "string",
-                        "title": "Benutzer",
-                        "required": true
+        const dialogSettings = { id: "settingsDialog",
+            schema: {
+                type: "object",
+                properties: {
+                    user: {
+                        type: "string",
+                        title: "Benutzer",
+                        required: true
                     },
-                    "password": {
-                        "type": "string",
-                        "title": "Password",
-                        "required": true
+                    password: {
+                        type: "string",
+                        title: "Password",
+                        required: true
                     },
-                    "server": {
-                        "type": "string",
-                        "title": "Server",
-                        "required": true,
-                        "pattern": "^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-‌​\.\?\,\'\/\\\+&amp;%\$#_]*)?$"
+                    server: {
+                        type: "string",
+                        title: "Server",
+                        required: true,
+                        pattern: "^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-‌​\.\?\,\'\/\\\+&amp;%\$#_]*)?$"
                     },
-                    "binding": {
-                        "type": "string",
-                        "title": "Binding",
-                        "required": true,
-                        "pattern": "^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-‌​\.\?\,\'\/\\\+&amp;%\$#_]*)?$"
+                    binding: {
+                        type: "string",
+                        title: "Binding",
+                        required: true,
+                        pattern: "^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-‌​\.\?\,\'\/\\\+&amp;%\$#_]*)?$"
                     },
-                    "store": {
-                        "type": "boolean",
-                        "title": "Einstellungen sichern",
-                        "required": false,
-                        "default": false
+                    store: {
+                        type: "boolean",
+                        title: "Einstellungen sichern",
+                        required: false,
+                        default: false
                     }
                 }
             },
-                "options": {
-                    "renderForm": true,
-                    "form": {
-                        "buttons": {
-                            "submit": {"value": "Sichern"},
-                            "reset": {"value": "Abbrechen"}
+                options: {
+                    renderForm: true,
+                    form: {
+                        buttons: {
+                            submit: {value: "Sichern"},
+                            reset: {value: "Abbrechen"}
                         }
                     },
-                "fields": {
-                    "server": {
-                        "size": 60,
-                        "placeholder": "z.B.: http://[host]:[port]/alfresco/",
-                        "events": {
-                            "change": function(){
+                fields: {
+                    server: {
+                        size: 60,
+                        placeholder: "z.B.: http://[host]:[port]/alfresco/",
+                        events: {
+                            change: function(){
                                 if (!this.getValue().endsWith("/")) {
                                     this.setValue(this.getValue() + "/");
                                     this.refresh();
@@ -72,38 +72,38 @@ function startSettingsDialog(modal) {
                             }
                         }
                     },
-                    "binding": {
-                        "size": 100,
-                        "placeholder": "z.B.: http://[host]:[port]/alfresco/api/-default-/public/cmis/versions/1.0/atom"
+                    binding: {
+                        size: 100,
+                        placeholder: "z.B.: http://[host]:[port]/alfresco/api/-default-/public/cmis/versions/1.0/atom"
                     },
-                    "user": {
-                        "size": 30
+                    user: {
+                        size: 30
                     },
-                    "password": {
-                        "type": "password",
-                        "size": 20
+                    password: {
+                        type: "password",
+                        size: 20
                     },
-                    "store" : {
+                    store : {
 
                     }
                 }
             },
 
-            "view": {
-                "parent": "web-edit",
-                "locale": "de_DE",
-                "layout": {
-                    "template": "columnGridLayout",
-                    "bindings": {
-                        "server":    "server",
-                        "binding":   "binding",
-                        "user":      "user",
-                        "password":  "password",
-                        "store":     "store"
+            view: {
+                parent: "web-edit",
+                locale: "de_DE",
+                layout: {
+                    template: "columnGridLayout",
+                    bindings: {
+                        server:    "server",
+                        binding:   "binding",
+                        user:      "user",
+                        password:  "password",
+                        store:     "store"
                     }
                 },
-                "templates": {
-                    "columnGridLayout": '<div class="filter-content">' + '{{#if options.label}}<h2>{{options.label}}</h2><span></span>{{/if}}' + '{{#if options.helper}}<p>{{options.helper}}</p>{{/if}}'
+                templates: {
+                    columnGridLayout: '<div class="filter-content">' + '{{#if options.label}}<h2>{{options.label}}</h2><span></span>{{/if}}' + '{{#if options.helper}}<p>{{options.helper}}</p>{{/if}}'
                         + '<div id="server" class="col-1-1"> </div>'
                         + '<div id="binding" class="col-1-1"> </div>'
                         + '<div id="user" class="col-7-12"> </div><div id="password" class="col-5-12"> </div>'
@@ -111,33 +111,33 @@ function startSettingsDialog(modal) {
                         + '</div>'                }
 
             },
-            "data": data,
-            "ui": "jquery-ui",
+            data: data,
+            ui: "jquery-ui",
 
-            "postRender": function (renderedField) {
+            postRender: function (renderedField) {
                 try {
-                    var server = renderedField.childrenByPropertyId["server"];
-                    var binding = renderedField.childrenByPropertyId["binding"];
-                    binding.subscribe(server, function (val) {
+                    const server = renderedField.childrenByPropertyId["server"];
+                    const binding = renderedField.childrenByPropertyId["binding"];
+                    binding.subscribe(server, function () {
                         if (!this.getValue().trim().length)
                             this.setValue(server.data + "api/-default-/public/cmis/versions/1.0/atom");
                         this.refresh();
                     });
-                    var form = renderedField.form;
+                    const form = renderedField.form;
                     if (form) {
                         form.registerSubmitHandler(function () {
                             if (form.isFormValid()) {
                                 try {
-                                    var input = $("#dialogBox").alpaca().getValue();
+                                    const input = $("#dialogBox").alpaca().getValue();
                                     if (!input.server.endsWith("/"))
                                         input.server = input.server + "/";
                                     settings = {
-                                        "settings": [
-                                            {"key": "server", "value": input.server},
-                                            {"key": "user", "value": input.user},
-                                            {"key": "password", "value": input.password},
-                                            {"key": "binding", "value": input.binding},
-                                            {"key": "store", "value": input.store}
+                                        settings: [
+                                            {key: "server", value: input.server},
+                                            {key: "user", value: input.user},
+                                            {key: "password", value: input.password},
+                                            {key: "binding", value: input.binding},
+                                            {key: "store", value: input.store}
                                         ]
                                     };
                                     if (store) {
@@ -190,113 +190,114 @@ function startDocumentDialog(data, modus, modal) {
             data.person = "Klaus";
 
         // Einstellungen für den Dokumentendialog
-        var dialogDocumentDetailsSettings = { "id": "detailDialog",
-            "schema": {
-                "type": "object",
-                "title": function() {
+        const dialogDocumentDetailsSettings = { id: "detailDialog",
+            schema: {
+                type: "object",
+                title: function() {
                     if (modus === "web-display")
                         return "Dokument löschen?";
                     else
                         return "a";
                 },
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "title": "Dateiname",
-                        "required": false
+                properties: {
+                    name: {
+                        type: "string",
+                        title: "Dateiname",
+                        required: false
                     },
-                    "title": {
-                        "type": "string",
-                        "title": "Titel",
-                        "required": true
+                    title: {
+                        type: "string",
+                        title: "Titel",
+                        required: true
                     },
 
-                    "description": {
-                        "type": "string",
-                        "title": "Beschreibung",
-                        "required": false
+                    description: {
+                        type: "string",
+                        title: "Beschreibung",
+                        required: false
                     },
-                    "person": {
-                        "type": "string",
-                        "title": "Person",
-                        "enum": [
+                    person: {
+                        type: "string",
+                        title: "Person",
+                        enum: [
                             "Klaus",
                             "Katja",
                             "Till",
                             "Kilian"
                         ],
-                        "required": true,
-                        "default": "Klaus"
+                        required: true,
+                        default: "Klaus"
                     },
-                    "amountDisplay": {
-                        "type": "string",
-                        "required": false,
-                        "properties": {}
+                    amountDisplay: {
+                        type: "string",
+                        required: false,
+                        properties: {}
                     },
-                    "documentDateDisplay": {
-                        "type": "string",
-                        "title": "Datum",
-                        "format": "date",
-                        "required": true
+                    documentDateDisplay: {
+                        type: "string",
+                        title: "Datum",
+                        format: "date",
+                        required: true
                     },
-                    "idvalue": {
-                        "type": "string",
-                        "title": "Id",
-                        "required": false
+                    idvalue: {
+                        type: "string",
+                        title: "Id",
+                        required: false
                     },
-                    "tax": {
-                        "type": "boolean",
-                        "title": "Steuern",
-                        "required": false
+                    tax: {
+                        type: "boolean",
+                        title: "Steuern",
+                        required: false
                     }
 
                 }
             },
-            "options": {
-                "renderForm": true,
-                "form": {
-                    "buttons": function () {
+            options: {
+                renderForm: true,
+                form: {
+                    buttons: function () {
                         switch (true) {
                             case /display/.test(modus):
                                 return {
-                                    "delete": {
-                                        "type": "button",
-                                        "styles": " ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only ",
-                                        "value": "Löschen"
+                                    delete: {
+                                        type: "button",
+                                        styles: " ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only ",
+                                        value: "Löschen"
                                     },
-                                    "reset": {"value": "Abbrechen"}
+                                    reset: {value: "Abbrechen"}
                                 };
                             case /create/.test(modus):
                                 return {
-                                    "submit": {"value": "Erstellen"},
-                                    "reset": {"value": "Abbrechen"}
+                                    submit: {value: "Erstellen"},
+                                    reset: {value: "Abbrechen"}
                                 };
                             default:
                                 return {
-                                    "submit": {"value": "Sichern"},
-                                    "reset": {"value": "Abbrechen"}
+                                    submit: {value: "Sichern"},
+                                    reset: {value: "Abbrechen"}
                                 };
                         }
                     }
                 },
-                "fields": {
-                    "title": {
-                        "size": 30,
-                        "typeahead": {
-                            "config": {
-                                "autoselect": true,
-                                "highlight": true,
-                                "hint": true,
-                                "minLength": 3
+                fields: {
+                    title: {
+                        size: 30,
+                        focus: true,
+                        typeahead: {
+                            config: {
+                                autoselect: true,
+                                highlight: true,
+                                hint: true,
+                                minLength: 3
                             },
-                            "datasets": {
-                                "type": "local",
-                                "source": function(query) {
-                                    var results = [];
-                                    var json = executeService({"name": "getTitles", "ignoreError": true});
-                                    for (var i = 0; i < json.data.length; i++) {
+                            datasets: {
+                                type: "local",
+                                source: function() {
+                                    const results = [];
+                                    const json = executeService({name: "getTitles", ignoreError: true});
+                                    for (let i = 0; i < json.data.length; i++) {
                                         results.push({
-                                            "value": json.data[i]
+                                            value: json.data[i]
                                         });
                                     }
                                     return results;
@@ -304,90 +305,90 @@ function startDocumentDialog(data, modus, modal) {
                             }
                         }
                     },
-                    "name": {
-                        "size": 30,
-                        "readonly": true
+                    name: {
+                        size: 30,
+                        readonly: true
                     },
-                    "description": {
-                        "type": "textarea",
-                        "size": 60
+                    description: {
+                        type: "textarea",
+                        size: 60
                     },
-                    "person": {
-                        "type": "select",
-                        "hideInitValidationError": true,
-                        "emptySelectFirst": true
+                    person: {
+                        type: "select",
+                        hideInitValidationError: true,
+                        emptySelectFirst: true
                     },
-                    "amountDisplay": {
-                        "type": "currency",
-                        "label": "Betrag",
-                        "centsLimit": 2,
-                        "centsSeparator": ",",
-                        "prefix": "",
-                        "round": "none",
-                        "thousandsSeparator": ".",
-                        "suffix": "",
-                        "unmask": true,
-                        "allowNegative" : true,
-                        "helpers": [],
-                        "validate": true,
-                        "disabled": false,
-                        "showMessages": true,
-                        "renderButtons": true,
-                        "data": {},
-                        "attributes": {},
-                        "allowOptionalEmpty": true,
-                        "autocomplete": false,
-                        "disallowEmptySpaces": false,
-                        "disallowOnlyEmptySpaces": false,
-                        "fields": {}
+                    amountDisplay: {
+                        type: "currency",
+                        label: "Betrag",
+                        centsLimit: 2,
+                        centsSeparator: ",",
+                        prefix: "",
+                        round: "none",
+                        thousandsSeparator: ".",
+                        suffix: "",
+                        unmask: true,
+                        allowNegative : true,
+                        helpers: [],
+                        validate: true,
+                        disabled: false,
+                        showMessages: true,
+                        renderButtons: true,
+                        data: {},
+                        attributes: {},
+                        allowOptionalEmpty: true,
+                        autocomplete: false,
+                        disallowEmptySpaces: false,
+                        disallowOnlyEmptySpaces: false,
+                        fields: {}
                     },
-                    "tax": {
-                        "rightLabel": "relevant"
+                    tax: {
+                        rightLabel: "relevant"
                     },
-                    "documentDateDisplay": {
-                        "type": "date",
-                        "label": "Dokumentdatum",
-                        "helpers": [],
-                        "validate": true,
-                        "disabled": false,
-                        "showMessages": true,
-                        "renderButtons": true,
-                        "allowOptionalEmpty": true,
-                        "autocomplete": false,
-                        "disallowEmptySpaces": false,
-                        "disallowOnlyEmptySpaces": false,
-                        "dateFormatRegex": "/(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.(19|20)\d\d$/",
-                        "picker": {
-                            "useCurrent": true,
-                            "format": "DD.MM.YYYY",
-                            "locale": "de_DE",
-                            "dayViewHeaderFormat": "DD.MM.YYYY",
-                            "extraFormats": []
+                    documentDateDisplay: {
+                        type: "date",
+                        label: "Dokumentdatum",
+                        helpers: [],
+                        validate: true,
+                        disabled: false,
+                        showMessages: true,
+                        renderButtons: true,
+                        allowOptionalEmpty: true,
+                        autocomplete: false,
+                        disallowEmptySpaces: false,
+                        disallowOnlyEmptySpaces: false,
+                        dateFormatRegex: "/(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.(19|20)\d\d$/",
+                        picker: {
+                            useCurrent: true,
+                            format: "DD.MM.YYYY",
+                            locale: "de_DE",
+                            dayViewHeaderFormat: "DD.MM.YYYY",
+                            extraFormats: []
                         },
-                        "dateFormat": "DD.MM.YYYY",
-                        "manualEntry": true
+                        dateFormat: "DD.MM.YYYY",
+                        manualEntry: true
                     }
                 }
             },
-            "view": {
-                "parent": modus,
-                "locale": "de_DE",
-                "layout": {
-                    "template": "threeColumnGridLayout",
-                    "bindings": {
-                        "name": "column-1-1",
-                        "title": "column-1-1",
-                        "description": "column-1-1",
-                        "person": "column-1-2",
-                        "documentDateDisplay": "column-2-2",
-                        "amountDisplay": "column-1-2",
-                        "idvalue": "column-2-2",
-                        "tax": "column-1-b"
+            view: {
+                parent: modus,
+                locale: "de_DE",
+                layout: {
+                    template: "threeColumnGridLayout",
+                    bindings: {
+                        name: "column-1-1",
+                        title: "column-1-1",
+                        description: "column-1-1",
+                        person: "column-1-2",
+                        documentDateDisplay: "column-2-2",
+                        amountDisplay: "column-1-2",
+                        idvalue: "column-2-2",
+                        tax: "column-1-b"
 
                     }
                 },
-                "templates": {
-                    "threeColumnGridLayout": '<div class="filter-content">'
+                templates: {
+                    threeColumnGridLayout: '<div class="filter-content">'
                         + '<div id="column-1-1" class="col-1-1"> </div>'
                         + '<div id="column-1-2" class="col-1-2"> </div> <div id="column-2-2" class="col-1-2"> </div>'
                         + '<div id="column-1-7_12" class="col-7-12"> </div> <div id="column-2-5_12" class="col-5-12"> </div>'
@@ -397,20 +398,19 @@ function startDocumentDialog(data, modus, modal) {
                 }
 
             },
-            "data": data,
-            "ui": "jquery-ui",
-            "postRender": function (renderedField) {
-                var form = renderedField.form;
+            data: data,
+            ui: "jquery-ui",
+            postRender: function (renderedField) {
+                const form = renderedField.form;
                 if (form) {
                     form.registerSubmitHandler(function () {
                         if (form.isFormValid()) {
                             try {
-                                var erg;
-                                var alpaca = $("#dialogBox").alpaca();
+                                const alpaca = $("#dialogBox").alpaca();
                                 // Werte übertragen
-                                var input = alpaca.getValue();
+                                const input = alpaca.getValue();
                                 // die original Daten sichern.
-                                var origData = alpaca.data;
+                                const origData = alpaca.data;
                                 if (modus === "web-edit") {
                                     // Konvertierung
                                     if (input.amountDisplay && typeof input.amountDisplay === "string")
@@ -440,7 +440,7 @@ function startDocumentDialog(data, modus, modal) {
                 }
             }
         };
-        var additionalButton =[{"id":".alpaca-form-button-delete", "function": deleteDocument }];
+        const additionalButton =[{id:".alpaca-form-button-delete", function: deleteDocument }];
         startDialog(modus === "web-display" ? "Dokument löschen?" : "Dokument Eigenschaften", dialogDocumentDetailsSettings, 450, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
@@ -460,89 +460,89 @@ function startFolderDialog(data, modus, modal) {
     try {
 
         // Einstellungen für den Folder Dialog
-        var folderDialogSettings = { "id": "detailDialog",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "title": "Name",
-                        "required": true,
-                        "readonly": !(data.objectID !== alfrescoRootFolderId &&
+        const folderDialogSettings = { id: "detailDialog",
+            schema: {
+                type: "object",
+                properties: {
+                    name: {
+                        type: "string",
+                        title: "Name",
+                        required: true,
+                        readonly: !(data.objectID !== alfrescoRootFolderId &&
                         data.objectID !== archivFolderId &&
                         data.objectID !== fehlerFolderId &&
                         data.objectID !== unknownFolderId &&
                         data.objectID !== doubleFolderId &&
                         data.objectID !== inboxFolderId)
                     },
-                    "title": {
-                        "type": "string",
-                        "title": "Titel",
-                        "required": false
+                    title: {
+                        type: "string",
+                        title: "Titel",
+                        required: false
                     },
-                    "description": {
-                        "type": "string",
-                        "title": "Beschreibung",
-                        "required": false
+                    description: {
+                        type: "string",
+                        title: "Beschreibung",
+                        required: false
                     }
                 }
             },
-            "options": {
-                "renderForm": true,
-                "form": {
-                    "buttons": function () {
+            options: {
+                renderForm: true,
+                form: {
+                    buttons: function () {
                         switch (true) {
                             case /display/.test(modus):
                                 return {
-                                    "delete": {
-                                        "type": "button",
-                                        "styles": "btn btn-primary",
-                                        "value": "Löschen"
+                                    delete: {
+                                        type: "button",
+                                        styles: "btn btn-primary",
+                                        value: "Löschen"
                                     },
-                                    "reset": {"value": "Abbrechen"}
+                                    reset: {value: "Abbrechen"}
                                 };
                             case /create/.test(modus):
                                 return {
-                                    "submit": {"value": "Erstellen"},
-                                    "reset": {"value": "Abbrechen"}
+                                    submit: {value: "Erstellen"},
+                                    reset: {value: "Abbrechen"}
                                 };
                             default:
                                 return {
-                                    "submit": {"value": "Sichern"},
-                                    "reset": {"value": "Abbrechen"}
+                                    submit: {value: "Sichern"},
+                                    reset: {value: "Abbrechen"}
                                 };
                         }
                     }
                 },
-                "fields": {
+                fields: {
 
-                    "name": {
-                        "size": 30
+                    name: {
+                        size: 30
                     },
-                    "title": {
-                        "size": 30
+                    title: {
+                        size: 30
                     },
-                    "description": {
-                        "type": "textarea",
-                        "size": 150
+                    description: {
+                        type: "textarea",
+                        size: 150
                     }
                 }
             },
-            "data": data,
-            "view": {
-                "parent": modus,
-                "locale": "de_DE",
-                "layout": {
-                    "template": "threeColumnGridLayout",
-                    "bindings": {
-                        "name": "column-1-1",
-                        "title": "column-1-1",
-                        "description": "column-1-1"
+            data: data,
+            view: {
+                parent: modus,
+                locale: "de_DE",
+                layout: {
+                    template: "threeColumnGridLayout",
+                    bindings: {
+                        name: "column-1-1",
+                        title: "column-1-1",
+                        description: "column-1-1"
 
                     }
                 },
-                "templates": {
-                    "threeColumnGridLayout": '<div class="filter-content">'
+                templates: {
+                    threeColumnGridLayout: '<div class="filter-content">'
                         + '<div id="column-1-1" class="col-1-1"> </div>'
                         + '<div id="column-1-2" class="col-1-2"> </div> <div id="column-2-2" class="col-1-2"> </div>'
                         + '<div id="column-1-7_12" class="col-7-12"> </div> <div id="column-2-5_12" class="col-5-12"> </div>'
@@ -551,20 +551,19 @@ function startFolderDialog(data, modus, modal) {
                 }
 
             },
-            "ui": "jquery-ui",
-            "postRender": function (renderedField) {
+            ui: "bootstrap",
+            postRender: function (renderedField) {
 
-                var form = renderedField.form;
+                const form = renderedField.form;
                 if (form) {
                     form.registerSubmitHandler(function () {
                         if (form.isFormValid()) {
-                            var erg;
                             try {
-                                var alpaca = $("#dialogBox").alpaca();
+                                const alpaca = $("#dialogBox").alpaca();
                                 // Werte übertragen
-                                var input = alpaca.getValue();
+                                const input = alpaca.getValue();
                                 // die original Daten sichern.
-                                var origData = alpaca.data;
+                                const origData = alpaca.data;
                                 if (modus === "web-create") {
                                     // ein neuer Ordner wird erstellt
                                     createFolder(input, origData);
@@ -575,7 +574,7 @@ function startFolderDialog(data, modus, modal) {
                                     if ((input.name && input.name !== origData.name) ||
                                         (input.title && input.title !== origData.title) ||
                                         (input.description && input.description !== origData.description)) {
-                                        erg = editFolder(input, origData.objectID);
+                                        const erg = editFolder(input, origData.objectID);
                                         if (!erg.success)
                                             message("Fehler", erg.error);
                                     }
@@ -589,7 +588,7 @@ function startFolderDialog(data, modus, modal) {
                 }
             }
         };
-        var additionalButton =[{"id":".alpaca-form-button-delete", "function": deleteFolder }];
+        const additionalButton = [{id: ".alpaca-form-button-delete", function: deleteFolder}];
         startDialog(modus === "web-display" ? "Ordner löschen?" : "Ordner Eigenschaften", folderDialogSettings, 460, modal, additionalButton);
     } catch (e) {
         errorHandler(e);
@@ -601,7 +600,7 @@ function startFolderDialog(data, modus, modal) {
  */
 function startCommentsDialog(comments) {
     try {
-        var data = comments.items;
+        const data = comments.items;
 
         $dialog = $('<div> <table cellpadding="0" cellspacing="0" border="0" class="display" id="custTabelle"></table> </div>').dialog({
             autoOpen: false,
@@ -610,7 +609,7 @@ function startCommentsDialog(comments) {
             height:300,
             width:800,
             buttons: {
-                "Ok": function () {
+                Ok: function () {
                     $(this).dialog("destroy");
                 }
             }
@@ -618,52 +617,52 @@ function startCommentsDialog(comments) {
 
         $dialog.dialog('open');
         $('#custTabelle').DataTable({
-            "jQueryUI": true,
-            "paging": false,
-            "data": data,
-            "scrollX": "100%",
-            "scrollXInner": "100%",
+            jQueryUI: true,
+            paging: false,
+            data: data,
+            scrollX: "100%",
+            scrollXInner: "100%",
             // "sScrollY" : calcDataTableHeight(),
-            "autoWidth": true,
-            "lengthChange": false,
-            "searching": false,
-            "columns": [
+            autoWidth: true,
+            lengthChange: false,
+            searching: false,
+            columns: [
                 {
-                    "data": "author.username",
-                    "title": "User",
-                    "defaultContent": '',
-                    "type": "string",
-                    "width": "120px",
-                    "class": "alignLeft"
+                    data: "author.username",
+                    title: "User",
+                    defaultContent: '',
+                    type: "string",
+                    width: "120px",
+                    class: "alignLeft"
                 },
                 {
-                    "data": "modifiedOn",
-                    "title": "Datum",
-                    "defaultContent": '',
-                    "type": "string",
-                    "width": "120px",
-                    "class": "alignLeft"
+                    data: "modifiedOn",
+                    title: "Datum",
+                    defaultContent: '',
+                    type: "string",
+                    width: "120px",
+                    class: "alignLeft"
                 },
                 {
-                    "title": "Kommentar",
-                    "data": "content",
-                    "class": "alignLeft"
+                    title: "Kommentar",
+                    data: "content",
+                    class: "alignLeft"
                 }
             ],
-            "columnDefs": [
+            columnDefs: [
                 {
-                    "targets": [0, 2],
-                    "visible": true
+                    targets: [0, 2],
+                    visible: true
                 },
                 {
-                    "targets": [1],
-                    "visible": true,
-                    "render": function (data, type, row) {
+                    targets: [1],
+                    visible: true,
+                    render: function (data, type, row) {
                         return  $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Date.parse(row.modifiedOnISO)));
                     }
                 }
             ],
-            "info": false
+            info: false
         });
     } catch (e) {
         errorHandler(e);
@@ -675,16 +674,16 @@ function startCommentsDialog(comments) {
  */
 function startUploadDialog() {
     try {
-        var data = comments.items;
+        const data = comments.items;
 
-        $dialog = $('<div> <input type="file" multiple="" name="files[]" class="dnd-file-selection-button"> </div>').dialog({
+        const $dialog = $('<div> <input type="file" multiple="" name="files[]" class="dnd-file-selection-button"> </div>').dialog({
             autoOpen: false,
             title: "Kommentare",
             modal: true,
             height:300,
             width:800,
             buttons: {
-                "Ok": function () {
+                Ok: function () {
                     $(this).dialog("destroy");
                 }
             }
@@ -692,52 +691,52 @@ function startUploadDialog() {
 
         $dialog.dialog('open');
         $('#custTabelle').DataTable({
-            "jQueryUI": true,
-            "paging": false,
-            "data": data,
-            "scrollX": "100%",
-            "scrollXInner": "100%",
+            jQueryUI: true,
+            paging: false,
+            data: data,
+            scrollX: "100%",
+            scrollXInner: "100%",
             // "sScrollY" : calcDataTableHeight(),
-            "autoWidth": true,
-            "lengthChange": false,
-            "searching": false,
-            "columns": [
+            autoWidth: true,
+            lengthChange: false,
+            searching: false,
+            columns: [
                 {
-                    "data": "author.username",
-                    "title": "User",
-                    "defaultContent": '',
-                    "type": "string",
-                    "width": "120px",
-                    "class": "alignLeft"
+                    data: "author.username",
+                    title: "User",
+                    defaultContent: '',
+                    type: "string",
+                    width: "120px",
+                    class: "alignLeft"
                 },
                 {
-                    "data": "modifiedOn",
-                    "title": "Datum",
-                    "defaultContent": '',
-                    "type": "string",
-                    "width": "120px",
-                    "class": "alignLeft"
+                    data: "modifiedOn",
+                    title: "Datum",
+                    defaultContent: '',
+                    type: "string",
+                    width: "120px",
+                    class: "alignLeft"
                 },
                 {
-                    "title": "Kommentar",
-                    "data": "content",
-                    "class": "alignLeft"
+                    title: "Kommentar",
+                    data: "content",
+                    class: "alignLeft"
                 }
             ],
-            "columnDefs": [
+            columnDefs: [
                 {
-                    "targets": [0, 2],
-                    "visible": true
+                    targets: [0, 2],
+                    visible: true
                 },
                 {
-                    "targets": [1],
-                    "visible": true,
-                    "render": function (data, type, row) {
+                    targets: [1],
+                    visible: true,
+                    render: function (data, type, row) {
                         return  $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Date.parse(row.modifiedOnISO)));
                     }
                 }
             ],
-            "info": false
+            info: false
         });
     } catch (e) {
         errorHandler(e);
@@ -757,46 +756,46 @@ function startMoveDialog(rowData, table, typ) {
         if (!typ)
             typ = "Dokumente";
         
-        var moveDialogSettings = { "id": "moveDialog",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "token": {
-                        "type": "string"                    }
+        const moveDialogSettings = { id: "moveDialog",
+            schema: {
+                type: "object",
+                properties: {
+                    token: {
+                        type: "string"                    }
                 }
             },
-            "options": {
-                "renderForm": true,
-                "fields": {
-                    "token": {
-                        "type": "hidden"
+            options: {
+                renderForm: true,
+                fields: {
+                    token: {
+                        type: "hidden"
                     }
                 },
-                "form": {
-                    "buttons": {
-                        "submit": {"value": "Verschieben"},
-                        "reset": {"value": "Abbrechen"}
+                form: {
+                    buttons: {
+                        submit: {value: "Verschieben"},
+                        reset: {value: "Abbrechen"}
                     },
-                    "toggleSubmitValidState": true
+                    toggleSubmitValidState: true
                 }
             },
-            "view": {
-                "parent": "web-edit",
-                "locale": "de_DE",
-                "layout": {
-                    "template": "layout"
+            view: {
+                parent: "web-edit",
+                locale: "de_DE",
+                layout: {
+                    template: "layout"
                 },
-                "templates": {
-                    "layout": '<div class="filter-content" id="dialogTree"></div>'
+                templates: {
+                    layout: '<div class="filter-content" id="dialogTree"></div>'
                 }
             },
-            "ui": "jquery-ui",
-            "postRender": function (renderedField) {
-                var form = renderedField.form;
+            ui: "jquery-ui",
+            postRender: function (renderedField) {
+                const form = renderedField.form;
                 form.disableSubmitButton();
-                var dialogTree = $("#dialogTree").jstree({
-                    'core': {
-                        'data': function (node, aFunction) {
+                $("#dialogTree").jstree({
+                    core: {
+                        data: function (node, aFunction) {
                             try {
                                 // relevante Knoten im Alfresco suchen
                                 loadAndConvertDataForTree(node, aFunction);
@@ -807,41 +806,41 @@ function startMoveDialog(rowData, table, typ) {
                         error : function (err) {
                             Logger.log(Level.DEBUG, err.reason);
                         },
-                        'themes': {
-                            'responsive': true,
-                            'variant': 'big',
-                            'stripes': false,
-                            'dots': true,
-                            'icons': true
+                        themes: {
+                            responsive: true,
+                            variant: 'big',
+                            stripes: false,
+                            dots: true,
+                            icons: true
                         }
                     },
-                    'types' : {
-                        '#' : {
-                            "max_children" : 1
+                    types : {
+                        "#" : {
+                            max_children : 1
                         },
-                        'archivRootStandard' : {
-                            "valid_children" : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
-                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        archivRootStandard : {
+                            valid_children : ["archivFolderStandard", "archivDocumentFolderStandard", "archivFehlerFolderStandard"],
+                            icon: "fa fa-file-text-o fa-15x awesomeEntity"
                         },
-                        'archivFolderStandard' : {
-                            "valid_children" : [],
-                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        archivFolderStandard : {
+                            valid_children : [],
+                            icon: "fa fa-file-text-o fa-15x awesomeEntity"
                         },
-                        'archivDoubleFolderStandard' : {
-                            "valid_children" : [],
-                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        archivDoubleFolderStandard : {
+                            valid_children : [],
+                            icon: "fa fa-file-text-o fa-15x awesomeEntity"
                         },
-                        'archivFehlerFolderStandard' : {
-                            "valid_children" : ["archivDoubleFolderStandard"],
-                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        archivFehlerFolderStandard : {
+                            valid_children : ["archivDoubleFolderStandard"],
+                            icon: "fa fa-file-text-o fa-15x awesomeEntity"
                         },
-                        'archivDocumentFolderStandard' : {
-                            "valid_children" : ["documentFolderStandard"] ,
-                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        archivDocumentFolderStandard : {
+                            valid_children : ["documentFolderStandard"] ,
+                            icon: "fa fa-file-text-o fa-15x awesomeEntity"
                         },
-                        'documentFolderStandard' : {
-                            "valid_children" : -1,
-                            "icon": "fa fa-file-text-o fa-15x awesomeEntity"
+                        documentFolderStandard : {
+                            valid_children : -1,
+                            icon: "fa fa-file-text-o fa-15x awesomeEntity"
                         }
                     },
                     'plugins': ["dnd", "types"]
@@ -875,15 +874,15 @@ function startMoveDialog(rowData, table, typ) {
                         if (form.isFormValid()) {
 
                             try {
-                                var dialogTree = $.jstree.reference('#dialogTree');
-                                var nodeIds = dialogTree.get_selected();
+                                const dialogTree = $.jstree.reference('#dialogTree');
+                                const nodeIds = dialogTree.get_selected();
                                 // über alle selektierten Zeilen iterieren
-                                for (var index = 0; index < rowData.length; ++index) {
-                                     var done = function (json) {
+                                for (let index = 0; index < rowData.length; ++index) {
+                                    const done = function (json) {
                                         if (json.success) {
-                                            var newData = json.data;
-                                            var source = json.source;
-                                            var target = json.target;
+                                            const newData = json.data;
+                                            const source = json.source;
+                                            const target = json.target;
                                             Logger.log(Level.INFO, typ + " " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
                                             // nur wenn die Tabelle angeben ist werden die Zeilen gelöscht. Bei der Tabelle mit den Suchergebnissen
                                             // werden keine Einträge gelöscht und deshalb sollte die Tabelle dort auch nicht für diese Funktion mit
@@ -895,14 +894,14 @@ function startMoveDialog(rowData, table, typ) {
                                         }
                                     };
                                     // Verschieben....
-                                    var json = executeService({
-                                        "name": "moveNode",
-                                        "callback": done,
-                                        "errorMessage": typ + " konnte nicht verschoben werden:"
+                                    executeService({
+                                        name: "moveNode",
+                                        callback: done,
+                                        errorMessage: typ + " konnte nicht verschoben werden:"
                                     }, [
-                                        {"name": "documentId", "value": rowData[index].objectID},
-                                        {"name": "currentLocationId", "value": rowData[index].parentId},
-                                        {"name": "destinationId", "value": nodeIds[0]}
+                                        {name: "documentId", value: rowData[index].objectID},
+                                        {name: "currentLocationId", value: rowData[index].parentId},
+                                        {name: "destinationId", value: nodeIds[0]}
                                     ]);
                                 }
 
@@ -929,7 +928,7 @@ function startMoveDialog(rowData, table, typ) {
  * schliesst den Dialog
  */
 function closeDialog() {
-    var dialogBox = $('#dialogBox');
+    const dialogBox = $('#dialogBox');
     if (dialogBox) {
         dialogBox.dialog("close");
         dialogBox.remove();
@@ -948,35 +947,36 @@ function startDialog(title, dialogSettings, width, modal, callbacks) {
 
     $("<div>", {id: "dialogBox", class: "grid gridpad"}).appendTo("body");
     $('#dialogBox').alpaca(dialogSettings).dialog({
-        "autoOpen": true,
-        "width": width,
-        "height": 'auto',
-        "modal": modal,
-        "title": title,
-        "position": {
-            "my": "top",
-            "at": "center center-20%",
-            "of": window,
-            "collision": "fit",
+        autoOpen: true,
+        width: width,
+        height: 'auto',
+        modal: modal,
+        title: title,
+        dialogClass: "no-close",
+        position: {
+            my: "top",
+            at: "center center-20%",
+            of: window,
+            collision: "fit",
             // Ensure the titlebar is always visible
-            "using": function (pos) {
-                var topOffset = $(this).css(pos).offset().top;
+            using: function (pos) {
+                const topOffset = $(this).css(pos).offset().top;
                 if (topOffset < 0) {
                     $(this).css("top", pos.top - topOffset);
                 }
             }
         },
-        "open": function () {
+        open: function () {
             $(".alpaca-form-buttons-container").addClass("ui-dialog-buttonpane ui-widget-content");
             $(".alpaca-form-button-submit").button();
             $(".alpaca-form-button-reset").button().click(function () {
                 closeDialog();
             });
             if (callbacks) {
-                for (var i = 0; i < callbacks.length; i++) {
-                    var obj = callbacks[i];
+                for (let i = 0; i < callbacks.length; i++) {
+                    const obj = callbacks[i];
                     $(obj.id).button().click(function () {
-                        obj.function();
+                        obj.function($("#dialogBox").alpaca().data);
                         closeDialog();
                     });
                 }

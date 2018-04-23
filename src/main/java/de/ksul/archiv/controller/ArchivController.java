@@ -519,21 +519,24 @@ public class ArchivController {
      */
     @RequestMapping(value = "/deleteDocument", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse deleteDocument(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
+    RestResponse deleteDocument(@RequestBody @Valid final ObjectByIdsRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
         CmisObject document;
-        document = con.getNodeById(model.getDocumentId());
-        if (document != null && document instanceof Document) {
-            if (((Document) document).isVersionSeriesCheckedOut())
-                ((Document) document).cancelCheckOut();
-            document.delete(true);
-            obj.setSuccess(true);
-            obj.setData("");
-        } else {
-            obj.setSuccess(false);
-            obj.setData(document == null ? "Das Document ist nicht vorhanden!" : "Das Document ist nicht vom Typ Document!");
+        for (String id : model.getDocumentId()) {
+            document = con.getNodeById(id);
+            if (document != null && document instanceof Document) {
+                if (((Document) document).isVersionSeriesCheckedOut())
+                    ((Document) document).cancelCheckOut();
+                document.delete(true);
+                obj.setSuccess(true);
+                obj.setData("");
+            } else {
+                obj.setSuccess(false);
+                obj.setData(document == null ? "Das Dokument ist nicht vorhanden!" : "Das Dokument ist nicht vom Typ Dokument!");
+                return obj;
+            }
         }
 
         return obj;
@@ -734,27 +737,33 @@ public class ArchivController {
      * löscht einen Folder
      * löscht einen Pfad
      *
-     * @param model das Requestmodel
+     * @param model das Array mit den Requestmodels
      * @return obj
      */
     @RequestMapping(value = "/deleteFolder", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse deleteFolder(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
+    RestResponse deleteFolder(@RequestBody @Valid final ObjectByIdsRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
 
         CmisObject folder;
-        folder = con.getNodeById(model.getDocumentId());
-        if (folder != null && folder instanceof Folder) {
+        List<String> list = new ArrayList<>();
+        for (String id : model.getDocumentId()) {
+            folder = con.getNodeById(id);
+            if (folder != null && folder instanceof Folder) {
 
-            List<String> list = ((Folder) folder).deleteTree(true, UnfileObject.DELETE, true);
-            obj.setSuccess(true);
-            obj.setData(list);
-        } else {
-            obj.setSuccess(false);
-            obj.setData(folder == null ? "Der  angegebene Pfad ist nicht vorhanden!" : "Der verwendete Pfad ist kein Folder!");
+                list.addAll(((Folder) folder).deleteTree(true, UnfileObject.DELETE, true));
+
+            } else {
+                obj.setSuccess(false);
+                obj.setData(folder == null ? "Der angegebene Pfad ist nicht vorhanden!" : "Der verwendete Pfad ist kein Folder!");
+                return obj;
+            }
         }
 
+        obj.setSuccess(true);
+        obj.setData(list);
+        
         return obj;
     }
 
