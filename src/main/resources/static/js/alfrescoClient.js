@@ -3434,17 +3434,17 @@ function createAlfrescoMenus() {
         menuData: {
             alfrescoDocumentAuswahl: {
                 title: "Auswählen",
-                className: "fa fa-check fa-1x",
+                className: "fas fa-check fa-1x",
                 alfrescoDocumentAuswahlAll: {
                     title: "Alle",
-                    className: "fa fa-check-circle-o fa-1x",
+                    className: "far fa-check-circle fa-1x",
                     action: function () {
                         alfrescoTabelle.rows().select();
                     }
                 },
                 alfrescoDocumentAuswahlRevert: {
                     title: "Umkehren",
-                    className: "fa fa-refresh fa-1x",
+                    className: "fas fa-sync-alt fa-1x",
                     disabled: true,
                     action: function () {
                         var rows = alfrescoTabelle.rows({selected: true})[0];
@@ -3454,7 +3454,7 @@ function createAlfrescoMenus() {
                 },
                 alfrescoDocumentAuswahlNone: {
                     title: "Keine",
-                    className: "fa fa-times-circle-o fa-1x",
+                    className: "far fa-times-circle fa-1x",
                     disabled: true,
                     action: function () {
                         alfrescoTabelle.rows().deselect();
@@ -3468,10 +3468,10 @@ function createAlfrescoMenus() {
         menuData: {
             "alfrescoDocumentAction": {
                 title: "Aktion",
-                className: "fa fa-sign-in fa-1x",
+                className: "fas fa-sign-in-alt fa-1x",
                 alfrescoDocumentActionUpload: {
                     title: "Upload",
-                    className: "fa fa-upload fa-1x",
+                    className: "fas fa-upload fa-1x",
                     file: true,
                     action: function (evt) {
                         try {
@@ -3568,17 +3568,17 @@ function createAlfrescoFolderMenus() {
         menuData: {
             alfrescoFolderAuswahl: {
                 title: "Auswählen",
-                className: "fa fa-check fa-1x",
+                className: "fas fa-check fa-1x",
                 alfrescoFolderAuswahlAll: {
                     title: "Alle",
-                    className: "fa fa-check-circle-o fa-1x",
+                    className: "far fa-check-circle fa-1x",
                     action: function () {
                         alfrescoFolderTabelle.rows().select();
                     }
                 },
                 alfrescoFolderAuswahlRevert: {
                     title: "Umkehren",
-                    className: "fa fa-refresh fa-1x",
+                    className: "fas fa-sync-alt fa-1x",
                     disabled: true,
                     action: function () {
                         var rows = alfrescoFolderTabelle.rows({selected: true})[0];
@@ -3588,7 +3588,7 @@ function createAlfrescoFolderMenus() {
                 },
                 alfrescoFolderAuswahlNone: {
                     title: "Keine",
-                    className: "fa fa-times-circle-o fa-1x",
+                    className: "far fa-times-circle fa-1x",
                     disabled: true,
                     action: function () {
                         alfrescoFolderTabelle.rows().deselect();
@@ -3602,7 +3602,7 @@ function createAlfrescoFolderMenus() {
         menuData: {
             "alfrescoFolderAction": {
                 title: "Aktion",
-                className: "fa fa-sign-in fa-1x",
+                className: "fas fa-sign-in-alt fa-1x",
                 alfrescoFolderActionCreate: {
                     title: "Erstellen",
                     className: "fas fa-plus-circle fa-1x",
@@ -3693,10 +3693,10 @@ function createSearchMenus(){
         menuData: {
             alfrescoSearchDocumentAction: {
                 title: "Aktion",
-                className: "fa fa-sign-in fa-1x",
+                className: "fas fa-sign-in-alt fa-1x",
                 alfrescoSearchDocumentActionMove: {
                     title: "Verschieben",
-                    className: "fa fa-files-o fa-1x",
+                    className: "far fa-copy fa-1x",
                     disabled: true,
                     action: function () {
                         try {
@@ -3722,17 +3722,17 @@ function createSearchMenus(){
         menuData: {
             alfrescoSearchDocumentAuswahl: {
                 title: "Auswählen",
-                className: "fa fa-check fa-1x",
+                className: "fas fa-check fa-1x",
                 alfrescoSearchDocumentAuswahlAll: {
                     title: "Alle",
-                    className: "fa fa-check-circle-o fa-1x",
+                    className: "far fa-check-circle fa-1x",
                     action: function () {
                         alfrescoSearchTabelle.rows().select();
                     }
                 },
                 alfrescoSearchDocumentAuswahlRevert: {
                     title: "Umkehren",
-                    className: "fa fa-refresh fa-1x",
+                    className: "fas fa-sync-alt fa-1x",
                     disabled: true,
                     action: function () {
                         var rows = alfrescoSearchTabelle.rows({selected: true})[0];
@@ -3742,7 +3742,7 @@ function createSearchMenus(){
                 },
                 alfrescoSearchDocumentAuswahlNone: {
                     title: "Keine",
-                    className: "fa fa-times-circle-o fa-1x",
+                    className: "far fa-times-circle fa-1x",
                     disabled: true,
                     action: function () {
                         alfrescoSearchTabelle.rows().deselect();
