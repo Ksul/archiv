@@ -1,4 +1,5 @@
 ./css/jquery-ui-custom.css
+./css/bootstrap.css
 ./css/bootstrap-datetimepicker.css
 ./css/font-awesome.css
 ./css/dataTables.css
@@ -16,7 +17,8 @@
 ./css/ArchivLayout.css
 
 
-./js/jquery/jquery-1.12.1.js
+./js/jquery/jquery-3.3.1.js
+./js/jquery/jquery-migrate.js
 ./js/bootstrap/bootstrap.js
 ./js/ace/ace.js
 ./js/ace/theme-chrome.js

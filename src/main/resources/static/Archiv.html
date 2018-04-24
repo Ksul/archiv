@@ -190,25 +190,25 @@
         <!--Tab Panels-->
         <div id="tabPanels" class="tabPanel">
             <!--Tab Archiv-->
-            <div id="tab1" class="tabPanel hidden">
+            <div id="tab1" class="tabPanel">
                 <div id="alfrescoNorth" onmouseover="alfrescoLayout.allowOverflow(this);"
-                     class="inner-north container hidden">
+                     class="inner-north container">
                     <div id="alfrescoNorthCenter"
-                         class="inner-center container hidden">
+                         class="inner-center container">
                         <div class="breadCrumbHolder module">
                             <div id="breadcrumb" class="breadCrumb module">
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="alfrescoWest" class="inner-west container  hidden">
+                <div id="alfrescoWest" class="inner-west container">
                     <div id="alfrescoHeaderWest" class="header  ui-widget-header">Archiv</div>
                     <div>
                         <div id="tree"></div>
                     </div>
                 </div>
-                <div id="alfrescoCenter" class="inner-center container hidden">
-                    <div id="alfrescoCenterNorth" class="inner-north container hidden">
+                <div id="alfrescoCenter" class="inner-center container">
+                    <div id="alfrescoCenterNorth" class="inner-north container">
                         <div class="header ui-widget-header" id="alfrescoFolderTabelleHeader">Ordner</div>
                         <div>
                             <ul id="selectionMenuAlfrescoFolder" class="sf-menu" style="height: 15px;"></ul>
@@ -220,7 +220,7 @@
                         </div>
                         <div class="header ui-widget-header dataTableFooter" id="alfrescoFolderTableFooter"></div>
                     </div>
-                    <div id="alfrescoCenterCenter" class="inner-center container  hidden">
+                    <div id="alfrescoCenterCenter" class="inner-center container">
                         <div class="header ui-widget-header" id="alfrescoTabelleHeader">Dokumente</div>
                         <div>
                             <ul id="selectionMenuAlfrescoDocuments" class="sf-menu" style="height: 15px;"></ul>
@@ -236,15 +236,15 @@
                 </div>
             </div>
             <!--Tab Suche-->
-            <div id="tab2" class="tabPanel hidden">
-                <div id="searchNorth" class="inner-north container hidden">
+            <div id="tab2" class="tabPanel">
+                <div id="searchNorth" class="inner-north container">
                     <input id="alfrescoSearch" style="width:400px;height:auto;float:left;margin: 3px 5px 5px 5px;"
                            class="ui-autocomplete-input" autocomplete="off"/>
-                    <div id="alfrescoSearchButton" onclick="startSearch($('#alfrescoSearch').val());"
-                         style="margin: 3px 5px 5px 5px;">Suche
-                    </div>
+                    <a class="btn" id="alfrescoSearchButton" onclick="startSearch($('#alfrescoSearch').val());">
+                        <i class="fas fa-search"></i>Suche
+                    </a>
                 </div>
-                <div id="searchCenter" class="inner-center container hidden">
+                <div id="searchCenter" class="inner-center container">
                     <div class="header ui-widget-header" id="searchTabelleHeader">Ergebnisse</div>
                     <div>
                         <ul id="selectionMenuAlfrescoSearchDocuments" class="sf-menu" style="height: 15px;"></ul>
@@ -259,9 +259,9 @@
                 </div>
             </div>
             <!--Tab Verteilung-->
-            <div id="tab3" class="tabPanel hidden">
+            <div id="tab3" class="tabPanel">
                 <!--Dokument-->
-                <div id="verteilungWest" class="ui-tab-layout-west container ui-widget-header hidden">
+                <div id="verteilungWest" class="ui-tab-layout-west container ui-widget-header">
                     <div id="headerWest" class="header">Dokument</div>
                     <div id="subHeaderWest" class="subhead">
                         <table>
@@ -344,7 +344,7 @@
                 </div>
 
                 <!--Regeln-->
-                <div id="verteilungCenter" class="ui-tab-layout-center container ui-widget-header hidden">
+                <div id="verteilungCenter" class="ui-tab-layout-center container ui-widget-header">
                     <div id="headerCenter" class="header">Regeln</div>
                     <div id="subHeaderCenter" class="subhead">
                         <table>
@@ -393,7 +393,7 @@
                     </div>
                 </div>
                 <!--Ergebnis-->
-                <div id="verteilungEast" class="ui-tab-layout-east container ui-widget-header hidden">
+                <div id="verteilungEast" class="ui-tab-layout-east container ui-widget-header">
                     <div class="header">Ergebnis</div>
                     <div id="subHeaderEast" class="subhead">
                         <table>
@@ -421,7 +421,7 @@
 
     </div>
     <!--Ausgabe-->
-    <div id="contentSouth" class="ui-layout-south ui-widget-header container hidden">
+    <div id="contentSouth" class="ui-layout-south ui-widget-header container">
         <div id="headerSouth" class="header">Ausgabe</div>
         <div class="ui-widget-content">
             <div>

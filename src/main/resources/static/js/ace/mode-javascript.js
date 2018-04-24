@@ -1,4 +1,4 @@
-ace.define("ace/mode/doc_comment_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
+define("ace/mode/doc_comment_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
@@ -25,7 +25,7 @@ ace.define("ace/mode/doc_comment_highlight_rules",["require","exports","module",
             token : "comment.doc.tag.storage.type",
             regex : "\\b(?:TODO|FIXME|XXX|HACK)\\b"
         };
-    }
+    };
 
     DocCommentHighlightRules.getStartRule = function(start) {
         return {
@@ -48,7 +48,7 @@ ace.define("ace/mode/doc_comment_highlight_rules",["require","exports","module",
 
 });
 
-ace.define("ace/mode/javascript_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/doc_comment_highlight_rules","ace/mode/text_highlight_rules"], function(require, exports, module) {
+define("ace/mode/javascript_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/doc_comment_highlight_rules","ace/mode/text_highlight_rules"], function(require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
@@ -92,7 +92,6 @@ ace.define("ace/mode/javascript_highlight_rules",["require","exports","module","
             "3[0-7][0-7]?|" + // oct
             "[4-7][0-7]?|" + //oct
             ".)";
-
         this.$rules = {
             "no_regex" : [
                 DocCommentHighlightRules.getStartRule("doc-start"),
@@ -521,7 +520,7 @@ ace.define("ace/mode/javascript_highlight_rules",["require","exports","module","
     exports.JavaScriptHighlightRules = JavaScriptHighlightRules;
 });
 
-ace.define("ace/mode/matching_brace_outdent",["require","exports","module","ace/range"], function(require, exports, module) {
+define("ace/mode/matching_brace_outdent",["require","exports","module","ace/range"], function(require, exports, module) {
     "use strict";
 
     var Range = require("../range").Range;
@@ -561,7 +560,7 @@ ace.define("ace/mode/matching_brace_outdent",["require","exports","module","ace/
     exports.MatchingBraceOutdent = MatchingBraceOutdent;
 });
 
-ace.define("ace/mode/folding/cstyle",["require","exports","module","ace/lib/oop","ace/range","ace/mode/folding/fold_mode"], function(require, exports, module) {
+define("ace/mode/folding/cstyle",["require","exports","module","ace/lib/oop","ace/range","ace/mode/folding/fold_mode"], function(require, exports, module) {
     "use strict";
 
     var oop = require("../../lib/oop");
@@ -582,8 +581,8 @@ ace.define("ace/mode/folding/cstyle",["require","exports","module","ace/lib/oop"
 
     (function() {
 
-        this.foldingStartMarker = /(\{|\[)[^\}\]]*$|^\s*(\/\*)/;
-        this.foldingStopMarker = /^[^\[\{]*(\}|\])|^[\s\*]*(\*\/)/;
+        this.foldingStartMarker = /([\{\[\(])[^\}\]\)]*$|^\s*(\/\*)/;
+        this.foldingStopMarker = /^[^\[\{\(]*([\}\]\)])|^[\s\*]*(\*\/)/;
         this.singleLineBlockCommentRe= /^\s*(\/\*).*\*\/\s*$/;
         this.tripleStarBlockCommentRe = /^\s*(\/\*\*\*).*\*\/\s*$/;
         this.startRegionRe = /^\s*(\/\*|\/\/)#?region\b/;
@@ -701,7 +700,7 @@ ace.define("ace/mode/folding/cstyle",["require","exports","module","ace/lib/oop"
 
 });
 
-ace.define("ace/mode/javascript",["require","exports","module","ace/lib/oop","ace/mode/text","ace/mode/javascript_highlight_rules","ace/mode/matching_brace_outdent","ace/worker/worker_client","ace/mode/behaviour/cstyle","ace/mode/folding/cstyle"], function(require, exports, module) {
+define("ace/mode/javascript",["require","exports","module","ace/lib/oop","ace/mode/text","ace/mode/javascript_highlight_rules","ace/mode/matching_brace_outdent","ace/worker/worker_client","ace/mode/behaviour/cstyle","ace/mode/folding/cstyle"], function(require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
@@ -787,3 +786,11 @@ ace.define("ace/mode/javascript",["require","exports","module","ace/lib/oop","ac
 
     exports.Mode = Mode;
 });
+(function() {
+    window.require(["ace/mode/javascript"], function(m) {
+        if (typeof module == "object" && typeof exports == "object" && module) {
+            module.exports = m;
+        }
+    });
+})();
+            

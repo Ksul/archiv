@@ -1,5 +1,5 @@
 "no use strict";
-(function(window) {
+!(function(window) {
     if (typeof window.window != "undefined" && window.document)
         return;
     if (window.require && window.define)
@@ -20,13 +20,13 @@
 
     window.onerror = function(message, file, line, col, err) {
         postMessage({type: "error", data: {
-            message: message,
-            data: err.data,
-            file: file,
-            line: line,
-            col: col,
-            stack: err.stack
-        }});
+                message: message,
+                data: err.data,
+                file: file,
+                line: line,
+                col: col,
+                stack: err.stack
+            }});
     };
 
     window.normalizeModule = function(parentId, moduleName) {
@@ -217,7 +217,7 @@
     };
 })(this);
 
-ace.define("ace/lib/oop",["require","exports","module"], function(require, exports, module) {
+define("ace/lib/oop",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     exports.inherits = function(ctor, superCtor) {
@@ -245,7 +245,7 @@ ace.define("ace/lib/oop",["require","exports","module"], function(require, expor
 
 });
 
-ace.define("ace/lib/lang",["require","exports","module"], function(require, exports, module) {
+define("ace/lib/lang",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     exports.last = function(a) {
@@ -433,7 +433,7 @@ ace.define("ace/lib/lang",["require","exports","module"], function(require, expo
     };
 });
 
-ace.define("ace/range",["require","exports","module"], function(require, exports, module) {
+define("ace/range",["require","exports","module"], function(require, exports, module) {
     "use strict";
     var comparePoints = function(p1, p2) {
         return p1.row - p2.row || p1.column - p2.column;
@@ -459,7 +459,7 @@ ace.define("ace/range",["require","exports","module"], function(require, exports
         };
         this.toString = function() {
             return ("Range: [" + this.start.row + "/" + this.start.column +
-            "] -> [" + this.end.row + "/" + this.end.column + "]");
+                "] -> [" + this.end.row + "/" + this.end.column + "]");
         };
 
         this.contains = function(row, column) {
@@ -638,9 +638,9 @@ ace.define("ace/range",["require","exports","module"], function(require, exports
         };
         this.collapseRows = function() {
             if (this.end.column == 0)
-                return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0)
+                return new Range(this.start.row, 0, Math.max(this.start.row, this.end.row-1), 0);
             else
-                return new Range(this.start.row, 0, this.end.row, 0)
+                return new Range(this.start.row, 0, this.end.row, 0);
         };
         this.toScreenRange = function(session) {
             var screenPosStart = session.documentToScreenPosition(this.start);
@@ -672,7 +672,7 @@ ace.define("ace/range",["require","exports","module"], function(require, exports
     exports.Range = Range;
 });
 
-ace.define("ace/apply_delta",["require","exports","module"], function(require, exports, module) {
+define("ace/apply_delta",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     function throwDeltaError(delta, errorText){
@@ -705,7 +705,6 @@ ace.define("ace/apply_delta",["require","exports","module"], function(require, e
     }
 
     exports.applyDelta = function(docLines, delta, doNotValidate) {
-
         var row = delta.start.row;
         var startColumn = delta.start.column;
         var line = docLines[row] || "";
@@ -734,10 +733,10 @@ ace.define("ace/apply_delta",["require","exports","module"], function(require, e
                 }
                 break;
         }
-    }
+    };
 });
 
-ace.define("ace/lib/event_emitter",["require","exports","module"], function(require, exports, module) {
+define("ace/lib/event_emitter",["require","exports","module"], function(require, exports, module) {
     "use strict";
 
     var EventEmitter = {};
@@ -795,7 +794,7 @@ ace.define("ace/lib/event_emitter",["require","exports","module"], function(requ
 
 
     EventEmitter.setDefaultHandler = function(eventName, callback) {
-        var handlers = this._defaultHandlers
+        var handlers = this._defaultHandlers;
         if (!handlers)
             handlers = this._defaultHandlers = {_disabled_: {}};
 
@@ -812,7 +811,7 @@ ace.define("ace/lib/event_emitter",["require","exports","module"], function(requ
         handlers[eventName] = callback;
     };
     EventEmitter.removeDefaultHandler = function(eventName, callback) {
-        var handlers = this._defaultHandlers
+        var handlers = this._defaultHandlers;
         if (!handlers)
             return;
         var disabled = handlers._disabled_[eventName];
@@ -863,7 +862,7 @@ ace.define("ace/lib/event_emitter",["require","exports","module"], function(requ
 
 });
 
-ace.define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/event_emitter"], function(require, exports, module) {
+define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/event_emitter"], function(require, exports, module) {
     "use strict";
 
     var oop = require("./lib/oop");
@@ -923,7 +922,6 @@ ace.define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/eve
                     column: point.column + (point.row == deltaEnd.row ? deltaColShift : 0)
                 };
             }
-
             return {
                 row: deltaStart.row,
                 column: deltaStart.column
@@ -988,7 +986,7 @@ ace.define("ace/anchor",["require","exports","module","ace/lib/oop","ace/lib/eve
 
 });
 
-ace.define("ace/document",["require","exports","module","ace/lib/oop","ace/apply_delta","ace/lib/event_emitter","ace/range","ace/anchor"], function(require, exports, module) {
+define("ace/document",["require","exports","module","ace/lib/oop","ace/apply_delta","ace/lib/event_emitter","ace/range","ace/anchor"], function(require, exports, module) {
     "use strict";
 
     var oop = require("./lib/oop");
@@ -1275,32 +1273,27 @@ ace.define("ace/document",["require","exports","module","ace/lib/oop","ace/apply
         this.applyDelta = function(delta, doNotValidate) {
             var isInsert = delta.action == "insert";
             if (isInsert ? delta.lines.length <= 1 && !delta.lines[0]
-                    : !Range.comparePoints(delta.start, delta.end)) {
+                : !Range.comparePoints(delta.start, delta.end)) {
                 return;
             }
 
-            if (isInsert && delta.lines.length > 20000)
+            if (isInsert && delta.lines.length > 20000) {
                 this.$splitAndapplyLargeDelta(delta, 20000);
-            applyDelta(this.$lines, delta, doNotValidate);
-            this._signal("change", delta);
+            }
+            else {
+                applyDelta(this.$lines, delta, doNotValidate);
+                this._signal("change", delta);
+            }
         };
 
         this.$splitAndapplyLargeDelta = function(delta, MAX) {
             var lines = delta.lines;
-            var l = lines.length;
+            var l = lines.length - MAX + 1;
             var row = delta.start.row;
             var column = delta.start.column;
-            var from = 0, to = 0;
-            do {
-                from = to;
+            for (var from = 0, to = 0; from < l; from = to) {
                 to += MAX - 1;
                 var chunk = lines.slice(from, to);
-                if (to > l) {
-                    delta.lines = chunk;
-                    delta.start.row = row + from;
-                    delta.start.column = column;
-                    break;
-                }
                 chunk.push("");
                 this.applyDelta({
                     start: this.pos(row + from, column),
@@ -1308,7 +1301,11 @@ ace.define("ace/document",["require","exports","module","ace/lib/oop","ace/apply
                     action: delta.action,
                     lines: chunk
                 }, true);
-            } while(true);
+            }
+            delta.lines = lines.slice(from);
+            delta.start.row = row + from;
+            delta.start.column = column;
+            this.applyDelta(delta, true);
         };
         this.revertDelta = function(delta) {
             this.applyDelta({
@@ -1326,7 +1323,7 @@ ace.define("ace/document",["require","exports","module","ace/lib/oop","ace/apply
                 if (index < 0)
                     return {row: i, column: index + lines[i].length + newlineLength};
             }
-            return {row: l-1, column: lines[l-1].length};
+            return {row: l-1, column: index + lines[l-1].length + newlineLength};
         };
         this.positionToIndex = function(pos, startRow) {
             var lines = this.$lines || this.getAllLines();
@@ -1344,7 +1341,7 @@ ace.define("ace/document",["require","exports","module","ace/lib/oop","ace/apply
     exports.Document = Document;
 });
 
-ace.define("ace/worker/mirror",["require","exports","module","ace/range","ace/document","ace/lib/lang"], function(require, exports, module) {
+define("ace/worker/mirror",["require","exports","module","ace/range","ace/document","ace/lib/lang"], function(require, exports, module) {
     "use strict";
 
     var Range = require("../range").Range;
@@ -1406,7 +1403,7 @@ ace.define("ace/worker/mirror",["require","exports","module","ace/range","ace/do
 
 });
 
-ace.define("ace/mode/xml/sax",["require","exports","module"], function(require, exports, module) {
+define("ace/mode/xml/sax",["require","exports","module"], function(require, exports, module) {
     var nameStartChar = /[A-Z_a-z\xC0-\xD6\xD8-\xF6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]///\u10000-\uEFFFF
     var nameChar = new RegExp("[\\-\\.0-9"+nameStartChar.source.slice(1,-1)+"\u00B7\u0300-\u036F\\ux203F-\u2040]");
     var tagNamePattern = new RegExp('^'+nameStartChar.source+nameChar.source+'*(?:\:'+nameStartChar.source+nameChar.source+'*)?$');
@@ -1917,7 +1914,7 @@ ace.define("ace/mode/xml/sax",["require","exports","module"], function(require, 
     return XMLReader;
 });
 
-ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, exports, module) {
+define("ace/mode/xml/dom",["require","exports","module"], function(require, exports, module) {
 
     function copy(src,dest){
         for(var p in src){
@@ -1925,13 +1922,13 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         }
     }
     function _extends(Class,Super){
+        var t = function(){};
         var pt = Class.prototype;
         if(Object.create){
-            var ppt = Object.create(Super.prototype)
+            var ppt = Object.create(Super.prototype);
             pt.__proto__ = ppt;
         }
         if(!(pt instanceof Super)){
-            function t(){};
             t.prototype = Super.prototype;
             t = new t();
             copy(pt,t);
@@ -1939,13 +1936,13 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         }
         if(pt.constructor != Class){
             if(typeof Class != 'function'){
-                console.error("unknow Class:"+Class)
+                console.error("unknown Class:"+Class);
             }
-            pt.constructor = Class
+            pt.constructor = Class;
         }
     }
     var htmlns = 'http://www.w3.org/1999/xhtml' ;
-    var NodeType = {}
+    var NodeType = {};
     var ELEMENT_NODE                = NodeType.ELEMENT_NODE                = 1;
     var ATTRIBUTE_NODE              = NodeType.ATTRIBUTE_NODE              = 2;
     var TEXT_NODE                   = NodeType.TEXT_NODE                   = 3;
@@ -1958,7 +1955,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
     var DOCUMENT_TYPE_NODE          = NodeType.DOCUMENT_TYPE_NODE          = 10;
     var DOCUMENT_FRAGMENT_NODE      = NodeType.DOCUMENT_FRAGMENT_NODE      = 11;
     var NOTATION_NODE               = NodeType.NOTATION_NODE               = 12;
-    var ExceptionCode = {}
+    var ExceptionCode = {};
     var ExceptionMessage = {};
     var INDEX_SIZE_ERR              = ExceptionCode.INDEX_SIZE_ERR              = ((ExceptionMessage[1]="Index size error"),1);
     var DOMSTRING_SIZE_ERR          = ExceptionCode.DOMSTRING_SIZE_ERR          = ((ExceptionMessage[2]="DOMString size error"),2);
@@ -2002,7 +1999,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
     };
     function LiveNodeList(node,refresh){
         this._node = node;
-        this._refresh = refresh
+        this._refresh = refresh;
         _updateLiveList(this);
     }
     function _updateLiveList(list){
@@ -2048,9 +2045,9 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
     function _removeNamedNode(el,list,attr){
         var i = _findNodeIndex(list,attr);
         if(i>=0){
-            var lastIndex = list.length-1
+            var lastIndex = list.length-1;
             while(i<lastIndex){
-                list[i] = list[++i]
+                list[i] = list[++i];
             }
             list.length = lastIndex;
             if(el){
@@ -2061,7 +2058,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
                 }
             }
         }else{
-            throw DOMException(NOT_FOUND_ERR,new Error())
+            throw new DOMException(NOT_FOUND_ERR,new Error());
         }
     }
     NamedNodeMap.prototype = {
@@ -2255,7 +2252,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
             c == '>' && '&gt;' ||
             c == '&' && '&amp;' ||
             c == '"' && '&quot;' ||
-            '&#'+c.charCodeAt()+';'
+            '&#'+c.charCodeAt()+';';
     }
 
 
@@ -2287,7 +2284,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         doc && doc._inc++;
         var ns = newAttr.namespaceURI ;
         if(ns == 'http://www.w3.org/2000/xmlns/'){
-            delete el._nsMap[newAttr.prefix?newAttr.localName:'']
+            delete el._nsMap[newAttr.prefix?newAttr.localName:''];
         }
     }
     function _onUpdateChild(doc,el,newChild){
@@ -2423,7 +2420,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
                         return true;
                     }
                 }
-            })
+            });
             return rtv;
         },
         createElement :	function(tagName){
@@ -2445,19 +2442,19 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         createTextNode :	function(data){
             var node = new Text();
             node.ownerDocument = this;
-            node.appendData(data)
+            node.appendData(data);
             return node;
         },
         createComment :	function(data){
             var node = new Comment();
             node.ownerDocument = this;
-            node.appendData(data)
+            node.appendData(data);
             return node;
         },
         createCDATASection :	function(data){
             var node = new CDATASection();
             node.ownerDocument = this;
-            node.appendData(data)
+            node.appendData(data);
             return node;
         },
         createProcessingInstruction :	function(target,data){
@@ -2538,10 +2535,10 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         setAttribute : function(name, value){
             var attr = this.ownerDocument.createAttribute(name);
             attr.value = attr.nodeValue = "" + value;
-            this.setAttributeNode(attr)
+            this.setAttributeNode(attr);
         },
         removeAttribute : function(name){
-            var attr = this.getAttributeNode(name)
+            var attr = this.getAttributeNode(name);
             attr && this.removeAttributeNode(attr);
         },
         appendChild:function(newChild){
@@ -2575,7 +2572,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         setAttributeNS : function(namespaceURI, qualifiedName, value){
             var attr = this.ownerDocument.createAttributeNS(namespaceURI, qualifiedName);
             attr.value = attr.nodeValue = "" + value;
-            this.setAttributeNode(attr)
+            this.setAttributeNode(attr);
         },
         getAttributeNodeNS : function(namespaceURI, localName){
             return this.attributes.getNamedItemNS(namespaceURI, localName);
@@ -2629,11 +2626,10 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         },
         insertData: function(offset,text) {
             this.replaceData(offset,0,text);
-
         },
         appendChild:function(newChild){
-            throw new Error(ExceptionMessage[3])
-            return Node.prototype.appendChild.apply(this,arguments)
+            throw new Error(ExceptionMessage[3]);
+            return Node.prototype.appendChild.apply(this,arguments);
         },
         deleteData: function(offset, count) {
             this.replaceData(offset,count,"");
@@ -2684,27 +2680,27 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
 
 
     function DocumentType() {
-    };
+    }
     DocumentType.prototype.nodeType = DOCUMENT_TYPE_NODE;
     _extends(DocumentType,Node);
 
     function Notation() {
-    };
+    }
     Notation.prototype.nodeType = NOTATION_NODE;
     _extends(Notation,Node);
 
     function Entity() {
-    };
+    }
     Entity.prototype.nodeType = ENTITY_NODE;
     _extends(Entity,Node);
 
     function EntityReference() {
-    };
+    }
     EntityReference.prototype.nodeType = ENTITY_REFERENCE_NODE;
     _extends(EntityReference,Node);
 
     function DocumentFragment() {
-    };
+    }
     DocumentFragment.prototype.nodeName =	"#document-fragment";
     DocumentFragment.prototype.nodeType =	DOCUMENT_FRAGMENT_NODE;
     _extends(DocumentFragment,Node);
@@ -2730,10 +2726,10 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
                 var len = attrs.length;
                 var child = node.firstChild;
                 var nodeName = node.tagName;
-                var isHTML = htmlns === node.namespaceURI
+                var isHTML = htmlns === node.namespaceURI;
                 buf.push('<',nodeName);
                 for(var i=0;i<len;i++){
-                    serializeToString(attrs.item(i),buf,isHTML);
+                    serializeToString(attrs.item(i),buf);
                 }
                 if(child || isHTML && !/^(?:meta|link|img|br|hr|input|button)$/i.test(nodeName)){
                     buf.push('>');
@@ -2822,6 +2818,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
         }
         return node2;
     }
+//
     function cloneNode(doc,node,deep){
         var node2 = new node.constructor();
         for(var n in node){
@@ -2840,12 +2837,12 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
             case ELEMENT_NODE:
                 var attrs	= node.attributes;
                 var attrs2	= node2.attributes = new NamedNodeMap();
-                var len = attrs.length
+                var len = attrs.length;
                 attrs2._ownerElement = node2;
                 for(var i=0;i<len;i++){
                     node2.setAttributeNode(cloneNode(doc,attrs.item(i),true));
                 }
-                break;;
+                break;
             case ATTRIBUTE_NODE:
                 deep = true;
         }
@@ -2860,7 +2857,24 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
     }
 
     function __set__(object,key,value){
-        object[key] = value
+        object[key] = value;
+    }
+    function getTextContent(node){
+        switch(node.nodeType){
+            case 1:
+            case 11:
+                var buf = [];
+                node = node.firstChild;
+                while(node){
+                    if(node.nodeType!==7 && node.nodeType !==8){
+                        buf.push(getTextContent(node));
+                    }
+                    node = node.nextSibling;
+                }
+                return buf.join('');
+            default:
+                return node.nodeValue;
+        }
     }
     try{
         if(Object.defineProperty){
@@ -2891,28 +2905,11 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
                             this.nodeValue = data;
                     }
                 }
-            })
+            });
 
-            function getTextContent(node){
-                switch(node.nodeType){
-                    case 1:
-                    case 11:
-                        var buf = [];
-                        node = node.firstChild;
-                        while(node){
-                            if(node.nodeType!==7 && node.nodeType !==8){
-                                buf.push(getTextContent(node));
-                            }
-                            node = node.nextSibling;
-                        }
-                        return buf.join('');
-                    default:
-                        return node.nodeValue;
-                }
-            }
             __set__ = function(object,key,value){
-                object['$$'+key] = value
-            }
+                object['$$'+key] = value;
+            };
         }
     }catch(e){//ie8
     }
@@ -2920,7 +2917,7 @@ ace.define("ace/mode/xml/dom",["require","exports","module"], function(require, 
     return DOMImplementation;
 });
 
-ace.define("ace/mode/xml/dom-parser",["require","exports","module","ace/mode/xml/sax","ace/mode/xml/dom"], function(require, exports, module) {
+define("ace/mode/xml/dom-parser",["require","exports","module","ace/mode/xml/sax","ace/mode/xml/dom"], function(require, exports, module) {
     'use strict';
 
     var XMLReader = require('./sax'),
@@ -2981,8 +2978,8 @@ ace.define("ace/mode/xml/dom-parser",["require","exports","module","ace/mode/xml
                 }
             }
             errorHandler[key] = fn && function(msg){
-                    fn(msg+_locator(locator), msg, locator);
-                }||function(){};
+                fn(msg+_locator(locator), msg, locator);
+            }||function(){};
         }
         build('warning','warn');
         build('error','warn','warning');
@@ -3126,7 +3123,7 @@ ace.define("ace/mode/xml/dom-parser",["require","exports","module","ace/mode/xml
     };
 });
 
-ace.define("ace/mode/xml_worker",["require","exports","module","ace/lib/oop","ace/lib/lang","ace/worker/mirror","ace/mode/xml/dom-parser"], function(require, exports, module) {
+define("ace/mode/xml_worker",["require","exports","module","ace/lib/oop","ace/lib/lang","ace/worker/mirror","ace/mode/xml/dom-parser"], function(require, exports, module) {
     "use strict";
 
     var oop = require("../lib/oop");
@@ -3189,8 +3186,10 @@ ace.define("ace/mode/xml_worker",["require","exports","module","ace/lib/oop","ac
 
 });
 
-ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, exports, module) {
+define("ace/lib/es5-shim",["require","exports","module"], function(require, exports, module) {
 
+//
+//
     function Empty() {}
 
     if (!Function.prototype.bind) {
@@ -3203,7 +3202,6 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
             var bound = function () {
 
                 if (this instanceof bound) {
-
                     var result = target.apply(
                         this,
                         args.concat(slice.call(arguments))
@@ -3227,6 +3225,7 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
                 bound.prototype = new Empty();
                 Empty.prototype = null;
             }
+            //
             return bound;
         };
     }
@@ -3247,27 +3246,30 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
         lookupGetter = call.bind(prototypeOfObject.__lookupGetter__);
         lookupSetter = call.bind(prototypeOfObject.__lookupSetter__);
     }
+
+//
+//
     if ([1,2].splice(0).length != 2) {
         if(function() { // test IE < 9 to splice bug - see issue #138
-                function makeArray(l) {
-                    var a = new Array(l+2);
-                    a[0] = a[1] = 0;
-                    return a;
-                }
-                var array = [], lengthBefore;
+            function makeArray(l) {
+                var a = new Array(l+2);
+                a[0] = a[1] = 0;
+                return a;
+            }
+            var array = [], lengthBefore;
 
-                array.splice.apply(array, makeArray(20));
-                array.splice.apply(array, makeArray(26));
+            array.splice.apply(array, makeArray(20));
+            array.splice.apply(array, makeArray(26));
 
-                lengthBefore = array.length; //46
-                array.splice(5, 0, "XXX"); // add one element
+            lengthBefore = array.length; //46
+            array.splice(5, 0, "XXX"); // add one element
 
-                lengthBefore + 1 == array.length
+            lengthBefore + 1 == array.length
 
-                if (lengthBefore + 1 == array.length) {
-                    return true;// has right splice implementation without bugs
-                }
-            }()) {//IE 6/7
+            if (lengthBefore + 1 == array.length) {
+                return true;// has right splice implementation without bugs
+            }
+        }()) {//IE 6/7
             var array_splice = Array.prototype.splice;
             Array.prototype.splice = function(start, deleteCount) {
                 if (!arguments.length) {
@@ -3525,8 +3527,8 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
     if (!Array.prototype.indexOf || ([0, 1].indexOf(1, 2) != -1)) {
         Array.prototype.indexOf = function indexOf(sought /*, fromIndex */ ) {
             var self = splitString && _toString(this) == "[object String]" ?
-                    this.split("") :
-                    toObject(this),
+                this.split("") :
+                toObject(this),
                 length = self.length >>> 0;
 
             if (!length) {
@@ -3549,8 +3551,8 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
     if (!Array.prototype.lastIndexOf || ([0, 1].lastIndexOf(0, -3) != -1)) {
         Array.prototype.lastIndexOf = function lastIndexOf(sought /*, fromIndex */) {
             var self = splitString && _toString(this) == "[object String]" ?
-                    this.split("") :
-                    toObject(this),
+                this.split("") :
+                toObject(this),
                 length = self.length >>> 0;
 
             if (!length) {
@@ -3569,13 +3571,16 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
             return -1;
         };
     }
+
+//
+//
     if (!Object.getPrototypeOf) {
         Object.getPrototypeOf = function getPrototypeOf(object) {
             return object.__proto__ || (
-                    object.constructor ?
-                        object.constructor.prototype :
-                        prototypeOfObject
-                );
+                object.constructor ?
+                    object.constructor.prototype :
+                    prototypeOfObject
+            );
         };
     }
     if (!Object.getOwnPropertyDescriptor) {
@@ -3652,7 +3657,6 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
             return object;
         };
     }
-
     function doesDefinePropertyWork(object) {
         try {
             Object.defineProperty(object, "sentinel", {});
@@ -3818,11 +3822,18 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
         };
 
     }
+
+//
+//
     if (!Date.now) {
         Date.now = function now() {
             return new Date().getTime();
         };
     }
+
+
+//
+//
     var ws = "\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003" +
         "\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028" +
         "\u2029\uFEFF";
@@ -3835,6 +3846,8 @@ ace.define("ace/lib/es5-shim",["require","exports","module"], function(require, 
         };
     }
 
+//
+//
     function toInteger(n) {
         n = +n;
         if (n !== n) { // isNaN

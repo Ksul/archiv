@@ -1060,8 +1060,8 @@ var makeEditable;
             oSettings = oTable.settings().context[0];
             properties.bUseKeyTable = (properties.oKeyTable != null);
 
-            return $(document.getElementById(oTable.toJQuery().context[0].sTableId)).each(function () {
-                var sTableId = oTable.toJQuery().context[0].sTableId;
+            return $(document.getElementById(oTable.context[0].sTableId)).each(function () {
+                var sTableId = oTable.context[0].sTableId;
                 //KEYTABLE
                 if (properties.bUseKeyTable) {
                     var keys = new KeyTable({

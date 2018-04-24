@@ -3847,11 +3847,11 @@ function buildSearchTab() {
             startSearch($(this).val());
         }
     });
-    $("#alfrescoSearchButton").button({
-        icons: {
-            primary: 'ui-icon-search'
-        }
-    });
+    // $("#alfrescoSearchButton").button({
+    //     icons: {
+    //         primary: 'ui-icon-search'
+    //     }
+    // });
 
 }
 

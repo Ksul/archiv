@@ -889,7 +889,7 @@ a:before, label:before {
     padding: 0em;
 }
 
-.alertify .ajs-button {
+.alertify .ajs-button .alpaca-form-button {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -909,4 +909,8 @@ a:before, label:before {
     -ms-user-select: none;
     user-select: none;
     min-height: inherit;
+}
+
+#alfrescoSearchButton {
+    padding-right: 5px;
 }
