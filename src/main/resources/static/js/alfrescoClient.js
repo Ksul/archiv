@@ -98,20 +98,20 @@ function resizeTable(panel, divId, tabelleId, headerId, footerId) {
 
 
 function asumeCountOfTableEntries(panel,  divId, tabelleId,headerId, footerId) {
-    var div = $('#'+divId);
-    var completePanel = $('#' + panel).height();
-    var topPanel = div.children().children()[0].offsetHeight;
-    var downPanel = div.children().children()[2].offsetHeight;
-    var columnPanel = div.children().children()[1].children[0].offsetHeight;
-    var headerPanel = $('#' + headerId).height();
-    var footerPanel = $('#' + footerId).height();
-    var rowHeight = $('.odd') + 2;
+    const div = $('#'+divId);
+    const completePanel = $('#' + panel).height();
+    const topPanel = div.children().children()[0].offsetHeight;
+    const downPanel = div.children().children()[2].offsetHeight;
+    const columnPanel = div.children().children()[1].children[0].offsetHeight;
+    const headerPanel = $('#' + headerId).height();
+    const footerPanel = $('#' + footerId).height();
+    const rowHeight = $('.odd') + 2;
     return Math.floor((completePanel - topPanel - headerPanel - columnPanel - downPanel - footerPanel) / rowHeight);
 }
 
 function toggleLiveResizing() {
     $.each($.layout.config.borderPanes, function (i, pane) {
-        var o = verteilungLayout.options[pane];
+        const o = verteilungLayout.options[pane];
         o.livePaneResizing = !o.livePaneResizing;
     });
 }
@@ -120,8 +120,8 @@ function toggleLiveResizing() {
 function toggleStateManagement(skipAlert, mode) {
     if (!$.layout.plugins.stateManagement) return;
 
-    var options = verteilungLayout.options.stateManagement
-        , enabled = options.enabled // current setting
+    const options = verteilungLayout.options.stateManagement;
+    let enabled = options.enabled // current setting
         ;
     if ($.type(mode) === "boolean") {
         if (enabled === mode) return; // already correct
@@ -144,13 +144,14 @@ function toggleStateManagement(skipAlert, mode) {
  */
 function loadLayout() {
     try {
-        var clientPageLayoutSettings = {
+        const tabs = $("#tabs");
+        const clientPageLayoutSettings = {
             name: "clientLayoutSettings",
             center__paneSelector: "#clientPage",
             resizable: false
         };
         // Seitenlayout
-        var pageLayoutSettings = {
+        const pageLayoutSettings = {
             name: "pageLayout",
             spacing_open: 8,
             spacing_closed: 12,
@@ -158,7 +159,8 @@ function loadLayout() {
             togglerClass: "ui-widget-content",
             center: {
                 paneSelector: "#tabs",
-                size: "auto"                                         
+                size: "auto",
+                resizeWithWindow: true
             },
             south: {
                 paneSelector: "#contentSouth",
@@ -172,7 +174,7 @@ function loadLayout() {
             }
         };
 
-        var contentLayoutSettings = {
+        const contentLayoutSettings = {
             name: "contentLayout",
             spacing_open: 0,
             spacing_closed: 12,
@@ -196,7 +198,7 @@ function loadLayout() {
         };
 
          //AlfrescoTab
-        var alfrescoLayoutSettings = {
+        const alfrescoLayoutSettings = {
             name: "alfrescoLayout",
             size: "auto",
             resizerTip: "Resize This Pane",
@@ -210,8 +212,8 @@ function loadLayout() {
             north: {
                 paneSelector: "#alfrescoNorth",
                 name: "alfrescoNorthLayout",
-                minSize: 28,
-                maxSize: 28,
+                minSize: 30,
+                maxSize: 30,
                 resizable: false,
                 closable: false,
                 children: {
@@ -275,21 +277,22 @@ function loadLayout() {
             }
         };
         // SearchTab
-        var searchLayoutSettings = {
+        const searchLayoutSettings = {
             name: "searchLayout",
             size: "auto",
-            minSize: 36,
+            resizerTip: "Resize This Pane",
+            livePaneResizing: true,
             spacing_open: 8,
             spacing_closed: 12,
-            livePaneResizing: true,
+            resizeWithWindow: false,
             contentSelector: ".ui-widget-content",
             resizerClass: "ui-widget-content",
             togglerClass: "ui-widget-content",
             north: {
                 paneSelector: "#searchNorth",
                 name: "searchNorthLayout",
-                minSize: 36,
-                maxSize: 36,
+                minSize: 30,
+                maxSize: 30,
                 resizable: false,
                 closable: false,
                 slidable: false
@@ -297,8 +300,7 @@ function loadLayout() {
             center: {
                 paneSelector: "#searchCenter",
                 name: "searchCenterLayout",
-                minHeight: 80,
-                size: .8,
+                size: "auto",
                 onresize: function () {
                     try {
                         $("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#searchCenter").outerHeight() - ($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight() +
@@ -311,7 +313,7 @@ function loadLayout() {
         };
 
         //VerteilungTab
-        var verteilungLayoutSettings = {
+        const verteilungLayoutSettings = {
             name: "verteilungLayout",
             size: "auto",
             minSize: 13,
@@ -377,7 +379,7 @@ function loadLayout() {
 
 
         // create the tabs before the page layout because tabs will change the height of the north-pane
-        tabLayout = $("#tabs").tabs({
+        tabLayout = tabs.tabs({
             activate: function (event, ui) {
                 $.layout.callbacks.resizeTabLayout(event, ui);
                 // bei den nicht sichtbaren Panels ist die Height zunächst 0, so dass das Scrollen nicht funktioniert.
@@ -405,9 +407,9 @@ function loadLayout() {
 
 
 
-        var globalLayout = $('body').layout(clientPageLayoutSettings);
+        const globalLayout = $('body').layout(clientPageLayoutSettings);
         $('#clientPage').layout(pageLayoutSettings);
-        $('#tabs').layout(contentLayoutSettings);
+        tabs.layout(contentLayoutSettings);
 
 
         alfrescoLayout = $('#tab1').layout(alfrescoLayoutSettings);
@@ -418,7 +420,7 @@ function loadLayout() {
         globalLayout.deleteCookie();
         globalLayout.options.stateManagement.autoSave = false;
         // if there is no state-cookie, then DISABLE state management initially
-        var cookieExists = !$.isEmptyObject(verteilungLayout.readCookie());
+        const cookieExists = !$.isEmptyObject(verteilungLayout.readCookie());
         if (!cookieExists) toggleStateManagement(true, false);
     } catch (e) {
         errorHandler(e);
@@ -1315,7 +1317,7 @@ function loadAlfrescoSearchTable() {
                 {
                     data: null,
                     title: "Aktion",
-                    width: "120px",
+                    width: "130px",
                     class: "alignLeft"
                 },
                 {
@@ -1337,8 +1339,8 @@ function loadAlfrescoSearchTable() {
                     render: function (obj, type, row, meta) {
                         try {
                             if (obj && obj === "application/pdf" && !meta.settings.oInit.iconView) {
-                                var span = document.createElement("span");
-                                var image = document.createElement('div');
+                                let span = document.createElement("span");
+                                let image = document.createElement('div');
                                 image.id = "alfrescoSearchTableIcon" + row.objectID;
                                 image.className = "alfrescoSearchTableIconEvent far fa-file-pdf fa-15x awesomeEnity";
                                 image.title = "PDF Dokument";
@@ -1428,11 +1430,10 @@ function loadAlfrescoSearchTable() {
                     targets: [8],
                     render: function(obj, type, row) {
                         
-                        var container = alfrescoAktionFieldFormatter(obj, type, row);
-                        var image = document.createElement("div");
+                        let container = alfrescoAktionFieldFormatter(obj, type, row);
+                        let image = document.createElement("div");
                         image.href = "#";
-                        image.className = "detailAim";
-                        image.style.backgroundImage = "url(./images/ziel.png)";
+                        image.className = "detailAim fas fa-bullseye fa-15x awesomeEntity";
                         image.title = "Dokument im Ordner anzeigen";
                         image.style.cursor = "pointer";
                         image.style.width = "16px";
@@ -1491,8 +1492,8 @@ function loadAlfrescoSearchTable() {
 
         // Add event listener for opening and closing details
         $('#dtable4 tbody').on('click', 'td.details-control', function () {
-            var tr = $(this).closest('tr');
-            var row = alfrescoSearchTabelle.row(tr);
+            let tr = $(this).closest('tr');
+            let row = alfrescoSearchTabelle.row(tr);
 
             if (row.child.isShown()) {
                 // This row is already open - close it
@@ -1709,8 +1710,8 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
  */
 function alfrescoAktionFieldFormatter(data, type, full) {
     try {
-        var container = document.createElement("div");
-        var image = document.createElement("i");
+        let container = document.createElement("div");
+        let image = document.createElement("i");
         image.href = "#";
         image.className = "detailEdit fas fa-pencil-alt fa-15x awesomeEntity";
         image.title = "Details bearbeiten";

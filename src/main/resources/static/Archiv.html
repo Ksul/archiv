@@ -174,7 +174,7 @@
 <!--Seite-->
 <div id="clientPage">
     <!--Tab Bereich-->
-    <div id="tabs" class="container">
+    <div id="tabs" class="ui-layout-center container">
         <div id="tabNorth" class="ui-layout-north ui-widget">
             <!--Tabulatoren-->
             <div id="tabNorthInnerCenter" class="inner-center container">
@@ -238,7 +238,7 @@
             <!--Tab Suche-->
             <div id="tab2" class="tabPanel">
                 <div id="searchNorth" class="inner-north container">
-                    <input id="alfrescoSearch" style="width:400px;height:auto;float:left;margin: 3px 5px 5px 5px;"
+                    <input id="alfrescoSearch"
                            class="ui-autocomplete-input" autocomplete="off"/>
                     <a class="btn" id="alfrescoSearchButton" onclick="startSearch($('#alfrescoSearch').val());">
                         <i class="fas fa-search"></i>Suche
@@ -266,8 +266,12 @@
                     <div id="subHeaderWest" class="subhead">
                         <table>
                             <tr>
-                                <td width="70%"><input id="filesinput" name="filesinput"
-                                                       type="file" multiple="multiple" size="50"/>
+                                <td width="70%">
+                                    <a>
+                                        <input id="filesinput" name="filesinput"
+                                               type="file" multiple="multiple" class="inputfile"/>
+                                        <label for="filesinput" class="far fa-folder-open" >Öffnen</label>
+                                    </a>
                                 </td>
                                 <td width="60px" align="center"><input onclick="work();"
                                                                        name="play" id="play" type="submit" class="play"
@@ -421,8 +425,8 @@
 
     </div>
     <!--Ausgabe-->
-    <div id="contentSouth" class="ui-layout-south ui-widget-header container">
-        <div id="headerSouth" class="header">Ausgabe</div>
+    <div id="contentSouth" class="ui-layout-south  container">
+        <div id="headerSouth" class="header ui-widget-header">Ausgabe</div>
         <div class="ui-widget-content">
             <div>
                 <ul id="actionMenuOutput" class="sf-menu" style="height: 15px;"></ul>

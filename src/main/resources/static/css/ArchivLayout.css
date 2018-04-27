@@ -545,7 +545,7 @@ DIV#tabPanels {
 
 .tabPanel {
     /* container for tabLayout */
-    height: 100%; /* need to 'fill' the tabPanels - layout container must have 'height' */
+    height: 98.6%; /* need to 'fill' the tabPanels - layout container must have 'height' */
     padding: 0 !important;
     background-color: wheat;
 / / DO NOT set top- or bottom-padding because height = 100 %
@@ -643,7 +643,6 @@ a.ui-state-default  {
     padding: 0.5em;
     float: left;
     margin: 10px;
-    cursor: hand;
     cursor: pointer;
     border: 1px solid #000;
 }
@@ -837,6 +836,10 @@ span.awesomeBlue i.awesomeAction {
     font-size: 0.9em;
 }
 
+.fa-search:before {
+    padding-right: 5px;
+}
+
 .jstree-icon:empty {
     padding-right: 25px;
 }
@@ -850,7 +853,7 @@ span.awesomeBlue i.awesomeAction {
 }
 
 a:before, label:before {
-    margin-right: 15px;
+    margin-right: 5px;
 }
 
 .no-close .ui-dialog-titlebar-close {
@@ -911,6 +914,57 @@ a:before, label:before {
     min-height: inherit;
 }
 
-#alfrescoSearchButton {
-    padding-right: 5px;
+#alfrescoSearch {
+    width:400px;
+    height: 25px;
+    float:left;
+    font-size: 1.1em;
 }
+
+#alfrescoSearchButton {
+    padding: 2px 10px;
+}
+
+#searchNorth {
+    padding: 2px 5px;
+    width: auto;
+}
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.inputfile + label {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    background-color: white;
+    min-height: inherit;
+    display: inline-block;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #0e82c7;
+    text-decoration: none;
+}
+
