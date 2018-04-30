@@ -18,7 +18,7 @@
 
 
 ./js/jquery/jquery-3.3.1.js
-./js/jquery/jquery-migrate.js
+#./js/jquery/jquery-migrate.js
 ./js/bootstrap/bootstrap.js
 ./js/ace/ace.js
 ./js/ace/theme-chrome.js

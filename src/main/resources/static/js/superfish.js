@@ -212,7 +212,7 @@
                         //inputElement.attr("multiple", "multiple");
                         inputElement.attr("style", "display:none;");
                         if (obj.action)
-                            inputElement.change(obj.action);
+                            inputElement.on("change", obj.action );
                         menuElement.append(inputElement);
 
                     } else {

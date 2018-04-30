@@ -9,16 +9,16 @@ function alertt(msg) {
 function handleDropInbox(evt) {
     evt.stopPropagation();
     evt.preventDefault();
-    var files = evt.dataTransfer.files;
-    for ( var i = 0; i < files.length; i++) {
-        var f = files[i];
+    const files = evt.dataTransfer.files;
+    for ( let i = 0; i < files.length; i++) {
+        let f = files[i];
         if (f) {
-            var reader = new FileReader();
+            const reader = new FileReader();
             reader.onloadend = (function (f) {
                 return function (evt) {
                     if (evt.target.readyState === FileReader.DONE) {
-                        var content = evt.target.result;
-                        var json = executeService({"name": "createDocument", "errorMessage": "Dokument konnten nicht im Alfresco angelegt werden!"},[
+                        const content = evt.target.result;
+                        let json = executeService({"name": "createDocument", "errorMessage": "Dokument konnten nicht im Alfresco angelegt werden!"},[
                             {"name": "documentId", "value":inboxFolderId},
                             {"name": "fileName", "value": f.name},
                             {"name": "content", "value": base64EncArr(strToUTF8Arr(content))},
@@ -48,11 +48,10 @@ function handleDropInbox(evt) {
  * @return
  */
 function calculateTableHeight(panel, divId, tabelle, headerId, footerId) {
-    var div, table, rowHeight = 0, availableHeight = 0, topPanel = 0, downPanel = 0,columnPanel = 0, headerPanel = 0, footerPanel = 0;
-    var children;
+    let div, table, rowHeight = 0, availableHeight = 0, topPanel = 0, downPanel = 0,columnPanel = 0, headerPanel = 0, footerPanel = 0;
     div = $('#'+divId);
     availableHeight = $('#'+panel).height();
-    children =  div.children().children();
+    let children =  div.children().children();
     if (children.length > 0)
         topPanel = children[0].offsetHeight;
     if (children.length > 2)
@@ -85,8 +84,8 @@ function calculateTableHeight(panel, divId, tabelle, headerId, footerId) {
  */
 function resizeTable(panel, divId, tabelleId, headerId, footerId) {
 
-    var tabelle = $('#'+tabelleId).DataTable();
-    var drawRows = calculateTableHeight(panel, divId, tabelle, headerId, footerId);
+    const tabelle = $('#'+tabelleId).DataTable();
+    const drawRows = calculateTableHeight(panel, divId, tabelle, headerId, footerId);
 
     if ( drawRows !== Infinity && drawRows !== -Infinity &&
         ! isNaN( drawRows )   && drawRows > 0 &&
@@ -441,12 +440,12 @@ function loadAlfrescoTable() {
         try {
             event.preventDefault();
             event.stopImmediatePropagation();
-            var erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
+            const erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
                 {"name": "documentId", "value": alfrescoTabelle.row($(obj).closest('tr')).data().objectID}
             ]);
             if (erg.success) {
-                var  file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
-                var fileURL = URL.createObjectURL(file);
+                const file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
+                const fileURL = URL.createObjectURL(file);
                 window.open(fileURL);
             }
 
@@ -456,7 +455,7 @@ function loadAlfrescoTable() {
     }
 
     try {
-        var duration;
+        let duration;
         $.fn.dataTable.moment('DD.MM.YY');
         alfrescoTabelle = $('#alfrescoTabelle').DataTable({
             jQueryUI: false,
@@ -486,8 +485,8 @@ function loadAlfrescoTable() {
                 },
                  error:  function (xhr, status, error) {
                      try {
-                         var txt;
-                         var statusErrorMap = {
+                         let txt;
+                         const statusErrorMap = {
                              '400': "Server understood the request, but request content was invalid.",
                              '401': "Unauthorized access.",
                              '403': "Forbidden resource can't be accessed.",
@@ -512,9 +511,9 @@ function loadAlfrescoTable() {
                          errorHandler(txt, "Server Error");
 
                      } catch (e) {
-                         var str = "FEHLER:\n";
+                         let str = "FEHLER:\n";
                          str = str + e.toString() + "\n";
-                         for (var prop in e)
+                         for (let prop in e)
                              str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
                          errorHandler(str, "Server Error");
                      }
@@ -637,8 +636,8 @@ function loadAlfrescoTable() {
                     render: function (obj, type, row, meta) {
                         try {
                                 if (obj && obj === "application/pdf" && !meta.settings.oInit.iconView) {
-                                    var span = document.createElement("span");
-                                    var image = document.createElement('div');
+                                    let span = document.createElement("span");
+                                    let image = document.createElement('div');
                                     image.id = "alfrescoTableIcon" + row.objectID;
                                     image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable far fa-file-pdf fa-15x awesomeEntity";
                                     image.title = "PDF Dokument";
@@ -662,12 +661,12 @@ function loadAlfrescoTable() {
                     render: function (obj, type, row, meta) {
                         try {
                             if (row && row.nodeRef && meta.settings.oInit.iconView) {
-                                var span = document.createElement("span");
+                                let span = document.createElement("span");
 
                                 span.href = "#";
                                 span.style.width = "100px";
                                 span.style.height = "100px";
-                                var image = document.createElement('img');
+                                let image = document.createElement('img');
                                 image.id = "alfrescoTableThumbnail" + row.objectID;
                                 image.className = "alfrescoTableThumbnailEvent alfrescoTableDragable treeDropable";
                                 image.draggable = true;
@@ -778,8 +777,8 @@ function loadAlfrescoTable() {
 
         // Add event listener for opening and closing details
         $('#dtable2 tbody').on('click', 'td.details-control', function () {
-            var tr = $(this).closest('tr');
-            var row = alfrescoTabelle.row(tr);
+            let tr = $(this).closest('tr');
+            let row = alfrescoTabelle.row(tr);
 
             if (row.child.isShown()) {
                 // This row is already open - close it
@@ -799,21 +798,21 @@ function loadAlfrescoTable() {
         $(document)
             .on('mousedown', '.alfrescoTableDragable', function (event) {
                 try {
-                    var nodes = [];
-                    var selected = alfrescoTabelle.rows( {selected:true} ).data().toArray();
+                    let nodes = [];
+                    const selected = alfrescoTabelle.rows( {selected:true} ).data().toArray();
                     //prüfen, ob überhaupt etwas selektiert worden ist
                     if (!selected.length) {
-                        var row = alfrescoTabelle.row($(this).closest(('tr')));
+                        const row = alfrescoTabelle.row($(this).closest(('tr')));
                         if (row && row.length)
                          selected.push(row.data());
                     }
 
-                    for ( var index = 0; index < selected.length; ++index) {
+                    for ( let index = 0; index < selected.length; ++index) {
                         if (selected[index])
                             nodes.push(selected[index].objectID)
                     }
                     if (nodes.length) {
-                        var title = (selected.length > 1 ? (selected.length + " Dokumente") : selected[0].title ? selected[0].title : selected[0].name);
+                        const title = (selected.length > 1 ? (selected.length + " Dokumente") : selected[0].title ? selected[0].title : selected[0].name);
                         return $.vakata.dnd.start(event, {
                             'jstree': false,
                             'table': "alfrescoTabelle",
@@ -864,8 +863,8 @@ function loadAlfrescoFolderTable() {
                 },
                 error:  function (xhr, status, error) {
                     try {
-                        var txt;
-                        var statusErrorMap = {
+                        let txt;
+                        const statusErrorMap = {
                             '400': "Server understood the request, but request content was invalid.",
                             '401': "Unauthorized access.",
                             '403': "Forbidden resource can't be accessed.",
@@ -890,9 +889,9 @@ function loadAlfrescoFolderTable() {
                         errorHandler(txt, "Server Error");
 
                     } catch (e) {
-                        var str = "FEHLER:\n";
+                        let str = "FEHLER:\n";
                         str = str + e.toString() + "\n";
-                        for (var prop in e)
+                        for (let prop in e)
                             str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
                         errorHandler(str, "Server Error");
                     }
@@ -912,14 +911,14 @@ function loadAlfrescoFolderTable() {
                             alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlRevert');
                             alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlNone');
                         }
-                        var tree = $.jstree.reference('#tree');
-                        var parent = tree.get_node(obj.parent);
+                        const tree = $.jstree.reference('#tree');
+                        const parent = tree.get_node(obj.parent);
                         if (parent) {
                             fillBreadCrumb(parent.data);
                             //$("#tree").jstree(true).refresh_node(objectID);
 
                             // Knoten einfügen
-                            for (var i = 0; i < obj.data.length; i++) {
+                            for (let i = 0; i < obj.data.length; i++) {
                                 if (!tree.get_node(obj.data[i].objectID))
                                     tree.create_node(parent, obj.data[i]);
                             }
@@ -954,10 +953,10 @@ function loadAlfrescoFolderTable() {
                         }
                     });
                     // Cursor
-                    $('td', row).hover(function () {
+                    $('td', row).on('mouseenter', function () {
                         if (this.cellIndex === 0)
                             $(this).css('cursor', 'pointer');
-                    }, function () {
+                    }).on('mouseleave', function () {
                         $(this).css('cursor', 'auto');
 
                     });
@@ -1100,21 +1099,21 @@ function loadAlfrescoFolderTable() {
         $(document)
             .on('mousedown', '.alfrescoFolderTableDragable', function (event) {
                 try {
-                    var nodes = [];
-                    var selected = alfrescoFolderTabelle.rows( {selected:true} ).data().toArray();
+                    let nodes = [];
+                    const selected = alfrescoFolderTabelle.rows( {selected:true} ).data().toArray();
                     //prüfen, ob überhaupt etwas selektiert worden ist
                     if (!selected.length) {
-                        var row = alfrescoFolderTabelle.row($(this).closest(('tr')));
+                        const row = alfrescoFolderTabelle.row($(this).closest(('tr')));
                         if (row && row.length)
                             selected.push(row.data());
                     }
 
-                    for( var index = 0; index < selected.length; ++index) {
+                    for( let index = 0; index < selected.length; ++index) {
                         if (selected[index])
                             nodes.push(selected[index].objectID)
                     }
                     if (nodes.length) {
-                        var title = (selected.length > 1 ? (selected.length + " Ordner") : selected[0].title ? selected[0].title : selected[0].name);
+                        const title = (selected.length > 1 ? (selected.length + " Ordner") : selected[0].title ? selected[0].title : selected[0].name);
                         return $.vakata.dnd.start(event, {
                             'jstree': false,
                             'table': "alfrescoFolderTabelle",
@@ -1150,12 +1149,12 @@ function loadAlfrescoSearchTable() {
         try {
             event.preventDefault();
             event.stopImmediatePropagation();
-            var erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnte nicht geöffnet werden!"}, [
+            const erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnte nicht geöffnet werden!"}, [
                 {"name": "documentId", "value": alfrescoSearchTabelle.row($(obj).closest('tr')).data().objectID}
             ]);
             if (erg.success) {
-                var  file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
-                var fileURL = URL.createObjectURL(file);
+                const file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
+                const fileURL = URL.createObjectURL(file);
                 window.open(fileURL);
             }
 
@@ -1165,7 +1164,7 @@ function loadAlfrescoSearchTable() {
     }
 
     try {
-        var duration;
+        let duration;
         $.fn.dataTable.moment('DD.MM.YY');
         alfrescoSearchTabelle = $('#alfrescoSearchTabelle').DataTable({
             jQueryUI: false,
@@ -1192,8 +1191,8 @@ function loadAlfrescoSearchTable() {
                 },
                 error:  function (xhr, status, error) {
                     try {
-                        var txt;
-                        var statusErrorMap = {
+                        let txt;
+                        const statusErrorMap = {
                             '400': "Server understood the request, but request content was invalid.",
                             '401': "Unauthorized access.",
                             '403': "Forbidden resource can't be accessed.",
@@ -1218,9 +1217,9 @@ function loadAlfrescoSearchTable() {
                         errorHandler(txt, "Server Error");
 
                     } catch (e) {
-                        var str = "FEHLER:\n";
+                        let str = "FEHLER:\n";
                         str = str + e.toString() + "\n";
-                        for (var prop in e)
+                        for (let prop in e)
                             str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
                         errorHandler(str, "Server Error");
                     }
@@ -1364,12 +1363,12 @@ function loadAlfrescoSearchTable() {
                     render: function (obj, type, row, meta) {
                         try {
                             if (obj && meta.settings.oInit.iconView) {
-                                var span = document.createElement("span");
+                                let span = document.createElement("span");
 
                                 span.href = "#";
                                 span.style.width = "100px";
                                 span.style.height = "100px";
-                                var image = document.createElement('img');
+                                let image = document.createElement('img');
                                 image.id = "alfrescoSearchTableThumbnail" + row.objectID;
                                 image.className = "alfrescoSearchTableThumbnailEvent";
                                 image.draggable = true;
@@ -1597,8 +1596,8 @@ function loadVerteilungTable() {
         });
         // Add event listener for opening and closing details
         $('#tabelle tbody').on('click', 'td.details-control', function () {
-            var tr = $(this).closest('tr');
-            var row = tabelle.row(tr);
+            const tr = $(this).closest('tr');
+            const row = tabelle.row(tr);
 
             if (row.child.isShown()) {
                 // This row is already open - close it
@@ -1629,10 +1628,10 @@ function loadVerteilungTable() {
 function alfrescoFolderAktionFieldFormatter(data, type, full) {
     try {
 
-        var container = document.createElement("div");
-        var image;
-        var inner1;
-        var inner2;
+        let container = document.createElement("div");
+        let image;
+        let inner1;
+        let inner2;
 
         // Ordner bearbeiten
         image = document.createElement("i");
@@ -1781,8 +1780,8 @@ function alfrescoAktionFieldFormatter(data, type, full) {
  */
 function imageFieldFormatter(data, type, full) {
     try {
-        var container = document.createElement("div");
-        var image = document.createElement("div");
+        let container = document.createElement("div");
+        let image = document.createElement("div");
         image.href = "#";
         image.className = "run";
         if (full[3].error) {
@@ -1863,14 +1862,14 @@ function imageFieldFormatter(data, type, full) {
  * @returns {string}   HTML für die extra Zeile
  */
 function formatVerteilungTabelleDetailRow(data) {
-    var sOut = '<div class="innerDetails" style="overflow: auto; width: 100%; " ><table>' +
+    let sOut = '<div class="innerDetails" style="overflow: auto; width: 100%; " ><table>' +
         '<tr><tr style="height: 0px;" > '+
         '<th style="width: 100px; padding-top: 0px; padding-bottom: 0px; border-top-width: 0px; border-bottom-width: 0px; height: 0px; font-size: 12px"' +
         'colspan="1" rowspan="1" tabindex="0" class="control center">Fehler</th>' +
         '<th style="width: auto; padding-left: 10px; padding-top: 0px; padding-bottom: 0px; border-top-width: 0px; border-bottom-width: 0px; height: 0px; font-size: 12px"' +
         'colspan="1" rowspan="1" tabindex="0" class="alignLeft">Beschreibung</th></tr><td>';
-    var txt = "<tr>";
-    for ( var i = 0; i < data[5].length; i++) {
+    let txt = "<tr>";
+    for ( let i = 0; i < data[5].length; i++) {
         txt = txt + "<td class='alignCenter' style='font-size: 11px; padding-top: 0px; padding-bottom: 0px'>" + (i+1) + "</td><td style='font-size: 11px; padding-top: 0px; padding-bottom: 0px'>" + data[5][i] + "</td>";
         txt = txt + "</tr>";
     }
@@ -1894,17 +1893,17 @@ function formatAlfrescoTabelleDetailRow(data) {
  */
 function fillBreadCrumb(data) {
     try {
-        var object;
-        var id;
-        var parentObj;
-        var name;
-        var fill = true;
-        var tree = $("#tree").jstree(true);
-        var oldLi = $('#breadcrumblist');
+        let object;
+        let id;
+        let parentObj;
+        let name;
+        let fill = true;
+        const tree = $("#tree").jstree(true);
+        const oldLi = $('#breadcrumblist');
         if (oldLi)
             oldLi.remove();
-        var container = $('#breadcrumb');
-        var ul = document.createElement('ul');
+        const container = $('#breadcrumb');
+        let ul = document.createElement('ul');
         ul.id = 'breadcrumblist';
         do {
             if(data.path) {
@@ -1913,7 +1912,7 @@ function fillBreadCrumb(data) {
                 parentObj = data.parentId;
                 name = data.name;
 
-                var li = document.createElement('li');
+                let li = document.createElement('li');
                 li.data = {
                     'objectID': id,
                     'path': object.join('/'),
@@ -1926,7 +1925,7 @@ function fillBreadCrumb(data) {
                     switchAlfrescoDirectory(this.data);
                 };
                 $.data(li, "data", data);
-                var a = document.createElement('a');
+                let a = document.createElement('a');
                 a.href = '#';
                 a.text = name;
                 li.appendChild(a);
@@ -2027,10 +2026,9 @@ function updateInLineFolderFieldFieldDefinition() {
 function updateInlineFolder (value, settings) {
     
     try {
-        var extraProperties;
-        var changed = false;
-        var oldValue = "";
-        var data = alfrescoFolderTabelle.row($(this).closest('tr')).data();
+        let changed = false;
+        let oldValue = "";
+        let data = alfrescoFolderTabelle.row($(this).closest('tr')).data();
         switch (this.cellIndex) {
             case 1: {                           // Name geändert
                 if (value !== data.name) {
@@ -2052,7 +2050,7 @@ function updateInlineFolder (value, settings) {
             }
         }
         if (changed) {
-            var erg = editFolder(data, data.objectID);
+            const erg = editFolder(data, data.objectID);
             if (!erg.success) {
                 value = erg.error;
             }
@@ -2454,11 +2452,11 @@ function handleVerteilungImageClicks() {
     });
     $(document).on("click", ".loeschen", function () {
         try {
-            var answer = confirm("Eintrag löschen?");
+            const answer = confirm("Eintrag löschen?");
             if (answer) {
-                var tr = $(this).closest('tr');
-                var row = tabelle.row(tr).data();
-                var name = row[1];
+                const tr = $(this).closest('tr');
+                const row = tabelle.row(tr).data();
+                const name = row[1];
                 try {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
                 } catch (e) {
@@ -2469,7 +2467,7 @@ function handleVerteilungImageClicks() {
                 Verteilung.propsEditor.getSession().setValue("");
                 Verteilung.rulesEditor.getSession().foldAll(1);
                 if (currentFile.length > 0) {
-                    var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+                    const file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
                     file.initWithPath(currentFile);
                     if (file.exists() === true)
                         file.remove(false);
@@ -2482,15 +2480,15 @@ function handleVerteilungImageClicks() {
     });
     $(document).on("click", ".pdf", function () {
         try {
-            var tr = $(this).closest('tr');
-            var row = tabelle.row(tr).data();
-            var name = row[1];
-            var erg = executeService({"name": "openPDF", "errorMessage": "Dokument konnte nicht geöffnet werden!"}, [
+            const tr = $(this).closest('tr');
+            const row = tabelle.row(tr).data();
+            const name = row[1];
+            const erg = executeService({"name": "openPDF", "errorMessage": "Dokument konnte nicht geöffnet werden!"}, [
                 {"name": "fileName", "value": daten[name].file}
             ]);
             if (erg.success) {
-                var file = new Blob([base64DecToArr(erg.data)], {type: erg.mimeType});
-                var fileURL = URL.createObjectURL(file);
+                const file = new Blob([base64DecToArr(erg.data)], {type: erg.mimeType});
+                const fileURL = URL.createObjectURL(file);
                 window.open(fileURL);
             }
         } catch (e) {
@@ -2499,11 +2497,11 @@ function handleVerteilungImageClicks() {
     });
     $(document).on("click", ".moveToInbox", function () {
         try {
-            var tr = $(this).closest('tr');
-            var row = tabelle.row(tr).data();
-            var name = row[1];
-            var docId = "workspace:/SpacesStore/" + daten[name]["container"];
-            var json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successMessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
+            const tr = $(this).closest('tr');
+            const row = tabelle.row(tr).data();
+            const name = row[1];
+            const docId = "workspace:/SpacesStore/" + daten[name]["container"];
+            const json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successMessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
                 {"name": "documentId", "value": inboxFolderId},
                 { "name": "fileName", "value": name},
                 { "name": "documentContent", "value": daten[name].content, "type": "byte"},
@@ -3454,7 +3452,7 @@ function createAlfrescoMenus() {
                 className: "fas fa-check fa-1x",
                 alfrescoDocumentAuswahlAll: {
                     title: "Alle",
-                    className: "far fa-check-circle fa-1x",
+                    className: "fas fa-check-circle fa-1x",
                     action: function () {
                         alfrescoTabelle.rows().select();
                     }
@@ -3471,7 +3469,7 @@ function createAlfrescoMenus() {
                 },
                 alfrescoDocumentAuswahlNone: {
                     title: "Keine",
-                    className: "far fa-times-circle fa-1x",
+                    className: "fas fa-times-circle fa-1x",
                     disabled: true,
                     action: function () {
                         alfrescoTabelle.rows().deselect();
@@ -3509,7 +3507,7 @@ function createAlfrescoMenus() {
                 },
                 alfrescoDocumentActionMove: {
                     title: "Verschieben",
-                    className: "far fa-copy fa-1x",
+                    className: "fas fa-copy fa-1x",
                     disabled: true,
                     action: function () {
                         try {
@@ -3522,7 +3520,7 @@ function createAlfrescoMenus() {
                 },
                 alfrescoDocumentActionDelete: {
                     title: "Löschen",
-                    className: "far fa-trash-alt fa-1x",
+                    className: "fas fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
                         let txt = "";
@@ -3553,10 +3551,10 @@ function createAlfrescoMenus() {
         menuData: {
             alfrescoAnsicht: {
                 title: "Ansicht",
-                className: "far fa-file-alt fa-1x",
+                className: "fas fa-file-alt fa-1x",
                 alfrescoViewModeMenuNormal: {
                     title: "Normal",
-                    className: "far fa-file-alt fa-1x",
+                    className: "fas fa-file-alt fa-1x",
                     action: function () {
                         try {
                             alfrescoTabelle.settings().init().iconView = false;
@@ -3572,7 +3570,7 @@ function createAlfrescoMenus() {
                 },
                 alfrescoViewModeMenuIcon: {
                     title: "Icons",
-                    className: "far fa-image fa-1x",
+                    className: "fas fa-image fa-1x",
                     action: function () {
                         try {
                             alfrescoTabelle.settings().init().iconView = true;
@@ -3866,7 +3864,7 @@ function buildVerteilungTab(){
     Verteilung.propsEditor.renderer.setShowGutter(false);
     Verteilung.propsEditor.setShowPrintMargin(false);
     Verteilung.propsEditor.$blockScrolling = Infinity;
-    var zoneRules = document.getElementById('inRules');
+    let zoneRules = document.getElementById('inRules');
     zoneRules.addEventListener('dragover', handleDragOver, false);
     zoneRules.addEventListener('drop', handleRulesSelect, false);
 
@@ -3898,7 +3896,7 @@ function buildVerteilungTab(){
     Verteilung.textEditor.getSession().setMode("ace/mode/text");
     Verteilung.textEditor.$blockScrolling = Infinity;
 
-    var zone = document.getElementById('inTxt');
+    let zone = document.getElementById('inTxt');
     zone.addEventListener('dragover', handleDragOver, false);
     zone.addEventListener('drop', handleFileSelect, false);
 
@@ -3920,8 +3918,7 @@ function start() {
         });
         $(document).tooltip();
         $('.ui-dialog-titlebar-close').tooltip('disable');
-        //$("#switcher").themeswitcher();
-        jQuery("#breadcrumb").jBreadCrumb();
+        $("#breadcrumb").jBreadCrumb();
         loadLayout();
         document.getElementById('filesinput').addEventListener('change', readMultiFile, false);
         REC.init();
@@ -3942,11 +3939,11 @@ function start() {
             menuData: {
                 "actionMenuOutputAction": {
                     title: "Aktion",
-                    className: "fa fa-sign-in fa-1x",
+                    className: "fas fa-sign-in-alt fa-1x",
                     autoClose: true,
                     actionMenuOutputClear: {
                         title: "Löschen",
-                        className: "far fa-trash-alt fa-1x",
+                        className: "fas fa-trash-alt fa-1x",
                         disabled: false,
                         action: function () {
                             try {
@@ -3958,11 +3955,11 @@ function start() {
                     },
                     actionMenuOutputLevel: {
                         title: "Level",
-                        className: "fa fa-thermometer-half fa-1x",
+                        className: "fas fa-thermometer-half fa-1x",
                         disabled: false,
                         actionMenuOutputLevelNone: {
                             title: "Nichts",
-                            className: "fa fa-times fa-1x",
+                            className: "fas fa-times fa-1x",
                             autoClose: true,
                             action: function () {
                                 try {
@@ -3975,7 +3972,7 @@ function start() {
                         },
                         actionMenuOutputLevelError: {
                             title: "Fehler",
-                            className: "fa fa-ban fa-1x",
+                            className: "fas fa-ban fa-1x",
                             autoClose: true,
                             action: function () {
                                 try {
@@ -3988,7 +3985,7 @@ function start() {
                         },
                         actionMenuOutputLevelWarn: {
                             title: "Warnungen",
-                            className: "fa fa-exclamation-circle fa-1x",
+                            className: "fas fa-exclamation-circle fa-1x",
                             autoClose: true,
                             action: function (root) {
                                 try {
@@ -4001,7 +3998,7 @@ function start() {
                         },
                         actionMenuOutputLevelInfo: {
                             title: "Info",
-                            className: "fa fa-info-circle fa-1x",
+                            className: "fas fa-info-circle fa-1x",
                             autoClose: true,
                             action: function () {
                                 try {
@@ -4014,7 +4011,7 @@ function start() {
                         },
                         actionMenuOutputLevelDebug: {
                             title: "Debug",
-                            className: "fa fa-bug fa-1x",
+                            className: "fas fa-bug fa-1x",
                             autoClose: true,
                             action: function () {
                                 try {
@@ -4027,7 +4024,7 @@ function start() {
                         },
                         actionMenuOutputLevelTrace: {
                             title: "Trace",
-                            className: "fa fa-truck fa-1x",
+                            className: "fas fa-truck fa-1x",
                             autoClose: true,
                             action: function () {
                                 try {
@@ -4042,7 +4039,7 @@ function start() {
                 }
             }
         });
-
+        $('#clientPage').css("display","block");
     } catch(e) {
         errorHandler(e);
     }

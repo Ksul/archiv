@@ -1551,7 +1551,7 @@
                 initHotkeys();
 
                 // bind window.onunload
-                $(window).bind("unload."+ sID, unload);
+                $(window).on("unload."+ sID, unload);
 
                 // init plugins for this layout, if there are any (eg: customButtons)
                 runPluginCallbacks( Instance, $.layout.onLoad );
@@ -1620,7 +1620,7 @@
                     o.resizeWithWindow = false;
                 // bind resizeAll() for 'this layout instance' to window.resize event
                 else if (o.resizeWithWindow)
-                    $(window).bind("resize."+ sID, windowResize);
+                    $(window).on("resize."+ sID, windowResize);
 
                 delete state.creatingLayout;
                 state.initialized = true;
@@ -1854,7 +1854,7 @@
                 };
                 // loop hash and bind all methods - include layoutID namespacing
                 for (name in layoutMethods) {
-                    $N.bind("layout"+ name.toLowerCase() +"."+ sID, Instance[ layoutMethods[name] || name ]);
+                    $N.on("layout"+ name.toLowerCase() +"."+ sID, Instance[ layoutMethods[name] || name ]);
                 }
 
                 // if this container is another layout's 'pane', then set child/parent pointers
@@ -1997,7 +1997,7 @@
                 $.each(panes, function (i, pane) {
                     var o = options[pane];
                     if (o.enableCursorHotkey || o.customHotkey) {
-                        $(document).bind("keydown."+ sID, keyDown); // only need to bind this ONCE
+                        $(document).on("keydown."+ sID, keyDown); // only need to bind this ONCE
                         return false; // BREAK - binding was done
                     }
                 });
@@ -2265,8 +2265,8 @@
                     .css(c.cssReq).css("zIndex", options.zIndexes.pane_normal)
                     .css(o.applyDemoStyles ? c.cssDemo : {}) // demo styles
                     .addClass( o.paneClass +" "+ o.paneClass+"-"+pane ) // default = "ui-layout-pane ui-layout-pane-west" - may be a dupe of 'paneSelector'
-                    .bind("mouseenter."+ sID, addHover )
-                    .bind("mouseleave."+ sID, removeHover )
+                    .on("mouseenter."+ sID, addHover )
+                    .on("mouseleave."+ sID, removeHover )
                 ;
                 var paneMethods = {
                     hide:				''
@@ -2300,7 +2300,7 @@
                     ,	name;
                 // loop hash and bind all methods - include layoutID namespacing
                 for (name in paneMethods) {
-                    $P.bind("layoutpane"+ name.toLowerCase() +"."+ sID, Instance[ paneMethods[name] || name ]);
+                    $P.on("layoutpane"+ name.toLowerCase() +"."+ sID, Instance[ paneMethods[name] || name ]);
                 }
 
                 // see if this pane has a 'scrolling-content element'
@@ -2493,16 +2493,18 @@
                         .css(_c.resizers.cssReq).css("zIndex", options.zIndexes.resizer_normal)
                         .css(o.applyDemoStyles ? _c.resizers.cssDemo : {}) // add demo styles
                         .addClass(rClass +" "+ rClass+_pane)
-                        .hover(addHover, removeHover) // ALWAYS add hover-classes, even if resizing is not enabled - handle with CSS instead
-                        .hover(onResizerEnter, onResizerLeave) // ALWAYS NEED resizer.mouseleave to balance toggler.mouseenter
-                        .mousedown($.layout.disableTextSelection)	// prevent text-selection OUTSIDE resizer
-                        .mouseup($.layout.enableTextSelection)		// not really necessary, but just in case
+                        .on('mouseenter', addHover)
+                        .on('mouseleave', removeHover) // ALWAYS add hover-classes, even if resizing is not enabled - handle with CSS instead
+                        .on('mouseenter', onResizerEnter)
+                        .on('mouseleave', onResizerLeave) // ALWAYS NEED resizer.mouseleave to balance toggler.mouseenter
+                        .on('mousedown', $.layout.disableTextSelection)	// prevent text-selection OUTSIDE resizer
+                        .on('mouseup', $.layout.enableTextSelection)		// not really necessary, but just in case
                         .appendTo($N) // append DIV to container
                     ;
                     if ($.fn.disableSelection)
                         $R.disableSelection(); // prevent text-selection INSIDE resizer
                     if (o.resizerDblClickToggle)
-                        $R.bind("dblclick."+ sID, toggle );
+                        $R.on("dblclick."+ sID, toggle );
 
                     if ($T) {
                         $T	// if paneSelector is an ID, then create a matching ID for the resizer, eg: "#paneLeft" => "#paneLeft-toggler"
@@ -2516,8 +2518,9 @@
                             .css(_c.togglers.cssReq) // add base/required styles
                             .css(o.applyDemoStyles ? _c.togglers.cssDemo : {}) // add demo styles
                             .addClass(tClass +" "+ tClass+_pane)
-                            .hover(addHover, removeHover) // ALWAYS add hover-classes, even if toggling is not enabled - handle with CSS instead
-                            .bind("mouseenter", onResizerEnter) // NEED toggler.mouseenter because mouseenter MAY NOT fire on resizer
+                            .on('mouseenter', addHover)
+                            .on('mouseleave', removeHover) // ALWAYS add hover-classes, even if toggling is not enabled - handle with CSS instead
+                            .on("mouseenter", onResizerEnter) // NEED toggler.mouseenter because mouseenter MAY NOT fire on resizer
                             .appendTo($R) // append SPAN to resizer DIV
                         ;
                         // ADD INNER-SPANS TO TOGGLER
@@ -4610,7 +4613,7 @@
                     ;
                 if (!$T) return;
                 o.closable = true;
-                $T	.bind("click."+ sID, function(evt){ evt.stopPropagation(); toggle(pane); })
+                $T	.on("click."+ sID, function(evt){ evt.stopPropagation(); toggle(pane); })
                     .css("visibility", "visible")
                     .css("cursor", "pointer")
                     .attr("title", state[pane].isClosed ? o.tips.Open : o.tips.Close) // may be blank
@@ -5843,7 +5846,7 @@
         ,	_load: function (inst) {
             //	ADD Button methods to Layout Instance
             $.extend( inst, {
-                bindButton:		function (selector, action, pane) { return $.layout.buttons.bind(inst, selector, action, pane); }
+                bindButton:		function (selector, action, pane) { return $.layout.buttons.on(inst, selector, action, pane); }
                 //	DEPRECATED METHODS...
                 ,	addToggleBtn:	function (selector, pane, slide) { return $.layout.buttons.addToggle(inst, selector, pane, slide); }
                 ,	addOpenBtn:		function (selector, pane, slide) { return $.layout.buttons.addOpen(inst, selector, pane, slide); }

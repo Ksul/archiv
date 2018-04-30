@@ -61,11 +61,11 @@
 
         window.onload = function () {
 
-            var ajax = new XMLHttpRequest();
+            let ajax = new XMLHttpRequest();
             if (ajax !== null) {
                 //Caching verhindern
-                var timestamp = new Date();
-                var uniqueURI = "./templates/resource.template?" + "timestamp=" + timestamp.getTime();
+                const timestamp = new Date();
+                const uniqueURI = "./templates/resource.template?" + "timestamp=" + timestamp.getTime();
 
                 ajax.open("GET", uniqueURI, true);
                 ajax.setRequestHeader("X-Test", "test1");
@@ -91,12 +91,12 @@
              * @param  resources    die Resourcen als String
              * */
             function loadResources(resources) {
-                var fileref;
-                var lines = resources.split('\n');
-                var cssEntries = [];
-                var jsEntries = [];
-                for (var line in lines) {
-                    var element = lines[line].trim();
+                let fileref;
+                const lines = resources.split('\n');
+                let cssEntries = [];
+                let jsEntries = [];
+                for (let line in lines) {
+                    const element = lines[line].trim();
                     if (element.length) {
                         if (!element.startsWith("//") && !element.startsWith("#")) {
                             if (element.endsWith(".js")) { //if filename is a external JavaScript file
@@ -126,11 +126,11 @@
                 if (!files.length) {
                     files = [];
                 }
-                var head = document.head || document.getElementsByTagName('head')[0];
+                const head = document.head || document.getElementsByTagName('head')[0];
 
                 function loadJsEntry(index) {
                     if (files.length > index) {
-                        var fileref = document.createElement('script');
+                        let fileref = document.createElement('script');
                         fileref.setAttribute("type", "text/javascript");
                         fileref.setAttribute("charset", "utf-8");
                         fileref.setAttribute("src", files[index]);
@@ -153,8 +153,8 @@
              * @param entries     Array mit den File Namen
              **/
             function loadCssEntries(entries) {
-                for (var entry in entries) {
-                    var fileref = document.createElement("link");
+                for (const entry in entries) {
+                    let fileref = document.createElement("link");
                     fileref.setAttribute("rel", "stylesheet");
                     fileref.setAttribute("type", "text/css");
                     fileref.setAttribute("href", entries[entry]);
@@ -172,7 +172,7 @@
 <body>
 
 <!--Seite-->
-<div id="clientPage">
+<div id="clientPage" style="display:none;">
     <!--Tab Bereich-->
     <div id="tabs" class="ui-layout-center container">
         <div id="tabNorth" class="ui-layout-north ui-widget">

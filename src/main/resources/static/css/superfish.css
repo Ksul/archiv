@@ -49,7 +49,7 @@
 	padding: .75em 1em;
 	text-decoration: none;
 	zoom: 1; /* IE7 */
-	color: #13a;
+	color: #337ab7;
 }
 
 .disableLI  {
@@ -96,8 +96,7 @@
 	width: 0;
 	/* order of following 3 rules important for fallbacks to work */
 	border: 5px solid transparent;
-	border-top-color: #dFeEFF; /* edit this to suit design (no rgba in IE8) */
-	border-top-color: rgba(17, 51, 170, 0.5);
+	border-top-color: #337ab7;
 }
 .sf-arrows .disableLI:after {
 	border-top-color:  #cccccc !important;
@@ -105,7 +104,7 @@
 .sf-arrows > li > .sf-with-ul:focus:after,
 .sf-arrows > li:hover > .sf-with-ul:after,
 .sf-arrows > .sfHover > .sf-with-ul:after {
-	border-top-color: #13a;; /* IE8 fallback colour */
+	border-top-color: #23527c; /* IE8 fallback colour */
 }
 /* styling for right-facing arrows */
 .sf-arrows ul .sf-with-ul:after {
@@ -119,4 +118,18 @@
 .sf-arrows ul li:hover > .sf-with-ul:after,
 .sf-arrows ul .sfHover > .sf-with-ul:after {
 	border-left-color: white;
+	color: #23527c;
 }
+
+.sf-menu a selected {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	content: "\f058";
+	display: block;
+	float: right;
+}
+
+.sf-menu i unselected {
+	display: none;
+}
+
