@@ -223,6 +223,11 @@
                         if (submenus.length > 0)
                             selectElement.addClass(c.anchorClass);
                     }
+                    if (typeof obj.selected === "boolean" && obj.selected) {
+                        selectElement.addClass("selected");
+                    } else {
+                        selectElement.removeClass("selected");
+                    }
                     if (typeof obj.disabled === "boolean" && obj.disabled) {
                         selectElement.addClass("disableLI");
                     } else if (obj.action && !(typeof obj.file === "boolean" && obj.file)) {
@@ -337,22 +342,27 @@
                 });
             },
             disable: function (id) {
-                var element = $("#" + id);
+                const element = $("#" + id);
                 element.addClass("disableLI");
                 element.parent().children("ul").addClass("disableLI");
                 element.off("click");
             },
             enable: function (id) {
-                var $this = $(this);
-                var o = $this.data('sfOptions');
-                var element = $(document.getElementById(id));
+                const $this = $(this);
+                const o = $this.data('sfOptions');
+                const element = $(document.getElementById(id));
                 element.removeClass("disableLI");
                 element.parent().children("ul").removeClass("disableLI");
                 if (o && o.menuData) {
-                    var obj = recursiveKeySearch(id, o.menuData);
+                    const obj = recursiveKeySearch(id, o.menuData);
                     if (obj && obj.length && !obj[0].file && obj[0].action)
                         element.on("click", {root: getRootMenu()}, obj[0].action)
                 }
+            },
+            select: function(id) {
+                const element = $("#" + id);
+                element.parent().parent().children("li").children("a").removeClass("selected");
+                element.addClass("selected");
             },
             init: function (op) {
                 return this.each(function () {

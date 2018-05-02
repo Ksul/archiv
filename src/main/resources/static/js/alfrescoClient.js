@@ -2774,7 +2774,7 @@ function loadAlfrescoTree() {
                 separator_before: false,
                 separator_after: false,
                 label: "Löschen",
-                icon: "far fa-trash-alt fa-1x",
+                icon: "fas fa-trash-alt fa-1x",
                 action: function (obj) {
                     try {
                         startFolderDialog($.jstree.reference('#tree').get_node(obj.reference[0]).data, "web-display", true);
@@ -3701,10 +3701,10 @@ function createSearchMenus(){
         menuData: {
             searchAnsicht: {
                 title: "Ansicht",
-                className: "far fa-file-alt fa-1x",
+                className: "fas fa-file-alt fa-1x",
                 searchViewModeMenuNormal: {
                     title: "Normal",
-                    className: "far fa-file-alt fa-1x",
+                    className: "fas fa-file-alt fa-1x",
                     action: function () {
                         try {
                             alfrescoSearchTabelle.settings().init().iconView = false;
@@ -3720,7 +3720,7 @@ function createSearchMenus(){
                 },
                 searchViewModeMenuIcon: {
                     title: "Icons",
-                    className: "far fa-image fa-1x",
+                    className: "fas fa-image fa-1x",
                     action: function () {
                         try {
                             alfrescoSearchTabelle.settings().init().iconView = true;
@@ -3745,7 +3745,7 @@ function createSearchMenus(){
                 className: "fas fa-sign-in-alt fa-1x",
                 alfrescoSearchDocumentActionMove: {
                     title: "Verschieben",
-                    className: "far fa-copy fa-1x",
+                    className: "fas fa-copy fa-1x",
                     disabled: true,
                     action: function () {
                         try {
@@ -3758,7 +3758,7 @@ function createSearchMenus(){
                 },
                 alfrescoSearchDocumentActionDelete: {
                     title: "Löschen",
-                    className: "far fa-trash-alt fa-1x",
+                    className: "fas fa-trash-alt fa-1x",
                     disabled: true,
                     action: function () {
                         let txt = "";
@@ -3791,7 +3791,7 @@ function createSearchMenus(){
                 className: "fas fa-check fa-1x",
                 alfrescoSearchDocumentAuswahlAll: {
                     title: "Alle",
-                    className: "far fa-check-circle fa-1x",
+                    className: "fas fa-check-circle fa-1x",
                     action: function () {
                         alfrescoSearchTabelle.rows().select();
                     }
@@ -3808,7 +3808,7 @@ function createSearchMenus(){
                 },
                 alfrescoSearchDocumentAuswahlNone: {
                     title: "Keine",
-                    className: "far fa-times-circle fa-1x",
+                    className: "fas fa-times-circle fa-1x",
                     disabled: true,
                     action: function () {
                         alfrescoSearchTabelle.rows().deselect();
@@ -3961,9 +3961,11 @@ function start() {
                             title: "Nichts",
                             className: "fas fa-times fa-1x",
                             autoClose: true,
-                            action: function () {
+                            selected: Logger.getLevel() === Level.NONE,
+                            action: function (event) {
                                 try {
                                     Logger.setLevel(Level.NONE);
+                                    event.data.root.superfish('select','actionMenuOutputLevelNone');
                                     fillMessageBox(true);
                                 } catch (e) {
                                     errorHandler(e);
@@ -3974,9 +3976,11 @@ function start() {
                             title: "Fehler",
                             className: "fas fa-ban fa-1x",
                             autoClose: true,
-                            action: function () {
+                            selected: Logger.getLevel() === Level.ERROR,
+                            action: function (event) {
                                 try {
                                     Logger.setLevel(Level.ERROR);
+                                    event.data.root.superfish('select','actionMenuOutputLevelError');
                                     fillMessageBox(true);
                                 } catch (e) {
                                     errorHandler(e);
@@ -3987,9 +3991,11 @@ function start() {
                             title: "Warnungen",
                             className: "fas fa-exclamation-circle fa-1x",
                             autoClose: true,
-                            action: function (root) {
+                            selected: Logger.getLevel() === Level.WARN,
+                            action: function (event) {
                                 try {
                                     Logger.setLevel(Level.WARN);
+                                    event.data.root.superfish('select','actionMenuOutputLevelWarn');
                                     fillMessageBox(true);
                                 } catch (e) {
                                     errorHandler(e);
@@ -4000,9 +4006,11 @@ function start() {
                             title: "Info",
                             className: "fas fa-info-circle fa-1x",
                             autoClose: true,
-                            action: function () {
+                            selected: Logger.getLevel() === Level.INFO,
+                            action: function (event) {
                                 try {
                                     Logger.setLevel(Level.INFO);
+                                    event.data.root.superfish('select','actionMenuOutputLevelInfo');
                                     fillMessageBox(true);
                                 } catch (e) {
                                     errorHandler(e);
@@ -4013,9 +4021,11 @@ function start() {
                             title: "Debug",
                             className: "fas fa-bug fa-1x",
                             autoClose: true,
-                            action: function () {
+                            selected: Logger.getLevel() === Level.DEBUG,
+                            action: function (event) {
                                 try {
                                     Logger.setLevel(Level.DEBUG);
+                                    event.data.root.superfish('select','actionMenuOutputLevelDebug');
                                     fillMessageBox(true);
                                 } catch (e) {
                                     errorHandler(e);
@@ -4026,9 +4036,11 @@ function start() {
                             title: "Trace",
                             className: "fas fa-truck fa-1x",
                             autoClose: true,
-                            action: function () {
+                            selected: Logger.getLevel() === Level.TRACE,
+                            action: function (event) {
                                 try {
                                     Logger.setLevel(Level.TRACE);
+                                    event.data.root.superfish('select','actionMenuOutputLevelTrace');
                                     fillMessageBox(true);
                                 } catch (e) {
                                     errorHandler(e);
