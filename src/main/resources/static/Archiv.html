@@ -39,6 +39,7 @@
         var searchDocumentSelectMenu;
         var alfrescoDocumentActionMenu;
         var alfrescoSearchDocumentActionMenu;
+        var verteilungTxtActionMenu;
         var viewMode = 0;
         var workDocument = null;
         var multiMode = false;
@@ -263,24 +264,24 @@
                 <!--Dokument-->
                 <div id="verteilungWest" class="ui-tab-layout-west container ui-widget-header">
                     <div id="headerWest" class="header">Dokument</div>
-                    <div id="subHeaderWest" class="subhead">
+                    <div id="subHeaderWest" class="subhead" style="height:39px;">
+                        <a>
+                            <input id="filesinput" name="filesinput"
+                                   type="file" multiple="multiple" class="inputfile"/>
+                            <label for="filesinput" class="far fa-folder-open"><i class="filesinput">Öffnen</i></label>
+                        </a>
+                        <div style="float:left;">
+                            <ul id="actionMenuVerteilungTxt" class="sf-menu" style="height: 15px;"></ul>
+                        </div>
                         <table>
                             <tr>
                                 <td width="70%">
-                                    <a>
-                                        <input id="filesinput" name="filesinput"
-                                               type="file" multiple="multiple" class="inputfile"/>
-                                        <label for="filesinput" class="far fa-folder-open" >Öffnen</label>
-                                    </a>
+
                                 </td>
                                 <td width="60px" align="center"><input onclick="work();"
                                                                        name="play" id="play" type="submit" class="play"
                                                                        title="Recognize"
                                                                        value=""/>
-                                </td>
-                                <td width="60px" align="center"><input
-                                        onclick="openPDF(currentFile);" id="pdf"
-                                        type="submit" class="pdf" title="PDF" value="" style="display: none"/>
                                 </td>
                                 <td width="60px" align="center"><input onclick="openScript();"
                                                                        name="openScript" id="openScript" type="submit"
@@ -343,7 +344,7 @@
                     <div class="ui-widget-content" style="overflow:auto;">
                         <div id="dtable"></div>
                         <div id="inTxt" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
-                        <div class="header ui-widget-header" id="verteilungTableFooter"></div>
+                        <div style="display:none;" class="header ui-widget-header" id="verteilungTableFooter"></div>
                     </div>
                 </div>
 

@@ -282,14 +282,6 @@ input.beautify:disabled {
     disabled: true;
 }
 
-input.pdf {
-    background-image: url(../images/file_pdf.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: pointer;
-}
 
 input.pdf:disabled {
     background-image: url(../images/file_pdf-bw.png);
@@ -949,7 +941,8 @@ a:before, label:before {
     margin-right: 5px;
     margin-left: 5px;
     margin-bottom: 0;
-    font-size: 14px;
+    margin-top: 11px;
+    font-size: 13px;
     font-weight: normal;
     line-height: 1.42857143;
     text-align: center;
@@ -967,5 +960,14 @@ a:before, label:before {
     border-radius: 4px;
     color: #0e82c7;
     text-decoration: none;
+    float: left;
 }
+
+i.filesinput {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 13px;
+}
+
 

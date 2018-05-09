@@ -158,6 +158,7 @@ function showProgress() {
 function manageControls() {
     //document.getElementById('tree').style.display = 'none';
     document.getElementById('dtable').style.display = 'none';
+    document.getElementById('verteilungTableFooter').style.display = 'none';
     document.getElementById('inTxt').style.display = 'block';
     document.getElementById('filesinput').style.display = 'block';
     document.getElementById('settings').style.display = 'block';
@@ -166,8 +167,6 @@ function manageControls() {
     document.getElementById('play').style.display = 'block';
     document.getElementById('play').removeAttribute("disabled");
     document.getElementById('test').style.display = 'block';
-    document.getElementById('pdf').style.display = 'block';
-    document.getElementById('pdf').setAttribute("disabled", true);
     document.getElementById('openScript').style.display = 'block';
     document.getElementById('openScript').removeAttribute("disabled");
     document.getElementById('searchCont').style.display = 'block';
@@ -215,14 +214,18 @@ function manageControls() {
     if (multiMode) {
         document.getElementById('inTxt').style.display = 'none';
         document.getElementById('dtable').style.display = 'block';
+        document.getElementById('verteilungTableFooter').style.display = 'block';
         document.getElementById('sendToInbox').style.display = 'none';
     }
     if (showMulti) {
         document.getElementById('back').style.display = 'block';
         document.getElementById('dtable').style.display = 'none';
+        document.getElementById('verteilungTableFooter').style.display = 'none';
     }
     if (currentPDF)
-        document.getElementById('pdf').removeAttribute("disabled");
+        verteilungTxtActionMenu.superfish('enable', 'actionMenuVerteilungTxtPDF');
+    else
+        verteilungTxtActionMenu.superfish('disable', 'actionMenuVerteilungTxtPDF');
 
     if (!alfrescoServerAvailable) {
         document.getElementById('sendScript').setAttribute("disabled", true);
@@ -235,13 +238,14 @@ function manageControls() {
     if (scriptMode) {
         //document.getElementById('tree').style.display = 'none';
         document.getElementById('dtable').style.display = 'none';
+        document.getElementById('verteilungTableFooter').style.display = 'none';
         document.getElementById('inTxt').style.display = 'block';
         //document.getElementById('docAlfresco').setAttribute("disabled", true);
         document.getElementById('filesinput').style.display = 'none';
         document.getElementById('play').style.display = 'none';
         document.getElementById('test').style.display = 'none';
         document.getElementById('back').style.display = 'none';
-        document.getElementById('pdf').style.display = 'none';
+       // document.getElementById('pdf').style.display = 'none';
         document.getElementById('openScript').style.display = 'none';
         document.getElementById('closeScript').style.display = 'block';
         document.getElementById('sendScript').style.display = 'block';
@@ -301,11 +305,10 @@ function openPDF(name, fromServer) {
 
 /**
  * lädt einen Text
- * diese Methode wird auch aus dem Applet aufgerufen
  * @param content    der originale Inhalt der Datei
  * @param txt        der Inhalt des Dokumentes in Textform
  * @param name       der Name des Dokumentes
- * @param typ        der Dokuemttyp  (wird der eigentlich noch gebraucht)
+ * @param typ        der Dokumenttyp  (wird der eigentlich noch gebraucht)
  * @param container  ???
  */
 function loadText(content, txt, name, typ, container) {

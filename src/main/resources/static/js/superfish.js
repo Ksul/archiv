@@ -190,23 +190,23 @@
             },
             createMenu = function (obj, el, id) {
 
-                var submenus = [];
-                var selectElement;
+                const submenus = [];
+                let selectElement;
                 // prüfen, ob Submenüs da sind
-                for (var k in obj) {
+                for (let k in obj) {
                     if (obj.hasOwnProperty(k) && typeof obj[k] === 'object')
                         submenus.push(k)
                 }
 
-                var element = el;
+                let element = el;
 
                 if (obj.title) {
-                    var menuElement = $('<li>');
+                    const menuElement = $('<li>');
 
                     if (typeof obj.file === "boolean" && obj.file) {
                         selectElement = $('<label>');
                         selectElement.attr("for", "files_" + id);
-                        var inputElement = $("<input>");
+                        const inputElement = $('<input>');
                         inputElement.attr("id", "files_" + id);
                         inputElement.attr("type", "file");
                         //inputElement.attr("multiple", "multiple");
@@ -216,7 +216,7 @@
                         menuElement.append(inputElement);
 
                     } else {
-                        selectElement = $("<a>");
+                        selectElement = $('<a>');
                     }
                     if (obj.className) {
                         selectElement.addClass(obj.className);
@@ -232,7 +232,7 @@
                         selectElement.addClass("disableLI");
                     } else if (obj.action && !(typeof obj.file === "boolean" && obj.file)) {
                         if (typeof obj.autoClose === "boolean" && obj.autoClose) {
-                            var action = obj.action;
+                            const action = obj.action;
                             obj.action = function (event) {
                                 action(event);
                                 event.data.root.superfish('hide');
@@ -241,11 +241,14 @@
                         selectElement.on("click", {root: getRootMenu()}, obj.action);
                     }
 
-                    selectElement.text(obj.title);
+                    const textElement = $('<i>');
+                    textElement.text(obj.title);
+                    textElement.addClass("sf-entry");
+                    selectElement.append(textElement);
                     selectElement.attr("id", id);
 
                     if (submenus.length > 0) {
-                        var ulElement = $("<ul>");
+                        const ulElement = $("<ul>");
                         if (typeof obj.disabled === "boolean" && obj.disabled)
                             ulElement.addClass("disableLI");
                         menuElement.append(ulElement);
@@ -257,7 +260,7 @@
                 }
 
 
-                for (var i in submenus) {
+                for (let i in submenus) {
                     createMenu(obj[submenus[i]], element, submenus[i]);
                 }
 

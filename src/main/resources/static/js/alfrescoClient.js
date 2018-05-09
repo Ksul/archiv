@@ -3907,6 +3907,153 @@ function buildVerteilungTab(){
     manageControls();
 }
 
+function createOutputMenus() {
+    $('#actionMenuOutput').superfish({
+        menuData: {
+            "actionMenuOutputAction": {
+                title: "Aktion",
+                className: "fas fa-sign-in-alt fa-1x",
+                autoClose: true,
+                actionMenuOutputClear: {
+                    title: "Löschen",
+                    className: "fas fa-trash-alt fa-1x",
+                    disabled: false,
+                    action: function () {
+                        try {
+                            Logger.clear();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuOutputLevel: {
+                    title: "Level",
+                    className: "fas fa-thermometer-half fa-1x",
+                    disabled: false,
+                    actionMenuOutputLevelNone: {
+                        title: "Nichts",
+                        className: "fas fa-times fa-1x",
+                        autoClose: true,
+                        selected: Logger.getLevel() === Level.NONE,
+                        action: function (event) {
+                            try {
+                                Logger.setLevel(Level.NONE);
+                                event.data.root.superfish('select', 'actionMenuOutputLevelNone');
+                                fillMessageBox(true);
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        }
+                    },
+                    actionMenuOutputLevelError: {
+                        title: "Fehler",
+                        className: "fas fa-ban fa-1x",
+                        autoClose: true,
+                        selected: Logger.getLevel() === Level.ERROR,
+                        action: function (event) {
+                            try {
+                                Logger.setLevel(Level.ERROR);
+                                event.data.root.superfish('select', 'actionMenuOutputLevelError');
+                                fillMessageBox(true);
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        }
+                    },
+                    actionMenuOutputLevelWarn: {
+                        title: "Warnungen",
+                        className: "fas fa-exclamation-circle fa-1x",
+                        autoClose: true,
+                        selected: Logger.getLevel() === Level.WARN,
+                        action: function (event) {
+                            try {
+                                Logger.setLevel(Level.WARN);
+                                event.data.root.superfish('select', 'actionMenuOutputLevelWarn');
+                                fillMessageBox(true);
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        }
+                    },
+                    actionMenuOutputLevelInfo: {
+                        title: "Info",
+                        className: "fas fa-info-circle fa-1x",
+                        autoClose: true,
+                        selected: Logger.getLevel() === Level.INFO,
+                        action: function (event) {
+                            try {
+                                Logger.setLevel(Level.INFO);
+                                event.data.root.superfish('select', 'actionMenuOutputLevelInfo');
+                                fillMessageBox(true);
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        }
+                    },
+                    actionMenuOutputLevelDebug: {
+                        title: "Debug",
+                        className: "fas fa-bug fa-1x",
+                        autoClose: true,
+                        selected: Logger.getLevel() === Level.DEBUG,
+                        action: function (event) {
+                            try {
+                                Logger.setLevel(Level.DEBUG);
+                                event.data.root.superfish('select', 'actionMenuOutputLevelDebug');
+                                fillMessageBox(true);
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        }
+                    },
+                    actionMenuOutputLevelTrace: {
+                        title: "Trace",
+                        className: "fas fa-truck fa-1x",
+                        autoClose: true,
+                        selected: Logger.getLevel() === Level.TRACE,
+                        action: function (event) {
+                            try {
+                                Logger.setLevel(Level.TRACE);
+                                event.data.root.superfish('select', 'actionMenuOutputLevelTrace');
+                                fillMessageBox(true);
+                            } catch (e) {
+                                errorHandler(e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+function createVerteilungMenus() {
+    verteilungTxtActionMenu = $('#actionMenuVerteilungTxt').superfish({
+        menuData: {
+            "actionMenuVerteilungTxtAction": {
+                title: "Aktion",
+                className: "fas fa-sign-in-alt fa-1x",
+                autoClose: true,
+                actionMenuVerteilungTxtPDF: {
+                    title: "PDF anzeigen",
+                    className: "far fa-file-pdf fa-1x",
+                    disabled: true,
+                    action: function () {
+                        try {
+                            const file = new Blob([base64DecToArr(currentContent)], {type: "application/pdf"});
+                            const fileURL = URL.createObjectURL(file);
+                            window.open(fileURL);
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                }
+
+            }
+        }
+    });
+}
+
 /**
  * startet die Anwendung
  */
@@ -3934,123 +4081,8 @@ function start() {
         Verteilung.outputEditor.setReadOnly(true);
         Verteilung.outputEditor.setShowPrintMargin(false);
         Verteilung.outputEditor.$blockScrolling = Infinity;
-
-        $('#actionMenuOutput').superfish({
-            menuData: {
-                "actionMenuOutputAction": {
-                    title: "Aktion",
-                    className: "fas fa-sign-in-alt fa-1x",
-                    autoClose: true,
-                    actionMenuOutputClear: {
-                        title: "Löschen",
-                        className: "fas fa-trash-alt fa-1x",
-                        disabled: false,
-                        action: function () {
-                            try {
-                                Logger.clear();
-                            } catch (e) {
-                                errorHandler(e);
-                            }
-                        }
-                    },
-                    actionMenuOutputLevel: {
-                        title: "Level",
-                        className: "fas fa-thermometer-half fa-1x",
-                        disabled: false,
-                        actionMenuOutputLevelNone: {
-                            title: "Nichts",
-                            className: "fas fa-times fa-1x",
-                            autoClose: true,
-                            selected: Logger.getLevel() === Level.NONE,
-                            action: function (event) {
-                                try {
-                                    Logger.setLevel(Level.NONE);
-                                    event.data.root.superfish('select','actionMenuOutputLevelNone');
-                                    fillMessageBox(true);
-                                } catch (e) {
-                                    errorHandler(e);
-                                }
-                            }
-                        },
-                        actionMenuOutputLevelError: {
-                            title: "Fehler",
-                            className: "fas fa-ban fa-1x",
-                            autoClose: true,
-                            selected: Logger.getLevel() === Level.ERROR,
-                            action: function (event) {
-                                try {
-                                    Logger.setLevel(Level.ERROR);
-                                    event.data.root.superfish('select','actionMenuOutputLevelError');
-                                    fillMessageBox(true);
-                                } catch (e) {
-                                    errorHandler(e);
-                                }
-                            }
-                        },
-                        actionMenuOutputLevelWarn: {
-                            title: "Warnungen",
-                            className: "fas fa-exclamation-circle fa-1x",
-                            autoClose: true,
-                            selected: Logger.getLevel() === Level.WARN,
-                            action: function (event) {
-                                try {
-                                    Logger.setLevel(Level.WARN);
-                                    event.data.root.superfish('select','actionMenuOutputLevelWarn');
-                                    fillMessageBox(true);
-                                } catch (e) {
-                                    errorHandler(e);
-                                }
-                            }
-                        },
-                        actionMenuOutputLevelInfo: {
-                            title: "Info",
-                            className: "fas fa-info-circle fa-1x",
-                            autoClose: true,
-                            selected: Logger.getLevel() === Level.INFO,
-                            action: function (event) {
-                                try {
-                                    Logger.setLevel(Level.INFO);
-                                    event.data.root.superfish('select','actionMenuOutputLevelInfo');
-                                    fillMessageBox(true);
-                                } catch (e) {
-                                    errorHandler(e);
-                                }
-                            }
-                        },
-                        actionMenuOutputLevelDebug: {
-                            title: "Debug",
-                            className: "fas fa-bug fa-1x",
-                            autoClose: true,
-                            selected: Logger.getLevel() === Level.DEBUG,
-                            action: function (event) {
-                                try {
-                                    Logger.setLevel(Level.DEBUG);
-                                    event.data.root.superfish('select','actionMenuOutputLevelDebug');
-                                    fillMessageBox(true);
-                                } catch (e) {
-                                    errorHandler(e);
-                                }
-                            }
-                        },
-                        actionMenuOutputLevelTrace: {
-                            title: "Trace",
-                            className: "fas fa-truck fa-1x",
-                            autoClose: true,
-                            selected: Logger.getLevel() === Level.TRACE,
-                            action: function (event) {
-                                try {
-                                    Logger.setLevel(Level.TRACE);
-                                    event.data.root.superfish('select','actionMenuOutputLevelTrace');
-                                    fillMessageBox(true);
-                                } catch (e) {
-                                    errorHandler(e);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        createVerteilungMenus();
+        createOutputMenus();
         $('#clientPage').css("display","block");
     } catch(e) {
         errorHandler(e);
