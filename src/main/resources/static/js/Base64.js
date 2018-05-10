@@ -10,7 +10,7 @@
 
 /* Array of bytes to base64 string decoding */
 
-function b64ToUint6 (nChr) {
+    function b64ToUint6 (nChr) {
 
     return nChr > 64 && nChr < 91 ?
     nChr - 65
@@ -26,6 +26,13 @@ function b64ToUint6 (nChr) {
         0;
 
 }
+
+function decodeBase64(str) {
+    return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    }).join(''))
+}
+
 
 function base64DecToArr (sBase64, nBlocksSize) {
 

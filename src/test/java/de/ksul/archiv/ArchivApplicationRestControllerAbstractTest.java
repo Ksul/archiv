@@ -379,7 +379,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
-                .andExpect(jsonPath("$.data", startsWith("// ")));
+                .andExpect(jsonPath("$.data", startsWith(Base64.encodeBase64String("// ".getBytes()))));
         request.setDocumentId("x");
         this.mockMvc.perform(post("/getDocumentContent")
                 .contentType(APPLICATION_JSON_UTF8)

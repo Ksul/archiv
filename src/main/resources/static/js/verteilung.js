@@ -319,6 +319,7 @@ function loadText(content, txt, name, typ, container) {
         currentContent = content;
         currentText = txt;
         currentContainer = container;
+        currentPDF = typ === "application/pdf";
         $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
         $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
         $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
@@ -430,9 +431,10 @@ function readFiles(files) {
                         return function (evt) {
                             try {
                                 if (evt.target.readyState === FileReader.DONE) {
+                                    const enc = new TextDecoder();
                                     // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
-                                    var json = executeService({"name": "extractPDFContent", "errorMessage": "PDF Datei konte nicht geparst werden:"}, [
-                                        {"name": "content", "value": btoa(evt.target.result)}
+                                    const json = executeService({"name": "extractPDFContent", "errorMessage": "PDF Datei konte nicht geparst werden:"}, [
+                                        {"name": "content", "value": btoa(String.fromCharCode.apply(null, new Uint8Array(evt.target.result)))}
                                     ]);
                                     if (json.success) {
                                         if (count === 1)
@@ -447,7 +449,7 @@ function readFiles(files) {
                         };
                     })(f, first);
                     blob = f.slice(0, f.size + 1);
-                    reader.readAsBinaryString(blob);
+                    reader.readAsArrayBuffer(blob);
                 }
                 // ZIP Files
                 if (f.name.toLowerCase().endsWith(".zip")) {
@@ -712,7 +714,7 @@ function work() {
             ]);
             if (json.success) {
 
-                eval("//# sourceURL=recognition.js\n\n" + json.data);
+                eval("//# sourceURL=recognition.js\n\n" + decodeBase64(json.data));
             }
         }
         var selectMode = false;
@@ -815,7 +817,7 @@ function work() {
                     {"name": "documentId", "value": rulesSchemaId}
                 ]);
                 if (json.success) {
-                    schemaContent = json.data;
+                    schemaContent = decodeBase64(json.data);
                 }
             }
             if (schemaContent) {
@@ -886,18 +888,18 @@ function sendRules() {
  */
 function getRules(rulesId, loadLocal) {
     try {
-        var ret;
+        let ret;
         if (loadLocal) {
-            var open = openFile("./rules/doc.xml");
+            const open = openFile("./rules/doc.xml");
             Verteilung.rulesEditor.getSession().setValue(open);
             Verteilung.rulesEditor.getSession().foldAll(1);
             Logger.log(Level.INFO, "Regeln erfolgreich lokal gelesen!");
         } else {
-            var json = executeService({"name": "getDocumentContent", "errorMessage": "Regeln konnten nicht gelesen werden:"}, [
+            const json = executeService({"name": "getDocumentContent", "errorMessage": "Regeln konnten nicht gelesen werden:"}, [
                 {"name": "documentId", "value": rulesID}
             ]);
             if (json.success) {
-                Verteilung.rulesEditor.getSession().setValue(json.data);
+                Verteilung.rulesEditor.getSession().setValue(decodeBase64(json.data));
                 Verteilung.rulesEditor.getSession().foldAll(1);
                 Logger.log(Level.INFO, "Regeln erfolgreich vom Server übertragen!");
             } else
@@ -1042,7 +1044,7 @@ function getScript() {
             {"name": "documentId", "value": scriptID}
         ]);
         if (json.success) {
-            Verteilung.textEditor.getSession().setValue(json.data);
+            Verteilung.textEditor.getSession().setValue(decodeBase64(json.data));
             Logger.log(Level.INFO, "Script erfolgreich heruntergeladen!");
         }
     };
@@ -1097,7 +1099,7 @@ function openScript() {
                     {"name": "documentId", "value": scriptID}
                 ]);
                 if (json.success) {
-                    content = json.data;
+                    content = decodeBase64(json.data);
                     read = true;
                     Logger.log(Level.INFO, "Script erfolgreich vom Server geladen!");
                 }

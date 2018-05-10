@@ -247,7 +247,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        String document = (String) obj.getData();
+        String document = new String(Base64.decodeBase64((String) obj.getData()), "UTF-8");
         assertThat(document.startsWith("//"), is(true));
     }
 
@@ -294,7 +294,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        String document = (String) obj.getData();
+        String document =  new String(Base64.decodeBase64((String) obj.getData()), "UTF-8");
         assertThat(document, is(content));
         obj = services.deleteDocument(new ObjectByIdsRequest(new String[] {(String)  ((Map<String, Object>) services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()).get("objectID")}));
         assertThat(obj, notNullValue());
@@ -337,7 +337,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        String document = (String) obj.getData();
+        String document =  new String(Base64.decodeBase64((String) obj.getData()), "UTF-8");
         assertThat(document, Matchers.equalTo(content));
         obj = services.deleteDocument(new ObjectByIdsRequest(new String[] {(String) ((Map<String, Object>) services.getNodeId(new ObjectByPathRequest("/TestFolder/TestDocument.txt")).getData()).get("objectID")}));
         assertThat(obj, notNullValue());
@@ -394,7 +394,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        assertThat(obj.getData(), Matchers.is(content));
+        assertThat( new String(Base64.decodeBase64((String) obj.getData()), "UTF-8"), Matchers.is(content));
         obj = services.deleteDocument(new ObjectByIdsRequest(new String[]{(String) doc.get("objectId")}));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));

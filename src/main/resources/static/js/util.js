@@ -9,7 +9,7 @@
  */
 function checkServerStatus(url) {
 
-    var obj = executeService({"name": "isURLAvailable", "ignoreError": true}, [{
+    const obj = executeService({"name": "isURLAvailable", "ignoreError": true}, [{
         "name": "server",
         "value": url
     }, {"name": "timeout", "value": "5000"}]);
@@ -563,7 +563,7 @@ function createDocument(input, file) {
                         {"name": "documentId", "value": tree.jstree("get_selected")[0]},
                         {"name": "fileName", "value": theFile.name},
                         // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
-                        {"name": "content", "value": btoa(evt.target.result)},
+                        {"name": "content", "value": btoa(String.fromCharCode.apply(null, new Uint8Array(evt.target.result)))},
                         {"name": "extraProperties", "value": extraProperties},
                         // TODO Richtigen Mimetype ermitteln
                         {"name": "mimeType", "value": "application/pdf"},
@@ -576,7 +576,7 @@ function createDocument(input, file) {
         };
     })(file);
     blob = file.slice(0, file.size + 1);
-    reader.readAsBinaryString(blob);
+    reader.readAsArrayBuffer(blob);
 }
 
 /**

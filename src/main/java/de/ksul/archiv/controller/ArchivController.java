@@ -443,7 +443,7 @@ public class ArchivController {
     }
 
     /**
-     * liefert den Inhalt eines Dokumentes als String
+     * liefert den Inhalt eines Dokumentes als Base64 encodeter String
      *
      * @param model das Requestmodel
      * @return obj
@@ -456,7 +456,7 @@ public class ArchivController {
 
         Document document = (Document) con.getNodeById(model.getDocumentId());
         obj.setSuccess(true);
-        obj.setData(new String(con.getDocumentContent(document), "UTF-8"));
+        obj.setData(Base64.encodeBase64String(con.getDocumentContent(document)));
 
         return obj;
     }

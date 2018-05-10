@@ -2369,15 +2369,29 @@ function handleAlfrescoImageClicks() {
     // Regeln
     $(document).on("click", ".rulesDocument", function () {
         try {
-            var tr = $(this).closest('tr');
-            var tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
-            var id = tabelle.row(tr).data().objectID;
-            var json = executeService({"name": "getDocumentContentExtracted", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
-                {"name": "documentId", "value": tabelle.row(tr).data().objectID}
+            const tr = $(this).closest('tr');
+            const tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
+            const id = tabelle.row(tr).data().objectID;
+            const json1 = executeService({"name": "getDocumentContentExtracted", "errorMessage": "Dokument konnten nicht gelesen werden!"}, [
+                {"name": "documentId", "value": id}
             ]);
-            if (json.success) {
-                loadText(json.data, json.data, tabelle.row(tr).data().name, tabelle.row(tr).data().contentStreamMimeType, null);
-                tabLayout.tabs("option", "active", 2);
+            if (json1.success) {
+                const json = executeService({
+                    "name": "getDocumentContent",
+                    "errorMessage": "Dokument konnten nicht gelesen werden!"
+                }, [
+                    {"name": "documentId", "value": id}
+                ]);
+                if (json.success) {
+                    const binary_string =  window.atob(json.data);
+                    const len = binary_string.length;
+                    let bytes = new Uint8Array( len );
+                    for (let i = 0; i < len; i++)        {
+                        bytes[i] = binary_string.charCodeAt(i);
+                    }
+                    tabLayout.tabs("option", "active", 2);
+                    loadText(bytes, json1.data, tabelle.row(tr).data().name, tabelle.row(tr).data().contentStreamMimeType, null);
+                }
             }
         } catch (e) {
             errorHandler(e);
@@ -4040,9 +4054,21 @@ function createVerteilungMenus() {
                     disabled: true,
                     action: function () {
                         try {
-                            const file = new Blob([base64DecToArr(currentContent)], {type: "application/pdf"});
+                            const file = new Blob([currentContent], {type: "application/pdf"});
                             const fileURL = URL.createObjectURL(file);
                             window.open(fileURL);
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuVerteilungTxtScript: {
+                    title: "Script anzeigen",
+                    className: "fab fa-js fa-1x",
+                    disabled: false,
+                    action: function () {
+                        try {
+                            openScript();
                         } catch (e) {
                             errorHandler(e);
                         }
