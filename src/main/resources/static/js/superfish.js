@@ -230,15 +230,18 @@
                     }
                     if (typeof obj.disabled === "boolean" && obj.disabled) {
                         selectElement.addClass("disableLI");
+                    } else if (typeof obj.removed === "boolean" && obj.removed) {
+                        selectElement.css("display", "none");
                     } else if (obj.action && !(typeof obj.file === "boolean" && obj.file)) {
                         if (typeof obj.autoClose === "boolean" && obj.autoClose) {
                             const action = obj.action;
                             obj.action = function (event) {
-                                action(event);
+                                event.stopPropagation();
                                 event.data.root.superfish('hide');
+                                action(event);
                             };
-                        }
-                        selectElement.on("click", {root: getRootMenu()}, obj.action);
+                        } else
+                             selectElement.on("click", {root: getRootMenu()}, obj.action);
                     }
 
                     const textElement = $('<i>');
@@ -270,12 +273,12 @@
             // public methods
             hide: function (instant) {
                 if (this.length) {
-                    var $this = this,
+                    const $this = this,
                         o = getOptions($this);
                     if (!o) {
                         return this;
                     }
-                    var not = (o.retainPath === true) ? o.$path : '',
+                    let not = (o.retainPath === true) ? o.$path : '',
                         $ul = $this.find('li.' + o.hoverClass).add(this).not(not).removeClass(o.hoverClass).children(o.popUpSelector),
                         speed = o.speedOut;
 
@@ -290,7 +293,7 @@
                     }
 
                     $ul.stop(true, true).animate(o.animationOut, speed, function () {
-                        var $this = $(this);
+                        const $this = $(this);
                         o.onHide.call($this);
                     });
                 }
@@ -318,7 +321,7 @@
             },
             destroy: function () {
                 return this.each(function () {
-                    var $this = $(this),
+                    let $this = $(this),
                         o = $this.data('sfOptions'),
                         $hasPopUp;
                     if (!o) {
@@ -344,16 +347,22 @@
                     $this.removeData('sfOptions');
                 });
             },
-            disable: function (id) {
+            disableItem: function (id) {
                 const element = $("#" + id);
+                element.css("display", "block");
                 element.addClass("disableLI");
                 element.parent().children("ul").addClass("disableLI");
                 element.off("click");
             },
-            enable: function (id) {
+            hideItem: function (id) {
+                const element = $("#" + id);
+                element.css("display", "none");
+            },
+            enableItem: function (id) {
                 const $this = $(this);
                 const o = $this.data('sfOptions');
                 const element = $(document.getElementById(id));
+                element.css("display", "block");
                 element.removeClass("disableLI");
                 element.parent().children("ul").removeClass("disableLI");
                 if (o && o.menuData) {
@@ -362,7 +371,7 @@
                         element.on("click", {root: getRootMenu()}, obj[0].action)
                 }
             },
-            select: function(id) {
+            selectItem: function(id) {
                 const element = $("#" + id);
                 element.parent().parent().children("li").children("a").removeClass("selected");
                 element.addClass("selected");

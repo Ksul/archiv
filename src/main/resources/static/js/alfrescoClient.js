@@ -521,21 +521,21 @@ function loadAlfrescoTable() {
                 dataSrc: function (obj) {
                     Logger.log(Level.DEBUG, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
                     if (obj.data.length === 0) {
-                        alfrescoViewModeMenu.superfish('disable','alfrescoAnsicht');
-                        alfrescoDocumentSelectMenu.superfish('disable','alfrescoDocumentAuswahl');
+                        alfrescoViewModeMenu.superfish('disableItem','alfrescoAnsicht');
+                        alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahl');
                     }
                     else {
-                        alfrescoViewModeMenu.superfish('enable','alfrescoAnsicht');
-                        alfrescoDocumentSelectMenu.superfish('enable','alfrescoDocumentAuswahl');
-                        alfrescoDocumentActionMenu.superfish('disable', 'alfrescoDocumentActionMove');
-                        alfrescoDocumentActionMenu.superfish('disable', 'alfrescoDocumentActionDelete');
-                        alfrescoDocumentSelectMenu.superfish('disable','alfrescoDocumentAuswahlRevert');
-                        alfrescoDocumentSelectMenu.superfish('disable','alfrescoDocumentAuswahlNone');
+                        alfrescoViewModeMenu.superfish('enableItem','alfrescoAnsicht');
+                        alfrescoDocumentSelectMenu.superfish('enableItem','alfrescoDocumentAuswahl');
+                        alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionMove');
+                        alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionDelete');
+                        alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlRevert');
+                        alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlNone');
                     }
                     if (obj.parent === archivFolderId || obj.parent === documentFolderId){
-                        alfrescoDocumentActionMenu.superfish('disable', 'alfrescoDocumentActionUpload');
+                        alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionUpload');
                     } else {
-                        alfrescoDocumentActionMenu.superfish('enable', 'alfrescoDocumentActionUpload');
+                        alfrescoDocumentActionMenu.superfish('enableItem', 'alfrescoDocumentActionUpload');
                     }
                     return obj.data;
                 },
@@ -752,18 +752,18 @@ function loadAlfrescoTable() {
             }
         }).on( 'select', function ( e, dt, type, indexes ) {
             if ( type === 'row' ) {
-                alfrescoDocumentActionMenu.superfish('enable','alfrescoDocumentActionMove');
-                alfrescoDocumentActionMenu.superfish('enable','alfrescoDocumentActionDelete');
-                alfrescoDocumentSelectMenu.superfish('enable','alfrescoDocumentAuswahlRevert');
-                alfrescoDocumentSelectMenu.superfish('enable','alfrescoDocumentAuswahlNone');
+                alfrescoDocumentActionMenu.superfish('enableItem','alfrescoDocumentActionMove');
+                alfrescoDocumentActionMenu.superfish('enableItem','alfrescoDocumentActionDelete');
+                alfrescoDocumentSelectMenu.superfish('enableItem','alfrescoDocumentAuswahlRevert');
+                alfrescoDocumentSelectMenu.superfish('enableItem','alfrescoDocumentAuswahlNone');
             }
         } ).on( 'deselect', function ( e, dt, type, indexes ) {
             if ( type === 'row' ) {
                if( alfrescoTabelle.rows( { selected: true }).length <= 1 ) {
-                   alfrescoDocumentActionMenu.superfish('disable', 'alfrescoDocumentActionMove');
-                   alfrescoDocumentActionMenu.superfish('disable', 'alfrescoDocumentActionDelete');
-                   alfrescoDocumentSelectMenu.superfish('disable','alfrescoDocumentAuswahlRevert');
-                   alfrescoDocumentSelectMenu.superfish('disable','alfrescoDocumentAuswahlNone');
+                   alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionMove');
+                   alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionDelete');
+                   alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlRevert');
+                   alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlNone');
                }
             }
         } );
@@ -901,15 +901,15 @@ function loadAlfrescoFolderTable() {
                         Logger.log(Level.DEBUG, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
                         $.fn.dataTable.makeEditable(alfrescoFolderTabelle, updateInLineFolderFieldFieldDefinition());
                         if (obj.data.length === 0) {
-                            alfrescoFolderSelectMenu.superfish('disable','alfrescoFolderAuswahl');
+                            alfrescoFolderSelectMenu.superfish('disableItem','alfrescoFolderAuswahl');
                         }
                         else {
-                            alfrescoFolderActionMenu.superfish('enable','alfrescoFolderAuswahl');
-                            alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
-                            alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
-                            alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
-                            alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlRevert');
-                            alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlNone');
+                            alfrescoFolderActionMenu.superfish('enableItem','alfrescoFolderAuswahl');
+                            alfrescoFolderActionMenu.superfish('disableItem', 'alfrescoFolderActionCreate');
+                            alfrescoFolderActionMenu.superfish('disableItem', 'alfrescoFolderActionMove');
+                            alfrescoFolderActionMenu.superfish('disableItem', 'alfrescoFolderActionDelete');
+                            alfrescoFolderSelectMenu.superfish('disableItem', 'alfrescoFolderAuswahlRevert');
+                            alfrescoFolderSelectMenu.superfish('disableItem', 'alfrescoFolderAuswahlNone');
                         }
                         const tree = $.jstree.reference('#tree');
                         const parent = tree.get_node(obj.parent);
@@ -1059,17 +1059,17 @@ function loadAlfrescoFolderTable() {
                     dt.data().objectID !== unknownFolderId &&
                     // der Ordner darf nicht der Doppelte Folder sein
                     dt.data().objectID !== doubleFolderId) {
-                        alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionCreate');
+                        alfrescoFolderActionMenu.superfish('enableItem', 'alfrescoFolderActionCreate');
                         if (
                         // der Ordner darf nicht der Dokumenten Folder sein
                         dt.data().objectID !== documentFolderId
                         ) {
-                            alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionMove');
-                            alfrescoFolderActionMenu.superfish('enable', 'alfrescoFolderActionDelete');
+                            alfrescoFolderActionMenu.superfish('enableItem', 'alfrescoFolderActionMove');
+                            alfrescoFolderActionMenu.superfish('enableItem', 'alfrescoFolderActionDelete');
                         }
                     }
-                    alfrescoFolderSelectMenu.superfish('enable', 'alfrescoFolderAuswahlRevert');
-                    alfrescoFolderSelectMenu.superfish('enable', 'alfrescoFolderAuswahlNone');
+                    alfrescoFolderSelectMenu.superfish('enableItem', 'alfrescoFolderAuswahlRevert');
+                    alfrescoFolderSelectMenu.superfish('enableItem', 'alfrescoFolderAuswahlNone');
                 }
             } catch (e) {
                 errorHandler(e);
@@ -1078,11 +1078,11 @@ function loadAlfrescoFolderTable() {
             try {
                 if (type === 'row') {
                     if (alfrescoFolderTabelle.rows({selected: true}).length <= 1) {
-                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionCreate');
-                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionMove');
-                        alfrescoFolderActionMenu.superfish('disable', 'alfrescoFolderActionDelete');
-                        alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlRevert');
-                        alfrescoFolderSelectMenu.superfish('disable', 'alfrescoFolderAuswahlNone');
+                        alfrescoFolderActionMenu.superfish('disableItem', 'alfrescoFolderActionCreate');
+                        alfrescoFolderActionMenu.superfish('disableItem', 'alfrescoFolderActionMove');
+                        alfrescoFolderActionMenu.superfish('disableItem', 'alfrescoFolderActionDelete');
+                        alfrescoFolderSelectMenu.superfish('disableItem', 'alfrescoFolderAuswahlRevert');
+                        alfrescoFolderSelectMenu.superfish('disableItem', 'alfrescoFolderAuswahlNone');
                     }
                 }
             } catch (e) {
@@ -1227,16 +1227,16 @@ function loadAlfrescoSearchTable() {
                 dataSrc: function (obj) {
                     Logger.log(Level.DEBUG, "Execution of Service: findFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
                     if (obj.data.length === 0) {
-                        searchViewModeMenu.superfish('disable','searchAnsicht');
-                        searchDocumentSelectMenu.superfish('disable','alfrescoSearchDocumentAuswahl');
+                        searchViewModeMenu.superfish('disableItem','searchAnsicht');
+                        searchDocumentSelectMenu.superfish('disableItem','alfrescoSearchDocumentAuswahl');
                       }
                     else {
-                        searchViewModeMenu.superfish('enable','searchAnsicht');
-                        searchDocumentSelectMenu.superfish('enable','alfrescoSearchDocumentAuswahl');
-                        alfrescoSearchDocumentActionMenu.superfish('disable', 'alfrescoSearchDocumentActionMove');
-                        alfrescoSearchDocumentActionMenu.superfish('disable', 'alfrescoSearchDocumentActionDelete');
-                        searchDocumentSelectMenu.superfish('disable','alfrescoSearchDocumentAuswahlRevert');
-                        searchDocumentSelectMenu.superfish('disable','alfrescoSearchDocumentAuswahlNone');
+                        searchViewModeMenu.superfish('enableItem','searchAnsicht');
+                        searchDocumentSelectMenu.superfish('enableItem','alfrescoSearchDocumentAuswahl');
+                        alfrescoSearchDocumentActionMenu.superfish('disableItem', 'alfrescoSearchDocumentActionMove');
+                        alfrescoSearchDocumentActionMenu.superfish('disableItem', 'alfrescoSearchDocumentActionDelete');
+                        searchDocumentSelectMenu.superfish('disableItem','alfrescoSearchDocumentAuswahlRevert');
+                        searchDocumentSelectMenu.superfish('disableItem','alfrescoSearchDocumentAuswahlNone');
                     }
                     return obj.data;
                 },
@@ -1466,18 +1466,18 @@ function loadAlfrescoSearchTable() {
             }
         }).on( 'select', function ( e, dt, type, indexes ) {
             if ( type === 'row' ) {
-                alfrescoSearchDocumentActionMenu.superfish('enable','alfrescoSearchDocumentActionMove');
-                alfrescoSearchDocumentActionMenu.superfish('enable','alfrescoSearchDocumentActionDelete');
-                searchDocumentSelectMenu.superfish('enable','alfrescoSearchDocumentAuswahlRevert');
-                searchDocumentSelectMenu.superfish('enable','alfrescoSearchDocumentAuswahlNone');
+                alfrescoSearchDocumentActionMenu.superfish('enableItem','alfrescoSearchDocumentActionMove');
+                alfrescoSearchDocumentActionMenu.superfish('enableItem','alfrescoSearchDocumentActionDelete');
+                searchDocumentSelectMenu.superfish('enableItem','alfrescoSearchDocumentAuswahlRevert');
+                searchDocumentSelectMenu.superfish('enableItem','alfrescoSearchDocumentAuswahlNone');
             }
         } ).on( 'deselect', function ( e, dt, type, indexes ) {
             if ( type === 'row' ) {
                 if( alfrescoSearchTabelle.rows( { selected: true }).length <= 1 ) {
-                    alfrescoSearchDocumentActionMenu.superfish('disable', 'alfrescoSearchDocumentActionMove');
-                    alfrescoSearchDocumentActionMenu.superfish('disable', 'alfrescoSearchDocumentActionDelete');
-                    searchDocumentSelectMenu.superfish('disable','alfrescoSearchDocumentAuswahlRevert');
-                    searchDocumentSelectMenu.superfish('disable','alfrescoSearchDocumentAuswahlNone');
+                    alfrescoSearchDocumentActionMenu.superfish('disableItem', 'alfrescoSearchDocumentActionMove');
+                    alfrescoSearchDocumentActionMenu.superfish('disableItem', 'alfrescoSearchDocumentActionDelete');
+                    searchDocumentSelectMenu.superfish('disableItem','alfrescoSearchDocumentAuswahlRevert');
+                    searchDocumentSelectMenu.superfish('disableItem','alfrescoSearchDocumentAuswahlNone');
                 }
             }
         } );
@@ -3952,7 +3952,7 @@ function createOutputMenus() {
                         action: function (event) {
                             try {
                                 Logger.setLevel(Level.NONE);
-                                event.data.root.superfish('select', 'actionMenuOutputLevelNone');
+                                event.data.root.superfish('selectItem', 'actionMenuOutputLevelNone');
                                 fillMessageBox(true);
                             } catch (e) {
                                 errorHandler(e);
@@ -3967,7 +3967,7 @@ function createOutputMenus() {
                         action: function (event) {
                             try {
                                 Logger.setLevel(Level.ERROR);
-                                event.data.root.superfish('select', 'actionMenuOutputLevelError');
+                                event.data.root.superfish('selectItem', 'actionMenuOutputLevelError');
                                 fillMessageBox(true);
                             } catch (e) {
                                 errorHandler(e);
@@ -3982,7 +3982,7 @@ function createOutputMenus() {
                         action: function (event) {
                             try {
                                 Logger.setLevel(Level.WARN);
-                                event.data.root.superfish('select', 'actionMenuOutputLevelWarn');
+                                event.data.root.superfish('selectItem', 'actionMenuOutputLevelWarn');
                                 fillMessageBox(true);
                             } catch (e) {
                                 errorHandler(e);
@@ -3997,7 +3997,7 @@ function createOutputMenus() {
                         action: function (event) {
                             try {
                                 Logger.setLevel(Level.INFO);
-                                event.data.root.superfish('select', 'actionMenuOutputLevelInfo');
+                                event.data.root.superfish('selectItem', 'actionMenuOutputLevelInfo');
                                 fillMessageBox(true);
                             } catch (e) {
                                 errorHandler(e);
@@ -4012,7 +4012,7 @@ function createOutputMenus() {
                         action: function (event) {
                             try {
                                 Logger.setLevel(Level.DEBUG);
-                                event.data.root.superfish('select', 'actionMenuOutputLevelDebug');
+                                event.data.root.superfish('selectItem', 'actionMenuOutputLevelDebug');
                                 fillMessageBox(true);
                             } catch (e) {
                                 errorHandler(e);
@@ -4027,7 +4027,7 @@ function createOutputMenus() {
                         action: function (event) {
                             try {
                                 Logger.setLevel(Level.TRACE);
-                                event.data.root.superfish('select', 'actionMenuOutputLevelTrace');
+                                event.data.root.superfish('selectItem', 'actionMenuOutputLevelTrace');
                                 fillMessageBox(true);
                             } catch (e) {
                                 errorHandler(e);
@@ -4052,6 +4052,7 @@ function createVerteilungMenus() {
                     title: "PDF anzeigen",
                     className: "far fa-file-pdf fa-1x",
                     disabled: true,
+                    autoClose: true,
                     action: function () {
                         try {
                             const file = new Blob([currentContent], {type: "application/pdf"});
@@ -4066,6 +4067,7 @@ function createVerteilungMenus() {
                     title: "Script anzeigen",
                     className: "fab fa-js fa-1x",
                     disabled: false,
+                    autoClose: true,
                     action: function () {
                         try {
                             openScript();
@@ -4073,7 +4075,48 @@ function createVerteilungMenus() {
                             errorHandler(e);
                         }
                     }
+                },
+                actionMenuVerteilungTxtScriptReload: {
+                    title: "Script anwenden",
+                    className: "fas fa-sync fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            activateScriptToContext();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuVerteilungTxtScriptUpload: {
+                    title: "Script zum Server laden",
+                    className: "fas fa-upload fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            sendScript();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuVerteilungTxtScriptClose: {
+                    title: "Script schließen",
+                    className: "far fa-window-close fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            closeScript();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
                 }
+
+
 
             }
         }

@@ -293,33 +293,6 @@ input.pdf:disabled {
     disabled: true;
 }
 
-input.close {
-    background-image: url(../images/exit.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: pointer;
-}
-
-input.test {
-    background-image: url(../images/tabicon_pipette.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: pointer;
-}
-
-input.reload {
-    background-image: url(../images/refresh.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: pointer;
-}
-
 input.docAlfresco {
     background-image: url(../images/alfresco.png);
     background-color: transparent;

@@ -24,7 +24,6 @@
         var alfrescoRootFolderId;
         var currentRules = null;
         var scriptMode = false;
-        var testMode = false;
         var runLocal = false;
         var REC;
         var tabelle;
@@ -310,12 +309,7 @@
                                                                        class="close"
                                                                        style="display: none"/>
                                 </td>
-                                <td width="60px" align="center"><input
-                                        onclick="activateScriptToContext();" name="activateScriptToContext"
-                                        id="activateScriptToContext"
-                                        type="submit" class="reload" title="Skript im Kontext aktualisieren" value=""
-                                        style="display: none"/>
-                                </td>
+
                                 <td width="60px" align="center"><input
                                         onclick="save(this.workDocument, Verteilung.textEditor.getSession().getValue());modifiedScript=null;"
                                         name="saveScript" id="saveScript" type="submit" class="save"
@@ -327,17 +321,7 @@
                                                                        title="Download"
                                                                        value="" style="display: none"/>
                                 </td>
-                                <td width="60px" align="center"><input onclick="sendScript();"
-                                                                       name="sendScript" id="sendScript" type="submit"
-                                                                       class="upload"
-                                                                       title="Upload"
-                                                                       value="" style="display: none"/>
-                                </td>
-                                <td width="60px" align="center"><input onclick="closeScript();"
-                                                                       name="closeScript" id="closeScript" type="submit"
-                                                                       class="close" title="Close"
-                                                                       value="" style="display: none"/>
-                                </td>
+
                             </tr>
                         </table>
                     </div>
@@ -402,19 +386,7 @@
                     <div class="header">Ergebnis</div>
                     <div id="subHeaderEast" class="subhead">
                         <table>
-                            <tr>
-                                <td width="60px" align="center"><input onclick="doTest();"
-                                                                       name="test" id="test" type="submit" class="test"
-                                                                       title="Test"
-                                                                       value=""/>
-                                </td>
-                                <td width="60px" align="center"><input onclick="closeTest();"
-                                                                       name="closeTest" id="closeTest" type="submit"
-                                                                       class="close"
-                                                                       title="Close"
-                                                                       value="" style="display: none"/>
-                                </td>
-                            </tr>
+
                         </table>
                     </div>
                     <div class="ui-widget-content">

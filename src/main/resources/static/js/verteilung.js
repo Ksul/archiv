@@ -156,6 +156,8 @@ function showProgress() {
  * verwaltet die Controls
  */
 function manageControls() {
+
+
     //document.getElementById('tree').style.display = 'none';
     document.getElementById('dtable').style.display = 'none';
     document.getElementById('verteilungTableFooter').style.display = 'none';
@@ -166,20 +168,13 @@ function manageControls() {
     //document.getElementById('closeAlfresco').style.display = 'none';
     document.getElementById('play').style.display = 'block';
     document.getElementById('play').removeAttribute("disabled");
-    document.getElementById('test').style.display = 'block';
-    document.getElementById('openScript').style.display = 'block';
-    document.getElementById('openScript').removeAttribute("disabled");
     document.getElementById('searchCont').style.display = 'block';
     document.getElementById('searchCont').removeAttribute("disabled");
     document.getElementById('beautifyScript').style.display = 'none';
     document.getElementById('back').style.display = 'none';
-    document.getElementById('closeScript').style.display = 'none';
-    document.getElementById('closeTest').style.display = 'none';
-    document.getElementById('activateScriptToContext').style.display = 'none';
     document.getElementById('saveScript').style.display = 'none';
     document.getElementById('saveScript').setAttribute("disabled", true);
     document.getElementById('getScript').style.display = 'none';
-    document.getElementById('sendScript').style.display = 'none';
     document.getElementById('beautifyRules').style.display = 'block';
     document.getElementById('searchRules').style.display = 'block';
     document.getElementById('foldAll').style.display = 'block';
@@ -190,13 +185,6 @@ function manageControls() {
     document.getElementById('sendToInbox').style.display = 'block';
     document.getElementById('sendToInbox').removeAttribute("disabled");
 
-    if (testMode) {
-        document.getElementById('test').style.display = 'none';
-        document.getElementById('closeTest').style.display = 'block';
-        //document.getElementById('docAlfresco').setAttribute("disabled", true);
-        document.getElementById('openScript').setAttribute("disabled", true);
-        document.getElementById('pdf').setAttribute("disabled", true);
-    }
 /*
     if (alfrescoMode) {
         document.getElementById('tree').style.display = 'block';
@@ -223,12 +211,12 @@ function manageControls() {
         document.getElementById('verteilungTableFooter').style.display = 'none';
     }
     if (currentPDF)
-        verteilungTxtActionMenu.superfish('enable', 'actionMenuVerteilungTxtPDF');
+        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtPDF');
     else
-        verteilungTxtActionMenu.superfish('disable', 'actionMenuVerteilungTxtPDF');
+        verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtPDF');
 
     if (!alfrescoServerAvailable) {
-        document.getElementById('sendScript').setAttribute("disabled", true);
+        verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtScriptUpload');
         document.getElementById('getScript').setAttribute("disabled", true);
         document.getElementById('getRules').setAttribute("disabled", true);
         document.getElementById('sendRules').setAttribute("disabled", true);
@@ -243,65 +231,26 @@ function manageControls() {
         //document.getElementById('docAlfresco').setAttribute("disabled", true);
         document.getElementById('filesinput').style.display = 'none';
         document.getElementById('play').style.display = 'none';
-        document.getElementById('test').style.display = 'none';
         document.getElementById('back').style.display = 'none';
        // document.getElementById('pdf').style.display = 'none';
-        document.getElementById('openScript').style.display = 'none';
-        document.getElementById('closeScript').style.display = 'block';
-        document.getElementById('sendScript').style.display = 'block';
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtPDF');
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScript');
+        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptReload');
+        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptUpload');
+        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptClose');
+
         document.getElementById('getScript').style.display = 'block';
         document.getElementById('saveScript').style.display = 'block';
-        document.getElementById('activateScriptToContext').style.display = 'block';
         document.getElementById('beautifyScript').style.display = 'block';
+    } else {
+        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScript');
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptReload');
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptUpload');
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptClose');
+
     }
 }
 
-/**
- * TODO prüfen, wie das mit den Services umgesetzt werden kann
- * Öffnet ein PDF
- * @param name       Name des Dokuments
- * @param fromServer legt fest, ob das Dokument vom Server geholt werden soll
- * TODO Dass muss überarbeitet werden!!
- */
-function openPDF(name, fromServer) {
-    try {
-        if (fromServer) {
-            var dataString = {
-                "function": "getTicket",
-                "server": getSettings("server"),
-                "username": getSettings("user"),
-                "password": getSettings("password"),
-                "proxyHost": getSettings("proxy"),
-                "proxyPort": getSettings("port")
-            };
-            $.ajax({
-                type: "POST",
-                data: dataString,
-                datatype: "json",
-                url: "/TestVerteilung/VerteilungServlet",
-                error: function (response) {
-                    try {
-                        var r = jQuery.parseJSON(response.responseText);
-                        message("Fehler", "Fehler: " + r.Message + "<br>StackTrace: " + r.StackTrace + "<br>ExceptionType: " + r.ExceptionType);
-                    } catch (e) {
-                        errorHandler(e);
-                    }
-                },
-                success: function (data) {
-                    window.open(name + "?alf_ticket=" + data.data.toString());
-                }
-            });
-        }
-        else {
-            if (isLocal())
-                document.reader.openPDF(name);
-            else
-                window.open("/TestVerteilung/VerteilungServlet?function=openPDF&fileName=" + name, "_blank");
-        }
-    } catch (e) {
-        errorHandler(e);
-    }
-}
 
 /**
  * lädt einen Text
@@ -323,7 +272,7 @@ function loadText(content, txt, name, typ, container) {
         $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
         $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
         $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
-        for (var j = 0; j< Verteilung.rulesEditor.getSession().getLength(); j++)
+        for (let j = 0; j< Verteilung.rulesEditor.getSession().getLength(); j++)
             Verteilung.rulesEditor.getSession().removeGutterDecoration(j, "ace_selectXML");
         Verteilung.textEditor.getSession().setValue(txt);
         document.getElementById('headerWest').textContent = name;
@@ -378,10 +327,10 @@ function loadMultiText(content, txt, name, typ,  notDeleteable, container) {
  * handelt den File-Select der Dateiauswahl
  * @param evt    das Event
  */
-function    handleFileSelect(evt) {
+function handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
-    var files = evt.dataTransfer.files;
+    const files = evt.dataTransfer.files;
     readFiles(files);
 }
 
@@ -402,7 +351,7 @@ function handleDragOver(evt) {
 function readMultiFile(evt) {
     multiMode = false;
     currentPDF = false;
-    var files = evt.target.files;
+    const files = evt.target.files;
     readFiles(files);
 }
 
@@ -415,13 +364,13 @@ function readFiles(files) {
         Verteilung.textEditor.getSession().setValue("");
         tabelle.clear();
         daten = [];
-        var count = files.length;
-        var maxLen = 1000000;
-        var first = true;
-        var reader;
-        var blob;
-        for (var i = 0; i < count; i++) {
-            var f = files[i];
+        let count = files.length;
+        const maxLen = 1000000;
+        let first = true;
+        let reader;
+        let blob;
+        for (let i = 0; i < count; i++) {
+            let f = files[i];
             if (f) {
                 // PDF Files
                 if (f.name.toLowerCase().endsWith(".pdf")) {
@@ -431,10 +380,13 @@ function readFiles(files) {
                         return function (evt) {
                             try {
                                 if (evt.target.readyState === FileReader.DONE) {
-                                    const enc = new TextDecoder();
                                     // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
+                                    const content = btoa(
+                                        new Uint8Array(evt.target.result)
+                                            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                                    );
                                     const json = executeService({"name": "extractPDFContent", "errorMessage": "PDF Datei konte nicht geparst werden:"}, [
-                                        {"name": "content", "value": btoa(String.fromCharCode.apply(null, new Uint8Array(evt.target.result)))}
+                                        {"name": "content", "value": content}
                                     ]);
                                     if (json.success) {
                                         if (count === 1)
@@ -459,16 +411,16 @@ function readFiles(files) {
                             try {
                                 if (evt.target.readyState === FileReader.DONE) {
                                     // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
-                                    var json = executeService({"name": "extractZIPAndExtractPDFToInternalStorage", "errorMessage": "ZIP Datei konte nicht entpackt werden:"}, [
+                                    const json = executeService({"name": "extractZIPAndExtractPDFToInternalStorage", "errorMessage": "ZIP Datei konte nicht entpackt werden:"}, [
                                         {"name": "content", "value": btoa(evt.target.result)}
                                     ]);
                                     if (json.success) {
                                         count = count + json.data - 1;
-                                        var json1 = executeService({"name": "getCompleteDataFromInternalStorage"});
+                                        const json1 = executeService({"name": "getCompleteDataFromInternalStorage"});
                                         if (json1.success) {
-                                            var erg = json1.data;
-                                            for (var pos in erg) {
-                                                var entry = erg[pos];
+                                            const erg = json1.data;
+                                            for (let pos in erg) {
+                                                let entry = erg[pos];
                                                 if (count === 1)
                                                     loadText(UTF8ArrToStr(base64DecToArr(entry.data)), entry.extractedData, entry.name, "application/zip", null);
                                                 else {
@@ -489,7 +441,7 @@ function readFiles(files) {
                 }
                 // Text Files
                 if (f.type === "text/plain") {
-                    var r = new FileReader();
+                    const r = new FileReader();
                     if (files.length === 1) {
                         r.onload = (function (theFile) {
                             return function (e) {
@@ -628,72 +580,9 @@ function doBack() {
 /**
  * Fuktionalität für den Test Button
  */
-function doTest() {
-    try {
-        var dataString = {
-            "function": "doTest",
-            "fileName": "test.txt",
-            "filePath": "test.xml"
-        };
-        $.ajax({
-            type: "POST",
-            data: dataString,
-            datatype: "json",
-            url: "/TestVerteilung/VerteilungServlet",
-            error: function (response) {
-                try {
-                    var r = jQuery.parseJSON(response.responseText);
-                    message("Fehler", "Fehler: " + r.Message + "<br>StackTrace: " + r.StackTrace + "<br>ExceptionType: " + r.ExceptionType);
-                } catch (e) {
-                    var str = "FEHLER:\n";
-                    str = str + e.toString() + "\n";
-                    for (var prop in e)
-                        str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
-                    message("Fehler", str + "<br>" + response.responseText);
-                }
-            },
-            success: function (data) {
-                if (data.success[0]) {
-                    REC.currentDocument.setContent(data.result[0].text.toString());
-                    $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
-                    $.each(Verteilung.rulesEditor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.getSession().removeMarker(element)});
-                    $.each(Verteilung.propsEditor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.getSession().removeMarker(element)});
-                    Verteilung.textEditor.getSession().setValue(data.result[0].text.toString());
-                    currentRules = "test.xml";
-                    document.getElementById('headerCenter').textContent = "Regeln (test.xml)";
-                    Verteilung.rulesEditor.getSession().setValue(data.result[0].xml.toString());
-                    REC.testRules(Verteilung.rulesEditor.getSession().getValue());
-                    setXMLPosition(REC.currXMLName);
-                    Verteilung.positions.setMarkers();
-                    Verteilung.propsEditor.getSession().setValue(printResults(REC.results));
-                    Verteilung.positions.setMarkers();
-                    testMode = true;
-                    manageControls();
-                } else
-                    message("Fehler", "Fehler: " + data.result[0]);
-            }
-        });
-    } catch (e) {
-        errorHandler(e);
-    }
-}
 
-/**
- * schliesst die Testanzeige
- */
-function closeTest() {
-    try {
-        testMode = false;
-        Verteilung.textEditor.getSession().setValue(currentContent);
-        Verteilung.propsEditor.getSession().setValue("");
-        Verteilung.outputEditor.getSession().setValue("");
-        document.getElementById('headerWest').textContent = currentFile;
-        openRules();
-        manageControls();
-    } catch (e) {
-        errorHandler(e);
-    }
-}
+
+
 
 /**
  * Funktionalität für den Run Button
@@ -1134,7 +1023,8 @@ function openScript() {
         }
     } catch (e) {
         errorHandler(e);
-        verteilungLayout.sizePane("west", layoutState.west.size);
+        // if (layoutState)
+        //     verteilungLayout.sizePane("west", layoutState.west.size);
     }
 }
 
@@ -1158,9 +1048,9 @@ function activateScriptToContext() {
  */
 function sendScript() {
     try {
-        var erg = false;
+        let erg = false;
         if (workDocument.endsWith("recognition.js")) {
-            var json = executeService({"name": "updateDocument", "errorMessage": "Skript konnte nicht zum Server gesendet werden:"}, [
+            const json = executeService({"name": "updateDocument", "errorMessage": "Skript konnte nicht zum Server gesendet werden:"}, [
                 {"name": "documentId", "value": scriptID},
                 {"name": "content", "value": Verteilung.textEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "application/javascript"},
