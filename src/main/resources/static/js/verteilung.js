@@ -166,8 +166,6 @@ function manageControls() {
     document.getElementById('settings').style.display = 'block';
     //document.getElementById('docAlfresco').removeAttribute("disabled");
     //document.getElementById('closeAlfresco').style.display = 'none';
-    document.getElementById('searchCont').style.display = 'block';
-    document.getElementById('searchCont').removeAttribute("disabled");
     document.getElementById('beautifyScript').style.display = 'none';
     document.getElementById('back').style.display = 'none';
     document.getElementById('saveScript').style.display = 'none';
@@ -241,7 +239,6 @@ function manageControls() {
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptUpload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptClose');
         if (Verteilung.textEditor.getSession().getValue().length === 0) {
-            document.getElementById('searchCont').setAttribute("disabled", true);
             verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
         } else {
             verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtWork');
