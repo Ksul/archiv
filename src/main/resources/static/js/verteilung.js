@@ -166,8 +166,6 @@ function manageControls() {
     document.getElementById('settings').style.display = 'block';
     //document.getElementById('docAlfresco').removeAttribute("disabled");
     //document.getElementById('closeAlfresco').style.display = 'none';
-    document.getElementById('play').style.display = 'block';
-    document.getElementById('play').removeAttribute("disabled");
     document.getElementById('searchCont').style.display = 'block';
     document.getElementById('searchCont').removeAttribute("disabled");
     document.getElementById('beautifyScript').style.display = 'none';
@@ -182,8 +180,6 @@ function manageControls() {
     document.getElementById('getRules').removeAttribute("disabled");
     document.getElementById('sendRules').removeAttribute("disabled");
     document.getElementById('saveRules').setAttribute("disabled", true);
-    document.getElementById('sendToInbox').style.display = 'block';
-    document.getElementById('sendToInbox').removeAttribute("disabled");
 
 /*
     if (alfrescoMode) {
@@ -195,15 +191,12 @@ function manageControls() {
         document.getElementById('play').setAttribute("disabled", true);
     }
 */
-    if (Verteilung.textEditor.getSession().getValue().length === 0) {
-        document.getElementById('searchCont').setAttribute("disabled", true);
-        document.getElementById('sendToInbox').setAttribute("disabled", true);
-    }
+
     if (multiMode) {
         document.getElementById('inTxt').style.display = 'none';
         document.getElementById('dtable').style.display = 'block';
         document.getElementById('verteilungTableFooter').style.display = 'block';
-        document.getElementById('sendToInbox').style.display = 'none';
+        verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
     }
     if (showMulti) {
         document.getElementById('back').style.display = 'block';
@@ -220,7 +213,7 @@ function manageControls() {
         document.getElementById('getScript').setAttribute("disabled", true);
         document.getElementById('getRules').setAttribute("disabled", true);
         document.getElementById('sendRules').setAttribute("disabled", true);
-        document.getElementById('sendToInbox').setAttribute("disabled", true);
+        verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
     }
     // Muss als letztes stehen
     if (scriptMode) {
@@ -230,7 +223,7 @@ function manageControls() {
         document.getElementById('inTxt').style.display = 'block';
         //document.getElementById('docAlfresco').setAttribute("disabled", true);
         document.getElementById('filesinput').style.display = 'none';
-        document.getElementById('play').style.display = 'none';
+        verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtWork');
         document.getElementById('back').style.display = 'none';
        // document.getElementById('pdf').style.display = 'none';
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtPDF');
@@ -247,7 +240,13 @@ function manageControls() {
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptReload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptUpload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptClose');
-
+        if (Verteilung.textEditor.getSession().getValue().length === 0) {
+            document.getElementById('searchCont').setAttribute("disabled", true);
+            verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
+        } else {
+            verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtWork');
+            verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtSendToInbox');
+        }
     }
 }
 

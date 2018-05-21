@@ -4048,6 +4048,32 @@ function createVerteilungMenus() {
                 title: "Aktion",
                 className: "fas fa-sign-in-alt fa-1x",
                 autoClose: true,
+                actionMenuVerteilungTxtWork: {
+                    title: "Erkennung starten",
+                    className: "fas fa-cog fa-1x",
+                    disabled: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            work();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuVerteilungTxtSendToInbox: {
+                    title: "Inbox senden",
+                    className: "fas fa-upload fa-1x",
+                    disabled: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            sendToInbox();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
                 actionMenuVerteilungTxtPDF: {
                     title: "PDF anzeigen",
                     className: "far fa-file-pdf fa-1x",

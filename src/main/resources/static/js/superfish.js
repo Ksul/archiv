@@ -19,13 +19,6 @@
                 anchorClass: 'sf-with-ul',
                 menuArrowClass: 'sf-arrows'
             },
-            rootMenu = null,
-            setRootMenu = function(menu){
-                rootMenu = menu;
-            },
-            getRootMenu = function(){
-                return rootMenu;
-            },
             recursiveKeySearch = function (key, data) {
                 // not shown - perhaps validate key as non-zero length string
 
@@ -188,7 +181,7 @@
                     .on('focusout.superfish', 'li', out)
                     .on(touchevent, 'a', o, touchHandler);
             },
-            createMenu = function (obj, el, id) {
+            createMenu = function (obj, el, id, root) {
 
                 const submenus = [];
                 let selectElement;
@@ -230,18 +223,21 @@
                     }
                     if (typeof obj.disabled === "boolean" && obj.disabled) {
                         selectElement.addClass("disableLI");
-                    } else if (typeof obj.removed === "boolean" && obj.removed) {
+                    }
+                    if (typeof obj.removed === "boolean" && obj.removed) {
                         selectElement.css("display", "none");
-                    } else if (obj.action && !(typeof obj.file === "boolean" && obj.file)) {
+                    }
+                    if (obj.action && !(typeof obj.file === "boolean" && obj.file)) {
                         if (typeof obj.autoClose === "boolean" && obj.autoClose) {
                             const action = obj.action;
                             obj.action = function (event) {
                                 event.stopPropagation();
-                                event.data.root.superfish('hide');
                                 action(event);
+                                event.data.root.superfish('hide');
                             };
-                        } else
-                             selectElement.on("click", {root: getRootMenu()}, obj.action);
+                        }
+                        selectElement.off('click');
+                        selectElement.on("click", {root: root}, obj.action);
                     }
 
                     const textElement = $('<i>');
@@ -264,13 +260,13 @@
 
 
                 for (let i in submenus) {
-                    createMenu(obj[submenus[i]], element, submenus[i]);
+                    createMenu(obj[submenus[i]], element, submenus[i], root);
                 }
 
             };
 
         return {
-            // public methods
+            // public
             hide: function (instant) {
                 if (this.length) {
                     const $this = this,
@@ -367,8 +363,18 @@
                 element.parent().children("ul").removeClass("disableLI");
                 if (o && o.menuData) {
                     const obj = recursiveKeySearch(id, o.menuData);
-                    if (obj && obj.length && !obj[0].file && obj[0].action)
-                        element.on("click", {root: getRootMenu()}, obj[0].action)
+                    if (obj && obj.length && !obj[0].file && obj[0].action) {
+                        if (typeof obj[0].autoClose === "boolean" && obj[0].autoClose) {
+                            const action = obj[0].action;
+                            obj[0].action = function (event) {
+                                event.stopPropagation();
+                                action(event);
+                                event.data.root.superfish('hide');
+                            };
+                        }
+                        element.off('click');
+                        element.on("click", {root: o.root}, obj[0].action);
+                    }
                 }
             },
             selectItem: function(id) {
@@ -379,14 +385,14 @@
             init: function (op) {
                 return this.each(function () {
                     var $this = $(this);
-                    setRootMenu($this);
                     if ($this.data('sfOptions')) {
                         return false;
                     }
                     var o = $.extend({}, $.fn.superfish.defaults, op),
                         $hasPopUp = $this.find(o.popUpSelector).parent('li');
                     if ($hasPopUp.length === 0) {
-                        createMenu(o.menuData, $this, this.id);
+                        o.root = $this;
+                        createMenu(o.menuData, $this, this.id, $this);
                     }
                     o.$path = setPathToCurrent($this, o);
 

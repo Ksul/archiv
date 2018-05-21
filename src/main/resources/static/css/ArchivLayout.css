@@ -169,25 +169,6 @@ input.save:disabled {
     disabled: true;
 }
 
-input.play {
-    background-image: url(../images/play.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: pointer;
-}
-
-input.play:disabled {
-    background-image: url(../images/play-bw.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: text;
-    disabled: true;
-}
-
 input.maximize {
     background-image: url(../images/maximize.png);
     background-color: transparent;
@@ -312,25 +293,6 @@ input.docAlfresco:disabled {
     disabled: true;
 }
 
-input.edit {
-    background-image: url(../images/file_edit.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: pointer;
-}
-
-input.edit:disabled {
-    background-image: url(../images/file_edit-bw.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: text;
-    disabled: true;
-}
-
 input.settings {
     background-image: url(../images/settings.png);
     background-color: transparent;
@@ -347,25 +309,6 @@ input.themes {
     height: 24px;
     border: 0;
     cursor: pointer;
-}
-
-input.sendToInbox {
-    background-image: url(../images/inbox_icon.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: pointer;
-}
-
-input.sendToInbox:disabled {
-    background-image: url(../images/inbox_icon-bw.png);
-    background-color: transparent;
-    width: 24px;
-    height: 24px;
-    border: 0;
-    cursor: text;
-    disabled: true;
 }
 
 /* add padding and min/max sizes to BODY */
