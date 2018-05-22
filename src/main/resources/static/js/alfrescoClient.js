@@ -3886,14 +3886,14 @@ function buildVerteilungTab(){
     Verteilung.rulesEditor.getSession().setMode("ace/mode/xml");
     Verteilung.rulesEditor.setShowPrintMargin(false);
     Verteilung.rulesEditor.setDisplayIndentGuides(true);
-    Verteilung.rulesEditor.commands.addCommand({
-        name: "save",
-        bindKey: {
-            win: "Ctrl-Shift-S",
-            mac: "Command-s"
-        },
-        exec: save
-    });
+    // Verteilung.rulesEditor.commands.addCommand({
+    //     name: "save",
+    //     bindKey: {
+    //         win: "Ctrl-Shift-S",
+    //         mac: "Command-s"
+    //     },
+    //     exec: save
+    // });
     Verteilung.rulesEditor.commands.addCommand({
         name: "format",
         bindKey: {
@@ -4110,6 +4110,32 @@ function createVerteilungMenus() {
                     action: function () {
                         try {
                             activateScriptToContext();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuVerteilungTxtScriptBeautify: {
+                    title: "Script formatiren",
+                    className: "fas fa-gavel fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            formatScript();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuVerteilungTxtScriptDownload: {
+                    title: "Script vom Server laden",
+                    className: "fas fa-download fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            getScript();
                         } catch (e) {
                             errorHandler(e);
                         }

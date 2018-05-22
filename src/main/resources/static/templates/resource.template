@@ -27,6 +27,7 @@
 ./js/ace/mode-javascript.js
 ./js/ace/mode-text.js
 ./js/ace/ext-searchbox.js
+./js/ace/ext-settings_menu.js
 ./js/alertify/alertify.js
 ./js/alfrescoClient.js
 ./js/dialoge.js
@@ -66,5 +67,5 @@
 ./js/alpaca/handlebars.js
 ./js/alpaca/alpaca.js
 ./js/vkbeautify.js
-./js/jsbeautify.js
+./js/jsbeautify/beautify.js
 ./js/Base64.js

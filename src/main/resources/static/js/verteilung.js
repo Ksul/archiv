@@ -166,11 +166,6 @@ function manageControls() {
     document.getElementById('settings').style.display = 'block';
     //document.getElementById('docAlfresco').removeAttribute("disabled");
     //document.getElementById('closeAlfresco').style.display = 'none';
-    document.getElementById('beautifyScript').style.display = 'none';
-    document.getElementById('back').style.display = 'none';
-    document.getElementById('saveScript').style.display = 'none';
-    document.getElementById('saveScript').setAttribute("disabled", true);
-    document.getElementById('getScript').style.display = 'none';
     document.getElementById('beautifyRules').style.display = 'block';
     document.getElementById('searchRules').style.display = 'block';
     document.getElementById('foldAll').style.display = 'block';
@@ -197,7 +192,7 @@ function manageControls() {
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
     }
     if (showMulti) {
-        document.getElementById('back').style.display = 'block';
+       // document.getElementById('back').style.display = 'block';
         document.getElementById('dtable').style.display = 'none';
         document.getElementById('verteilungTableFooter').style.display = 'none';
     }
@@ -208,7 +203,7 @@ function manageControls() {
 
     if (!alfrescoServerAvailable) {
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtScriptUpload');
-        document.getElementById('getScript').setAttribute("disabled", true);
+        verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtScriptDownload');
         document.getElementById('getRules').setAttribute("disabled", true);
         document.getElementById('sendRules').setAttribute("disabled", true);
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
@@ -221,23 +216,25 @@ function manageControls() {
         document.getElementById('inTxt').style.display = 'block';
         //document.getElementById('docAlfresco').setAttribute("disabled", true);
         document.getElementById('filesinput').style.display = 'none';
-        verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtWork');
-        document.getElementById('back').style.display = 'none';
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtWork');
+        //document.getElementById('back').style.display = 'none';
        // document.getElementById('pdf').style.display = 'none';
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtPDF');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScript');
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptReload');
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptUpload');
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptClose');
+        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptBeautify');
 
-        document.getElementById('getScript').style.display = 'block';
-        document.getElementById('saveScript').style.display = 'block';
-        document.getElementById('beautifyScript').style.display = 'block';
+        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptDownload');
+
     } else {
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScript');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptReload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptUpload');
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptDownload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptClose');
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptBeautify');
         if (Verteilung.textEditor.getSession().getValue().length === 0) {
             verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
         } else {
@@ -743,10 +740,10 @@ function work() {
  */
 function sendRules() {
     try {
-        var erg = false;
+        let erg = false;
         if (currentRules.endsWith("doc.xml")) {
             vkbeautify.xml(Verteilung.rulesEditor.getSession().getValue());
-            var json = executeService({"name": "updateDocument", "errorMessage": "Regeln konnten nicht übertragen werden:"}, [
+            const json = executeService({"name": "updateDocument", "errorMessage": "Regeln konnten nicht übertragen werden:"}, [
                 {"name": "documentId", "value": rulesID},
                 {"name": "content", "value": Verteilung.rulesEditor.getSession().getValue(), "type": "byte"},
                 {"name": "mimeType", "value": "text/xml"},
@@ -775,8 +772,7 @@ function getRules(rulesId, loadLocal) {
     try {
         let ret;
         if (loadLocal) {
-            const open = openFile("./rules/doc.xml");
-            Verteilung.rulesEditor.getSession().setValue(open);
+            Verteilung.rulesEditor.getSession().setValue(openFile("./rules/doc.xml"));
             Verteilung.rulesEditor.getSession().foldAll(1);
             Logger.log(Level.INFO, "Regeln erfolgreich lokal gelesen!");
         } else {
@@ -800,10 +796,9 @@ function getRules(rulesId, loadLocal) {
  * Öffnet die Regeln
  */
 function openRules() {
-    var id;
     try {
         if (rulesID && typeof rulesID === "string") {
-            id = rulesID.substring(rulesID.lastIndexOf('/') + 1);
+            const id = rulesID.substring(rulesID.lastIndexOf('/') + 1);
             getRules(id, false);
             document.getElementById('headerCenter').textContent = "Regeln (Server: doc.xml)";
         } else {
@@ -825,9 +820,7 @@ function openRules() {
  */
 function format() {
     try {
-        var xml = Verteilung.rulesEditor.getSession().getValue();
-        xml = vkbeautify.xml(xml);
-        Verteilung.rulesEditor.getSession().setValue(xml);
+        Verteilung.rulesEditor.getSession().setValue(vkbeautify.xml(Verteilung.rulesEditor.getSession().getValue()));
         // window.parent.frames.rules.Verteilung.rulesEditor.getSession().foldAll(1);
         if (currXMLName) {
             setXMLPosition(currXMLName);
@@ -843,9 +836,7 @@ function format() {
  */
 function formatScript() {
     try {
-        var txt = Verteilung.textEditor.getSession().getValue();
-        txt = js_beautify(txt);
-        Verteilung.textEditor.getSession().setValue(txt);
+        Verteilung.textEditor.getSession().setValue(js_beautify(Verteilung.textEditor.getSession().getValue()));
     } catch (e) {
         errorHandler(e);
     }
@@ -858,9 +849,8 @@ function formatScript() {
  */
 function openFile(file) {
     try {
-        var name = convertPath(file);
-        var json = executeService({"name": "openFile", "errorMessage": "Datei konnte nicht geöffnet werden:"}, [
-            {"name": "filePath", "value": name}
+        const json = executeService({"name": "openFile", "errorMessage": "Datei konnte nicht geöffnet werden:"}, [
+            {"name": "filePath", "value": convertPath(file)}
         ]);
         if (json.success) {
             Logger.log(Level.INFO, "Datei " + name + " erfolgreich geöffnet!");
@@ -873,27 +863,6 @@ function openFile(file) {
     }
 }
 
-/**
- * sichert einen Text in eine Datei
- * @param file         die zu erzeugende Datei
- * @param text         der in die Datei zu speichernde Text
- * @returns {boolean}  true, wenn alles geklappt hat
- */
-function save(file, text) {
-    try {
-        var name =  convertPath(file);
-        var json = executeService({"name": "saveToFile", "errorMessage": "Skript konnte nicht gespeichert werden:"}, [
-            {"name": "filePath", "value": name},
-            {"name": "content", "value": text}
-        ]);
-        if (json.success) {
-            Logger.log(Level.INFO, file + " erfolgreich gesichert!");
-        }
-        return json.success;
-    } catch (e) {
-        errorHandler(e);
-    }
-}
 
 /**
  * Eventhandler der die Verarbeitung von fallen gelassen Dateien auf den Regelbereich zuständig ist
@@ -902,13 +871,13 @@ function save(file, text) {
 function handleRulesSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
-    var files = evt.dataTransfer.files;
-    for ( var i = 0; i < files.length; i++) {
-        var f = files[i];
+    let files = evt.dataTransfer.files;
+    for ( let i = 0; i < files.length; i++) {
+        const f = files[i];
         if (f) {
-            var r = new FileReader();
+            const r = new FileReader();
             r.onload = function(e) {
-                var contents = e.target.result;
+                const contents = e.target.result;
                 Verteilung.rulesEditor.getSession().setValue(contents);
                 Verteilung.rulesEditor.getSession().foldAll(1);
             };
@@ -924,8 +893,8 @@ function handleRulesSelect(evt) {
  * lädt das auf dem Server gespeicherte Verteilungsscript
  */
 function getScript() {
-    var fetchScript = function () {
-        var json = executeService({"name": "getDocumentContent", "errorMessage": "Skript konnte nicht gelesen werden:"}, [
+    const fetchScript = function () {
+        const json = executeService({"name": "getDocumentContent", "errorMessage": "Skript konnte nicht gelesen werden:"}, [
             {"name": "documentId", "value": scriptID}
         ]);
         if (json.success) {
@@ -935,7 +904,7 @@ function getScript() {
     };
     try {
         if (!Verteilung.textEditor.getSession().getUndoManager().isClean()) {
-            var $dialog = $('<div></div>').html('Skript wurde geändert!<br>Neu laden?').dialog({
+            const $dialog = $('<div></div>').html('Skript wurde geändert!<br>Neu laden?').dialog({
                 autoOpen: true,
                 title: "Skript laden",
                 modal: true,
@@ -973,8 +942,8 @@ function openScript() {
         // des Scriptes die Darstellung der Regeln kaputt
         verteilungLayout.sizePane("west", "84%");
         Verteilung.oldContent = Verteilung.textEditor.getSession().getValue();
-        var content, json, script;
-        var read = false;
+        let content, json, script;
+        let read = false;
         if (Verteilung.modifiedScript && Verteilung.modifiedScript.length > 0) {
             content = Verteilung.modifiedScript;
         } else {
@@ -1004,7 +973,7 @@ function openScript() {
         }
         if (read) {
             workDocument = "recognition.js";
-            var tmp = REC.mess;
+            const tmp = REC.mess;
             eval("//# sourceURL=recognition.js\n\n" + content);
             REC.mess = tmp;
             $.each(Verteilung.textEditor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.getSession().removeMarker(element)});
@@ -1071,7 +1040,7 @@ function sendScript() {
  */
 function sendToInbox() {
     try {
-        var json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successmessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
+        const json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successmessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
             {"name": "documentId", "value": inboxFolderId},
             {"name": "fileName", "value": currentFile},
             {"name": "content", "value": currentContent, "type": "byte"},

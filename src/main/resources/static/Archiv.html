@@ -135,11 +135,14 @@
                         fileref.setAttribute("charset", "utf-8");
                         fileref.setAttribute("src", files[index]);
                         head.appendChild(fileref);
-                        index = index + 1;
+                        fileref.onerror = function() {
+                            alert("Bibliotek " + files[index] + " konnte nicht geladen werden!");
+                        };
                         // Used to call a callback function
                         fileref.onload = function () {
-                            loadJsEntry(index);
-                        }
+
+                            loadJsEntry(++index);
+                        };
                     } else if (fn) {
                         fn();
                     }
@@ -272,37 +275,6 @@
                         <div style="float:left;">
                             <ul id="actionMenuVerteilungTxt" class="sf-menu" style="height: 15px;"></ul>
                         </div>
-                        <table>
-                            <tr>
-                                <td width="70%">
-
-                                </td>
-                                <td width="60px" align="center"><input onclick="formatScript();"
-                                                                       name="beautifyScript" id="beautifyScript"
-                                                                       type="submit"
-                                                                       class="fa fa-magic fa-2x" title="Format" value=""
-                                                                       style="display: none"/>
-                                </td>
-                                <td width="60px" align="center"><input onclick="doBack();"
-                                                                       id="back" value="" type="submit" title="Close"
-                                                                       class="close"
-                                                                       style="display: none"/>
-                                </td>
-
-                                <td width="60px" align="center"><input
-                                        onclick="save(this.workDocument, Verteilung.textEditor.getSession().getValue());modifiedScript=null;"
-                                        name="saveScript" id="saveScript" type="submit" class="save"
-                                        title="Save" value="" style="display: none"/>
-                                </td>
-                                <td width="60px" align="center"><input onclick="getScript();"
-                                                                       name="getScript" id="getScript" type="submit"
-                                                                       class="download"
-                                                                       title="Download"
-                                                                       value="" style="display: none"/>
-                                </td>
-
-                            </tr>
-                        </table>
                     </div>
                     <div class="ui-widget-content" style="overflow:auto;">
                         <div id="dtable"></div>
