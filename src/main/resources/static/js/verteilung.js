@@ -157,33 +157,12 @@ function showProgress() {
  */
 function manageControls() {
 
-
-    //document.getElementById('tree').style.display = 'none';
     document.getElementById('dtable').style.display = 'none';
     document.getElementById('verteilungTableFooter').style.display = 'none';
     document.getElementById('inTxt').style.display = 'block';
     document.getElementById('filesinput').style.display = 'block';
     document.getElementById('settings').style.display = 'block';
-    //document.getElementById('docAlfresco').removeAttribute("disabled");
-    //document.getElementById('closeAlfresco').style.display = 'none';
-    document.getElementById('beautifyRules').style.display = 'block';
-    document.getElementById('searchRules').style.display = 'block';
-    document.getElementById('foldAll').style.display = 'block';
-    document.getElementById('unfoldAll').style.display = 'block';
-    document.getElementById('getRules').removeAttribute("disabled");
-    document.getElementById('sendRules').removeAttribute("disabled");
-    document.getElementById('saveRules').setAttribute("disabled", true);
 
-/*
-    if (alfrescoMode) {
-        document.getElementById('tree').style.display = 'block';
-        document.getElementById('dtable').style.display = 'none';
-        document.getElementById('inTxt').style.display = 'none';
-        document.getElementById('closeAlfresco').style.display = 'block';
-        document.getElementById('docAlfresco').setAttribute("disabled", true);
-        document.getElementById('play').setAttribute("disabled", true);
-    }
-*/
 
     if (multiMode) {
         document.getElementById('inTxt').style.display = 'none';
@@ -192,7 +171,6 @@ function manageControls() {
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
     }
     if (showMulti) {
-       // document.getElementById('back').style.display = 'block';
         document.getElementById('dtable').style.display = 'none';
         document.getElementById('verteilungTableFooter').style.display = 'none';
     }
@@ -204,9 +182,22 @@ function manageControls() {
     if (!alfrescoServerAvailable) {
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtScriptUpload');
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtScriptDownload');
-        document.getElementById('getRules').setAttribute("disabled", true);
-        document.getElementById('sendRules').setAttribute("disabled", true);
+        verteilungRulesActionMenu.superfish('disableItem', 'actionMenuVerteilungRulesDownload');
+        verteilungRulesActionMenu.superfish('disableItem', 'actionMenuVerteilungRulesUpload');
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
+    } else {
+        verteilungRulesActionMenu.superfish('enableItem', 'actionMenuVerteilungRulesDownload');
+        verteilungRulesActionMenu.superfish('enableItem', 'actionMenuVerteilungRulesUpload');
+    }
+    if (Verteilung.rulesEditor.getSession().getLength() > 1) {
+        verteilungRulesEditMenu.superfish('enableItem', 'editMenuVerteilungRulesEdit');
+    } else {
+        verteilungRulesEditMenu.superfish('disableItem', 'editMenuVerteilungRulesEdit');
+    }
+    if (Verteilung.textEditor.getSession().getLength() > 1) {
+        verteilungTxtEditMenu.superfish('enableItem', 'editMenuVerteilungTxtEdit');
+    } else {
+        verteilungTxtEditMenu.superfish('disableItem', 'editMenuVerteilungTxtEdit');
     }
     // Muss als letztes stehen
     if (scriptMode) {
@@ -214,18 +205,15 @@ function manageControls() {
         document.getElementById('dtable').style.display = 'none';
         document.getElementById('verteilungTableFooter').style.display = 'none';
         document.getElementById('inTxt').style.display = 'block';
-        //document.getElementById('docAlfresco').setAttribute("disabled", true);
         document.getElementById('filesinput').style.display = 'none';
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtWork');
-        //document.getElementById('back').style.display = 'none';
-       // document.getElementById('pdf').style.display = 'none';
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtPDF');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScript');
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptReload');
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptUpload');
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptClose');
-        verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptBeautify');
-
+        verteilungTxtEditMenu.superfish('enableItem', 'editMenuVerteilungTxtScriptBeautify');
+        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtSendToInbox');
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptDownload');
 
     } else {
@@ -234,12 +222,12 @@ function manageControls() {
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptUpload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptDownload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptClose');
-        verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptBeautify');
-        if (Verteilung.textEditor.getSession().getValue().length === 0) {
-            verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
-        } else {
+        verteilungTxtEditMenu.superfish('hideItem', 'editMenuVerteilungTxtScriptBeautify');
+        if (Verteilung.textEditor.getSession().getLength() > 1 ) {
             verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtWork');
             verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtSendToInbox');
+        } else {
+            verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
         }
     }
 }
@@ -822,8 +810,8 @@ function format() {
     try {
         Verteilung.rulesEditor.getSession().setValue(vkbeautify.xml(Verteilung.rulesEditor.getSession().getValue()));
         // window.parent.frames.rules.Verteilung.rulesEditor.getSession().foldAll(1);
-        if (currXMLName) {
-            setXMLPosition(currXMLName);
+        if (REC.currXMLName) {
+            setXMLPosition(REC.currXMLName);
             Verteilung.positions.setMarkers();
         }
     } catch (e) {

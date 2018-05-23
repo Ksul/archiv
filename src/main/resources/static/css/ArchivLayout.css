@@ -434,6 +434,7 @@ button.ui-dialog-titlebar-close span.ui-icon {
 .subhead {
     border-bottom: 1px solid #777;
     background-color: white;
+    height: 39px;
 }
 .footer  { border-top: 1px solid #777; }
 
@@ -857,7 +858,7 @@ a:before, label:before {
     margin-right: 5px;
     margin-left: 5px;
     margin-bottom: 0;
-    margin-top: 11px;
+    margin-top: 8px;
     font-size: 13px;
     font-weight: normal;
     line-height: 1.42857143;

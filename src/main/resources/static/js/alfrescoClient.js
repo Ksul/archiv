@@ -3924,7 +3924,7 @@ function buildVerteilungTab(){
 function createOutputMenus() {
     $('#actionMenuOutput').superfish({
         menuData: {
-            "actionMenuOutputAction": {
+            actionMenuOutputAction: {
                 title: "Aktion",
                 className: "fas fa-sign-in-alt fa-1x",
                 autoClose: true,
@@ -4044,7 +4044,7 @@ function createOutputMenus() {
 function createVerteilungMenus() {
     verteilungTxtActionMenu = $('#actionMenuVerteilungTxt').superfish({
         menuData: {
-            "actionMenuVerteilungTxtAction": {
+            actionMenuVerteilungTxtAction: {
                 title: "Aktion",
                 className: "fas fa-sign-in-alt fa-1x",
                 autoClose: true,
@@ -4116,7 +4116,7 @@ function createVerteilungMenus() {
                     }
                 },
                 actionMenuVerteilungTxtScriptBeautify: {
-                    title: "Script formatiren",
+                    title: "Script formatieren",
                     className: "fas fa-gavel fa-1x",
                     removed: true,
                     autoClose: true,
@@ -4142,7 +4142,7 @@ function createVerteilungMenus() {
                     }
                 },
                 actionMenuVerteilungTxtScriptUpload: {
-                    title: "Script zum Server laden",
+                    title: "Script zum Server kopieren",
                     className: "fas fa-upload fa-1x",
                     removed: true,
                     autoClose: true,
@@ -4170,6 +4170,137 @@ function createVerteilungMenus() {
 
 
 
+            }
+        }
+    });
+
+    verteilungTxtEditMenu = $('#editMenuVerteilungTxt').superfish({
+        menuData: {
+            editMenuVerteilungTxtEdit: {
+                title: "Editieren",
+                className: "far fa-edit fa-1x",
+                autoClose: true,
+                disabled: true,
+                editMenuVerteilungTxtSearch: {
+                    title: "Suchen",
+                    className: "fas fa-search fa-1x",
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            Verteilung.textEditor.execCommand("find");
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                editMenuVerteilungTxtScriptBeautify: {
+                    title: "Script formatieren",
+                    className: "fas fa-gavel fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            formatScript();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    verteilungRulesActionMenu = $('#actionMenuVerteilungRules').superfish({
+        menuData: {
+            actionMenuVerteilungRulesAction: {
+                title: "Aktion",
+                className: "fas fa-sign-in-alt fa-1x",
+                autoClose: true,
+                actionMenuVerteilungRulesDownload: {
+                    title: "Regeln vom Server laden",
+                    className: "fas fa-download fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            getRules(window.parent.rulesID, false);
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                actionMenuVerteilungRulesUpload: {
+                    title: "Regeln zum Server kopieren",
+                    className: "fas fa-upload fa-1x",
+                    removed: true,
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            sendRules();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    verteilungRulesEditMenu = $('#editMenuVerteilungRules').superfish({
+        menuData: {
+            editMenuVerteilungRulesEdit: {
+                title: "Editieren",
+                className: "far fa-edit fa-1x",
+                autoClose: true,
+                disabled: true,
+                editMenuVerteilungRulesSearch: {
+                    title: "Suchen",
+                    className: "fas fa-search fa-1x",
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            Verteilung.rulesEditor.execCommand("find")
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                editMenuVerteilungRulesFold: {
+                    title: "Alles einklappen",
+                    className: "fas fa-compress fa-1x",
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            Verteilung.rulesEditor.getSession().foldAll(1);
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                editMenuVerteilungRulesUnfold: {
+                    title: "Alles ausklappen",
+                    className: "fas fa-expand fa-1x",
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            Verteilung.rulesEditor.getSession().unfold();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                editMenuVerteilungRulesBeautify: {
+                    title: "Regeln formatieren",
+                    className: "fas fa-gavel fa-1x",
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            format();
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                }
             }
         }
     });

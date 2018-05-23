@@ -266,7 +266,7 @@
                 <!--Dokument-->
                 <div id="verteilungWest" class="ui-tab-layout-west container ui-widget-header">
                     <div id="headerWest" class="header">Dokument</div>
-                    <div id="subHeaderWest" class="subhead" style="height:39px;">
+                    <div id="subHeaderWest" class="subhead" >
                         <a>
                             <input id="filesinput" name="filesinput"
                                    type="file" multiple="multiple" class="inputfile"/>
@@ -274,6 +274,9 @@
                         </a>
                         <div style="float:left;">
                             <ul id="actionMenuVerteilungTxt" class="sf-menu" style="height: 15px;"></ul>
+                        </div>
+                        <div style="float:left;">
+                            <ul id="editMenuVerteilungTxt" class="sf-menu" style="height: 15px;"></ul>
                         </div>
                     </div>
                     <div class="ui-widget-content" style="overflow:auto;">
@@ -286,47 +289,14 @@
                 <!--Regeln-->
                 <div id="verteilungCenter" class="ui-tab-layout-center container ui-widget-header">
                     <div id="headerCenter" class="header">Regeln</div>
-                    <div id="subHeaderCenter" class="subhead">
-                        <table>
-                            <tr>
-                                <td width="60px" align="center"><input onclick="format();"
-                                                                       name="beautifyRules" id="beautifyRules"
-                                                                       type="submit"
-                                                                       class="fa fa-magic fa-2x"
-                                                                       title="Format" value=""/>
-                                </td>
+                    <div id="subHeaderCenter" class="subhead" >
+                        <div style="float:left;">
+                            <ul id="actionMenuVerteilungRules" class="sf-menu" style="height: 15px;"></ul>
+                        </div>
+                        <div style="float:left;">
+                            <ul id="editMenuVerteilungRules" class="sf-menu" style="height: 15px;"></ul>
+                        </div>
 
-                                <td width="60px" align="center"><input
-                                        onclick="var needle = prompt('Find:', Verteilung.rulesEditor.getCopyText());VerteilungrulesEditor.find(needle);"
-                                        name="searchRules" id="searchRules" type="submit" class="search"
-                                        title="Search" value=""/>
-                                </td>
-                                <td width="60px" align="center"><input
-                                        onclick="Verteilung.rulesEditor.getSession().foldAll(1);"
-                                        name="foldAll" id="foldAll" type="submit" class="minimize"
-                                        title="Fold All" value=""/>
-                                </td>
-                                <td width="60px" align="center"><input
-                                        onclick="Verteilung.rulesEditor.getSession().unfold();"
-                                        name="unfoldAll" id="unfoldAll" type="submit" class="maximize"
-                                        title="Unfold All" value=""/></td>
-                                <td width="60px" align="center"><input
-                                        onclick="getRules(window.parent.rulesID, false);" name="getRules"
-                                        id="getRules" type="submit" class="download" title="Download Regeln" value=""/>
-                                </td>
-                                <td width="60px" align="center"><input onclick="sendRules();"
-                                                                       name="sendRules" id="sendRules" type="submit"
-                                                                       class="upload"
-                                                                       title="Sende Regeln" value=""/>
-                                </td>
-                                <td width="60px" align="center"><input
-                                        onclick="save(currentRules, vkbeautify.xml(Verteilung.rulesEditor.getSession().getValue()));"
-                                        name="saveRules" id="saveRules" type="submit" class="save" title="Save"
-                                        value=""/>
-                                </td>
-
-                            </tr>
-                        </table>
                     </div>
                     <div class="ui-widget-content">
                         <div id="inRules" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
@@ -336,9 +306,7 @@
                 <div id="verteilungEast" class="ui-tab-layout-east container ui-widget-header">
                     <div class="header">Ergebnis</div>
                     <div id="subHeaderEast" class="subhead">
-                        <table>
 
-                        </table>
                     </div>
                     <div class="ui-widget-content">
                         <div id="inProps" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
@@ -351,10 +319,12 @@
     <!--Ausgabe-->
     <div id="contentSouth" class="ui-layout-south  container">
         <div id="headerSouth" class="header ui-widget-header">Ausgabe</div>
-        <div class="ui-widget-content">
+        <div id="subHeaderSouth" class="subhead" >
             <div>
                 <ul id="actionMenuOutput" class="sf-menu" style="height: 15px;"></ul>
             </div>
+        </div>
+        <div class="ui-widget-content">
             <div id="inOutput" style="width:100%;height:100%;"></div>
         </div>
     </div>
