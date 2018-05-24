@@ -278,6 +278,11 @@
                         <div style="float:left;">
                             <ul id="editMenuVerteilungTxt" class="sf-menu" style="height: 15px;"></ul>
                         </div>
+                        <div class="fontsize" >
+                            <a class="btn" id="txtfontsize-minus" href="#" onclick="const size = Verteilung.textEditor.editor.getFontSize(); Verteilung.textEditor.editor.setFontSize( size- 1); if (size <= 2) $(this).attr('disabled', 'disabled');">A-</a>
+                            <a class="btn" id="txtfontsize-default" href="#" onclick="Verteilung.textEditor.editor.setFontSize(Verteilung.textEditor.fontsize);">A</a>
+                            <a class="btn" id="txtfontsize-plus" href="#" onclick="const size = Verteilung.textEditor.editor.getFontSize(); Verteilung.textEditor.editor.setFontSize(size + 1); if (size > 2) $('#txtfontsize-minus').removeAttr('disabled');">A+</a>
+                        </div>
                     </div>
                     <div class="ui-widget-content" style="overflow:auto;">
                         <div id="dtable"></div>
@@ -296,7 +301,11 @@
                         <div style="float:left;">
                             <ul id="editMenuVerteilungRules" class="sf-menu" style="height: 15px;"></ul>
                         </div>
-
+                        <div class="fontsize" >
+                            <a class="btn" id="rulesfontsize-minus" href="#" onclick="const size = Verteilung.rulesEditor.editor.getFontSize(); Verteilung.rulesEditor.editor.setFontSize( size- 1); if (size <= 2) $(this).attr('disabled', 'disabled');">A-</a>
+                            <a class="btn" id="rulesfontsize-default" href="#" onclick="Verteilung.rulesEditor.editor.setFontSize(Verteilung.rulesEditor.fontsize);">A</a>
+                            <a class="btn" id="rulesfontsize-plus" href="#" onclick="const size = Verteilung.rulesEditor.editor.getFontSize(); Verteilung.rulesEditor.editor.setFontSize(size + 1); if (size > 2) $('#rulesfontsize-minus').removeAttr('disabled');">A+</a>
+                        </div>
                     </div>
                     <div class="ui-widget-content">
                         <div id="inRules" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
@@ -306,7 +315,11 @@
                 <div id="verteilungEast" class="ui-tab-layout-east container ui-widget-header">
                     <div class="header">Ergebnis</div>
                     <div id="subHeaderEast" class="subhead">
-
+                        <div class="fontsize" >
+                            <a class="btn" id="propsfontsize-minus" href="#" onclick="const size = Verteilung.propsEditor.editor.getFontSize(); Verteilung.propsEditor.editor.setFontSize( size- 1); if (size <= 2) $(this).attr('disabled', 'disabled');">A-</a>
+                            <a class="btn" id="propsfontsize-default" href="#" onclick="Verteilung.propsEditor.editor.setFontSize(Verteilung.propsEditor.fontsize);">A</a>
+                            <a class="btn" id="propsfontsize-plus" href="#" onclick="const size = Verteilung.propsEditor.editor.getFontSize(); Verteilung.propsEditor.editor.setFontSize(size + 1); if (size > 2) $('#propsfontsize-minus').removeAttr('disabled');">A+</a>
+                        </div>
                     </div>
                     <div class="ui-widget-content">
                         <div id="inProps" style="position:absolute; top:0;bottom:0;left:0;right:0"></div>
@@ -322,6 +335,11 @@
         <div id="subHeaderSouth" class="subhead" >
             <div>
                 <ul id="actionMenuOutput" class="sf-menu" style="height: 15px;"></ul>
+            </div>
+            <div class="fontsize" >
+                <a class="btn" id="outfontsize-minus" href="#" onclick="const size = Verteilung.outputEditor.editor.getFontSize(); Verteilung.outputEditor.editor.setFontSize( size- 1); if (size <= 2) $(this).attr('disabled', 'disabled');">A-</a>
+                <a class="btn" id="outfontsize-default" href="#" onclick="Verteilung.outputEditor.editor.setFontSize(Verteilung.outputEditor.fontsize);">A</a>
+                <a class="btn" id="outfontsize-plus" href="#" onclick="const size = Verteilung.outputEditor.editor.getFontSize(); Verteilung.outputEditor.editor.setFontSize(size + 1); if (size > 2) $('#outfontsize-minus').removeAttr('disabled');">A+</a>
             </div>
         </div>
         <div class="ui-widget-content">

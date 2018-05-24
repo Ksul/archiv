@@ -167,8 +167,8 @@ function loadLayout() {
                 size: 0.3,
                 resizeWithWindow: true,
                 onresize: function () {
-                    if (Verteilung.outputEditor)
-                        Verteilung.outputEditor.resize();
+                    if (Verteilung.outputEditor.editor)
+                        Verteilung.outputEditor.editor.resize();
                 }
             }
         };
@@ -345,8 +345,8 @@ function loadLayout() {
                 slidable: true,
                 onresize: function () {
                     try {
-                        if (Verteilung.textEditor)
-                            Verteilung.textEditor.resize();
+                        if (Verteilung.textEditor.editor)
+                            Verteilung.textEditor.editor.resize();
                     } catch (e){
                         errorHandler(e);
                     }
@@ -359,16 +359,16 @@ function loadLayout() {
                 size: .45,
                 initClosed: false,
                 onresize: function () {
-                    if (Verteilung.rulesEditor)
-                        Verteilung.rulesEditor.resize();
+                    if (Verteilung.rulesEditor.editor)
+                        Verteilung.rulesEditor.editor.resize();
                 }
             },
             east: {
                 size:.15,
                 paneSelector: "#verteilungEast",
                 onresize: function () {
-                    if (Verteilung.propsEditor)
-                        Verteilung.propsEditor.resize();
+                    if (Verteilung.propsEditor.editor)
+                        Verteilung.propsEditor.editor.resize();
                 }
             },
             //	enable state management
@@ -2425,7 +2425,7 @@ function handleVerteilungImageClicks() {
             var row = tabelle.row(tr).data();
             var name = row[1];
             REC.currentDocument.setContent(daten[name]["text"]);
-            REC.testRules(Verteilung.rulesEditor.getSession().getValue());
+            REC.testRules(Verteilung.rulesEditor.editor.getSession().getValue());
             daten[name].log = REC.mess;
             daten[name].result = results;
             daten[name].position = REC.positions;
@@ -2453,8 +2453,8 @@ function handleVerteilungImageClicks() {
             currentFile = daten[name]["file"];
             document.getElementById('headerWest').textContent = currentFile;
             setXMLPosition(daten[name]["xml"]);
-            Verteilung.textEditor.getSession().setValue(daten[name]["text"]);
-            Verteilung.propsEditor.getSession().setValue(printResults(daten[name]["result"]));
+            Verteilung.textEditor.editor.getSession().setValue(daten[name]["text"]);
+            Verteilung.propsEditor.editor.getSession().setValue(printResults(daten[name]["result"]));
             Verteilung.positions.setMarkers();
             //TODO das muss anders gemacht werden
             fillMessageBox(daten[name]["log"], true);
@@ -2477,9 +2477,9 @@ function handleVerteilungImageClicks() {
                     message("Fehler", "Permission to delete file was denied.");
                 }
                 currentFile = daten[name]["file"];
-                Verteilung.textEditor.getSession().setValue("");
-                Verteilung.propsEditor.getSession().setValue("");
-                Verteilung.rulesEditor.getSession().foldAll(1);
+                Verteilung.textEditor.editor.getSession().setValue("");
+                Verteilung.propsEditor.editor.getSession().setValue("");
+                Verteilung.rulesEditor.editor.getSession().foldAll(1);
                 if (currentFile.length > 0) {
                     const file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
                     file.initWithPath(currentFile);
@@ -3873,20 +3873,21 @@ function buildSearchTab() {
  */
 function buildVerteilungTab(){
 
-    Verteilung.propsEditor = ace.edit("inProps");
-    Verteilung.propsEditor.setReadOnly(true);
-    Verteilung.propsEditor.renderer.setShowGutter(false);
-    Verteilung.propsEditor.setShowPrintMargin(false);
-    Verteilung.propsEditor.$blockScrolling = Infinity;
+    Verteilung.propsEditor.editor = ace.edit("inProps");
+    Verteilung.propsEditor.editor.setReadOnly(true);
+    Verteilung.propsEditor.editor.renderer.setShowGutter(false);
+    Verteilung.propsEditor.editor.setShowPrintMargin(false);
+    Verteilung.propsEditor.editor.$blockScrolling = Infinity;
+    Verteilung.propsEditor.fontsize = Verteilung.propsEditor.editor.getFontSize();
     let zoneRules = document.getElementById('inRules');
     zoneRules.addEventListener('dragover', handleDragOver, false);
     zoneRules.addEventListener('drop', handleRulesSelect, false);
 
-    Verteilung.rulesEditor = ace.edit("inRules");
-    Verteilung.rulesEditor.getSession().setMode("ace/mode/xml");
-    Verteilung.rulesEditor.setShowPrintMargin(false);
-    Verteilung.rulesEditor.setDisplayIndentGuides(true);
-    // Verteilung.rulesEditor.commands.addCommand({
+    Verteilung.rulesEditor.editor = ace.edit("inRules");
+    Verteilung.rulesEditor.editor.getSession().setMode("ace/mode/xml");
+    Verteilung.rulesEditor.editor.setShowPrintMargin(false);
+    Verteilung.rulesEditor.editor.setDisplayIndentGuides(true);
+    // Verteilung.rulesEditor.editor.commands.addCommand({
     //     name: "save",
     //     bindKey: {
     //         win: "Ctrl-Shift-S",
@@ -3894,7 +3895,7 @@ function buildVerteilungTab(){
     //     },
     //     exec: save
     // });
-    Verteilung.rulesEditor.commands.addCommand({
+    Verteilung.rulesEditor.editor.commands.addCommand({
         name: "format",
         bindKey: {
             win: "Ctrl-Shift-F",
@@ -3902,13 +3903,16 @@ function buildVerteilungTab(){
         },
         exec: format
     });
-    Verteilung.rulesEditor.$blockScrolling = Infinity;
-    Verteilung.textEditor = ace.edit("inTxt");
-    Verteilung.textEditor.setTheme("ace/theme/chrome");
-    Verteilung.textEditor.setShowInvisibles(true);
-    Verteilung.textEditor.setShowPrintMargin(false);
-    Verteilung.textEditor.getSession().setMode("ace/mode/text");
-    Verteilung.textEditor.$blockScrolling = Infinity;
+    Verteilung.rulesEditor.editor.$blockScrolling = Infinity;
+    Verteilung.rulesEditor.fontsize = Verteilung.rulesEditor.editor.getFontSize();
+    
+    Verteilung.textEditor.editor = ace.edit("inTxt");
+    Verteilung.textEditor.editor.setTheme("ace/theme/chrome");
+    Verteilung.textEditor.editor.setShowInvisibles(true);
+    Verteilung.textEditor.editor.setShowPrintMargin(false);
+    Verteilung.textEditor.editor.getSession().setMode("ace/mode/text");
+    Verteilung.textEditor.editor.$blockScrolling = Infinity;
+    Verteilung.textEditor.fontsize = Verteilung.textEditor.editor.getFontSize();
 
     let zone = document.getElementById('inTxt');
     zone.addEventListener('dragover', handleDragOver, false);
@@ -4187,7 +4191,7 @@ function createVerteilungMenus() {
                     autoClose: true,
                     action: function () {
                         try {
-                            Verteilung.textEditor.execCommand("find");
+                            Verteilung.textEditor.editor.execCommand("find");
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -4259,7 +4263,7 @@ function createVerteilungMenus() {
                     autoClose: true,
                     action: function () {
                         try {
-                            Verteilung.rulesEditor.execCommand("find")
+                            Verteilung.rulesEditor.editor.execCommand("find")
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -4271,7 +4275,7 @@ function createVerteilungMenus() {
                     autoClose: true,
                     action: function () {
                         try {
-                            Verteilung.rulesEditor.getSession().foldAll(1);
+                            Verteilung.rulesEditor.editor.getSession().foldAll(1);
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -4283,7 +4287,7 @@ function createVerteilungMenus() {
                     autoClose: true,
                     action: function () {
                         try {
-                            Verteilung.rulesEditor.getSession().unfold();
+                            Verteilung.rulesEditor.editor.getSession().unfold();
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -4312,8 +4316,8 @@ function createVerteilungMenus() {
 function start() {
     try {
         Logger.setCallback(function() {
-            if (Verteilung.outputEditor)
-                Verteilung.outputEditor.getSession().setValue(Logger.getMessages(true));
+            if (Verteilung.outputEditor.editor)
+                Verteilung.outputEditor.editor.getSession().setValue(Logger.getMessages(true));
         });
         $(document).tooltip();
         $('.ui-dialog-titlebar-close').tooltip('disable');
@@ -4329,10 +4333,11 @@ function start() {
             }
         });
         initApplication();
-        Verteilung.outputEditor = ace.edit("inOutput");
-        Verteilung.outputEditor.setReadOnly(true);
-        Verteilung.outputEditor.setShowPrintMargin(false);
-        Verteilung.outputEditor.$blockScrolling = Infinity;
+        Verteilung.outputEditor.editor = ace.edit("inOutput");
+        Verteilung.outputEditor.editor.setReadOnly(true);
+        Verteilung.outputEditor.editor.setShowPrintMargin(false);
+        Verteilung.outputEditor.editor.$blockScrolling = Infinity;
+        Verteilung.outputEditor.fontsize = Verteilung.outputEditor.editor.getFontSize();
         createVerteilungMenus();
         createOutputMenus();
         $('#clientPage').css("display","block");

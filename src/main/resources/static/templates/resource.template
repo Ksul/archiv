@@ -27,7 +27,6 @@
 ./js/ace/mode-javascript.js
 ./js/ace/mode-text.js
 ./js/ace/ext-searchbox.js
-./js/ace/ext-settings_menu.js
 ./js/alertify/alertify.js
 ./js/alfrescoClient.js
 ./js/dialoge.js

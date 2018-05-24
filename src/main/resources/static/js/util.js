@@ -473,10 +473,10 @@ function uuid() {
  * @param level     der Mindestlevel
  */
 function fillMessageBox(reverse, level) {
-    if (Verteilung.outputEditor) {
+    if (Verteilung.outputEditor.editor) {
         if (!level)
             level = Logger.getLevel();
-        Verteilung.outputEditor.getSession().setValue(Logger.getMessages(reverse, level));
+        Verteilung.outputEditor.editor.getSession().setValue(Logger.getMessages(reverse, level));
     }
 }
 
