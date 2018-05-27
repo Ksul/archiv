@@ -382,6 +382,10 @@
                 element.parent().parent().children("li").children("a").removeClass("selected");
                 element.addClass("selected");
             },
+            deselectItem: function(id) {
+                const element = $("#" + id);
+                element.parent().parent().children("li").children("a").removeClass("selected");
+            },
             init: function (op) {
                 return this.each(function () {
                     var $this = $(this);

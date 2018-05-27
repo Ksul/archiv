@@ -114,7 +114,7 @@ function executeService(service, params) {
                         txt = "Unknown Error \n.";
                     }
                     if (!service.ignoreError)
-                        message("Fehler", "Status: " + txt + "<br>Response: " + xhr.responseText);
+                        alertify.alert("Fehler", "Status: " + txt + "<br>Response: " + xhr.responseText);
                     json = {error: txt, success: false, data: null};
                     
                 } catch (e) {
@@ -123,7 +123,7 @@ function executeService(service, params) {
                     for (let prop in e)
                         str = str + "property: " + prop + " value: [" + e[prop] + "]\n";
                     if (!service.ignoreError)
-                        message("Fehler", str + "<br>" + xhr.responseText);
+                        alertify.alert("Fehler", str + "<br>" + xhr.responseText);
                     else {
                         json = {error: str, success: false, data: null};
                     }
@@ -400,52 +400,8 @@ function errorHandler(e, description) {
     for (let prop in e)
         str = str + "property: " + prop + " value: [" + e[prop] + "]<br>";
     str = str + "Stacktrace: <br>" + e.stack;
-    message("Fehler", str);
+    alertify.alert("Fehler", str);
 }
-
-/**
- * zeigt eine Meldung
- * @param title      Titel des Fensters
- * @param str        Meldungstext
- * @param autoClose  Wert für den Timeout beim automatischen Schliessen der Message
- * @param height     Höhe des Gensters
- * @param width      Breite des Fensters
- * TODO Message für einfachen Dialog mit Ja/Nein oder Ok/Cancel aufbohren
- */
-function message(title, str, autoClose, height, width) {
-    if (!height)
-        height = 200;
-    if (!width)
-        width = 800;
-    const dialogSettings = {
-        autoOpen: false,
-        title: title,
-        modal: true,
-        height: height,
-        width: width
-    };
-    const div = $("<div></div>");
-    if (autoClose) {
-        dialogSettings.open = function (event, ui) {
-            setTimeout("$('#messageBox').dialog('close')", autoClose);
-        }
-    } else {
-        dialogSettings.buttons = {
-            "Ok": function () {
-                $(this).dialog("destroy");
-                div.remove();
-            }
-        }
-    }
-
-    const $dialog = div.html(str).dialog(dialogSettings).css({
-        height: height + "px",
-        width: width + "px",
-        overflow: "auto"
-    });
-    $dialog.dialog('open');
-}
-
 
 /**
  * generiert eine eindeutige Id

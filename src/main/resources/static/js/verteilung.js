@@ -1,3 +1,4 @@
+const PDF = "application/pdf";
 /**
  * beschreibt die Position eines gefundenem Wertes in dem Dokument
  */
@@ -174,7 +175,7 @@ function manageControls() {
         document.getElementById('dtable').style.display = 'none';
         document.getElementById('verteilungTableFooter').style.display = 'none';
     }
-    if (currentPDF)
+    if (Verteilung.textEditor.typ === PDF)
         verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtPDF');
     else
         verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtPDF');
@@ -189,18 +190,10 @@ function manageControls() {
         verteilungRulesActionMenu.superfish('enableItem', 'actionMenuVerteilungRulesDownload');
         verteilungRulesActionMenu.superfish('enableItem', 'actionMenuVerteilungRulesUpload');
     }
-    if (Verteilung.rulesEditor.editor.getSession().getLength() > 1) {
-        verteilungRulesEditMenu.superfish('enableItem', 'editMenuVerteilungRulesEdit');
-    } else {
-        verteilungRulesEditMenu.superfish('disableItem', 'editMenuVerteilungRulesEdit');
-    }
-    if (Verteilung.textEditor.editor.getSession().getLength() > 1) {
-        verteilungTxtEditMenu.superfish('enableItem', 'editMenuVerteilungTxtEdit');
-    } else {
-        verteilungTxtEditMenu.superfish('disableItem', 'editMenuVerteilungTxtEdit');
-    }
+
+
     // Muss als letztes stehen
-    if (scriptMode) {
+    if (Verteilung.textEditor.scriptMode) {
         //document.getElementById('tree').style.display = 'none';
         document.getElementById('dtable').style.display = 'none';
         document.getElementById('verteilungTableFooter').style.display = 'none';
@@ -223,12 +216,7 @@ function manageControls() {
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptDownload');
         verteilungTxtActionMenu.superfish('hideItem', 'actionMenuVerteilungTxtScriptClose');
         verteilungTxtEditMenu.superfish('hideItem', 'editMenuVerteilungTxtScriptBeautify');
-        if (Verteilung.textEditor.editor.getSession().getLength() > 1 ) {
-            verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtWork');
-            verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtSendToInbox');
-        } else {
-            verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
-        }
+
     }
 }
 
@@ -245,11 +233,11 @@ function loadText(content, txt, name, typ, container) {
     try {
         multiMode = false;
         txt = txt.replace(/\r\n/g,'\n');
-        currentFile = name;
-        currentContent = content;
-        currentText = txt;
+        Verteilung.textEditor.file = name;
+        Verteilung.textEditor.typ = typ;
+        Verteilung.textEditor.content.original = content;
+        Verteilung.textEditor.content.asText = txt;
         currentContainer = container;
-        currentPDF = typ === "application/pdf";
         $.each(Verteilung.textEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.editor.getSession().removeMarker(element)});
         $.each(Verteilung.rulesEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.editor.getSession().removeMarker(element)});
         $.each(Verteilung.propsEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.editor.getSession().removeMarker(element)});
@@ -331,7 +319,7 @@ function handleDragOver(evt) {
  */
 function readMultiFile(evt) {
     multiMode = false;
-    currentPDF = false;
+    Verteilung.textEditor.reset();
     const files = evt.target.files;
     readFiles(files);
 }
@@ -355,7 +343,7 @@ function readFiles(files) {
             if (f) {
                 // PDF Files
                 if (f.name.toLowerCase().endsWith(".pdf")) {
-                    currentPDF = true;
+
                     reader = new FileReader();
                     reader.onloadend = (function (theFile, clear) {
                         return function (evt) {
@@ -559,11 +547,40 @@ function doBack() {
 }
 
 /**
- * Fuktionalität für den Test Button
+ * prüft die Regeln
+ * @param xmlContent die Regelm als String
+ * @returns {boolean} true wenn die Regeln syntaktisch korrekt sind.
  */
+function validateXML(xmlContent) {
+    let schemaContent;
+    let validateErrors;
+    if (rulesSchemaId) {
+        const json = executeService({
+            "name": "getDocumentContent",
+            "errorMessage": "Schema konnten nicht gelesen werden:"
+        }, [
+            {"name": "documentId", "value": rulesSchemaId}
+        ]);
+        if (json.success) {
+            schemaContent = decodeBase64(json.data);
+        }
 
-
-
+        if (schemaContent) {
+            validateErrors = xmllint.validateXML({xml: xmlContent, schema: schemaContent}).errors;
+            if (validateErrors) {
+                for (let i = 0; i < validateErrors.length; i++) {
+                    const err = validateErrors[i];
+                    if (err.startsWith("file_0.xml")) {
+                        const line = err.split(":")[1];
+                        new Position(Verteilung.POSITIONTYP.RULES, line, 0, line, 1, "ace_error", "fullLine");
+                    }
+                    Logger.log(Level.ERROR, validateErrors[i]);
+                }
+            }
+        }
+    }
+    return !validateErrors;
+}
 
 /**
  * Funktionalität für den Run Button
@@ -583,8 +600,10 @@ function work() {
                 {"name": "documentId", "value": scriptID}
             ]);
             if (json.success) {
-
+                // Logger retten
+                const logger = Logger;
                 eval("//# sourceURL=recognition.js\n\n" + decodeBase64(json.data));
+                Logger = logger;
             }
         }
         var selectMode = false;
@@ -674,43 +693,20 @@ function work() {
                 sel = Verteilung.rulesEditor.editor.getSession().getValue();
             REC.init();
             REC.currentDocument.properties.content.write(new Content(Verteilung.textEditor.editor.getSession().getValue()));
-            REC.currentDocument.name = currentFile;
+            REC.currentDocument.name = Verteilung.textEditor.file ? Verteilung.textEditor.file : "DocumentOhneNamen";
             $.each(Verteilung.textEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.editor.getSession().removeMarker(element)});
             $.each(Verteilung.rulesEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.editor.getSession().removeMarker(element)});
             $.each(Verteilung.propsEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.propsEditor.editor.getSession().removeMarker(element)});
             Verteilung.positions.clear();
-            if (rulesSchemaId) {
-                json = executeService({
-                    "name": "getDocumentContent",
-                    "errorMessage": "Schema konnten nicht gelesen werden:"
-                }, [
-                    {"name": "documentId", "value": rulesSchemaId}
-                ]);
-                if (json.success) {
-                    schemaContent = decodeBase64(json.data);
-                }
-            }
-            if (schemaContent) {
-                var validateErrors = xmllint.validateXML({xml: sel, schema: schemaContent}).errors;
-                    if (validateErrors) {
-                        validate = false;
-                        for (var i = 0; i < validateErrors.length; i++) {
-                            var err = validateErrors[i];
-                            if(err.startsWith("file_0.xml")) {
-                                var line = err.split(":")[1];
-                                new Position(Verteilung.POSITIONTYP.RULES, line, 0, line, 1, "ace_error", "fullLine");
-                             }
-                            Logger.log(Level.ERROR, validateErrors[i]);
-                        }
-                    }
-            }
-            if (validate) {
+
+            if (validateXML(sel)) {
                 REC.testRules(sel);
-                if (!selectMode)
+                if (!selectMode) {
                     setXMLPosition(REC.currXMLName);
-            }
-            if (!validate)
-                message("Fehler", "Regeln sind syntaktisch nicht korrekt!");
+                    alertify.success("Erkennung beendet");
+                }
+            } else
+                alertify.alert("Fehler", "Regeln sind syntaktisch nicht korrekt!");
             Verteilung.propsEditor.editor.getSession().setValue(printResults(REC.results));
             Verteilung.positions.setMarkers();
             document.getElementById('inTxt').style.display = 'block';
@@ -730,20 +726,34 @@ function sendRules() {
     try {
         let erg = false;
         if (currentRules.endsWith("doc.xml")) {
-            vkbeautify.xml(Verteilung.rulesEditor.editor.getSession().getValue());
-            const json = executeService({"name": "updateDocument", "errorMessage": "Regeln konnten nicht übertragen werden:"}, [
-                {"name": "documentId", "value": rulesID},
-                {"name": "content", "value": Verteilung.rulesEditor.editor.getSession().getValue(), "type": "byte"},
-                {"name": "mimeType", "value": "text/xml"},
-                {"name": "extraProperties", "value": {}},
-                {"name": "versionState", "value": "minor"},
-                {"name": "versionComment", "value": ""}
-            ]);
-            if (json.success) {
-                Logger.log(Level.INFO, "Regeln erfolgreich zum Server übertragen!");
-                rulesID = json.data.objectId;
-                erg = true;
-            }
+            const xmlContent = Verteilung.rulesEditor.editor.getSession().getValue();
+             if (!validateXML(xmlContent)) {
+                 $.each(Verteilung.rulesEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.editor.getSession().removeMarker(element)});
+                 Verteilung.positions.setMarkers();
+                 alertify.alert("Fehler", "Regeln sind syntaktisch nicht korrekt!");
+             } else {
+
+                 const json = executeService({
+                     "name": "updateDocument",
+                     "errorMessage": "Regeln konnten nicht übertragen werden:"
+                 }, [
+                     {"name": "documentId", "value": rulesID},
+                     {
+                         "name": "content",
+                         "value": vkbeautify.xml(xmlContent),
+                         "type": "byte"
+                     },
+                     {"name": "mimeType", "value": "text/xml"},
+                     {"name": "extraProperties", "value": {}},
+                     {"name": "versionState", "value": "minor"},
+                     {"name": "versionComment", "value": ""}
+                 ]);
+                 if (json.success) {
+                     Logger.log(Level.INFO, "Regeln erfolgreich zum Server übertragen!");
+                     rulesID = json.data.objectId;
+                     erg = true;
+                 }
+             }
             return erg;
         }
     } catch (e) {
@@ -772,7 +782,7 @@ function getRules(rulesId, loadLocal) {
                 Verteilung.rulesEditor.editor.getSession().foldAll(1);
                 Logger.log(Level.INFO, "Regeln erfolgreich vom Server übertragen!");
             } else
-                message("Fehler", "Fehler bei der Übertragung: " + json.data);
+                alertify.alert("Fehler", "Fehler bei der Übertragung: " + json.data);
         }
         currentRules = "doc.xml";
     } catch (e) {
@@ -871,7 +881,7 @@ function handleRulesSelect(evt) {
             };
             r.readAsText(f);
         } else {
-            message("Fehler", "Failed to load file!");
+            alertify.alert("Fehler", "Failed to load file!");
         }
     }
 }
@@ -971,7 +981,7 @@ function openScript() {
             Verteilung.textEditor.editor.getSession().setValue(content);
             Verteilung.textEditor.editor.setShowInvisibles(false);
             Verteilung.textEditor.editor.getSession().getUndoManager().markClean();
-            scriptMode = true;
+            Verteilung.textEditor.scriptMode = true;
             manageControls();
         }
     } catch (e) {
@@ -988,8 +998,13 @@ function openScript() {
 function activateScriptToContext() {
     try {
         Verteilung.modifiedScript = Verteilung.textEditor.editor.getSession().getValue();
+        // Logger retten
+        const logger = Logger;
         eval("//# sourceURL=recognition.js\n\n" + Verteilung.modifiedScript);
-        Logger.log(Level.INFO, "Die gändeterten Skriptanweisungen sind jetzt wirksam!");
+        Logger = logger;
+        const mess = "Die gändeterten Skriptanweisungen sind jetzt wirksam!";
+        alertify.success(mess);
+        Logger.log(Level.INFO, mess);
     } catch (e) {
         errorHandler(e);
     }
@@ -1000,12 +1015,18 @@ function activateScriptToContext() {
  * @returns {boolean}  true, wenn alles geklappt hat
  */
 function sendScript() {
+    let erg = false;
     try {
-        let erg = false;
         if (workDocument.endsWith("recognition.js")) {
+            const script = Verteilung.textEditor.editor.getSession();
+            // Logger retten
+            const logger = Logger;
+            eval("//# sourceURL=recognition.js\n\n" + script);
+            Logger = logger;
+
             const json = executeService({"name": "updateDocument", "errorMessage": "Skript konnte nicht zum Server gesendet werden:"}, [
                 {"name": "documentId", "value": scriptID},
-                {"name": "content", "value": Verteilung.textEditor.editor.getSession().getValue(), "type": "byte"},
+                {"name": "content", "value": script, "type": "byte"},
                 {"name": "mimeType", "value": "application/javascript"},
                 {"name": "extraProperties", "value": {}},
                 {"name": "versionState", "value": "minor"},
@@ -1013,13 +1034,14 @@ function sendScript() {
             ]);
             if (json.success) {
                 Logger.log(Level.INFO, "Script erfolgreich zum Server gesendet!");
-                scriptID = $.parseJSON(json.data).objectId;
+                scriptID = json.data.objectId;
                 erg = true;
             }
         }
         return erg;
     } catch (e) {
         errorHandler(e);
+        return false;
     }
 }
 
@@ -1030,10 +1052,10 @@ function sendToInbox() {
     try {
         const json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successmessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
             {"name": "documentId", "value": inboxFolderId},
-            {"name": "fileName", "value": currentFile},
-            {"name": "content", "value": currentContent, "type": "byte"},
+            {"name": "fileName", "value": Verteilung.textEditor.file},
+            {"name": "content", "value": Verteilung.textEditor.content.original, "type": "byte"},
             // TODO Richtigen Mimetype ermitteln
-            {"name": "mimeType", "value": "application/pdf"},
+            {"name": "mimeType", "value": Verteilung.textEditor.typ},
             {"name": "extraProperties", "value": {}},
             {"name": "versionState", "value": "none"}
         ]);
@@ -1054,7 +1076,7 @@ function closeScript() {
         else
             Verteilung.textEditor.editor.getSession().setValue("");
         Verteilung.textEditor.editor.setShowInvisibles(true);
-        scriptMode = false;
+        Verteilung.textEditor.scriptMode = false;
         manageControls();
     } catch (e) {
         errorHandler(e);
@@ -1068,7 +1090,21 @@ var Verteilung = {
     },
     textEditor:  {
         editor: null,
+        scriptMode: false,
+        file: false,
+        typ: false,
+        content: {
+            original: false,
+            asText: false
+        },
         fontsize: 10,
+        reset: function(){
+            this.scriptMode = false;
+            this.file = false;
+            this.typ = false;
+            this.content.original = false;
+            this.content.asText = false;
+        }
     },
     propsEditor:  {
         editor: null,

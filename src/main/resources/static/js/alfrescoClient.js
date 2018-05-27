@@ -1,7 +1,3 @@
-function alertt(msg) {
-    alert(msg);
-}
-
 /**
  * Eventhandler der für die Verarbeitung von fallen gelassen Dateien auf die Inbox zuständig ist
  * @param evt  das Event
@@ -33,7 +29,7 @@ function handleDropInbox(evt) {
             blob = f.slice(0, f.size + 1);
             reader.readAsBinaryString(blob);
         } else {
-            message("Fehler", "Failed to load file!");
+            alertify.alert("Fehler", "Failed to load file!");
         }
     }
 }
@@ -1956,7 +1952,7 @@ function fillBreadCrumb(data) {
 function updateInLineDocumentFieldDefinition () {
     return {
         "fnShowError" : function(text, aktion){
-            message("Fehler", text);
+            alertify.alert("Fehler", text);
         },
         "aoColumns": [ null,
             null,
@@ -2002,7 +1998,7 @@ function updateInLineDocumentFieldDefinition () {
 function updateInLineFolderFieldFieldDefinition() {
     return {
         "fnShowError": function (text, aktion) {
-            message("Fehler", text);
+            alertify.alert("Fehler", text);
         },
         "aoColumns": [null,
             {
@@ -2437,7 +2433,7 @@ function handleVerteilungImageClicks() {
             row[3] = ergebnis;
             row[5] = REC.errors;
             if (tabelle.fnUpdate(row, aPos[0]) > 0)
-                message("Fehler", "Tabelle konnte nicht aktualisiert werden!");
+                alertify.alert("Fehler", "Tabelle konnte nicht aktualisiert werden!");
         }
         catch (e) {
             errorHandler(e);
@@ -2450,8 +2446,8 @@ function handleVerteilungImageClicks() {
             var name = row[1];
             multiMode = false;
             showMulti = true;
-            currentFile = daten[name]["file"];
-            document.getElementById('headerWest').textContent = currentFile;
+            Verteilung.textEditor.file = daten[name]["file"];
+            document.getElementById('headerWest').textContent = Verteilung.textEditor.file;
             setXMLPosition(daten[name]["xml"]);
             Verteilung.textEditor.editor.getSession().setValue(daten[name]["text"]);
             Verteilung.propsEditor.editor.getSession().setValue(printResults(daten[name]["result"]));
@@ -2474,15 +2470,15 @@ function handleVerteilungImageClicks() {
                 try {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
                 } catch (e) {
-                    message("Fehler", "Permission to delete file was denied.");
+                    alertify.alert("Fehler", "Permission to delete file was denied.");
                 }
-                currentFile = daten[name]["file"];
+                Verteilung.textEditor.file = daten[name]["file"];
                 Verteilung.textEditor.editor.getSession().setValue("");
                 Verteilung.propsEditor.editor.getSession().setValue("");
                 Verteilung.rulesEditor.editor.getSession().foldAll(1);
-                if (currentFile.length > 0) {
+                if (Verteilung.textEditor.file) {
                     const file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-                    file.initWithPath(currentFile);
+                    file.initWithPath(Verteilung.textEditor.file);
                     if (file.exists() === true)
                         file.remove(false);
                 }
@@ -2636,7 +2632,7 @@ function loadAndConvertDataForTree(aNode, callBack) {
                         }
                     }
                     else {
-                        message("Fehler", "Folder konnte nicht erfolgreich im Alfresco gelesen werden!");
+                        alertify.alert("Fehler", "Folder konnte nicht erfolgreich im Alfresco gelesen werden!");
                     }    
                 };
                 var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
@@ -3168,7 +3164,7 @@ function checkAndBuidAlfrescoEnvironment() {
                     {"name": "filePath", "value": folder}
                 ]);
                 if (!erg.success)
-                    log(WARN, txt + " konnte auf dem Alfresco Server nicht gefunden werden!");
+                    Logger.log(WARN, txt + " konnte auf dem Alfresco Server nicht gefunden werden!");
             }
         }
         return erg;
@@ -3204,7 +3200,7 @@ function checkAndBuidAlfrescoEnvironment() {
                         {"name": "password", "value": getSettings("password")}
                     ]);
                     if (!erg.success) {
-                        log(WARN, "Binding Parameter konnten nicht gesetzt werden!");
+                        Logger.log(WARN, "Binding Parameter konnten nicht gesetzt werden!");
                     } else
                         alfrescoServerAvailable = false;    
                 }
@@ -3225,7 +3221,7 @@ function checkAndBuidAlfrescoEnvironment() {
         if (erg.success)
             scriptFolderId = erg.data.objectID;
         else {
-            log(WARN, "Verzeichnis '/Datenverzeichnis/Skripte' auf dem Alfresco Server nicht gefunden!");
+            Logger.log(WARN, "Verzeichnis '/Datenverzeichnis/Skripte' auf dem Alfresco Server nicht gefunden!");
         }
         // Verteilskript prüfen
         if (erg.success) {
@@ -3256,10 +3252,10 @@ function checkAndBuidAlfrescoEnvironment() {
                      if (erg.success)
                         scriptID = erg.data.objectID;
                     else {
-                        log(WARN, "Verteilscript (recognition.js) konnte auf dem Alfresco Server nicht angelegt werden!");
+                        Logger.log(WARN, "Verteilscript (recognition.js) konnte auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
-                    log(WARN, "Verteilscript (recognition.js) konnte nicht gelesen werden!");
+                    Logger.log(WARN, "Verteilscript (recognition.js) konnte nicht gelesen werden!");
             } else {
                 scriptID = erg.data.objectID;
             }
@@ -3293,10 +3289,10 @@ function checkAndBuidAlfrescoEnvironment() {
                     if (erg.success)
                         rulesID = erg.data.objectID;
                     else {
-                        log(WARN, "Verteilregeln (doc.xml) konnten auf dem Alfresco Server nicht angelegt werden!");
+                        Logger.log(WARN, "Verteilregeln (doc.xml) konnten auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
-                    log(WARN, "Verteilregeln (doc.xml) konnten nicht gelesen werden!");
+                    Logger.log(WARN, "Verteilregeln (doc.xml) konnten nicht gelesen werden!");
             } else {
                 rulesID = erg.data.objectID;
             }
@@ -3330,10 +3326,10 @@ function checkAndBuidAlfrescoEnvironment() {
                     if (erg.success)
                         rulesSchemaId = erg.data.objectID;
                     else {
-                        log(WARN, "Verteilschema (doc.xsd) konnten auf dem Alfresco Server nicht angelegt werden!");
+                        Logger.log(WARN, "Verteilschema (doc.xsd) konnten auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
-                    log(WARN, "Verteilschema (doc.xsd) konnten nicht gelesen werden!");
+                    Logger.log(WARN, "Verteilschema (doc.xsd) konnten nicht gelesen werden!");
             } else {
                 rulesSchemaId = erg.data.objectID;
             }
@@ -3346,7 +3342,7 @@ function checkAndBuidAlfrescoEnvironment() {
             if (erg.success) {
                 alfrescoRootFolderId = erg.data.objectID;
             } else {
-                log(WARN, "Root konnte auf dem Server nicht gefunden werden!");
+                Logger.log(WARN, "Root konnte auf dem Server nicht gefunden werden!");
             }
         }
         if (erg.success) {
@@ -3354,7 +3350,7 @@ function checkAndBuidAlfrescoEnvironment() {
             if (erg.success)
                 archivFolderId = erg.data.objectID;
             else
-                log(WARN, "Archiv konnte auf dem Alfresco Server nicht gefunden werden!");
+                Logger.log(WARN, "Archiv konnte auf dem Alfresco Server nicht gefunden werden!");
 
         }
         if (erg.success) {
@@ -3448,7 +3444,7 @@ function initApplication() {
 
 
         $.fn.dataTable.ext.errMode = function ( settings, helpPage, error ) {
-            message(error);
+            alertify.alert(error);
         };
     } catch (e) {
         errorHandler(e);
@@ -3904,6 +3900,16 @@ function buildVerteilungTab(){
         exec: format
     });
     Verteilung.rulesEditor.editor.$blockScrolling = Infinity;
+    Verteilung.rulesEditor.editor.getSession().on('change', function() {
+        if (Verteilung.rulesEditor.editor.getSession().getValue().length > 0) {
+            verteilungRulesEditMenu.superfish('enableItem', 'editMenuVerteilungRulesEdit');
+            if (alfrescoServerAvailable)
+                verteilungRulesActionMenu.superfish('enableItem', 'actionMenuVerteilungRulesUpload');
+        } else {
+            verteilungRulesEditMenu.superfish('disableItem', 'editMenuVerteilungRulesEdit');
+            verteilungRulesActionMenu.superfish('disableItem', 'actionMenuVerteilungRulesUpload');
+        }
+    });
     Verteilung.rulesEditor.fontsize = Verteilung.rulesEditor.editor.getFontSize();
     
     Verteilung.textEditor.editor = ace.edit("inTxt");
@@ -3913,11 +3919,36 @@ function buildVerteilungTab(){
     Verteilung.textEditor.editor.getSession().setMode("ace/mode/text");
     Verteilung.textEditor.editor.$blockScrolling = Infinity;
     Verteilung.textEditor.fontsize = Verteilung.textEditor.editor.getFontSize();
+    Verteilung.textEditor.editor.getSession().on('change', function(e) {
+        if (Verteilung.textEditor.editor.getSession().getValue().length > 0) {
+            verteilungTxtEditMenu.superfish('enableItem', 'editMenuVerteilungTxtEdit');
+        } else {
+            verteilungTxtEditMenu.superfish('disableItem', 'editMenuVerteilungTxtEdit');
+        }
+        if (Verteilung.textEditor.scriptMode) {
+            if (Verteilung.textEditor.editor.getSession().getValue().length > 0) {
+                verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptReload');
+                verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtScriptUpload');
+            } else {
+                verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtScriptReload');
+                verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtScriptUpload');
 
+            }
+        } else {
+            if (Verteilung.textEditor.editor.getSession().getValue().length > 0) {
+                verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtWork');
+                if (Verteilung.textEditor.file)
+                    verteilungTxtActionMenu.superfish('enableItem', 'actionMenuVerteilungTxtSendToInbox');
+            } else {
+                verteilungTxtActionMenu.superfish('disableItem', 'actionMenuVerteilungTxtSendToInbox');
+            }
+        }
+
+    });
     let zone = document.getElementById('inTxt');
     zone.addEventListener('dragover', handleDragOver, false);
     zone.addEventListener('drop', handleFileSelect, false);
-
+    createVerteilungMenus();
     loadVerteilungTable();
 
     handleVerteilungImageClicks();
@@ -4085,7 +4116,7 @@ function createVerteilungMenus() {
                     autoClose: true,
                     action: function () {
                         try {
-                            const file = new Blob([currentContent], {type: "application/pdf"});
+                            const file = new Blob([Verteilung.textEditor.content.original], {type: "application/pdf"});
                             const fileURL = URL.createObjectURL(file);
                             window.open(fileURL);
                         } catch (e) {
@@ -4119,19 +4150,6 @@ function createVerteilungMenus() {
                         }
                     }
                 },
-                actionMenuVerteilungTxtScriptBeautify: {
-                    title: "Script formatieren",
-                    className: "fas fa-gavel fa-1x",
-                    removed: true,
-                    autoClose: true,
-                    action: function () {
-                        try {
-                            formatScript();
-                        } catch (e) {
-                            errorHandler(e);
-                        }
-                    }
-                },
                 actionMenuVerteilungTxtScriptDownload: {
                     title: "Script vom Server laden",
                     className: "fas fa-download fa-1x",
@@ -4152,7 +4170,8 @@ function createVerteilungMenus() {
                     autoClose: true,
                     action: function () {
                         try {
-                            sendScript();
+                            if(sendScript())
+                                alertify.success("Script erfolgreich zum Server übertragen");
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -4209,6 +4228,21 @@ function createVerteilungMenus() {
                             errorHandler(e);
                         }
                     }
+                },
+                editMenuVerteilungTxtScriptGutter: {
+                    title: "Zeilennummern",
+                    className: "fas fa-list-ol fa-1x",
+                    autoClose: false,
+                    selected: Verteilung.textEditor.editor.renderer.getShowGutter(),
+                    action: function (event) {
+                        try {
+                            const gutter = !Verteilung.textEditor.editor.renderer.getShowGutter();
+                            Verteilung.textEditor.editor.renderer.setShowGutter(gutter);
+                            event.data.root.superfish((gutter ? 'selectItem':'deselectItem'), 'editMenuVerteilungTxtScriptGutter');
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
                 }
             }
         }
@@ -4240,7 +4274,8 @@ function createVerteilungMenus() {
                     autoClose: true,
                     action: function () {
                         try {
-                            sendRules();
+                            if (sendRules())
+                                alertify.success('Regeln erfolgreich zum Server übertragen');
                         } catch (e) {
                             errorHandler(e);
                         }
@@ -4304,7 +4339,23 @@ function createVerteilungMenus() {
                             errorHandler(e);
                         }
                     }
+                },
+                editMenuVerteilungRulesGutter: {
+                    title: "Zeilennummern",
+                    className: "fas fa-list-ol fa-1x",
+                    autoClose: false,
+                    selected: Verteilung.rulesEditor.editor.renderer.getShowGutter(),
+                    action: function (event) {
+                        try {
+                            const gutter = !Verteilung.rulesEditor.editor.renderer.getShowGutter();
+                            Verteilung.rulesEditor.editor.renderer.setShowGutter(gutter);
+                            event.data.root.superfish((gutter ? 'selectItem':'deselectItem'), 'editMenuVerteilungRulesGutter');
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
                 }
+
             }
         }
     });
@@ -4338,7 +4389,6 @@ function start() {
         Verteilung.outputEditor.editor.setShowPrintMargin(false);
         Verteilung.outputEditor.editor.$blockScrolling = Infinity;
         Verteilung.outputEditor.fontsize = Verteilung.outputEditor.editor.getFontSize();
-        createVerteilungMenus();
         createOutputMenus();
         $('#clientPage').css("display","block");
     } catch(e) {

@@ -50,11 +50,17 @@
 	text-decoration: none;
 	zoom: 1; /* IE7 */
 	color: #337ab7;
+	cursor: pointer;
 }
 
 .disableLI  {
 	color: #cccccc !important;
 }
+
+.sf-menu .disableLI, .disableLI > i {
+	cursor: default !important;
+}
+
 .sf-menu li {
 	/* background: #BDD2FF;*/
 	background: white;
@@ -134,5 +140,6 @@
     font-weight: normal;
     font-style: normal;
     font-size: 13px;
+	cursor: pointer;
 }
 

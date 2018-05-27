@@ -576,7 +576,7 @@ function startFolderDialog(data, modus, modal) {
                                         (input.description && input.description !== origData.description)) {
                                         const erg = editFolder(input, origData.objectID);
                                         if (!erg.success)
-                                            message("Fehler", erg.error);
+                                            alertify.alert("Fehler", erg.error);
                                     }
                                 }
                                 closeDialog();
