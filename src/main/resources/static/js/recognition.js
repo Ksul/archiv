@@ -2187,7 +2187,8 @@ function Category(srch) {
                     for (var nodeKey in nodes) {
                         if (nodes.hasOwnProperty(nodeKey)) {
                         var node = nodes[nodeKey];
-                            if (node.name === current) {
+                            // darf nicht === sein!
+                            if (node.name == current) {
                                 Logger.log(Level.TRACE, "Category [" + current + "] found");
                                 top = node;
                                 nodeExists = true;
