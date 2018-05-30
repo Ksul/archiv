@@ -500,32 +500,39 @@ function setXMLPosition(position) {
  * @returns {string}
  */
 function printResults(results) {
-    var key;
-    var ret = "";
-    var blanks = "                                               ";
-    var maxLength = 0;
-    var pos = 0;
-    for (key in results) {
-        if (key.length > maxLength)
-            maxLength = key.length;                   
-    }
-    maxLength++;
-    for (key in results) {
-        if (results[key]) {
-            ret = ret + key + blanks.substr(0, maxLength - key.length) + ": " + results[key].getValue();
-            if ( Verteilung.positions.get(key))
-                new Position(Verteilung.POSITIONTYP.PROPS, pos, pos + key.length, Verteilung.positions.get(key).getCSS(), key);
-            if (results[key].expected) {
-                var tmp = eval(results[key].expected);
-                if (results[key].getValue() && tmp.valueOf() === results[key].getValue().valueOf())
-                    ret = ret + " [OK]";
-                else
-                    ret = ret + " [FALSE] " + tmp;
-            }
-            ret = ret + "\n";
-            pos = ret.length;
+    function printBlock(block ,name, indent) {
+        const blanks = "                                               ";
+        let ret = name +":\n";
+        let maxLength = 0;
+        let pos = ret.length;
+        for (let key in block) {
+            if (key.length > maxLength)
+                maxLength = key.length;
         }
+        maxLength++;
+        for (let key in block) {
+            if (block[key]) {
+                ret = ret + blanks.substr(0, indent) + key + blanks.substr(0, maxLength - key.length) + ": " + block[key].getValue();
+                if (Verteilung.positions.get(key))
+                    new Position(Verteilung.POSITIONTYP.PROPS, pos + indent, pos + indent + key.length, Verteilung.positions.get(key).getCSS(), key);
+                if (block[key].expected) {
+                    const tmp = eval(block[key].expected);
+                    if (block[key].getValue() && tmp.valueOf() === block[key].getValue().valueOf())
+                        ret = ret + " [OK]";
+                    else
+                        ret = ret + " [FALSE] " + tmp;
+                }
+                ret = ret + "\n"  ;
+                pos = ret.length;
+            }
+        }
+        return ret;
     }
+
+    let ret = "";
+    ret = ret + printBlock(results.search, "Suche", 2);
+    ret = ret + printBlock(results.tag, "Tags", 2);
+    ret = ret + printBlock(results.category, "Kategorien", 2);
     return ret;
 }
 

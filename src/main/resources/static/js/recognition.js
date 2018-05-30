@@ -1524,9 +1524,9 @@ function ArchivTyp(srch, parentType) {
                                 } else {
                                     var searchTitleResult = [];
                                     // Hier wird überprüft, ob es schon Dokument mit dem gleichen Titel gibt
-                                    if (this.unique && REC.results["title"]) {
+                                    if (this.unique && REC.results.search["title"]) {
                                         Logger.log(Level.TRACE, "ArchivTyp.resolve: check for unique");
-                                        var searchCriteria = "+PATH:\"/" + destinationFolder.qnamePath + "//*\" +@cm\\:title:\"" + REC.results["title"].val + "\"";
+                                        var searchCriteria = "+PATH:\"/" + destinationFolder.qnamePath + "//*\" +@cm\\:title:\"" + REC.results.search["title"].val + "\"";
                                         Logger.log(Level.TRACE, "ArchivTyp.resolve: search document with " + searchCriteria);
                                         searchTitleResult = search.luceneSearch(searchCriteria);
                                         if (searchTitleResult.length > 0) {
@@ -1534,7 +1534,7 @@ function ArchivTyp(srch, parentType) {
                                             for (var k = 0; k < searchTitleResult.length; k++) {
                                                 // TODO prüfen, ob man das machen muss
                                                 Logger.log(Level.TRACE, "ArchivTyp.resolve: compare with document " + searchTitleResult[k].name + "[" + searchTitleResult[k].properties['cm:title'] + "]...");
-                                                if (searchTitleResult[k].properties["cm:title"] !== REC.results["title"].val) {
+                                                if (searchTitleResult[k].properties["cm:title"] !== REC.results.search["title"].val) {
                                                     searchTitleResult.splice(k, 1)
                                                 }
                                             }
@@ -2202,10 +2202,12 @@ function Category(srch) {
                             Logger.log(Level.TRACE, "Create Root Category...");
                             top = classification.createRootCategory("cm:generalclassifiable", current);
                             Logger.log(Level.TRACE, "Root Category created!");
+                            REC.results.category.push(new Result("", this.xml, current, 0, 0));
                         } else {
                             Logger.log(Level.TRACE, top.name + ": Create Sub Category...");
                             top = top.createSubCategory(current);
                             Logger.log(Level.TRACE, "Sub Category created!");
+                            REC.results.category.push(new Result("", this.xml, current, 0, 0));
                         }
                     }
                 }
@@ -2268,6 +2270,7 @@ function Tags(srch) {
             Logger.log(Level.TRACE, "Tags.resolve: Tag is " + this.name);
             doc.addTag(this.name);
             doc.save();
+            REC.results.tag.push(new Result("", this.xml, this.name, 0, 0 ));
             Logger.log(Level.INFO, "Document saved!");
             Logger.log(Level.INFO, "add Tag " + this.name);
         }
@@ -2283,7 +2286,7 @@ function Tags(srch) {
 function SearchItem(srch) {
     var tmp;
     var i;
-    this.erg = new SearchResultContainer();
+    this.erg = new ResultContainer();
     this.resolved = false;
     if (srch.debugLevel)
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
@@ -2486,7 +2489,7 @@ function SearchItem(srch) {
                     }
                     else if (kind[0] === "amount" || kind[0] === "float")
                         typ = "float";
-                    var res = new SearchResult( match[k], this.xml, null, result.index, result.index + match[k].length, typ, expected);
+                    var res = new Result( match[k], this.xml, null, result.index, result.index + match[k].length, typ, expected);
                     res.convertValue();
                     // prüfen, ob der gefundene Wert schon in der Liste der Werte enthalten ist. Falls ja, kann dieses Ergebnis ignoriert werden
                     if (res.val) {
@@ -2510,7 +2513,7 @@ function SearchItem(srch) {
     this.handleError = function () {
         Logger.log(Level.INFO, "SearchItem.resolve: " + this.name + " has NO RESULT");
         this.resolved = true;
-        REC.results[this.name] = null;
+        REC.results.search[this.name] = null;
         return null;
     };
 
@@ -2543,11 +2546,11 @@ function SearchItem(srch) {
                 Logger.log(Level.TRACE, "SearchItem.resolve: search found at position " + pos);
                 var str;
                 if (this.left) {
-                    str = new SearchResult(txt.slice(lastPos, pos + (this.included ? match[j].length : 0)), this.xml, null, lastPos, pos + (this.included ? match[j].length : 0), this.objectTyp,
+                    str = new Result(txt.slice(lastPos, pos + (this.included ? match[j].length : 0)), this.xml, null, lastPos, pos + (this.included ? match[j].length : 0), this.objectTyp,
                         this.expected);
                     Logger.log(Level.TRACE, "SearchItem.resolve: get result left from position  " + REC.printTrace(str.text, this.left));
                 } else {
-                    str = new SearchResult(txt.substr(pos + (this.included ? 0 : match[j].length)), this.xml,  null, pos + (this.included ? 0 : match[j].length), txt.length, this.objectTyp, this.expected);
+                    str = new Result(txt.substr(pos + (this.included ? 0 : match[j].length)), this.xml,  null, pos + (this.included ? 0 : match[j].length), txt.length, this.objectTyp, this.expected);
                     Logger.log(Level.TRACE, "SearchItem.resolve: get result right from position  " + REC.printTrace(str.text, this.left));
                 }
                 if (str && str.text.length > 0) {
@@ -2627,7 +2630,7 @@ function SearchItem(srch) {
         for (var i = 0; i < REC.currentSearchItems.length; i++) {
             if (REC.currentSearchItems[i].name === name) {
                 REC.currentSearchItems[i].resolve();
-                return REC.results[name];
+                return REC.results.search[name];
             }
         }
         REC.errors.push("SearchItem " + name + " not found!");
@@ -2642,8 +2645,8 @@ function SearchItem(srch) {
         Logger.log(Level.DEBUG, "resolve SearchItem");
         Logger.log(Level.TRACE, "SearchItem.resolve: settings are: \n" + this);
         if (this.resolved) {
-            if (REC.results[this.name])
-                return REC.results[this.name].getValue();
+            if (REC.results.search[this.name])
+                return REC.results.search[this.name].getValue();
             else
                 return null;
         }
@@ -2651,18 +2654,18 @@ function SearchItem(srch) {
             this.text = REC.replaceVar(this.text)[0];
         var txt = null;
         if (this.fix) {
-            var searchResult = new SearchResult(REC.replaceVar(this.fix)[0], this.xml, null, 0, 0, this.objectTyp, this.expected);
+            var searchResult = new Result(REC.replaceVar(this.fix)[0], this.xml, null, 0, 0, this.objectTyp, this.expected);
             searchResult.convertValue();
             this.erg.modifyResult(searchResult, 0);
         } else if (this.eval) {
             e = eval(REC.replaceVar(this.eval)[0]);
             if (e)
-                this.erg.modifyResult(new SearchResult(e.toString(), this.xml, e, 0, 0, null, this.expected), 0);
+                this.erg.modifyResult(new Result(e.toString(), this.xml, e, 0, 0, null, this.expected), 0);
         } else {
             if (this.value) {
                 e = this.resolveItem(this.value);
                 if (e) {
-                    e = new SearchResult(e.text, e.xml, e.val, e.getStart(), e.getEnd(), e.typ, e.expected);
+                    e = new Result(e.text, e.xml, e.val, e.getStart(), e.getEnd(), e.typ, e.expected);
                     if (this.expected)
                         e.expected = this.expected;
                     if (this.objectTyp)
@@ -2744,7 +2747,7 @@ function SearchItem(srch) {
         } else if (this.erg.isFound()) {
             Logger.log(Level.DEBUG, "SearchItem.resolve: return is  " + this.erg.getResult().getValue());
             Logger.setLevel(orgLevel);
-            REC.results[this.name] = this.erg.getResult();
+            REC.results.search[this.name] = this.erg.getResult();
             Logger.log(Level.INFO, this.name + " is " + this.erg.getResult().getValue());
             this.resolved = true;
 
@@ -2766,11 +2769,11 @@ function SearchItem(srch) {
 
 
 
-function SearchResultContainer() {}
+function ResultContainer() {}
 
-SearchResultContainer.prototype = [];
+ResultContainer.prototype = [];
 
-SearchResultContainer.prototype.addResult = function (result) {
+ResultContainer.prototype.addResult = function (result) {
     if (result instanceof Array) {
         for (var i = 0; i < result.length; i++)
             this.push(result[i]);
@@ -2778,7 +2781,7 @@ SearchResultContainer.prototype.addResult = function (result) {
         this.push(result);
 };
 
-SearchResultContainer.prototype.getResult = function () {
+ResultContainer.prototype.getResult = function () {
     for (var i = 0; i < this.length; i++) {
         if (this[i].check)
             return this[i];
@@ -2788,7 +2791,7 @@ SearchResultContainer.prototype.getResult = function () {
     return null;
 };
 
-SearchResultContainer.prototype.removeResult = function (result) {
+ResultContainer.prototype.removeResult = function (result) {
     var h = [];
     for (var i = 0; i < this.length; i++) {
         if (this[i] !== result)
@@ -2797,7 +2800,7 @@ SearchResultContainer.prototype.removeResult = function (result) {
     this.prototype = h;
 };
 
-SearchResultContainer.prototype.modifyResult = function (result, pos) {
+ResultContainer.prototype.modifyResult = function (result, pos) {
     if (!this[pos])
         this.addResult(result);
     else {
@@ -2821,11 +2824,11 @@ SearchResultContainer.prototype.modifyResult = function (result, pos) {
     }
 };
 
-SearchResultContainer.prototype.isFound = function () {
+ResultContainer.prototype.isFound = function () {
     return (this.getResult() && this.getResult().check);
 };
 
-SearchResultContainer.prototype.toString = function (ident) {
+ResultContainer.prototype.toString = function (ident) {
     var txt = "";
     if (!ident)
         ident = 0;
@@ -2836,7 +2839,7 @@ SearchResultContainer.prototype.toString = function (ident) {
     return txt;
 };
 
-SearchResultContainer.prototype.getError = function () {
+ResultContainer.prototype.getError = function () {
     var e = this.getResult();
     if (e)
         return e.error;
@@ -2847,7 +2850,7 @@ SearchResultContainer.prototype.getError = function () {
 /**
  * entfernt die Blanks aus den Ergebnissen
  */
-SearchResultContainer.prototype.removeBlanks = function () {
+ResultContainer.prototype.removeBlanks = function () {
     for (var i = 0; i < this.length; i++) {
         if (typeof this[i].text === "string") {
             Logger.log(Level.TRACE, "Removing Blanks from String...");
@@ -2859,7 +2862,7 @@ SearchResultContainer.prototype.removeBlanks = function () {
 /**
  * entfernt die Returns aus einem String
  */
-SearchResultContainer.prototype.removeReturns = function () {
+ResultContainer.prototype.removeReturns = function () {
     for (var i = 0; i < this.length; i++) {
         if (typeof this[i].text === "string") {
             Logger.log(Level.TRACE, "Removing Returns from String...");
@@ -2872,7 +2875,7 @@ SearchResultContainer.prototype.removeReturns = function () {
 /**
  * konvertiert ein gefundenes Ergebnis in den vorgesehen Objecttypen
  */
-SearchResultContainer.prototype.convert = function () {
+ResultContainer.prototype.convert = function () {
     for (var i = 0; i < this.length; i++) {
         Logger.log(Level.TRACE, "SearchItem.resolve: call convertValue " + this[i].text + " and " + this.name);
         if (typeof this[i].text === "string" && this[i].text) {
@@ -2921,7 +2924,7 @@ SearchResultContainer.prototype.convert = function () {
  * @param  typ        der Typ des Ergebnis
  * @param  expected   für Testzwecke. Hier kann ein erwartetes Ergebnis hinterlegt werden
  */
-function SearchResult(text, xml, val, startPos, endPos, typ, expected) {
+function Result(text, xml, val, startPos, endPos, typ, expected) {
     this.text = text;
     this.xml = xml;
     var start = startPos;
@@ -3125,7 +3128,7 @@ function SearchResult(text, xml, val, startPos, endPos, typ, expected) {
         if (!ident)
             ident = 0;
         ident++;
-        var txt = REC.getIdent(ident) + "SearchResult:\n";
+        var txt = REC.getIdent(ident) + "Result:\n";
         txt = txt + REC.getIdent(ident) + "text    : " + this.text + "\n";
         txt = txt + REC.getIdent(ident) + "start   : " + start + "\n";
         txt = txt + REC.getIdent(ident) + "end     : " + end + "\n";
@@ -3717,7 +3720,12 @@ REC = {
         this.showContent = false;
         this.result = [];
         this.errors = [];
-        this.results = [];
+        this.results = {
+            search: [],
+            tag : [],
+            category: [],
+            directory: null
+        };
         companyhome.init();
         this.archivRoot = companyhome.createFolder("Archiv");
         this.unknownBox = this.archivRoot.createFolder("Unbekannt");
@@ -3742,7 +3750,12 @@ REC = {
     showContent: false,
     result: [],
     errors: [],
-    results: [],
+    results: {
+        search: [],
+        tag : [],
+        category: [],
+        directory: null
+    },
     xyz: 0
 
 };

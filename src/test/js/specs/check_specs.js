@@ -12,7 +12,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="100" upperValue="300" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult( "100", rules, 100, 0, 3, "int", "asd");
+        var result = new Result( "100", rules, 100, 0, 3, "int", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"int"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -25,7 +25,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="100" upperValue="300" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("99", rules, 99, 0, 3, "int", "asd");
+        var result = new Result("99", rules, 99, 0, 3, "int", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"int"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -38,7 +38,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="100" upperValue="300" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("301", rules, 301, 0, 3, "int", "asd");
+        var result = new Result("301", rules, 301, 0, 3, "int", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"int"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -51,7 +51,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="100" upperValue="300" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("300", rules, 300.00, 0, 3, "float", "asd");
+        var result = new Result("300", rules, 300.00, 0, 3, "float", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"float"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -64,7 +64,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="100" upperValue="300" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("300", rules, 300.01, 0, 3, "float", "asd");
+        var result = new Result("300", rules, 300.01, 0, 3, "float", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"float"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -77,7 +77,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="01/02/2015" upperValue="12/31/2015" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("02.01.2015", rules, new Date(2015,0,2), 0, 3, "date", "asd");
+        var result = new Result("02.01.2015", rules, new Date(2015,0,2), 0, 3, "date", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"date"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -90,7 +90,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="01/02/2015" upperValue="12/31/2015" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("01.01.2015", rules, new Date(2015,0,1), 0, 3, "date", "asd");
+        var result = new Result("01.01.2015", rules, new Date(2015,0,1), 0, 3, "date", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"date"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -103,7 +103,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="01/02/2015" upperValue="12/31/2015" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("01.01.2015", rules, new Date(2016,0,1), 0, 3, "date", "asd");
+        var result = new Result("01.01.2015", rules, new Date(2016,0,1), 0, 3, "date", "asd");
         var searchItem = new SearchItem({name: "Wert", objectTyp:"date"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -117,7 +117,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="b" upperValue="y" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult( "k", rules, "k", 0, 3, "string", "asd");
+        var result = new Result( "k", rules, "k", 0, 3, "string", "asd");
         var searchItem = new SearchItem({name: "Wert"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -130,7 +130,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="b" upperValue="y" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("a", rules, "a", 0, 3, "string", "asd");
+        var result = new Result("a", rules, "a", 0, 3, "string", "asd");
         var searchItem = new SearchItem({name: "Wert"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
@@ -143,7 +143,7 @@ describe("Test für Check", function() {
         var rules = '  <check lowerValue="b" upperValue="y" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var result = new SearchResult("z", rules, "z", 0, 3, "string", "asd");
+        var result = new Result("z", rules, "z", 0, 3, "string", "asd");
         var searchItem = new SearchItem({name: "Wert"});
         searchItem.erg.addResult(result);
         var check = new Check(new XMLObject(XMLDoc.docNode), searchItem);
