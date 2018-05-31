@@ -4073,6 +4073,45 @@ function createOutputMenus() {
             }
         }
     });
+
+    editMenuOutput = $('#editMenuOutput').superfish({
+        menuData: {
+            editMenuOutputEdit: {
+                title: "Editor",
+                className: "far fa-edit fa-1x",
+                autoClose: true,
+                disabled: true,
+                editMenuOutputSearch: {
+                    title: "Suchen",
+                    className: "fas fa-search fa-1x",
+                    autoClose: true,
+                    action: function () {
+                        try {
+                            Verteilung.outputEditor.editor.execCommand("find")
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                },
+                editMenuOutputGutter: {
+                    title: "Zeilennummern",
+                    className: "fas fa-list-ol fa-1x",
+                    autoClose: false,
+                    selected: Verteilung.outputEditor.editor.renderer.getShowGutter(),
+                    action: function (event) {
+                        try {
+                            const gutter = !Verteilung.outputEditor.editor.renderer.getShowGutter();
+                            Verteilung.outputEditor.editor.renderer.setShowGutter(gutter);
+                            event.data.root.superfish((gutter ? 'selectItem':'deselectItem'), 'editMenuOutputGutter');
+                        } catch (e) {
+                            errorHandler(e);
+                        }
+                    }
+                }
+
+            }
+        }
+    });
 }
 
 
@@ -4200,7 +4239,7 @@ function createVerteilungMenus() {
     verteilungTxtEditMenu = $('#editMenuVerteilungTxt').superfish({
         menuData: {
             editMenuVerteilungTxtEdit: {
-                title: "Editieren",
+                title: "Editor",
                 className: "far fa-edit fa-1x",
                 autoClose: true,
                 disabled: true,
@@ -4288,7 +4327,7 @@ function createVerteilungMenus() {
     verteilungRulesEditMenu = $('#editMenuVerteilungRules').superfish({
         menuData: {
             editMenuVerteilungRulesEdit: {
-                title: "Editieren",
+                title: "Editor",
                 className: "far fa-edit fa-1x",
                 autoClose: true,
                 disabled: true,
@@ -4389,6 +4428,13 @@ function start() {
         Verteilung.outputEditor.editor.setShowPrintMargin(false);
         Verteilung.outputEditor.editor.$blockScrolling = Infinity;
         Verteilung.outputEditor.fontsize = Verteilung.outputEditor.editor.getFontSize();
+        Verteilung.outputEditor.editor.getSession().on('change', function() {
+            if (Verteilung.outputEditor.editor.getSession().getValue().length > 0) {
+                editMenuOutput.superfish('enableItem', 'editMenuOutputEdit');
+             } else {
+                editMenuOutput.superfish('disableItem', 'editMenuOutputEdit');
+            }
+        });
         createOutputMenus();
         $('#clientPage').css("display","block");
     } catch(e) {

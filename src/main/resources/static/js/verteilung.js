@@ -87,17 +87,23 @@ PositionContainer.prototype = [];
 
 PositionContainer.prototype.add = function (pos) {
     var found = false;
-    if (!(pos.startPosition === pos.endPosition) ) {
-        for (var i = 0; i < this.length; i++) {
-            if (pos.typ === this[i].typ && (pos.startPosition > this[i].startPosition && pos.endPosition < this[i].endPosition)) {
-                this[i] = pos;
-                found = true;
-                break;
+
+    if (pos.startPosition && pos.endPosition) {
+        if (pos.startPosition === pos.endPosition)
+            return;
+        if (pos.startPosition != -1 && pos.endPosition != -1) {
+            for (var i = 0; i < this.length; i++) {
+                if (pos.typ === this[i].typ && (pos.startPosition > this[i].startPosition && pos.endPosition < this[i].endPosition)) {
+                    this[i] = pos;
+                    found = true;
+                    break;
+                }
             }
         }
-        if (!found)
-            this.push(pos);
     }
+    if (!found)
+        this.push(pos);
+
 };
 
 PositionContainer.prototype.clear = function () {
@@ -110,7 +116,7 @@ PositionContainer.prototype.clear = function () {
  * @returns {*}
  */
 PositionContainer.prototype.get = function(name) {
-    for (var i = 0; i < this.length; i++) {
+    for (let i = 0; i < this.length; i++) {
         if (this[i].desc === name)
             return this[i];
     }

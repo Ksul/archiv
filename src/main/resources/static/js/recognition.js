@@ -1465,7 +1465,7 @@ function ArchivTyp(srch, parentType) {
             if (this.tags) {
                 for (i = 0; i < this.tags.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call Tags.resolve with currentDocument");
-                    this.tags[i].resolve(REC.currentDocument);
+                    this.tags[i].resolve(i, REC.currentDocument);
                 }
             }
             if (this.category) {
@@ -2258,9 +2258,10 @@ function Tags(srch) {
 
     /**
      * taggt das Dokument
+     * @param counter       die Nummer des Tags
      * @param doc           das Dokument
      */
-    this.resolve = function (doc) {
+    this.resolve = function (counter, doc) {
         var orgLevel = Logger.getLevel();
         if (this.debugLevel)
            Logger.setLevel(this.debugLevel);
@@ -2270,13 +2271,16 @@ function Tags(srch) {
             Logger.log(Level.TRACE, "Tags.resolve: Tag is " + this.name);
             doc.addTag(this.name);
             doc.save();
-            REC.results.tag.push(new Result("", this.xml, this.name, 0, 0 ));
+            var resultContainer = new ResultContainer(new Result("", this.xml.getText(), this.name ));
+            REC.results.tag["Tag " + counter] = resultContainer.getResult();
+            REC.storePosition(resultContainer, this.xml, "Tag " + counter);
             Logger.log(Level.INFO, "Document saved!");
             Logger.log(Level.INFO, "add Tag " + this.name);
         }
         Logger.setLevel(orgLevel);
     };
 }
+
 
 /**
  * stellt die Funktionalität zum Suchen eines Dokumentes zur Verfügung
@@ -2752,14 +2756,8 @@ function SearchItem(srch) {
             this.resolved = true;
 
             // Positionen nicht im Server merken weil sie dort nicht gebraucht werden
-            if (typeof Position === "function" && !this.fix) {
-                new Position(Verteilung.POSITIONTYP.TEXT, this.erg.getResult().getStart(), this.erg.getResult().getEnd(), this.erg.getResult().check ? "ace_selection" + REC.xyz : "ace_step", this.name);
-                var start = this.xml.getText().indexOf("name");
-                start = this.xml.getText().indexOf('"', start);
-                var end  = this.xml.getText().indexOf('"', start + 1);
-                new Position(Verteilung.POSITIONTYP.RULES, this.xml.getStart() + start + 1,  this.xml.getStart() + end, "ace_selection" + REC.xyz);
-                REC.xyz++;
-            }
+            if (!this.fix)
+                REC.storePosition(this.erg, this.xml, this.name);
 
             return this.erg.getResult().getValue();
         } else
@@ -2769,7 +2767,10 @@ function SearchItem(srch) {
 
 
 
-function ResultContainer() {}
+function ResultContainer(result) {
+    if (result)
+        this.addResult(result);
+}
 
 ResultContainer.prototype = [];
 
@@ -3708,6 +3709,17 @@ REC = {
         }
     },
 
+    storePosition: function(resultContainer, xml, name) {
+        if (typeof Position === "function") {
+            new Position(Verteilung.POSITIONTYP.TEXT, resultContainer.getResult().getStart(), resultContainer.getResult().getEnd(), resultContainer.getResult().check ? "ace_selection" + REC.cssCounter : "ace_step", name);
+            var start = xml.getText().indexOf("name");
+            start = xml.getText().indexOf('"', start);
+            var end = xml.getText().indexOf('"', start + 1);
+            new Position(Verteilung.POSITIONTYP.RULES, xml.getStart() + start + 1, xml.getStart() + end, "ace_selection" + REC.cssCounter);
+            REC.cssCounter++;
+        }
+    },
+
     currentDocument: null,
 
     init: function(){
@@ -3733,7 +3745,7 @@ REC = {
         this.errorBox  = this.archivRoot.createFolder("Fehler");
         this.duplicateBox = this.errorBox.createFolder("Doppelte");
         this.currentDocument = companyhome.createNode('WebScriptTest', "my:archivContent");
-        this.xyz = 0;
+        this.cssCounter = 0;
     },
     
     id: Math.random() * 100,
@@ -3756,7 +3768,7 @@ REC = {
         category: [],
         directory: null
     },
-    xyz: 0
+    cssCounter: 0
 
 };
 if (typeof (space) !== "undefined")
