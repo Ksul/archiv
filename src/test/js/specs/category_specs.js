@@ -15,7 +15,7 @@ describe("Test für Kategorie", function() {
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
         var category = new Category(new XMLObject(XMLDoc.docNode));
-        category.resolve(REC.currentDocument);
+        category.resolve(0, REC.currentDocument);
         expect( classification.rootCategories.contains((new BasicObject("Steuern")))).toBeTruthy();
         var cat = classification.rootCategories.get(new BasicObject("Steuern"));
         expect(cat.subCategories.contains(new BasicObject("Einkommen"))).toBeTruthy();
@@ -28,7 +28,7 @@ describe("Test für Kategorie", function() {
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
         var category = new Category(new XMLObject(XMLDoc.docNode));
-        category.resolve(REC.currentDocument);
+        category.resolve(0, REC.currentDocument);
         expect( classification.rootCategories.contains((new BasicObject("Steuern")))).toBeTruthy();
         var cat = classification.rootCategories.get(new BasicObject("Steuern"));
         expect(cat.subCategories.contains(new BasicObject("Einkommen"))).toBeTruthy();

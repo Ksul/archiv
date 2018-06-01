@@ -4,7 +4,7 @@
 ./css/bootstrap-datetimepicker.css
 ./css/dataTables.css
 ./css/alertify.css
-./css/Base.css
+#./css/Base.css
 ./css/BreadCrumb.css
 ./css/select.jqueryui.css
 ./css/superfish.css

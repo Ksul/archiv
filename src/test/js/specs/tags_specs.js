@@ -13,7 +13,7 @@ describe("Test für Tags", function() {
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
         var tags = new Tags(new XMLObject(XMLDoc.docNode));
-        tags.resolve(REC.currentDocument);
+        tags.resolve(0, REC.currentDocument);
         expect(REC.currentDocument.hasTag("Rückrechnung")).toBeTruthy();
     });
 });

@@ -506,16 +506,20 @@ function setXMLPosition(position) {
  * @returns {string}
  */
 function printResults(results) {
-    function printBlock(block ,name, indent) {
-        const blanks = "                                               ";
-        let ret = name +":\n";
+
+    function findLength(block) {
         let maxLength = 0;
-        let pos = ret.length;
         for (let key in block) {
             if (key.length > maxLength)
                 maxLength = key.length;
         }
-        maxLength++;
+        return maxLength;
+    }
+
+    function printBlock(block ,name, indent) {
+
+        ret = ret + name +":\n";
+        let pos = ret.length;
         for (let key in block) {
             if (block[key]) {
                 ret = ret + blanks.substr(0, indent) + key + blanks.substr(0, maxLength - key.length) + ": " + block[key].getValue();
@@ -532,13 +536,17 @@ function printResults(results) {
                 pos = ret.length;
             }
         }
-        return ret;
     }
 
+    const blanks = "                                               ";
     let ret = "";
-    ret = ret + printBlock(results.search, "Suche", 2);
-    ret = ret + printBlock(results.tag, "Tags", 2);
-    ret = ret + printBlock(results.category, "Kategorien", 2);
+    const maxLength = Math.max(findLength(results.search), findLength(results.tag), findLength(results.category), findLength(results.directory));
+    printBlock(results.search, "Suche", 2);
+    printBlock(results.tag, "Tags", 2);
+    printBlock(results.category, "Kategorien", 2);
+    printBlock(results.directory, "Position", 2);
+    if (REC.errors.length > 0)
+        printBlock(REC.errors, "Fehler", 2);
     return ret;
 }
 
@@ -716,7 +724,10 @@ function work() {
                 REC.testRules(sel);
                 if (!selectMode) {
                     setXMLPosition(REC.currXMLName);
-                    alertify.success("Erkennung beendet");
+                    if (REC.errors.length > 0)
+                        alertify.error("Erkennung mit Fehlern beendet");
+                    else
+                        alertify.success("Erkennung beendet");
                 }
             } else
                 alertify.alert("Fehler", "Regeln sind syntaktisch nicht korrekt!");

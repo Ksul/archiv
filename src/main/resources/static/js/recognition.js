@@ -1407,6 +1407,11 @@ function ArchivTyp(srch, parentType) {
             Logger.log(Level.TRACE, "ArchivTyp.resolve: move document to folder");
             if (!REC.currentDocument.move(destination))
                 REC.errors.push("Dokument konnte nicht in den Zielordner verschoben werden " + REC.completeNodePath(destination));
+            else {
+                var resultContainer = new ResultContainer(new Result("", "", REC.completeNodePath(destination)));
+                REC.results.directory["Position"] = resultContainer.getResult();
+            }
+
         }
         // notieren das die Destination aufgelöst worden ist
         this.getTopParent().destinationResolved = true;
@@ -1459,7 +1464,7 @@ function ArchivTyp(srch, parentType) {
             if (this.searchItem) {
                 for (i = 0; i < this.searchItem.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call SearchItem.resolve ");
-                    this.searchItem[i].resolve();
+                    this.searchItem[i].resolve(i);
                 }
             }
             if (this.tags) {
@@ -1471,7 +1476,7 @@ function ArchivTyp(srch, parentType) {
             if (this.category) {
                 for (i = 0; i < this.category.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call Category.resolve with currentDocument");
-                    this.category[i].resolve(REC.currentDocument);
+                    this.category[i].resolve(i, REC.currentDocument);
                 }
             }
             // Unique in die Parents übertragen
@@ -2161,9 +2166,10 @@ function Category(srch) {
 
     /**
      * kategorisiert das Dokument
+     * @param counter            die Nummer der Kategorie
      * @param document           das Dokument
      */
-    this.resolve = function (document) {
+    this.resolve = function (counter, document) {
         var orgLevel = Logger.getLevel();
         if (this.debugLevel)
            Logger.setLevel(this.debugLevel);
@@ -2202,12 +2208,10 @@ function Category(srch) {
                             Logger.log(Level.TRACE, "Create Root Category...");
                             top = classification.createRootCategory("cm:generalclassifiable", current);
                             Logger.log(Level.TRACE, "Root Category created!");
-                            REC.results.category.push(new Result("", this.xml, current, 0, 0));
                         } else {
                             Logger.log(Level.TRACE, top.name + ": Create Sub Category...");
                             top = top.createSubCategory(current);
                             Logger.log(Level.TRACE, "Sub Category created!");
-                            REC.results.category.push(new Result("", this.xml, current, 0, 0));
                         }
                     }
                 }
@@ -2220,6 +2224,9 @@ function Category(srch) {
                     document.properties["cm:categories"] = categories;
                     document.save();
                     Logger.log(Level.INFO, "Document saved!");
+                    var resultContainer = new ResultContainer(new Result("", this.xml.getText(), this.name));
+                    REC.results.category["Kategorie " + counter] = resultContainer.getResult();
+                    REC.storePosition(resultContainer, this.xml, "Kategorie " + counter);
                 } else
                     REC.errors.push("Category top not found!");
             } else
@@ -2641,7 +2648,11 @@ function SearchItem(srch) {
         return null;
     };
 
-    this.resolve = function () {
+    /**
+     * sucht ein Element
+     * @param counter            die Nummer der Suche
+     */
+    this.resolve = function (counter) {
         var i, e;
         var orgLevel = Logger.getLevel();
         if (this.debugLevel)
@@ -3736,7 +3747,7 @@ REC = {
             search: [],
             tag : [],
             category: [],
-            directory: null
+            directory: []
         };
         companyhome.init();
         this.archivRoot = companyhome.createFolder("Archiv");
@@ -3766,7 +3777,7 @@ REC = {
         search: [],
         tag : [],
         category: [],
-        directory: null
+        directory: []
     },
     cssCounter: 0
 
