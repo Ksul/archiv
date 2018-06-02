@@ -48,7 +48,7 @@
                 <xsd:annotation>
                     <xsd:documentation>Sucht nach ganzen Wörtern. Der Parameter kann aus 2 Komponenten bestehen, die
                         durch ein Komma getrennt werden
-                        Der erste Wert beschreibt di Anzahl Wörter bis zum gesuchten Ergebnis
+                        Der erste Wert beschreibt die Anzahl Wörter bis zum gesuchten Ergebnis
                         Der zweite (optionale) Wert gibt die Anzahl Wörter an, die in das Ergebnis übernommen werden
                         sollen (Default: 1)
                     </xsd:documentation>
@@ -112,14 +112,14 @@
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="left">
                             <xsd:annotation>
-                                <xsd:documentation>das Ergebnis wir aus dem Text vor der gefundenen Position
+                                <xsd:documentation>das Ergebnis wird aus dem Text vor der gefundenen Position
                                     ermittelt.
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:enumeration>
                         <xsd:enumeration value="right">
                             <xsd:annotation>
-                                <xsd:documentation>das Ergebnis wir aus dem Text nach der gefundenen Position
+                                <xsd:documentation>das Ergebnis wird aus dem Text nach der gefundenen Position
                                     ermittelt.
                                 </xsd:documentation>
                             </xsd:annotation>
@@ -130,7 +130,7 @@
             <xsd:attribute name="readOverReturn" type="xsd:boolean" use="optional">
                 <xsd:annotation>
                     <xsd:documentation>
-                        standardmäßig wir nur der Text von der aktuellen Sucposition bis zum nächsten CR geprüft. Mit
+                        standardmäßig wird nur der Text von der aktuellen Suchposition bis zum nächsten CR geprüft. Mit
                         diesem Attribut (Wert=true) kann
                         dieses übersteuert
                         werden.
@@ -230,7 +230,7 @@
             </xsd:annotation>
             <xsd:attribute name="lowerValue" type="xsd:string" use="optional">
                 <xsd:annotation>
-                    <xsd:documentation>Der unterere Wert, der spezifiziert das das
+                    <xsd:documentation>Der unterere Wert, der spezifiziert dass das
                         gefundene Element nur dann gültig ist wenn es größer als dieser
                         Wert ist. Die Prüfung
                         wird typabhängig durchgeführt.
@@ -239,7 +239,7 @@
             </xsd:attribute>
             <xsd:attribute name="upperValue" type="xsd:string" use="optional">
                 <xsd:annotation>
-                    <xsd:documentation>Der obere Wert, der spezifiziert das das
+                    <xsd:documentation>Der obere Wert, der spezifiziert dass das
                         gefundene Element nur dann gültig ist wenn es kleiner als dieser
                         Wert ist. Die Prüfung wird
                         typabhängig durchgeführt.
@@ -317,7 +317,7 @@
             </xsd:annotation>
             <xsd:attribute name="aspect" type="xsd:QName" use="optional">
                 <xsd:annotation>
-                    <xsd:documentation>fügt dem Dokument den angegeben Aspect hinzu.
+                    <xsd:documentation>fügt dem Dokument den angegebenen Aspect hinzu.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>

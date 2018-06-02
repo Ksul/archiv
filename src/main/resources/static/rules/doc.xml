@@ -48,7 +48,7 @@
             <searchItem name="datum" text="Datum:" objectTyp="date" target="my:documentDate">
                 <check lowerValue="01/01/2005" upperValue="01/01/2020" />
             </searchItem>
-            <searchItem name="betrag" text="Überweisung" readOverReturn="true" objectTyp="float" target="my:amount">
+            <searchItem name="betrag" text="EUR" direction="left" word="1" readOverReturn="false" objectTyp="float" target="my:amount">
                 <check lowerValue="3000" upperValue="15000" />
                 <archivZiel aspect="my:amountable" />
             </searchItem>

@@ -517,23 +517,24 @@ function printResults(results) {
     }
 
     function printBlock(block ,name, indent) {
-
-        ret = ret + name +":\n";
-        let pos = ret.length;
-        for (let key in block) {
-            if (block[key]) {
-                ret = ret + blanks.substr(0, indent) + key + blanks.substr(0, maxLength - key.length) + ": " + block[key].getValue();
-                if (Verteilung.positions.get(key))
-                    new Position(Verteilung.POSITIONTYP.PROPS, pos + indent, pos + indent + key.length, Verteilung.positions.get(key).getCSS(), key);
-                if (block[key].expected) {
-                    const tmp = eval(block[key].expected);
-                    if (block[key].getValue() && tmp.valueOf() === block[key].getValue().valueOf())
-                        ret = ret + " [OK]";
-                    else
-                        ret = ret + " [FALSE] " + tmp;
+        if (Object.keys(block).length > 0 ) {
+            ret = ret + name + ":\n";
+            let pos = ret.length;
+            for (let key in block) {
+                if (block[key]) {
+                    ret = ret + blanks.substr(0, indent) + key + blanks.substr(0, maxLength - key.length) + ": " + block[key].getValue();
+                    if (Verteilung.positions.get(key))
+                        new Position(Verteilung.POSITIONTYP.PROPS, pos + indent, pos + indent + key.length, Verteilung.positions.get(key).getCSS(), key);
+                    if (block[key].expected) {
+                        const tmp = eval(block[key].expected);
+                        if (block[key].getValue() && tmp.valueOf() === block[key].getValue().valueOf())
+                            ret = ret + " [OK]";
+                        else
+                            ret = ret + " [FALSE] " + tmp;
+                    }
+                    ret = ret + "\n";
+                    pos = ret.length;
                 }
-                ret = ret + "\n"  ;
-                pos = ret.length;
             }
         }
     }
@@ -545,8 +546,12 @@ function printResults(results) {
     printBlock(results.tag, "Tags", 2);
     printBlock(results.category, "Kategorien", 2);
     printBlock(results.directory, "Position", 2);
-    if (REC.errors.length > 0)
-        printBlock(REC.errors, "Fehler", 2);
+    if (REC.errors.length > 0) {
+        let err = [];
+        for (let i = 0; i < REC.errors.length; i++)
+            err["Fehler " + i] = new Result(null, null, REC.errors[i]);
+        printBlock(err, "Fehler", 2);
+    }
     return ret;
 }
 

@@ -391,17 +391,15 @@ function convertPath(name) {
  * @param description   optionale Fehlermeldung
  */
 function errorHandler(e, description) {
-    const pre = $("<pre>");
-    pre.css("maxHeight","250px");
+    const pre = $("<div>");
+    pre.css("maxHeight","300px");
     if (description) {
         
-        pre.append($("<label>").text(description));
+        pre.append($("<label>").css("font-weight", "normal").text(description));
     }
-    pre.append($("<label>").text('Fehler:'));
-    pre.append($("<label>").text(e.toString()));
-    pre.append($("<label>").text('Stacktrace:'));
-    pre.append($("<textarea>").val(e.stack));
-    alertify.confirm(pre.get(0)).set({labels:{ok:'Ok'}, padding: false});
+    pre.append($("<label>").css("font-weight", "normal").text(e.toString()));
+    pre.append($("<textarea>").css("width", "100%").css("resize", "none").val(e.stack));
+    alertify.alert("Fehler", pre.get(0));
 }
 
 /**
