@@ -1687,6 +1687,11 @@ function ArchivPosition(srch) {
                         if (!top) {
                             REC.errors.push("Folder " + dir + " not successfuly created");
                             break;
+                        } else {
+                            // auf Archiv Folder spezialisieren
+                            top.specializeType("my:archivFolder");
+                            // Aspect hinzufügen, sonst wird er beim 'listFolder' nicht gefunden
+                            top.addAspect("cm:titled");
                         }
                     } else {
                         Logger.log(Level.TRACE, "resolveFolder: folder " + dir + " found");
