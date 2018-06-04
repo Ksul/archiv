@@ -786,7 +786,7 @@ function startMoveDialog(rowData, table, typ) {
                     template: "layout"
                 },
                 templates: {
-                    layout: '<div class="filter-content" id="dialogTree"></div>'
+                    layout: '<div class="filter-content" style="height: 250px;overflow-y: scroll;user-select: none;border: 1px solid lightgray; border-radius: 2px;" id="dialogTree"></div>'
                 }
             },
             ui: "jquery-ui",
@@ -883,7 +883,8 @@ function startMoveDialog(rowData, table, typ) {
                                             const newData = json.data;
                                             const source = json.source;
                                             const target = json.target;
-                                            Logger.log(Level.INFO, typ + " " + newData.name + " von " + source.path + " nach " + target.path + " verschoben");
+                                            const mess = typ + " " + newData.name + " von " + source.path + " nach " + target.path + " verschoben";
+                                            Logger.log(Level.INFO, mess);
                                             // nur wenn die Tabelle angeben ist werden die Zeilen gelöscht. Bei der Tabelle mit den Suchergebnissen
                                             // werden keine Einträge gelöscht und deshalb sollte die Tabelle dort auch nicht für diese Funktion mit
                                             // angegeben werden.
@@ -891,6 +892,10 @@ function startMoveDialog(rowData, table, typ) {
                                                 table.row('#' + newData.objectID).remove();
                                                 table.draw();
                                             }
+                                            alertify.success(mess);
+                                        }
+                                        else {
+                                            alertify.error(typ + " " + newData.name + " konnte nicht verschoben werden");
                                         }
                                     };
                                     // Verschieben....
@@ -916,7 +921,7 @@ function startMoveDialog(rowData, table, typ) {
         };
 
 
-        startDialog(typ + " verschieben", moveDialogSettings, 400, true);
+        startDialog(typ + " verschieben", moveDialogSettings, 350, true);
 
 
     } catch (e) {

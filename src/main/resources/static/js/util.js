@@ -522,9 +522,11 @@ function editDocument(input, id) {
                 if (row && row.length)
                     row.data(json.data).invalidate();
                 // Suchergebnis eventuell updaten
-                row = alfrescoSearchTabelle.row('#' + json.data.objectID);
-                if (row && row.length)
-                    row.data(json.data).invalidate();
+                if (alfrescoSearchTabelle) {
+                    row = alfrescoSearchTabelle.row('#' + json.data.objectID);
+                    if (row && row.length)
+                        row.data(json.data).invalidate();
+                }
             }
         };
         erg = executeService({"name": "updateProperties", "callback": done, "errorMessage": "Dokument konnte nicht aktualisiert werden!", "ignoreError": true}, [
@@ -588,7 +590,7 @@ function deleteDocument(data) {
 function createFolder(input, origData) {
     try {
         const extraProperties = {
-            'cmis:folder': {
+            'my:archivFolder': {
                 'cmis:objectTypeId': 'cmis:folder',
                 'cmis:name': input.name
             },

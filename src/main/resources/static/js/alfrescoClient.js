@@ -1880,7 +1880,14 @@ function formatVerteilungTabelleDetailRow(data) {
  * @returns {string}   HTML für die extra Zeile
  */
 function formatAlfrescoTabelleDetailRow(data) {
-    return 'Name: ' + data.name + ' erstellt am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.creationDate))) + ' von: ' + data.createdBy + (data.lastModificationDate == data.creationDate ? '' : ' modifiziert am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.lastModificationDate))) + ' von: ' + data.lastModifiedBy) + ' Version: ' + data.versionLabel + ' ' + (data.checkinComment ? data.checkinComment : '') + ' Größe: ' + $.formatNumber(data.contentStreamLength, {format:"#,###", locale:"de"}) + ' Bytes';
+    return 'Name: ' + data.name +
+        ' erstellt am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.creationDate))) +
+        ' von: ' + data.createdBy +
+        (data.lastModificationDate == data.creationDate ? '' : ' modifiziert am: ' + $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Number(data.lastModificationDate))) +
+            ' von: ' + data.lastModifiedBy) +
+        ' Version: ' + data.versionLabel + ' ' + (data.checkinComment ? data.checkinComment : '') +
+        ' Position: ' + data.parents[0].path +
+        ' Größe: ' + $.formatNumber(data.contentStreamLength, {format:"#,###", locale:"de"}) + ' Bytes';
 }
 
 /**
@@ -2189,7 +2196,7 @@ function handleAlfrescoFolderImageClicks() {
         try {
             var tr = $(this).closest('tr');
             var data = alfrescoFolderTabelle.row(tr).data();
-            startFolderDialog(data[0], "bootstrap-create", true);
+            startFolderDialog(data, "bootstrap-create", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -2198,7 +2205,7 @@ function handleAlfrescoFolderImageClicks() {
         try {
             var tr = $(this).closest('tr');
             var data = alfrescoFolderTabelle.row(tr).data();
-            startFolderDialog(data[0], "web-display", true);
+            startFolderDialog(data, "web-display", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -2207,7 +2214,7 @@ function handleAlfrescoFolderImageClicks() {
         try {
             var tr = $(this).closest('tr');
             var data = alfrescoFolderTabelle.row(tr).data();
-            startFolderDialog(data[0], "web-edit", true);
+            startFolderDialog(data, "web-edit", true);
         } catch (e) {
             errorHandler(e);
         }
@@ -3149,12 +3156,12 @@ function checkAndBuidAlfrescoEnvironment() {
      * @return {{result, success}| das Ergebnis}
      */
     function buildAlfrescoFolder(folder, id, txt) {
-        var erg = executeService({"name": "getNodeId", "ignoreError": true}, [
+        let erg = executeService({"name": "getNodeId", "ignoreError": true}, [
             {"name": "filePath", "value": folder}
         ]);
         if (!erg.success) {
-            var name = folder.split("/").pop();
-            var extraProperties = {"cmis:folder": {"cmis:name": "" + name +""}, "P:cm:titled":{"cm:title": "" + name +"", "cm:description":"" + txt + ""}};
+            const name = folder.split("/").pop();
+            const extraProperties = {"my:archivFolder": {"cmis:name": "" + name +""}, "P:cm:titled":{"cm:title": "" + name +"", "cm:description":"" + txt + ""}};
             erg = executeService({"name": "createFolder"}, [
                 {"name": "documentId", "value": id},
                 {"name": "extraProperties", "value": extraProperties}

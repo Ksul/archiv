@@ -717,7 +717,9 @@ div.dataTables_paginate a.last:after {
 }
 
 .alpaca-form-buttons-container.ui-dialog-buttonpane.ui-widget-content {
-    margin-top: 96%;
+    /*margin-top: 96%;*/
+    float:left;
+    width: 100%;
 }
 
 .alpaca-control {
