@@ -2073,11 +2073,11 @@ function updateInlineFolder (value, settings) {
  */
 function updateInlineDocument(value, settings) {
     try {
-        var changed = false;
-        var convValue;
-        var oldValue = "";
-        var row = $(this.parentElement.parentElement.parentElement).DataTable().row(this);
-        var data = row.data();
+        let changed = false;
+        let convValue;
+        let oldValue = "";
+        const row = $(this.parentElement.parentElement.parentElement).DataTable().row(this);
+        const data = row.data();
         switch (this.cellIndex) {
             case 2: {                                // Titel geändert
                 if ( value !== data.title) {
@@ -2128,7 +2128,7 @@ function updateInlineDocument(value, settings) {
             }
         }
         if (changed) {
-            var erg = editDocument(data, data.objectID);
+            const erg = editDocument(data, data.objectID);
             if (!erg.success) {
                 value = erg.error;
             }
@@ -2145,7 +2145,7 @@ function updateInlineDocument(value, settings) {
  */
 function switchAlfrescoDirectory(data) {
     try {
-        var objectID;
+        let objectID;
         if (data)
             objectID = data.objectID;
         else
@@ -2184,8 +2184,8 @@ function startSearch(searchText) {
 function handleAlfrescoFolderImageClicks() {
     $(document).on("click", ".folderSwitch", function () {
         try {
-             var tr = $(this).closest('tr');
-             var row = alfrescoFolderTabelle.row( tr).data();
+             const tr = $(this).closest('tr');
+             const row = alfrescoFolderTabelle.row( tr).data();
              $("#tree").jstree('deselect_all', true);
              switchAlfrescoDirectory(row);
         } catch (e) {
@@ -2194,8 +2194,8 @@ function handleAlfrescoFolderImageClicks() {
      });
     $(document).on("click", ".folderCreate", function () {
         try {
-            var tr = $(this).closest('tr');
-            var data = alfrescoFolderTabelle.row(tr).data();
+            const tr = $(this).closest('tr');
+            const data = alfrescoFolderTabelle.row(tr).data();
             startFolderDialog(data, "bootstrap-create", true);
         } catch (e) {
             errorHandler(e);
@@ -2203,8 +2203,8 @@ function handleAlfrescoFolderImageClicks() {
     });
     $(document).on("click", ".folderRemove", function () {
         try {
-            var tr = $(this).closest('tr');
-            var data = alfrescoFolderTabelle.row(tr).data();
+            const tr = $(this).closest('tr');
+            const data = alfrescoFolderTabelle.row(tr).data();
             startFolderDialog(data, "web-display", true);
         } catch (e) {
             errorHandler(e);
@@ -2212,8 +2212,8 @@ function handleAlfrescoFolderImageClicks() {
     });
     $(document).on("click", ".folderEdit", function () {
         try {
-            var tr = $(this).closest('tr');
-            var data = alfrescoFolderTabelle.row(tr).data();
+            const tr = $(this).closest('tr');
+            const data = alfrescoFolderTabelle.row(tr).data();
             startFolderDialog(data, "web-edit", true);
         } catch (e) {
             errorHandler(e);
@@ -2228,14 +2228,14 @@ function handleAlfrescoFolderImageClicks() {
  * @return true falls erfolgreich
  */
 function aimNode(data) {
-    var results = [];
-    var tree = $('#tree').jstree(true);
-    var id = data.objectID;
+    const results = [];
+    const tree = $('#tree').jstree(true);
+    const id = data.objectID;
     if (data && data.parents) {
-        var node = tree.get_node(data.parents[0].objectId);
+        let node = tree.get_node(data.parents[0].objectId);
         // Alle Knoten bis hinauf zum ersten geöffneten Knoten suchen
         while (!node) {
-            var json = executeService({
+            const json = executeService({
                 "name": "getNodeById",
                 "errorMessage": "Dokument konnten nicht gelesen werden!"
             }, [
@@ -2259,7 +2259,7 @@ function aimNode(data) {
             tree.open_node(node, function () {
                 alfrescoTabelle.on('draw', function () {
                     alfrescoTabelle.off('draw');
-                    var row = alfrescoTabelle.row('#' + id);
+                    const row = alfrescoTabelle.row('#' + id);
                     if (row && row.length) {
                         row.draw().show().draw(false);
                         row.select();
@@ -2276,15 +2276,15 @@ function aimNode(data) {
             // Hier muss mit einem Deferred Object gearbeitet werden, denn der open im Tree
             // bewirkt einen asynchronen Aufruf, so das die nachfolgenden Operationen sonst nicht
             // die notwendigen Daten haben.
-            var deffereds = $.Deferred(function (def) {
+            let deffereds = $.Deferred(function (def) {
                 def.resolve();
             });
 
-            for (var index = 0; index < results.length; index++) {
+            for (let index = 0; index < results.length; index++) {
                 deffereds = (function (name, last, id, deferreds) {
                     return deferreds.then(function () {
                         return $.Deferred(function (def) {
-                            var node = tree.get_node(name.objectID);
+                            let node = tree.get_node(name.objectID);
                             tree.open_node(node, function (last) {
 
                                 if (last) {
@@ -2295,7 +2295,7 @@ function aimNode(data) {
                                     tree.open_node(node, function () {
                                         alfrescoTabelle.on('draw', function () {
                                             alfrescoTabelle.off('draw');
-                                            var row = alfrescoTabelle.row('#' + id);
+                                            const row = alfrescoTabelle.row('#' + id);
                                             if (row && row.length) {
                                                 row.draw().show().draw(false);
                                                  row.select();
@@ -2325,7 +2325,7 @@ function handleAlfrescoImageClicks() {
     // Details bearbeiten
     $(document).on("click", ".detailEdit", function () {
         try {
-            var tr = $(this).closest('tr');
+            const tr = $(this).closest('tr');
             startDocumentDialog($('#' + tr[0].parentElement.parentElement.id).DataTable().row(tr).data(), "web-edit", true);
         } catch (e) {
             errorHandler(e);
@@ -2334,9 +2334,9 @@ function handleAlfrescoImageClicks() {
     // Kommentare lesen
     $(document).on("click", ".showComments", function () {
         try {
-            var tr = $(this).closest('tr');
+            const tr = $(this).closest('tr');
             // Kommentare lesen
-            var json = executeService({"name": "getComments", "errorMessage": "Kommentare konnten nicht gelesen werden!"}, [
+            const json = executeService({"name": "getComments", "errorMessage": "Kommentare konnten nicht gelesen werden!"}, [
                 {
                     "name": "documentId",
                     "value": $('#' + tr[0].parentElement.parentElement.id).DataTable().row(tr).data().objectID
@@ -2353,8 +2353,8 @@ function handleAlfrescoImageClicks() {
     // Dokument verschieben
     $(document).on("click", ".moveDocument", function () {
         try {
-            var tr = $(this).closest('tr');
-            var table = $('#' + tr[0].parentElement.parentElement.id).DataTable();
+            const tr = $(this).closest('tr');
+            const table = $('#' + tr[0].parentElement.parentElement.id).DataTable();
             startMoveDialog([table.row(tr).data()], table);
         } catch (e) {
             errorHandler(e);
@@ -2363,7 +2363,7 @@ function handleAlfrescoImageClicks() {
     // Dokument löschen
     $(document).on("click", ".deleteDocument", function () {
         try {
-            var tr = $(this).closest('tr');
+            const tr = $(this).closest('tr');
             startDocumentDialog($('#' + tr[0].parentElement.parentElement.id).DataTable().row(tr).data(), "web-display", true);
         } catch (e) {
             errorHandler(e);
@@ -2405,9 +2405,9 @@ function handleAlfrescoImageClicks() {
     $(document).on("click", ".detailAim", function () {
         try {
            
-            var tr = $(this).closest('tr');
-            var tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
-            var data = tabelle.row(tr).data();
+            const tr = $(this).closest('tr');
+            const tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
+            const data = tabelle.row(tr).data();
             if (aimNode(data))
             // auf den Archiv Tab umschalten
                tabLayout.tabs("option", "active", 0);
@@ -2424,9 +2424,9 @@ function handleAlfrescoImageClicks() {
 function handleVerteilungImageClicks() {
     $(document).on("click", ".run", function () {
         try {
-            var tr = $(this).closest('tr');
-            var row = tabelle.row(tr).data();
-            var name = row[1];
+            const tr = $(this).closest('tr');
+            const row = tabelle.row(tr).data();
+            const name = row[1];
             REC.currentDocument.setContent(daten[name]["text"]);
             REC.testRules(Verteilung.rulesEditor.editor.getSession().getValue());
             daten[name].log = REC.mess;
@@ -2434,7 +2434,7 @@ function handleVerteilungImageClicks() {
             daten[name].position = REC.positions;
             daten[name].xml = REC.currXMLName;
             daten[name].error = REC.errors;
-            var ergebnis = [];
+            const ergebnis = [];
             ergebnis["error"] = REC.errors.length > 0;
             row[2] = REC.currXMLName.join(" : ");
             row[3] = ergebnis;
@@ -2448,9 +2448,9 @@ function handleVerteilungImageClicks() {
     });
     $(document).on("click", ".glass", function () {
         try {
-            var tr = $(this).closest('tr');
-            var row = tabelle.row(tr).data();
-            var name = row[1];
+            const tr = $(this).closest('tr');
+            const row = tabelle.row(tr).data();
+            const name = row[1];
             multiMode = false;
             showMulti = true;
             Verteilung.textEditor.file = daten[name]["file"];
@@ -2538,7 +2538,7 @@ function handleVerteilungImageClicks() {
  * @return {{}}   das Tree kompatible Objekt
  */
 function buildObjectForTree(data) {
-    var item = {};
+    const item = {};
     if (data.baseTypeId === "cmis:folder") {
         // Eintrag ist vom Typ Folder
         item["icon"] = "";
@@ -2594,7 +2594,7 @@ function buildObjectForTree(data) {
  * @return
  */
 function loadAndConvertDataForTree(aNode, callBack) {
-    var obj = {};
+    let obj = {};
 
     try {
         // keine Parameter mit gegeben, also den Rooteintrag erzeugen
@@ -2612,10 +2612,10 @@ function loadAndConvertDataForTree(aNode, callBack) {
         } else {
             if (alfrescoServerAvailable) {
                 // den Folder einlesen
-                var done = function (json) {
+                const done = function (json) {
                     if (json.success) {
                         obj = [];
-                        for (var index = 0; index < json.data.length; index++) {
+                        for (let index = 0; index < json.data.length; index++) {
                             obj.push(buildObjectForTree(json.data[index]));
                         }
                         if (aNode.id === "#") {
@@ -2642,7 +2642,7 @@ function loadAndConvertDataForTree(aNode, callBack) {
                         alertify.alert("Fehler", "Folder konnte nicht erfolgreich im Alfresco gelesen werden!");
                     }    
                 };
-                var json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
+                const json = executeService({"name": "listFolder", "callback": done, "errorMessage": "Verzeichnis konnte nicht aus dem Server gelesen werden:"}, [
                     {"name": "folderId", "value": aNode.id !== "#" ? aNode.id : archivFolderId},
                     {"name": "withFolder", "value": -1}
                 ]);
@@ -2665,13 +2665,13 @@ function loadAlfrescoTree() {
      * @return {boolean} true, der Knoten ist gültig
      */
     function checkMove(data) {
-        var sourceData, targetData;
-        var erg = false;
-        var t = $(data.event.target);
+        let sourceData, targetData;
+        let erg = false;
+        const t = $(data.event.target);
         // prüfen, ob das Element entweder auf eine passende Tabellenzeile (treeDropable)
         // oder auf einen Tree Knoten (jstree-anchor) gezogen werden soll.
         if (t.closest('.treeDropable').length || t.closest('.jstree-anchor').length) {
-            for(var index = 0; index < data.data.nodes.length; ++index) {
+            for(let index = 0; index < data.data.nodes.length; ++index) {
                 erg = false;
                 if (data.data.jstree) {
                     // Quelle ist der Tree
@@ -2692,7 +2692,7 @@ function loadAlfrescoTree() {
                 } else if (data.event.target.className.indexOf("treeDropable") !== -1 && data.event.target.className.indexOf("alfrescoTableDragable") === -1) {
                     // Ziel ist die Tabelle
                     // die Ziel Zeile
-                    var row = alfrescoFolderTabelle.row(t.closest('.treeDropable')[0].parentElement);
+                    const row = alfrescoFolderTabelle.row(t.closest('.treeDropable')[0].parentElement);
                     if (row && row.length)
                         targetData = row.data();
                 }
@@ -2747,11 +2747,11 @@ function loadAlfrescoTree() {
      * @return {Array}       ein Array mit den Ids der Childknoten
      */
     function getAllChildrenIds(treeObj, nodeId) {
-        var result = [];
-        var node = treeObj.get_node(nodeId);
+        let result = [];
+        const node = treeObj.get_node(nodeId);
         result.push(node.id);
         if (node.children) {
-            for(var i = 0; i < node.children.length; i++) {
+            for(let i = 0; i < node.children.length; i++) {
                 result = result.concat(getAllChildrenIds(treeObj, node.children[i]));
             }
         }
@@ -2759,8 +2759,8 @@ function loadAlfrescoTree() {
     }
 
     function customMenu(node) {
-        var tree = $("#tree").jstree(true);
-        var items = {
+        const tree = $("#tree").jstree(true);
+        const items = {
             create: {
                 separator_before: false,
                 separator_after: false,
@@ -2847,7 +2847,7 @@ function loadAlfrescoTree() {
                 },
                 check_callback: function (op, node, par, pos, more) {
                     try {
-                        var erg = false;
+                        let erg = false;
                         // Umbenannt werden darf alles
                         if (op === "rename_node")
                             return true;
@@ -2938,9 +2938,9 @@ function loadAlfrescoTree() {
         }).on("changed.jstree",  function (event, data){
             try {
                 if (data.action === "select_node") {
-                    var tree = $("#tree").jstree(true);
-                    var evt = window.event || event;
-                    var button = evt.which || evt.button;
+                    const tree = $("#tree").jstree(true);
+                    const evt = window.event || event;
+                    const button = evt.which || evt.button;
 
                     // Select Node nicht bei rechter Maustaste
                     if (button !== 1 && ( typeof button !== "undefined")) {
@@ -2965,7 +2965,7 @@ function loadAlfrescoTree() {
             try {
                 if (data.node.id === inboxFolderId ) {
                     // Eventlistner für Drop in Inbox
-                    var zone = document.getElementById(inboxFolderId);
+                    const zone = document.getElementById(inboxFolderId);
                     zone.addEventListener('dragover', handleDragOver, false);
                     zone.addEventListener('drop', handleDropInbox, false);
                 }
@@ -2975,17 +2975,17 @@ function loadAlfrescoTree() {
         }).on('move_node.jstree', function (event, data) {
             // Knoten innerhalb des Trees per Drag and Drop verschieben
             try {
-                var nodeId = data.node.data.objectID;
-                var parentId = data.node.data.parentId;
-                var destinationId = data.parent;
-                var done = function (json) {
+                const nodeId = data.node.data.objectID;
+                const parentId = data.node.data.parentId;
+                const destinationId = data.parent;
+                const done = function (json) {
                     if (json.success) {
-                        var newData = json.data;
-                        var source = json.source;
-                        var target = json.target;
+                        const newData = json.data;
+                        const source = json.source;
+                        const target = json.target;
                         Logger.log(Level.INFO, "Ordner " + data.node.data.name + " von " + source.path + " nach " + target.path + " verschoben");
                         // Bei Bedarf den Ordner aus der Tabelle entfernen
-                        var row = alfrescoFolderTabelle.row('#' + nodeId);
+                        const row = alfrescoFolderTabelle.row('#' + nodeId);
                         if (row && row.length) {
                             row.remove();
                             alfrescoFolderTabelle.draw();
@@ -3014,14 +3014,14 @@ function loadAlfrescoTree() {
             }
         }).on('open_node.jstree', function (event, data) {
             try {
-                var icon = $('#' + data.node.id).find('i.jstree-icon.jstree-themeicon').first();
+                const icon = $('#' + data.node.id).find('i.jstree-icon.jstree-themeicon').first();
                 icon.removeClass('fa-folder').addClass('fa-folder-open');
             } catch (e) {
                 errorHandler(e);
             }
         }).on('close_node.jstree', function (event, data) {
             try {
-                var icon = $('#' + data.node.id).find('i.jstree-icon.jstree-themeicon').first();
+                const icon = $('#' + data.node.id).find('i.jstree-icon.jstree-themeicon').first();
                 icon.removeClass('fa-folder-open').addClass('fa-folder');
             } catch (e) {
                 errorHandler(e);
@@ -3035,7 +3035,7 @@ function loadAlfrescoTree() {
                 // es wird hier aber nicht verhindert, dass das verschieben trotzdem geht sondern nur das Icon beim gezogenen
                 // Objekt gesetzt.
                 try {
-                    var erg = checkMove(data);
+                    const erg = checkMove(data);
                     if (erg) {
                         // Das Icon an dem gezogenen Objekt auf Ok setzen
                         data.helper.find('.jstree-icon').removeClass('jstree-er').addClass('jstree-ok');
@@ -3051,11 +3051,11 @@ function loadAlfrescoTree() {
             try {
                 // nochmal die Zulässigkeit des Drop prüfen!!
                 if (checkMove(data)) {
-                    var sourceData, targetData;
-                    var t = $(data.event.target);
+                    let sourceData, targetData;
+                    const t = $(data.event.target);
                     if (t.closest('.treeDropable').length || t.closest('.jstree-anchor').length) {
 
-                        for(var index = 0; index < data.data.nodes.length; ++index) {
+                        for(let index = 0; index < data.data.nodes.length; ++index) {
 
                             if (data.data.jstree) {
                                 // Quelle ist der Tree
@@ -3066,7 +3066,7 @@ function loadAlfrescoTree() {
                                 if (data.data.table === "alfrescoFolderTabelle") {
                                     sourceData = alfrescoFolderTabelle.row('#' + data.data.nodes[index]).data();
                                 } else if (data.data.table === "alfrescoTabelle") {
-                                    var row = alfrescoTabelle.row('#' + data.data.nodes[index]);
+                                    const row = alfrescoTabelle.row('#' + data.data.nodes[index]);
                                     if (row && row.length)
                                         sourceData = row.data();
                                 }
@@ -3082,24 +3082,24 @@ function loadAlfrescoTree() {
                             }
                             if (sourceData.baseTypeId === "cmis:folder") {
                                 // Tree updaten
-                                var sourceNode = $.jstree.reference('#tree').get_node(sourceData.objectID);
-                                var targetNode = $.jstree.reference('#tree').get_node(targetData.objectID);
+                                const sourceNode = $.jstree.reference('#tree').get_node(sourceData.objectID);
+                                const targetNode = $.jstree.reference('#tree').get_node(targetData.objectID);
                                 if (sourceNode && targetNode)
                                     $.jstree.reference('#tree').move_node(sourceNode, targetNode);
                                 // Der Rest passiert im move_node Handler!!
                             } else {
-                                var done = function(json) {
+                                const done = function(json) {
                                     if (json.success) {
-                                        var newData = json.data;
-                                        var source = json.source;
-                                        var target = json.target;
+                                        const newData = json.data;
+                                        const source = json.source;
+                                        const target = json.target;
                                         Logger.log(Level.INFO, "Dokument " + sourceData.name + " von " + source.path + " nach " + target.path + " verschoben");
                                         row.remove();
                                         alfrescoTabelle.draw();
                                     }
                                 };
                                 //Dokument wurde verschoben
-                                var json = executeService({"name": "moveNode", "callback": done, "errorMessage": "Dokument konnte nicht verschoben werden:"}, [
+                                const json = executeService({"name": "moveNode", "callback": done, "errorMessage": "Dokument konnte nicht verschoben werden:"}, [
                                     {"name": "documentId", "value": sourceData.objectID},
                                     {"name": "currentLocationId", "value": sourceData.parentId},
                                     {"name": "destinationId", "value": targetData.objectID}
@@ -3178,7 +3178,7 @@ function checkAndBuidAlfrescoEnvironment() {
     }
 
     
-    var ret, erg;
+    let ret, erg;
     // ist schon ein Alfresco Server verbunden?
     erg = executeService({"name": "isConnected"});
     if (erg.success && erg.data) {
@@ -3220,8 +3220,7 @@ function checkAndBuidAlfrescoEnvironment() {
     }
     // falls ja, dann Server Parameter eintragen
     if (alfrescoServerAvailable) {
-        var extraProperties;
-        // Skript Verzeichnis prüfen
+         // Skript Verzeichnis prüfen
         erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
             {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
         ]);
@@ -3236,7 +3235,7 @@ function checkAndBuidAlfrescoEnvironment() {
                 {"name": "filePath", "value": "/Datenverzeichnis/Skripte/recognition.js"}
             ]);
             if (!erg.success) {
-                var script = $.ajax({
+                const script = $.ajax({
                     url: createPathToFile("./js/recognition.js"),
                     async: false
                 }).responseText;
@@ -3273,7 +3272,7 @@ function checkAndBuidAlfrescoEnvironment() {
                 {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
             ]);
             if (!erg.success) {
-                var doc = $.ajax({
+                const doc = $.ajax({
                     url: createPathToFile("./rules/doc.xml"),
                     async: false
                 }).responseText;
@@ -3310,7 +3309,7 @@ function checkAndBuidAlfrescoEnvironment() {
                 {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xsd"}
             ]);
             if (!erg.success) {
-                var doc = $.ajax({
+                const doc = $.ajax({
                     url: createPathToFile("./rules/doc.xsd"),
                     async: false
                 }).responseText;
