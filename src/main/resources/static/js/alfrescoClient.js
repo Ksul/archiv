@@ -763,7 +763,7 @@ function loadAlfrescoTable() {
                }
             }
         } ).on( 'draw', function () {
-            $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineFieldFieldDefinition());
+            $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineDocumentFieldDefinition());
         });
 
         $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterCenter").outerHeight() - ($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight() + $("#alfrescoTabelleHeader").outerHeight() +
@@ -2133,10 +2133,8 @@ function updateInlineDocument(value, settings) {
             }
         }
         if (changed) {
-            const erg = editDocument(data, data.objectID);
-            if (!erg.success) {
-                value = erg.error;
-            }
+            editDocument(data, data.objectID);
+
         }
         return value;
     } catch (e) {
