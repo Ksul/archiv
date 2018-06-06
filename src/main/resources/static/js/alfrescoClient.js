@@ -762,7 +762,9 @@ function loadAlfrescoTable() {
                    alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlNone');
                }
             }
-        } );
+        } ).on( 'draw', function () {
+            $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineFieldFieldDefinition());
+        });
 
         $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterCenter").outerHeight() - ($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight() + $("#alfrescoTabelleHeader").outerHeight() +
             $("div ul li, .current").outerHeight() - 4));
@@ -895,7 +897,6 @@ function loadAlfrescoFolderTable() {
                 dataSrc: function (obj) {
                     try {
                         Logger.log(Level.DEBUG, "Execution of Service: listFolderWithPagination duration " + (new Date().getTime() - duration) + " ms");
-                        $.fn.dataTable.makeEditable(alfrescoFolderTabelle, updateInLineFolderFieldFieldDefinition());
                         if (obj.data.length === 0) {
                             alfrescoFolderSelectMenu.superfish('disableItem','alfrescoFolderAuswahl');
                         }
@@ -1084,7 +1085,9 @@ function loadAlfrescoFolderTable() {
             } catch (e) {
                 errorHandler(e);
             }
-        } );
+        } ).on( 'draw', function () {
+            $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineDocumentFieldDefinition());
+        });
 
 
         $("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterNorth").outerHeight() - ($("#alfrescoFolderTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoFolderTableFooter").outerHeight() + $("#alfrescoFolderTabelleHeader").outerHeight() +
@@ -1476,7 +1479,9 @@ function loadAlfrescoSearchTable() {
                     searchDocumentSelectMenu.superfish('disableItem','alfrescoSearchDocumentAuswahlNone');
                 }
             }
-        } );
+        } ).on( 'draw', function () {
+            $.fn.dataTable.makeEditable(alfrescoSearchTabelle, updateInLineDocumentFieldDefinition());
+        });
 
         $("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#searchCenter").outerHeight() - ($("#alfrescoSearchTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoSearchTableFooter").outerHeight() + $("#searchTabelleHeader").outerHeight() +
             $("div ul li, .current").outerHeight() - 4));
@@ -2152,7 +2157,6 @@ function switchAlfrescoDirectory(data) {
             objectID = "-1";
         alfrescoTabelle.settings().init().folderId = objectID;
         alfrescoTabelle.ajax.reload();
-        $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineDocumentFieldDefinition());
         alfrescoFolderTabelle.settings().init().folderId = objectID;
         alfrescoFolderTabelle.ajax.reload();
     } catch (e) {
@@ -2171,8 +2175,7 @@ function startSearch(searchText) {
             "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
             "join my:idable as i on d.cmis:objectId = i.cmis:objectId  WHERE IN_TREE(d, '" + archivFolderId + "') AND ( CONTAINS(d, 'cmis:name:*" + searchText + "* OR TEXT:" + searchText + "') OR CONTAINS(o, 'cm:title:*" + searchText + "*'))";
         alfrescoSearchTabelle.ajax.reload();
-        $.fn.dataTable.makeEditable(alfrescoSearchTabelle, updateInLineDocumentFieldDefinition());
-    } catch (e) {
+     } catch (e) {
         errorHandler(e);
     }
 }
