@@ -1958,38 +1958,38 @@ function fillBreadCrumb(data) {
  */
 function updateInLineDocumentFieldDefinition () {
     return {
-        "fnShowError" : function(text, aktion){
+        fnShowError : function(text, aktion){
             alertify.alert("Fehler", text);
         },
-        "aoColumns": [ null,
+        aoColumns: [ null,
             null,
             {
-                "placeholder": "",
-                "tooltip": 'Titel des Dokumentes'
+                placeholder: "",
+                tooltip: 'Titel des Dokumentes'
             },
             {
-                "placeholder": "",
-                "tooltip": 'Datum des Dokumentes',
-                "type": 'datepicker',
-                "datepicker": {
-                    "dateFormat": "dd.mm.yy"
+                placeholder: "",
+                tooltip: 'Datum des Dokumentes',
+                type: 'datepicker',
+                datepicker: {
+                    dateFormat: "dd.mm.yy"
                 }
             },
             {
-                "placeholder": "",
-                "tooltip": 'Zugeordnete Person',
-                "loadtext": 'lade...',
-                "type": 'select',
-                "onblur": 'submit',
-                "data": "{'':'Bitte auswählen...', 'Klaus':'Klaus','Katja':'Katja','Till':'Till', 'Kilian':'Kilian'}"
+                placeholder: "",
+                tooltip: 'Zugeordnete Person',
+                loadtext: 'lade...',
+                type: 'select',
+                onblur: 'submit',
+                data: "{'':'Bitte auswählen...', 'Klaus':'Klaus','Katja':'Katja','Till':'Till', 'Kilian':'Kilian'}"
             },
             {
-                "placeholder": "",
-                "tooltip": 'Rechnungsbetrag des Dokumentes'
+                placeholder: "",
+                tooltip: 'Rechnungsbetrag des Dokumentes'
             },
             {
-                "placeholder": "",
-                "tooltip": 'Identifikationsschlüssel des Dokumentes'
+                placeholder: "",
+                tooltip: 'Identifikationsschlüssel des Dokumentes'
             },
             null
         ],
@@ -2004,19 +2004,19 @@ function updateInLineDocumentFieldDefinition () {
  */
 function updateInLineFolderFieldFieldDefinition() {
     return {
-        "fnShowError": function (text, aktion) {
+        fnShowError: function (text, aktion) {
             alertify.alert("Fehler", text);
         },
-        "aoColumns": [null,
+        aoColumns: [null,
             {
-                "placeholder": ""
+                placeholder: ""
             },
             {
-                "placeholder": ""
+                placeholder: ""
             },
             null
         ],
-        "sUpdateURL": updateInlineFolder
+        sUpdateURL: updateInlineFolder
     };
 }
 

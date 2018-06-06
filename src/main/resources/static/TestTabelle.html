@@ -4,14 +4,16 @@
     <meta charset="utf-8"/>
     <title>Table Example</title>
 
-
-    <script type="text/javascript" src="./js/jquery/jquery-1.12.1.js" charset="utf-8"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"
+            type="text/javascript"></script>
+    <!--<script type="text/javascript" src="./js/jquery/jquery-3.3.1.js" charset="utf-8"></script>-->
     <script type="text/javascript" src="./js/ace/ace.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/ace/theme-chrome.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/ace/theme-eclipse.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/ace/mode-xml.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/ace/mode-javascript.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/ace/mode-text.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/alertify/alertify.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/alfrescoClient.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/dialoge.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/util.js" charset="utf-8"></script>
@@ -46,7 +48,7 @@
     <script type="text/javascript" src="./js/alpaca/handlebars.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/alpaca/alpaca.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/vkbeautify.js" charset="utf-8"></script>
-    <script type="text/javascript" src="./js/jsbeautify.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/jsbeautify/beautify.js" charset="utf-8"></script>
     <script type="text/javascript" src="./js/Base64.js" charset="utf-8"></script>
 
 
@@ -78,7 +80,7 @@
 
     $(document).ready(function() {
         obj = executeService({"name": "getNodeId", "errorMessage": "Archiv konnte nicht gefunden werden:" }, [
-            {"name": "folderId", "value": "/Archiv/Unbekannt"}
+            {"name": "filePath", "value": "/Archiv/Unbekannt"}
         ]);
         $('#dynamic').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
         tabelle = $('#example').DataTable( {
@@ -89,10 +91,10 @@
             "order": [[3,'asc']],
             "displayStart":0,
             "ajax": {
-                "url": "/Archiv/listFolderWithPagination",
+                "url": (window.location.pathname === "/context.html" ? "http://localhost:8080/Archiv" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2))) + "/listFolderWithPagination",
                 type: "POST",
                 data: function (data) {
-                    data.folderId = obj.data;
+                    data.folderId = obj.data.objectId;
                     data.withFolder = 1;
                     data.start = 0;
                     return JSON.stringify(data);
@@ -207,9 +209,9 @@
                 {
                     "targets": [3],
                     "render": function (data, type, row) {
-                        if (exist(data))
+                        if (data)
                             return data;
-                        else if (exist(row.name))
+                        else if (row && row.name)
                             return row.name;
                         else
                             return "";
