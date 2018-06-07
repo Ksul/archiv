@@ -232,14 +232,14 @@ public class ArchivController {
     }
 
 
-    /**
-     * liefert die Dokumente eines Alfresco Folders als JSON Objekte
-     *
-     * @param model das Datatables Request Model
-     * @return resp              das Datatables Response Model
-     */
-    @RequestMapping(value = "/listFolderWithPagination", consumes = "application/json", produces = "application/json")
-    public @ResponseBody
+        /**
+         * liefert die Dokumente eines Alfresco Folders als JSON Objekte
+         *
+         * @param model das Datatables Request Model
+         * @return resp              das Datatables Response Model
+         */
+        @RequestMapping(value = "/listFolderWithPagination", consumes = "application/json", produces = "application/json")
+        public @ResponseBody
     DataTablesResponse listFolderWithPagination(@RequestBody @Valid final DataTablesRequest model) throws Exception {
 
 

@@ -44,7 +44,7 @@ function handleDropInbox(evt) {
  * @return
  */
 function calculateTableHeight(panel, divId, tabelle, headerId, footerId) {
-    let div, table, rowHeight = 0, availableHeight = 0, topPanel = 0, downPanel = 0,columnPanel = 0, headerPanel = 0, footerPanel = 0;
+    let div, rowHeight = 0, availableHeight = 0, topPanel = 0, downPanel = 0,columnPanel = 0, headerPanel = 0, footerPanel = 0;
     div = $('#'+divId);
     availableHeight = $('#'+panel).height();
     let children =  div.children().children();
@@ -70,48 +70,45 @@ function calculateTableHeight(panel, divId, tabelle, headerId, footerId) {
     return Math.floor(availableHeight / rowHeight);
 }
 
+// /**
+//  * setzt die Pagelength in der Tabelle
+//  * @param panel         das Layoutpanel, welches die Tabelle enthält
+//  * @param divId         die Id des DIV's welches die Tabelle enthält
+//  * @param tabelleId     die Id der Tabelle
+//  * @param headerId      die Id des headers
+//  * @param footerId      die Id des Footers
+//  */
+// function resizeTable(panel, divId, tabelleId, headerId, footerId) {
+//
+//     const tabelle = $('#'+tabelleId).DataTable();
+//     const drawRows = calculateTableHeight(panel, divId, tabelle, headerId, footerId);
+//
+//     if ( drawRows !== Infinity && drawRows !== -Infinity &&
+//         ! isNaN( drawRows )   && drawRows > 0 &&
+//         drawRows !== tabelle.page.len()
+//     ) {
+//         tabelle.page.len( drawRows ).draw("page");
+//     }
+// }
+
+
+// function asumeCountOfTableEntries(panel,  divId, tabelleId,headerId, footerId) {
+//     const div = $('#'+divId);
+//     const completePanel = $('#' + panel).height();
+//     const topPanel = div.children().children()[0].offsetHeight;
+//     const downPanel = div.children().children()[2].offsetHeight;
+//     const columnPanel = div.children().children()[1].children[0].offsetHeight;
+//     const headerPanel = $('#' + headerId).height();
+//     const footerPanel = $('#' + footerId).height();
+//     const rowHeight = $('.odd') + 2;
+//     return Math.floor((completePanel - topPanel - headerPanel - columnPanel - downPanel - footerPanel) / rowHeight);
+// }
+
 /**
- * setzt die Pagelength in der Tabelle
- * @param panel         das Layoutpanel, welches die Tabelle enthält
- * @param divId         die Id des DIV's welches die Tabelle enthält
- * @param tabelleId     die Id der Tabelle
- * @param headerId      die Id des headers
- * @param footerId      die Id des Footers
+ * 
+ * @param skipAlert
+ * @param mode
  */
-function resizeTable(panel, divId, tabelleId, headerId, footerId) {
-
-    const tabelle = $('#'+tabelleId).DataTable();
-    const drawRows = calculateTableHeight(panel, divId, tabelle, headerId, footerId);
-
-    if ( drawRows !== Infinity && drawRows !== -Infinity &&
-        ! isNaN( drawRows )   && drawRows > 0 &&
-        drawRows !== tabelle.page.len()
-    ) {
-        tabelle.page.len( drawRows ).draw("page");
-    }
-}
-
-
-function asumeCountOfTableEntries(panel,  divId, tabelleId,headerId, footerId) {
-    const div = $('#'+divId);
-    const completePanel = $('#' + panel).height();
-    const topPanel = div.children().children()[0].offsetHeight;
-    const downPanel = div.children().children()[2].offsetHeight;
-    const columnPanel = div.children().children()[1].children[0].offsetHeight;
-    const headerPanel = $('#' + headerId).height();
-    const footerPanel = $('#' + footerId).height();
-    const rowHeight = $('.odd') + 2;
-    return Math.floor((completePanel - topPanel - headerPanel - columnPanel - downPanel - footerPanel) / rowHeight);
-}
-
-function toggleLiveResizing() {
-    $.each($.layout.config.borderPanes, function (i, pane) {
-        const o = verteilungLayout.options[pane];
-        o.livePaneResizing = !o.livePaneResizing;
-    });
-}
-
-
 function toggleStateManagement(skipAlert, mode) {
     if (!$.layout.plugins.stateManagement) return;
 
@@ -128,10 +125,10 @@ function toggleStateManagement(skipAlert, mode) {
     if (!enabled) { // if disabling state management...
         verteilungLayout.deleteCookie(); // ...clear cookie so will NOT be found on next refresh
         if (!skipAlert)
-            alert('This layout will reload as the options specify \nwhen the page is refreshed.');
+            alertify.ok('This layout will reload as the options specify \nwhen the page is refreshed.');
     }
     else if (!skipAlert)
-        alert("This layout will save and restore its last state \nwhen the page is refreshed.");
+        alertify.ok("This layout will save and restore its last state \nwhen the page is refreshed.");
 }
 
 /**
@@ -1604,14 +1601,11 @@ function loadVerteilungTable() {
                 // This row is already open - close it
                 row.child.hide();
                 tr.removeClass('shown');
-                //calculateTableHeight("verteilungWest", "dtable", tabelle, "verteilungTabelleHeader", "verteilungTableFooter");
             }
             else {
                 // Open this row
                 row.child(formatVerteilungTabelleDetailRow(row.data())).show();
                 tr.addClass('shown');
-                //calculateTableHeight("verteilungWest", "dtable", tabelle, "verteilungTabelleHeader", "verteilungTableFooter");
-
             }
         });
     } catch (e) {
@@ -2834,7 +2828,7 @@ function loadAlfrescoTree() {
     try {
         tree = $("#tree").jstree({
             core: {
-                worker: window.location.pathname === "/context.html" ? false:true, // für Test die Worker abschalten!
+                worker: window.location.pathname !== "/context.html", // für Test die Worker abschalten!
                 data: function (node, aFunction) {
                     try {
                         // relevante Knoten im Alfresco suchen
@@ -3154,7 +3148,7 @@ function checkAndBuidAlfrescoEnvironment() {
      * @param folder               der Pfad des Ordners (z.B. /Archiv/Fehler/Doppelte) Aufgebaut wird nur der letzte, also "Doppelte"
      * @param id                   die Id des Ordners in dem  der Ordner erstellt werden soll
      * @param txt                  die Beschreibung für den Ordner
-     * @return {{result, success}| das Ergebnis}
+     * @return {{erg, success}|    das Ergebnis}
      */
     function buildAlfrescoFolder(folder, id, txt) {
         let erg = executeService({"name": "getNodeId", "ignoreError": true}, [
