@@ -14,7 +14,7 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
-    files: [ 'src/main/resources/static/js/jquery/jquery-1.12.1.js',
+    files: [ 'src/main/resources/static/js/jquery/jquery-3.3.1.js',
         'src/main/resources/static/js/jquery-ui/jquery-ui.js',
              'src/main/resources/static/js/alfrescoMock.js',
              'src/main/resources/static/js/recognition.js',

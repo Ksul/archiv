@@ -15,6 +15,8 @@ describe("Test für ArchivTyp", function() {
         search.setFind(false);
     });
 
+
+
     it("testWithNestedArchivZielWithLink", function() {
         REC.currentDocument.removeProperty("my:person");
         REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung Test"));
@@ -45,6 +47,27 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
         var doc = companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest");
         expect(doc.properties["my:idvalue"]).toBe("99.233.620.0");
+        expect(doc.properties["my:person"]).toBe("Test");
+    });
+
+    it("testWithRegularExpression", function() {
+        REC.currentDocument.removeProperty("my:person");
+        REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung Test"));
+        var rules = ' <archivTyp name="Zauberfrau" searchString="(?=ZAUBERFRAU)(?=Rechnung)">'+
+            ' <archivPosition folder="Dokumente/Rechnungen"/> ' +
+            '<searchItem name="person" fix="Test" target="my:person" />' +
+            ' </archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        console.log(Logger.getMessages(true));
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/WebScriptTest")).not.toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
+        var doc = companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/WebScriptTest");
         expect(doc.properties["my:person"]).toBe("Test");
     });
 
