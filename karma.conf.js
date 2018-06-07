@@ -4,9 +4,16 @@
 module.exports = function(config) {
   config.set({
 
+
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
+      plugins: [
+          require("karma-jasmine"),
+          require("karma-sourcemap-loader"),
+          require("karma-phantomjs-launcher"),
+          require("karma-webpack")
+      ],
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -14,8 +21,9 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
-    files: [ 'src/main/resources/static/js/jquery/jquery-3.3.1.js',
-        'src/main/resources/static/js/jquery-ui/jquery-ui.js',
+    files: [ { pattern: 'test-context.js', watched: false },
+             'src/main/resources/static/js/jquery/jquery-3.3.1.js',
+             'src/main/resources/static/js/jquery-ui/jquery-ui.js',
              'src/main/resources/static/js/alfrescoMock.js',
              'src/main/resources/static/js/recognition.js',
              'src/main/resources/static/js/util.js',
@@ -44,8 +52,27 @@ module.exports = function(config) {
           // do not include tests or libraries
           // (these files will be instrumented by Istanbul)
           //'src/main/resources/static/js/*.js': ['coverage']
+          'test-context.js': ['webpack', 'sourcemap']
       },
-
+      webpack: {
+          devtool: 'source-map',
+          module: {
+              rules: [{
+                  loader: 'babel-loader',
+                    query :{
+                        presets:['es2015']
+        // ,'es2017'
+                },
+                test: /\.js?$/,
+                exclude: /node_modules/
+              }
+              ]
+          },
+          watch: true
+      },
+      webpackServer: {
+          noInfo: true
+      },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'

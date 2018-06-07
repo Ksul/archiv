@@ -53,7 +53,7 @@ describe("Test für ArchivTyp", function() {
     it("testWithRegularExpression", function() {
         REC.currentDocument.removeProperty("my:person");
         REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung Test"));
-        var rules = ' <archivTyp name="Zauberfrau" searchString="(?=ZAUBERFRAU)(?=Rechnung)">'+
+        var rules = ' <archivTyp name="Zauberfrau" searchString="(?=.*ZAUBERFRAU)(?=.*Rechnung)">'+
             ' <archivPosition folder="Dokumente/Rechnungen"/> ' +
             '<searchItem name="person" fix="Test" target="my:person" />' +
             ' </archivTyp>';
