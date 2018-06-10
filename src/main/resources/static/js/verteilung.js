@@ -1047,7 +1047,7 @@ function sendScript() {
     let erg = false;
     try {
         if (workDocument.endsWith("recognition.js")) {
-            const script = Verteilung.textEditor.editor.getSession();
+            const script = Verteilung.textEditor.editor.getSession().getValue();
             // Logger retten
             const logger = Logger;
             eval("//# sourceURL=recognition.js\n\n" + script);

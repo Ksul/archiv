@@ -54,7 +54,6 @@
             </searchItem>
         </archivTyp>
     </archivTyp>
-
     <!-- Rechnung Zauberfrau -->
     <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">
         <archivZiel type="my:archivContent" />
@@ -220,7 +219,7 @@
         </searchItem>
     </archivTyp>
     <!-- Landesamt für Besoldung -->
-    <archivTyp name="Landesamt für Besoldung" searchString="BESOLDUNG">
+    <archivTyp name="Landesamt für Besoldung" searchString="C800533">
         <archivZiel type="my:archivContent" />
         <archivPosition folder="Dokumente/Gehalt/Landesamt für Besoldung/Bezügemitteilungen/{tmp}">
             <archivZiel type="my:archivFolder" />
@@ -264,7 +263,7 @@
         </archivTyp>
     </archivTyp>
     <!-- Rechnung Telekom -->
-    <archivTyp name="Rechnung Telekom" searchString="Telekom">
+    <archivTyp name="Rechnung Telekom" searchString="Deutsche Telekom">
         <archivZiel type="my:archivContent" />
         <archivPosition folder="Dokumente/Kommunikation/Telekom/Rechnungen Telekom/{tmp}">
             <archivZiel type="my:archivFolder" />
@@ -806,10 +805,10 @@
                 <format formatString="YYYY" />
             </searchItem>
             <searchItem name="tmp" text="Gesamtanlage" objectTyp="float" word="1">
-                <check lowerValue="300" upperValue="10000" />
+                <check lowerValue="300" upperValue="15000" />
             </searchItem>
             <searchItem name="tmp1" text="Mindestbeitragsgarantie" objectTyp="float" word="1">
-                <check lowerValue="300" upperValue="10000" />
+                <check lowerValue="300" upperValue="15000" />
             </searchItem>
             <searchItem name="tmp1" eval="Math.max({tmp},{tmp1})" target="my:amount">
                 <archivZiel aspect="my:amountable" />
@@ -832,23 +831,29 @@
         <category name="Versicherung/Kranken" />
         <searchItem name="person" fix="Klaus" target="my:person" />
         <searchItem name="datum" kind="date" target="my:documentDate">
-            <check lowerValue="01/01/2011" upperValue="01/01/2020" />
+            <check lowerValue="01/01/2011" upperValue="01/01/2030" />
+        </searchItem>
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
         </searchItem>
         <archivTyp name="Krankenversicherung" searchString="5.174.556">
             <archivZiel type="my:archivContent" />
             <searchItem name="id" fix="K 5.174.556" target="my:idvalue">
                 <archivZiel aspect="my:idable" />
             </searchItem>
+            <archivTyp name="Bescheinigung § 10" searchString="§ 10">
+                <searchItem name="title" fix="Bescheinigung der Vorsorgeaufwendungen nach § 10 Abs. 1 Nr. 3 EStG {tmp}" target="cm:title" />
+            </archivTyp>
         </archivTyp>
         <archivTyp name="Pflegeversicherung" searchString="5.793.183">
             <searchItem name="id" fix="K 5.793.183" target="my:idvalue">
                 <archivZiel aspect="my:idable" />
             </searchItem>
             <archivTyp name="Bescheinigung § 10" searchString="EStG § 10">
-                <searchItem name="title" fix="Bescheinigung der Vorsorgeaufwendungen nach § 10 Abs. 1 Nr. 3 EStG" target="cm:title" />
+                <searchItem name="title" fix="Bescheinigung der Vorsorgeaufwendungen nach § 10 Abs. 1 Nr. 3 EStG {tmp}" target="cm:title" />
             </archivTyp>
             <archivTyp name="Bescheinigung § 61" searchString="§ 61 SGB">
-                <searchItem name="title" fix="Bescheinigung zur Erlangung des Arbeitgeberzuschusses für die private Pflegepflichtversicherung nach § 61 SGB Xl"          target="cm:title" />
+                <searchItem name="title" fix="Bescheinigung zur Erlangung des Arbeitgeberzuschusses für die private Pflegepflichtversicherung nach § 61 SGB Xl {tmp}" target="cm:title" />
             </archivTyp>
         </archivTyp>
     </archivTyp>

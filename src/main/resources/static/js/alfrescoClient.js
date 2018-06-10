@@ -125,10 +125,10 @@ function toggleStateManagement(skipAlert, mode) {
     if (!enabled) { // if disabling state management...
         verteilungLayout.deleteCookie(); // ...clear cookie so will NOT be found on next refresh
         if (!skipAlert)
-            alertify.ok('This layout will reload as the options specify \nwhen the page is refreshed.');
+            alertify.success('This layout will reload as the options specify \nwhen the page is refreshed.');
     }
     else if (!skipAlert)
-        alertify.ok("This layout will save and restore its last state \nwhen the page is refreshed.");
+        alertify.success("This layout will save and restore its last state \nwhen the page is refreshed.");
 }
 
 /**
@@ -3085,12 +3085,16 @@ function loadAlfrescoTree() {
                             } else {
                                 const done = function(json) {
                                     if (json.success) {
-                                        const newData = json.data;
                                         const source = json.source;
                                         const target = json.target;
-                                        Logger.log(Level.INFO, "Dokument " + sourceData.name + " von " + source.path + " nach " + target.path + " verschoben");
-                                        row.remove();
-                                        alfrescoTabelle.draw();
+                                        const text = "Dokument " + sourceData.name + " von " + source.path + " nach " + target.path + " verschoben";
+                                        Logger.log(Level.INFO, text);
+                                        const row = alfrescoTabelle.row('#' + json.data.DT_RowId);
+                                        if (row) {
+                                            row.remove();
+                                            alfrescoTabelle.draw();
+                                        }
+                                        alertify.success(text);
                                     }
                                 };
                                 //Dokument wurde verschoben

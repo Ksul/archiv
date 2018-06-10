@@ -10,6 +10,7 @@ module.exports = function(config) {
 
       plugins: [
           require("karma-jasmine"),
+          //require("karma-chrome-launcher"),
           require("karma-sourcemap-loader"),
           require("karma-phantomjs-launcher"),
           require("karma-webpack")
