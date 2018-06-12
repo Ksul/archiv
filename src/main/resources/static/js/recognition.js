@@ -1346,20 +1346,19 @@ function ArchivTyp(srch, parentType) {
      * @return {boolean}        [true] wenn alles geklappt hat, [false] im Fehlerfall
      */
     this.makeNewVersion = function (doc, newDoc) {
-        if (doc.isLocked) {
-            REC.errors.push("Gelocktes Dokument kann nicht verändert werden!");
-            return false;
-        } else {
-            if (!doc.hasAspect("cm:workingcopy")) {
-                doc.ensureVersioningEnabled(true, false);
-                var workingCopy = doc.checkoutForUpload();
-                workingCopy.properties.content.write(new Content(REC.getContent(REC.currentDocument)));
-                workingCopy.checkin();
-                newDoc.remove();
-                Logger.log(Level.INFO, "Neue Version des Dokumentes erstellt");
-                return true;
-            }
-        }
+        if (doc.isLocked)
+            doc.unlock();
+        var workingCopy;
+        doc.ensureVersioningEnabled(true, false);
+        if (!doc.hasAspect("cm:workingcopy"))
+            workingCopy = doc.checkout();
+        else
+            workingCopy = doc;
+        workingCopy.properties.content = REC.currentDocument.content;
+        workingCopy.checkin();
+        newDoc.remove();
+        Logger.log(Level.INFO, "Neue Version des Dokumentes erstellt");
+        return true;
     };
 
     /**

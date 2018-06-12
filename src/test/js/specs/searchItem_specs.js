@@ -1,6 +1,10 @@
 
 describe("Test für SearchItem", function() {
 
+    var Verteilung = {
+        positions: new PositionContainer()
+       };
+
     beforeEach(function () {
         REC.init();
         var txt = " Dies ist ein Test!Datum: 01.05.1965\r\n" +
