@@ -50,6 +50,65 @@ describe("Test für ArchivTyp", function() {
         expect(doc.properties["my:person"]).toBe("Test");
     });
 
+    it("testWithSearchInDifferentLevel", function() {
+        REC.currentDocument.properties.content.write(new Content("Bezügemitteilung Personal ab: 05.05.2005"));
+        var rules = '<archivTyp name="Bezügemitteilung" searchString="Bezügemitteilung">\n' +
+            '        <archivZiel type="my:archivContent" />\n' +
+            '        <archivPosition folder="Dokumente/Gehalt/Landesamt für Besoldung/Bezügemitteilungen/{tmp}">\n' +
+            '            <archivZiel type="my:archivFolder" />\n' +
+            '        </archivPosition>' +
+            '            <searchItem name="tmp" objectTyp="date" value="datum">\n' +
+            '                <format formatString="YYYY" />\n' +
+            '            </searchItem>\n' +
+            '            <archivTyp name="Bezügemitteilung neu" searchString="Behörde">\n' +
+            '                <searchItem name="datum" text="Westfalen" word="1" objectTyp="date" target="my:documentDate">\n' +
+            '                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />\n' +
+            '                </searchItem>\n' +
+            '            </archivTyp>\n' +
+            '            <archivTyp name="Bezügemitteilung alt" searchString="Personal">\n' +
+            '                <searchItem name="datum" text="ab:" removeBlanks="after" objectTyp="date" target="my:documentDate">\n' +
+            '                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />\n' +
+            '                </searchItem>\n' +
+              '            </archivTyp>\n' +
+            '        </archivTyp>\n' +
+            '    </archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        expect(companyhome.childByNamePath("/Archiv/Dokumente/Gehalt/Landesamt für Besoldung/Bezügemitteilungen/2005/WebScriptTest")).not.toBeNull();
+     });
+
+    it("testWithSearchInDifferentLevel1", function() {
+        REC.currentDocument.properties.content.write(new Content("Bezügemitteilung Behörde Westfalen: 05.05.2006"));        var rules = '<archivTyp name="Bezügemitteilung" searchString="Bezügemitteilung">\n' +
+            '        <archivZiel type="my:archivContent" />\n' +
+            '        <archivPosition folder="Dokumente/Gehalt/Landesamt für Besoldung/Bezügemitteilungen/{tmp}">\n' +
+            '            <archivZiel type="my:archivFolder" />\n' +
+            '        </archivPosition>' +
+            '            <searchItem name="tmp" objectTyp="date" value="datum">\n' +
+            '                <format formatString="YYYY" />\n' +
+            '            </searchItem>\n' +
+            '            <archivTyp name="Bezügemitteilung neu" searchString="Behörde">\n' +
+            '                <searchItem name="datum" text="Westfalen" word="1" objectTyp="date" target="my:documentDate">\n' +
+            '                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />\n' +
+            '                </searchItem>\n' +
+            '            </archivTyp>\n' +
+            '            <archivTyp name="Bezügemitteilung alt" searchString="Personal">\n' +
+            '                <searchItem name="datum" text="ab:" removeBlanks="after" objectTyp="date" target="my:documentDate">\n' +
+            '                    <check lowerValue="01/01/2000" upperValue="01/01/2020" />\n' +
+            '                </searchItem>\n' +
+            '            </archivTyp>\n' +
+            '        </archivTyp>\n' +
+            '    </archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        expect(companyhome.childByNamePath("/Archiv/Dokumente/Gehalt/Landesamt für Besoldung/Bezügemitteilungen/2006/WebScriptTest")).not.toBeNull();
+        console.log(Logger.getMessages(true));
+    });
+
+
     it("testWithRegularExpression", function() {
         REC.currentDocument.removeProperty("my:person");
         REC.currentDocument.properties.content.write(new Content("ZAUBERFRAU Rechnung Test"));

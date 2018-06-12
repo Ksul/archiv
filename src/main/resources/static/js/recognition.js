@@ -1347,7 +1347,7 @@ function ArchivTyp(srch, parentType) {
      */
     this.makeNewVersion = function (doc, newDoc) {
         if (doc.isLocked) {
-            this.errors.push("Gelocktes Dokument kann nicht verändert werden!");
+            REC.errors.push("Gelocktes Dokument kann nicht verändert werden!");
             return false;
         } else {
             if (!doc.hasAspect("cm:workingcopy")) {

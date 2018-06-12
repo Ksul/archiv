@@ -910,4 +910,8 @@ i.filesinput {
     color: #337ab7;
 }
 
+.ui-tooltip {
+    background-color: yellow;
+}
+
 
