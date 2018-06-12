@@ -3166,7 +3166,7 @@ function checkAndBuidAlfrescoEnvironment() {
                     {"name": "filePath", "value": folder}
                 ]);
                 if (!erg.success)
-                    Logger.log(WARN, txt + " konnte auf dem Alfresco Server nicht gefunden werden!");
+                    Logger.log(Level.WARN, txt + " konnte auf dem Alfresco Server nicht gefunden werden!");
             }
         }
         return erg;
@@ -3202,7 +3202,7 @@ function checkAndBuidAlfrescoEnvironment() {
                         {"name": "password", "value": getSettings("password")}
                     ]);
                     if (!erg.success) {
-                        Logger.log(WARN, "Binding Parameter konnten nicht gesetzt werden!");
+                        Logger.log(Level.WARN, "Binding Parameter konnten nicht gesetzt werden!");
                     } else
                         alfrescoServerAvailable = false;    
                 }
@@ -3216,18 +3216,28 @@ function checkAndBuidAlfrescoEnvironment() {
     // falls ja, dann Server Parameter eintragen
     if (alfrescoServerAvailable) {
          // Skript Verzeichnis prüfen
-        erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
-            {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
-        ]);
+        const dataFolder = [];
+        dataFolder['de'] = "/Datenverzeichnis/Skripte";
+        dataFolder['en'] = "/Data Dictionary/Scripts";
+        let langFound = "";
+        for (let folder in dataFolder ) {
+            erg = executeService({"name": "getNodeId", "ignoreError": true}, [
+                {"name": "filePath", "value": dataFolder[folder]}
+            ]);
+            if (erg.success) {
+                langFound = folder;
+                break;
+            }
+        }
         if (erg.success)
             scriptFolderId = erg.data.objectID;
         else {
-            Logger.log(WARN, "Verzeichnis '/Datenverzeichnis/Skripte' auf dem Alfresco Server nicht gefunden!");
+            Logger.log(Level.WARN, "Kein Verzeichnis für Skripte auf dem Alfresco Server  gefunden!");
         }
         // Verteilskript prüfen
         if (erg.success) {
             erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
-                {"name": "filePath", "value": "/Datenverzeichnis/Skripte/recognition.js"}
+                {"name": "filePath", "value": dataFolder[langFound] + "/recognition.js"}
             ]);
             if (!erg.success) {
                 const script = $.ajax({
@@ -3253,10 +3263,10 @@ function checkAndBuidAlfrescoEnvironment() {
                      if (erg.success)
                         scriptID = erg.data.objectID;
                     else {
-                        Logger.log(WARN, "Verteilscript (recognition.js) konnte auf dem Alfresco Server nicht angelegt werden!");
+                        Logger.log(Level.WARN, "Verteilscript (recognition.js) konnte auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
-                    Logger.log(WARN, "Verteilscript (recognition.js) konnte nicht gelesen werden!");
+                    Logger.log(Level.WARN, "Verteilscript (recognition.js) konnte nicht gelesen werden!");
             } else {
                 scriptID = erg.data.objectID;
             }
@@ -3264,7 +3274,7 @@ function checkAndBuidAlfrescoEnvironment() {
         if (erg.success) {
             // Regeln prüfen
             erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
-                {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
+                {"name": "filePath", "value": dataFolder[langFound] + "/doc.xml"}
             ]);
             if (!erg.success) {
                 const doc = $.ajax({
@@ -3290,10 +3300,10 @@ function checkAndBuidAlfrescoEnvironment() {
                     if (erg.success)
                         rulesID = erg.data.objectID;
                     else {
-                        Logger.log(WARN, "Verteilregeln (doc.xml) konnten auf dem Alfresco Server nicht angelegt werden!");
+                        Logger.log(Level.WARN, "Verteilregeln (doc.xml) konnten auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
-                    Logger.log(WARN, "Verteilregeln (doc.xml) konnten nicht gelesen werden!");
+                    Logger.log(Level.WARN, "Verteilregeln (doc.xml) konnten nicht gelesen werden!");
             } else {
                 rulesID = erg.data.objectID;
             }
@@ -3301,7 +3311,7 @@ function checkAndBuidAlfrescoEnvironment() {
         if (erg.success) {
             // Schema prüfen
             erg = executeService({"name" : "getNodeId", "ignoreError" : true}, [
-                {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xsd"}
+                {"name": "filePath", "value": dataFolder[langFound] + "/doc.xsd"}
             ]);
             if (!erg.success) {
                 const doc = $.ajax({
@@ -3327,10 +3337,10 @@ function checkAndBuidAlfrescoEnvironment() {
                     if (erg.success)
                         rulesSchemaId = erg.data.objectID;
                     else {
-                        Logger.log(WARN, "Verteilschema (doc.xsd) konnten auf dem Alfresco Server nicht angelegt werden!");
+                        Logger.log(Level.WARN, "Verteilschema (doc.xsd) konnten auf dem Alfresco Server nicht angelegt werden!");
                     }
                 } else
-                    Logger.log(WARN, "Verteilschema (doc.xsd) konnten nicht gelesen werden!");
+                    Logger.log(Level.WARN, "Verteilschema (doc.xsd) konnten nicht gelesen werden!");
             } else {
                 rulesSchemaId = erg.data.objectID;
             }
@@ -3343,7 +3353,7 @@ function checkAndBuidAlfrescoEnvironment() {
             if (erg.success) {
                 alfrescoRootFolderId = erg.data.objectID;
             } else {
-                Logger.log(WARN, "Root konnte auf dem Server nicht gefunden werden!");
+                Logger.log(Level.WARN, "Root konnte auf dem Server nicht gefunden werden!");
             }
         }
         if (erg.success) {
@@ -3351,7 +3361,7 @@ function checkAndBuidAlfrescoEnvironment() {
             if (erg.success)
                 archivFolderId = erg.data.objectID;
             else
-                Logger.log(WARN, "Archiv konnte auf dem Alfresco Server nicht gefunden werden!");
+                Logger.log(Level.WARN, "Archiv konnte auf dem Alfresco Server nicht gefunden werden!");
 
         }
         if (erg.success) {
