@@ -12,7 +12,7 @@ describe("Test für Recognition", function() {
     it("testRecognize", function() {
         var iBox = companyhome.childByNamePath("/Archiv/Inbox");
         var doc = iBox.createNode("WebScriptTest", "my:archivContent");
-        doc.properties.content.write(new Content("Zauberfrau Rechnung Nr 1001 Gesamtbetrag 200  Datum 14.02.2015"));
+        doc.properties.content = "Zauberfrau Rechnung Nr 1001 Gesamtbetrag 200  Datum 14.02.2015";
         var rules =
             '<documentTypes                                                                                                                                                                                                                                                                                 ' +
             'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"                                                                                                                                                                                                                                          ' +
@@ -70,7 +70,7 @@ describe("Test für Recognition", function() {
     it("testUnknownDocument", function() {
         var iBox = companyhome.childByNamePath("Archiv/Inbox");
         var doc = iBox.createNode("WebScriptTest", "my:archivContent");
-        doc.properties.content.write(new Content("Hansel Rechnung Nr 1001 Gesamtbetrag 200  Datum 14.02.2015"));
+        doc.properties.content = "Hansel Rechnung Nr 1001 Gesamtbetrag 200  Datum 14.02.2015";
         var rules =
             '<documentTypes                                                                                                                                                                                                                                                                                 ' +
             'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"                                                                                                                                                                                                                                          ' +

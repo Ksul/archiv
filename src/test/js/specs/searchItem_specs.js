@@ -1,10 +1,6 @@
 
 describe("Test für SearchItem", function() {
 
-    var Verteilung = {
-        positions: new PositionContainer()
-       };
-
     beforeEach(function () {
         REC.init();
         var txt = " Dies ist ein Test!Datum: 01.05.1965\r\n" +
@@ -44,7 +40,7 @@ describe("Test für SearchItem", function() {
             "Unsere Lieferungen\r\n" +
             "Zahlbetrag \r\n" +
             "	 25,65 € ";
-        REC.currentDocument.properties.content.write(new Content(txt));
+        REC.currentDocument.properties.content = txt;
         Verteilung.positions.clear();
     });
 

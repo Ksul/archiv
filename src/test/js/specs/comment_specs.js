@@ -10,7 +10,7 @@ describe("Test für Kommentare", function() {
         REC.currentDocument = iBox.createNode("WebScriptTest", "my:archivContent");
         REC.currentDocument.setProperty("cm:title", "Test Title");
         REC.currentDocument.setProperty("my:person", "Klaus");
-        REC.currentDocument.properties.content.write(new Content("Test"));
+        REC.currentDocument.properties.content = "Test";
     });
 
     it("Teste addComment", function () {

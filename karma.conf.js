@@ -10,7 +10,7 @@ module.exports = function(config) {
 
       plugins: [
           require("karma-jasmine"),
-          require("karma-chrome-launcher"),
+        //  require("karma-chrome-launcher"),
           require("karma-sourcemap-loader"),
           require("karma-phantomjs-launcher"),
           require("karma-webpack")
@@ -37,6 +37,7 @@ module.exports = function(config) {
              'src/main/resources/static/js/dataTables/dataTables.editable.js',
              'src/main/resources/static/js/dataTables/datetime-moment.js',
              'src/main/resources/static/js/jstree/jstree.js',
+             'src/main/resources/static/js/alertify/alertify.js',
              'src/test/js/specs/**.js'
     ],
 
@@ -100,7 +101,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS', 'Chrome'],
+    browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode

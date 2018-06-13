@@ -117,7 +117,7 @@ function ScriptNode(name, type) {
     this.subType = "";
     this.tags = new Liste();
     this.properties = new Liste();
-    this.properties["content"] = new Content();
+   // this.properties["content"] = new Content();
     this.children = new Liste();
     this.childAssocs = new Liste();
     // Parents können keine Liste sein, denn für die contains Methode wird nur der Name herangezogen was hier nicht passt.
@@ -322,7 +322,7 @@ ScriptNode.prototype.clone = function(){
     newNode.aspect = this.aspect.clone();
     newNode.tags = this.tags.clone();
     newNode.properties = this.properties.clone();
-    newNode.content = newNode.properties["content"].content;
+    newNode.content = newNode.properties["content"];
     newNode.children = this.children;
     newNode.versions = this.versions;
     newNode.parent = this.parent;
