@@ -1729,6 +1729,7 @@ function alfrescoAktionFieldFormatter(data, type, full) {
             image.style.cursor = "none";
         }
         image.title = "Kommentare";
+        image.style.cursor = "pointer";
         image.style.cssFloat = "left";
         image.style.marginRight = "5px";
         container.appendChild(image);

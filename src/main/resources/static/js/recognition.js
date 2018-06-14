@@ -1356,6 +1356,9 @@ function ArchivTyp(srch, parentType) {
         var newFile = search.findNode(workingCopy.nodeRef);
         newFile.properties.content.write( newDoc.properties.content);
         newFile.properties['my:documentDate'] = newDoc.properties['my:documentDate'];
+        if (newDoc.properties['my:amount'])
+            newFile.properties['my:amount'] = newDoc.properties['my:amount'];
+        newFile.save();
         newDoc.remove();
         Logger.log(Level.INFO, "Neue Version des Dokumentes erstellt");
         return true;
