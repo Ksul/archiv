@@ -981,6 +981,21 @@
             </archivTyp>
         </archivTyp>
     </archivTyp>
+    <!-- Kfz Steuern -->
+    <archivTyp name="KFZSteuer" searchString="Kraftfahrzeugsteuern" unique="newVersion">
+        <archivZiel type="my:archivContent" />
+        <archivPosition folder="Dokumente/Steuern/Kfz/{kennzeichen}" />
+        <searchItem name="datum" kind="date" target="my:documentDate"></searchItem>
+        <searchItem name="kennzeichen" text="312/">
+            <delimitter typ="end" text="/" count="1" />
+        </searchItem>
+        <searchItem name="tmp" objectTyp="date" value="datum">
+            <format formatString="YYYY" />
+        </searchItem>
+        <searchItem name="title" fix="Steuer {tmp}" target="cm:title" />
+        <searchItem name="person" text="Kreditinstitutes" readOverReturn="true" word="1" target="my:person" />
+        <searchItem name="betrag" text="Gesamtbetrag" target="my:betrag" />
+    </archivTyp>
     <!-- Sparda Bank -->
     <!-- <archivTyp name="Sparda" searchString="Sparda-Bank"><archivZiel type="my:archivContent" /><archivPosition folder="Dokumente/Banken/Sparda Bank/{ordner}" /><category     name="Banken/Aktien" /><archivTyp name="Jahresbescheinigung für Kapitalerträge" searchString="24c EStG"><archivZiel type="my:archivContent" /><searchItem name="person"     fix="Klaus" target="my:person" /><searchItem name="ordner" fix="Aktiendepot"/><searchItem name="tmp" text="Seite"/><searchItem name="datum" value="tmp" kind="date"     target="my:documentDate"><check lowerValue="01/01/2002" /><check upperValue="01/01/2007" /></searchItem><searchItem name="tmp1" objectTyp="date" value="datum"><format     formatString="YYYY" /></searchItem><searchItem name="tmp2" eval="{tmp1} - 1" /><searchItem name="title" fix="Jahresbescheinigung über Kapitalerträge und Veräußerungsgeschäfte     aus Finanzanlagen {tmp2}" target="cm:title" /></archivTyp></archivTyp> -->
 </documentTypes>

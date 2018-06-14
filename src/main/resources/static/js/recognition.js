@@ -1358,7 +1358,8 @@ function ArchivTyp(srch, parentType) {
             workingCopy = doc.checkout();
         else
             workingCopy = doc;
-        workingCopy.properties.content = REC.currentDocument.content;
+        workingCopy.properties.content.write( REC.currentDocument.content);
+        workingCopy.properties['my:documentDate'] = REC.currentDocument.properties['my:documentDate'];
         workingCopy.checkin();
         newDoc.remove();
         Logger.log(Level.INFO, "Neue Version des Dokumentes erstellt");
@@ -2756,6 +2757,8 @@ function SearchItem(srch) {
                     this.archivZiel[i].resolve(REC.currentDocument);
                 }
             }
+
+            // gefundenes Property im Dokument eintragen
             if (this.target && this.erg.isFound()) {
                 Logger.log(Level.INFO, "currentDocument.properties[\"" + this.target + "\"] = \"" + this.erg.getResult().getValue() + "\";");
                 REC.currentDocument.properties[this.target] = this.erg.getResult().getValue();
@@ -3360,6 +3363,7 @@ REC = {
     },
 
     isEmpty: function (str) {
+        return !str || str.length === 0;
         return !str || str.length === 0;
     },
 
