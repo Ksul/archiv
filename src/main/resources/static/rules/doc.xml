@@ -845,7 +845,7 @@
                 <searchItem name="title" fix="Bescheinigung der Vorsorgeaufwendungen nach § 10 Abs. 1 Nr. 3 EStG {tmp}" target="cm:title" />
             </archivTyp>
         </archivTyp>
-        <archivTyp name="Pflegeversicherung" searchString="5.793.183">
+        <archivTyp name="Pflegeversicherung" searchString="5.793.183" unique="newVersion">
             <searchItem name="id" fix="K 5.793.183" target="my:idvalue">
                 <archivZiel aspect="my:idable" />
             </searchItem>
