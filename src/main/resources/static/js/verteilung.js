@@ -718,7 +718,7 @@ function work() {
             } else
                 sel = Verteilung.rulesEditor.editor.getSession().getValue();
             REC.init();
-            REC.currentDocument.properties.content.write(new Content(Verteilung.textEditor.editor.getSession().getValue()));
+            REC.currentDocument.properties.content = Verteilung.textEditor.editor.getSession().getValue();
             REC.currentDocument.name = Verteilung.textEditor.file ? Verteilung.textEditor.file : "DocumentOhneNamen";
             $.each(Verteilung.textEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.textEditor.editor.getSession().removeMarker(element)});
             $.each(Verteilung.rulesEditor.editor.getSession().getMarkers(false), function(element, index) {Verteilung.rulesEditor.editor.getSession().removeMarker(element)});

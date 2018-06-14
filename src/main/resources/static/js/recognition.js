@@ -1208,8 +1208,12 @@ function ArchivTyp(srch, parentType) {
     this.type = srch.type;
     if (srch.unique)
         this.unique = REC.trim(srch.unique);
-    else
-        this.unique = "error";
+    else {
+        if ( parentType && parentType.unique)
+            this.unique = parentType.unique;
+        else
+            this.unique = "error";
+    }
     if (srch.removeBlanks)
         this.removeBlanks = srch.removeBlanks;
     this.completeWord = REC.stringToBoolean(srch.completeWord, false);
