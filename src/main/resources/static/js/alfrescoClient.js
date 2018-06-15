@@ -553,6 +553,7 @@ function loadAlfrescoTable() {
                     defaultContent: '',
                     type: "string",
                     class: "alignCenter alfrescoTableDragable",
+                    orderable: false,
                     width: "43px"
                 },
                 {
@@ -590,6 +591,7 @@ function loadAlfrescoTable() {
                 },
                 {
                     data: "amountDisplay",
+                    orderable: false,
                     title: "Betrag",
                     name: "my:amount",
                     defaultContent: '',
@@ -598,6 +600,7 @@ function loadAlfrescoTable() {
                 },
                 {
                     data: "idvalue",
+                    orderable: false,
                     title: "Schlüssel",
                     name: "my:idvalue",
                     defaultContent: '',
@@ -606,6 +609,7 @@ function loadAlfrescoTable() {
                 },
                 {
                     data: null,
+                    orderable: false,
                     title: "Aktion",
                     width: "120px",
                     class: "alignLeft"

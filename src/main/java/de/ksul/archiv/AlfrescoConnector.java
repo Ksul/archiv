@@ -72,10 +72,17 @@ public class AlfrescoConnector {
             return this.name;
         }
     }
-    private final static String DOCUMENT_SQL_STRING = "select d.*, o.*, c.*, i.* from my:archivContent as d " +
+//    Dieser SQL sucht zwar alles in einem Rutsch, funktioniert aber nur, wenn die Documente alle notwendigen Aspekte besitzen
+//
+//    private final static String DOCUMENT_SQL_STRING = "select d.*, o.*, c.*, i.* from my:archivContent as d " +
+//            "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
+//            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
+//            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
+//            "WHERE IN_FOLDER(d, ?) ";
+    private final static String DOCUMENT_SQL_STRING = "select d.cmis:objectId, d.cmis:name, o.cm:title  from my:archivContent as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
-            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
-            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
+//            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
+//            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
             "WHERE IN_FOLDER(d, ?) ";
     private final static String FOLDER_SQL_STRING = "select d.*, o.* from cmis:folder as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
@@ -353,7 +360,9 @@ public class AlfrescoConnector {
                                 continue;
                             }
 
-                            page.add(of.convertObject(objectData, operationContext));
+                            page.add(session.getObject(session.createObjectId(objectData.getId()), operationContext));
+
+                            //of.convertObject(objectData, operationContext)
                             k++;
                             if (k >= maxNumItems)
                                 break;
