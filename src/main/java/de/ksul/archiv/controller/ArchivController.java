@@ -259,8 +259,14 @@ public class ArchivController {
 
             cmisObjects = con.listFolder(model.getFolderId().equals("-1") ? con.getNode("/Archiv").getId(): model.getFolderId(), model.getOrders(), model.getColumns(), model.getWithFolder()).skipTo(start).getPage(model.getLength());
 
+            OperationContext operationContext = con.getSession().createOperationContext();
+            operationContext.setIncludeAcls(false);
+            operationContext.setIncludePolicies(false);
+            operationContext.setIncludeAllowableActions(false);
+
             for (CmisObject cmisObject : cmisObjects) {
-                list.add(convertObjectToJson(model.getFolderId(), cmisObject));
+
+                list.add(convertObjectToJson(model.getFolderId(), cmisObject, operationContext));
             }
 
             resp.setRecordsTotal(cmisObjects.getTotalNumItems());
@@ -319,7 +325,7 @@ public class ArchivController {
             cmisObjects = con.findDocument(model.getCmisQuery(), model.getOrders(), model.getColumns()).skipTo(start).getPage(model.getLength());
 
         for (CmisObject cmisObject : cmisObjects) {
-            list.add(convertCmisObjectToJSON(cmisObject));
+            list.add(convertCmisObjectToJSON(cmisObject, true));
         }
 
 
@@ -391,7 +397,7 @@ public class ArchivController {
         RestResponse obj = new RestResponse();
 
         obj.setSuccess(true);
-        obj.setData(convertCmisObjectToJSON(con.getNode(model.getFilePath())));
+        obj.setData(convertCmisObjectToJSON(con.getNode(model.getFilePath()), true));
 
         return obj;
     }
@@ -413,7 +419,7 @@ public class ArchivController {
         CmisObject cmisObject = con.getNodeById(model.getDocumentId());
 
         if (cmisObject != null) {
-            obj.setData(convertCmisObjectToJSON(cmisObject));
+            obj.setData(convertCmisObjectToJSON(cmisObject, true));
             obj.setSuccess(true);
         }
         else {
@@ -567,7 +573,7 @@ public class ArchivController {
             document = con.createDocument((Folder) folderObject, model.getFileName(), Base64.decodeBase64(model.getContent()), model.getMimeType(), outMap, createVersionState(model.getVersionState()));
             if (document != null) {
                 obj.setSuccess(true);
-                obj.setData(convertCmisObjectToJSON(document));
+                obj.setData(convertCmisObjectToJSON(document, true));
             } else {
                 obj.setSuccess(false);
                 obj.setData("Ein Document mit dem Namen " + model.getFileName() + " konnte nicht erstellt werden!");
@@ -606,7 +612,7 @@ public class ArchivController {
 
             Document document = con.updateDocument((Document) cmisObject, Base64.decodeBase64(model.getContent()), model.getMimeType(), outMap, createVersionState(model.getVersionState()), model.getVersionComment());
             obj.setSuccess(true);
-            obj.setData(convertCmisObjectToJSON(document));
+            obj.setData(convertCmisObjectToJSON(document, true));
 
         } else {
 
@@ -640,7 +646,7 @@ public class ArchivController {
             cmisObject = con.updateProperties(cmisObject, outMap);
 
             obj.setSuccess(true);
-            obj.setData(convertCmisObjectToJSON(cmisObject));
+            obj.setData(convertCmisObjectToJSON(cmisObject, true));
         } else {
             throw new ArchivException("Ein Document mit der Id " + model.getDocumentId() + " ist nicht vorhanden!");
         }
@@ -670,10 +676,14 @@ public class ArchivController {
                     FileableCmisObject fileableCmisObject = con.moveNode((FileableCmisObject) node, (Folder) oldFolder, (Folder) newFolder);
                     logger.trace("Knoten " + node.getId() + " von " + ((FileableCmisObject) node).getPaths().get(0) + " nach " + fileableCmisObject.getPaths().get(0) + " verschoben!");
                     obj.setSuccess(true);
-                    obj.setData(convertObjectToJson(model.getDestinationId(), fileableCmisObject));
+                    OperationContext operationContext = con.getSession().createOperationContext();
+                    operationContext.setIncludeAcls(false);
+                    operationContext.setIncludePolicies(false);
+                    operationContext.setIncludeAllowableActions(false);
+                    obj.setData(convertObjectToJson(model.getDestinationId(), fileableCmisObject, operationContext));
                     // Quell und Zielordner zurückgeben
-                    obj.setSource(convertCmisObjectToJSON(oldFolder));
-                    obj.setTarget(convertCmisObjectToJSON(newFolder));
+                    obj.setSource(convertCmisObjectToJSON(oldFolder, true));
+                    obj.setTarget(convertCmisObjectToJSON(newFolder, true));
                 } else {
                     obj.setSuccess(false);
                     obj.setData("Der verwendete Pfad mit der Id" + model.getDestinationId() + " ist kein Folder!");
@@ -715,7 +725,7 @@ public class ArchivController {
             folder = con.createFolder((Folder) target, outMap);
             if (folder != null) {
                 obj.setSuccess(true);
-                Map<String, Object> o = convertCmisObjectToJSON(folder);
+                Map<String, Object> o = convertCmisObjectToJSON(folder, true);
                 // neu definierter Folder kann keine Children haben
                 o.put("hasChildren", false);
                 o.put("hasChildFolder", false);
@@ -1211,24 +1221,28 @@ public class ArchivController {
     /**
      * konvertiert die Properties eines Documentes in ein JSON Objekt
      *
-     * @param cmisObject das Objekt
-     * @return obj1          das Object als JSON Objekt
+     * @param cmisObject      das Objekt
+     * @param searchParents   legt fest, ob die Parents gesucht werden sollen
+     * @return props          das Object als JSON Objekt
      */
-    private Map<String, Object> convertCmisObjectToJSON(CmisObject cmisObject) {
+    private Map<String, Object> convertCmisObjectToJSON(CmisObject cmisObject,
+                                                        boolean searchParents) {
 
         List<Property<?>> properties = cmisObject.getProperties();
         Map<String, Object> props = convProperties(properties);
 
         // Parents suchen
-        List<Folder> parents = ((FileableCmisObject) cmisObject).getParents();
-        if (parents != null && parents.size() > 0) {
-            Map<String, Object> obj = new HashMap<>();
-            int i = 0;
-            for (Folder folder : parents) {
-                obj.put(Integer.toString(i++), convProperties(folder.getProperties()));
+        if (searchParents) {
+            List<Folder> parents = ((FileableCmisObject) cmisObject).getParents();
+            if (parents != null && parents.size() > 0) {
+                Map<String, Object> obj = new HashMap<>();
+                int i = 0;
+                for (Folder folder : parents) {
+                    obj.put(Integer.toString(i++), convProperties(folder.getProperties()));
+                }
+                props.put("parents", obj);
+                props.put("parentId", parents.get(0).getId());
             }
-            props.put("parents", obj);
-            props.put("parentId", parents.get(0).getId());
         }
         return props;
     }
@@ -1272,18 +1286,16 @@ public class ArchivController {
      *
      * @param parentId   die Id des Parent Objektes
      * @param cmisObject das zu konvertierende CMIS Objekt
+     * @param operationContext  ein Operationskontext
      * @return JSONObject             das gefüllte JSON Objekt
      */
     private Map<String, Object> convertObjectToJson(String parentId,
-                                                    CmisObject cmisObject) {
+                                                    CmisObject cmisObject,
+                                                    OperationContext operationContext) {
 
-        Map<String, Object> o = convertCmisObjectToJSON(cmisObject);
+        Map<String, Object> o = convertCmisObjectToJSON(cmisObject, true);
         // prüfen, ob Children vorhanden sind
         if (cmisObject instanceof Folder) {
-            OperationContext operationContext = con.getSession().createOperationContext();
-            operationContext.setIncludeAcls(false);
-            operationContext.setIncludePolicies(false);
-            operationContext.setIncludeAllowableActions(false);
             boolean hasChildFolder = con.hasChildFolder(cmisObject);
             o.put("hasChildFolder", hasChildFolder);
             // JsTree
@@ -1298,6 +1310,15 @@ public class ArchivController {
             state.put("disabled", "false");
             state.put("selected", "false");
             o.put("state", state);
+        } else {
+            if (((Document) cmisObject).isVersionable()) {
+                TreeMap<String, Object> versions = new TreeMap<>(Collections.reverseOrder());
+                for (Document document : ((Document) cmisObject).getAllVersions(operationContext)) {
+                    if (!document.isLatestVersion())
+                        versions.put(document.getVersionLabel(), convertCmisObjectToJSON(document, false));
+                }
+                o.put("versions", versions);
+            }
         }
         o.put("parentId", parentId);
 

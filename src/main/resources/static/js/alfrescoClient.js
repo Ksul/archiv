@@ -608,6 +608,16 @@ function loadAlfrescoTable() {
                     class: "alignLeft"
                 },
                 {
+                    data: "versionLabel",
+                    orderable: false,
+                    title: "Version",
+                    name: "cm:versionLabel",
+                    defaultContent: '',
+                    width: "25px",
+                    type: "string",
+                    class: "alignLeft"
+                },
+                {
                     data: null,
                     orderable: false,
                     title: "Aktion",
@@ -624,7 +634,7 @@ function loadAlfrescoTable() {
                     visible: true
                 },
 
-                {   targets: [9],
+                {   targets: [10],
                     visible: false
                 },
 
@@ -722,6 +732,18 @@ function loadAlfrescoTable() {
                 },
                 {
                     targets: [8],
+                    render: function(obj, type, row) {
+                        let sel = "<select>" ;
+                        sel += "<option selected value = '" + row.versionLabel + "' >" + row.versionLabel + "</option>";
+                        for( let version in row.versions){
+                            sel += "<option  value = ' "+ version + "' >" + version + "</option>";
+                        }
+                        sel += "</select>";
+                        return sel;
+                    }
+                },
+                {
+                    targets: [9],
                     render: function(obj, types, row) {
                         return alfrescoAktionFieldFormatter(obj, types, row).outerHTML;
                     },
