@@ -1314,8 +1314,7 @@ public class ArchivController {
             if (((Document) cmisObject).isVersionable()) {
                 TreeMap<String, Object> versions = new TreeMap<>(Collections.reverseOrder());
                 for (Document document : ((Document) cmisObject).getAllVersions(operationContext)) {
-                    if (!document.isLatestVersion())
-                        versions.put(document.getVersionLabel(), convertCmisObjectToJSON(document, false));
+                    versions.put(document.getVersionLabel(), convertCmisObjectToJSON(document, false));
                 }
                 o.put("versions", versions);
             }

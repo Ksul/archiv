@@ -615,7 +615,7 @@ function loadAlfrescoTable() {
                     defaultContent: '',
                     width: "25px",
                     type: "string",
-                    class: "alignLeft"
+                    class: "alignCenter"
                 },
                 {
                     data: null,
@@ -733,33 +733,32 @@ function loadAlfrescoTable() {
                 {
                     targets: [8],
                     render: function(obj, type, row) {
-                        function changeVersion( row) {
-                            const select = $("#versionSelect");
-                            const version = select.value();
-                            //const parents =
-                            row.data.objectID = row.data.versions[index].objectId;
-                            row.data.name = row.data.versions[index].documentDate;
-                            row.data.documentDate = row.data.versions[index].amount;
-                            row.data.amount = row.data.versions[index].amount;
-                            row.data.idvalue = row.data.versions[index].idvalue;
-                            row.draw();
-                        }
 
-                        let sel = $('<select/>');
-                        sel.append($('<option/>',  {value: row.versionLabel, text: row.versionLabel}));
+                        let sel = document.createElement("select");
                         for( let version in row.versions){
-                            sel.append($('<option/>',  {value: version, text: version}));
+                            const option = document.createElement("option");
+                            option.value = version;
+                            option.text = version;
+                            if (version == row.versionLabel)
+                                option.selected = "true";
+                            sel.appendChild(option);
                         }
-                        $('td select').on('change', function(){
-                            const row = alfrescoTabelle.row('#'+$(this.parentElement).parent()[0].id);
-                            if (row) {
-                                let d = row.data().versions[this.value];
-                                if (row.data().parents)
-                                    d.parents = row.data().parents;
-                                row.data(d).draw();
+                        $('td select').on('change', function(event){
+                            event.stopPropagation();
+                            const parent = $(this.parentElement).parent()[0];
+                            if (parent && parent.id) {
+                                const row = alfrescoTabelle.row('#' + parent.id);
+                                if (row && row.data()) {
+                                    let d = row.data().versions[this.value];
+                                    if (row.data().parents)
+                                        d.parents = row.data().parents;
+                                    if (row.data().versions)
+                                        d.versions = row.data().versions;
+                                    row.data(d);
+                                }
                             }
                         });
-                        return sel.outerHTML();
+                        return sel.outerHTML;
                     }
                 },
                 {
