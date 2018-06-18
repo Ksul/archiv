@@ -733,13 +733,13 @@ function loadAlfrescoTable() {
                 {
                     targets: [8],
                     render: function(obj, type, row) {
-                        let sel = "<select>" ;
-                        sel += "<option selected value = '" + row.versionLabel + "' >" + row.versionLabel + "</option>";
+
+                        let sel = $('<select/>');
+                        sel.append($('<option/>',  {value: row.versionLabel, text: row.versionLabel}));
                         for( let version in row.versions){
-                            sel += "<option  value = ' "+ version + "' >" + version + "</option>";
+                            sel.append($('<option/>',  {value: version, text: version}));
                         }
-                        sel += "</select>";
-                        return sel;
+                        return sel.outerHTML();
                     }
                 },
                 {
