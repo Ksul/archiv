@@ -733,12 +733,32 @@ function loadAlfrescoTable() {
                 {
                     targets: [8],
                     render: function(obj, type, row) {
+                        function changeVersion( row) {
+                            const select = $("#versionSelect");
+                            const version = select.value();
+                            //const parents =
+                            row.data.objectID = row.data.versions[index].objectId;
+                            row.data.name = row.data.versions[index].documentDate;
+                            row.data.documentDate = row.data.versions[index].amount;
+                            row.data.amount = row.data.versions[index].amount;
+                            row.data.idvalue = row.data.versions[index].idvalue;
+                            row.draw();
+                        }
 
                         let sel = $('<select/>');
                         sel.append($('<option/>',  {value: row.versionLabel, text: row.versionLabel}));
                         for( let version in row.versions){
                             sel.append($('<option/>',  {value: version, text: version}));
                         }
+                        $('td select').on('change', function(){
+                            const row = alfrescoTabelle.row('#'+$(this.parentElement).parent()[0].id);
+                            if (row) {
+                                let d = row.data().versions[this.value];
+                                if (row.data().parents)
+                                    d.parents = row.data().parents;
+                                row.data(d).draw();
+                            }
+                        });
                         return sel.outerHTML();
                     }
                 },
