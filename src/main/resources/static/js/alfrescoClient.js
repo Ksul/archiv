@@ -434,7 +434,7 @@ function loadAlfrescoTable() {
             event.preventDefault();
             event.stopImmediatePropagation();
             const erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
-                {"name": "documentId", "value": alfrescoTabelle.row($(obj).closest('tr')).data().objectID}
+                {"name": "documentId", "value": alfrescoTabelle.row($(obj).closest('tr')).data().objectId}
             ]);
             if (erg.success) {
                 const file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
@@ -734,31 +734,17 @@ function loadAlfrescoTable() {
                     targets: [8],
                     render: function(obj, type, row) {
 
-                        let sel = document.createElement("select");
+                        const id = uuid();
+                        let sel = "<select id=\"" + id + "\" onchange=\"handleVersionChange('" + id + "')\">";
                         for( let version in row.versions){
-                            const option = document.createElement("option");
-                            option.value = version;
-                            option.text = version;
+                            sel = sel + "<option ";
+                            sel = sel + "value='" + version + "' ";
                             if (version == row.versionLabel)
-                                option.selected = "true";
-                            sel.appendChild(option);
+                                sel = sel + "selected = 'true' ";
+                            sel = sel + ">" + version +"</option> ";
                         }
-                        $('td select').on('change', function(event){
-                            event.stopPropagation();
-                            const parent = $(this.parentElement).parent()[0];
-                            if (parent && parent.id) {
-                                const row = alfrescoTabelle.row('#' + parent.id);
-                                if (row && row.data()) {
-                                    let d = row.data().versions[this.value];
-                                    if (row.data().parents)
-                                        d.parents = row.data().parents;
-                                    if (row.data().versions)
-                                        d.versions = row.data().versions;
-                                    row.data(d);
-                                }
-                            }
-                        });
-                        return sel.outerHTML;
+                        sel = sel + "</select>";
+                        return sel;
                     }
                 },
                 {
@@ -833,6 +819,9 @@ function loadAlfrescoTable() {
                 //calculateTableHeight("alfrescoCenterCenterCenter", "dtable2", alfrescoTabelle, "alfrescoTabelleHeader", "alfrescoTableFooter");
             }
         });
+
+
+
 
         // Drag aus Tabelle
         $(document)
@@ -2358,6 +2347,22 @@ function aimNode(data) {
     }
     return false;
 }
+
+function handleVersionChange(uid) {
+    const box = $('#' + uid);
+    const parent = box.parent().parent()[0];
+    if (parent && parent.id) {
+        const row = alfrescoTabelle.row('#' + parent.id);
+        if (row && row.data()) {
+            let d = row.data().versions[box.val()];
+            if (row.data().parents)
+                d.parents = row.data().parents;
+            if (row.data().versions)
+                d.versions = row.data().versions;
+            row.data(d);
+        }
+    }
+};
 
 /**
  * behandelt die Clicks auf die Icons in der Alfrescotabelle
