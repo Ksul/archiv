@@ -1344,6 +1344,16 @@ function loadAlfrescoSearchTable() {
                     class: "alignLeft"
                 },
                 {
+                    data: "versionLabel",
+                    orderable: false,
+                    title: "Version",
+                    name: "cm:versionLabel",
+                    defaultContent: '',
+                    width: "25px",
+                    type: "string",
+                    class: "alignCenter"
+                },
+                {
                     data: null,
                     title: "Aktion",
                     width: "130px",
@@ -1359,7 +1369,7 @@ function loadAlfrescoSearchTable() {
                     visible: true
                 },
 
-                {   targets: [9],
+                {   targets: [10],
                     visible: false
                 },
 
@@ -1457,6 +1467,23 @@ function loadAlfrescoSearchTable() {
                 },
                 {
                     targets: [8],
+                    render: function(obj, type, row) {
+
+                        const id = uuid();
+                        let sel = "<select id=\"" + id + "\" onchange=\"handleVersionChange('" + id + "')\">";
+                        for( let version in row.versions){
+                            sel = sel + "<option ";
+                            sel = sel + "value='" + version + "' ";
+                            if (version == row.versionLabel)
+                                sel = sel + "selected = 'true' ";
+                            sel = sel + ">" + version +"</option> ";
+                        }
+                        sel = sel + "</select>";
+                        return sel;
+                    }
+                },
+                {
+                    targets: [9],
                     render: function(obj, type, row) {
                         
                         let container = alfrescoAktionFieldFormatter(obj, type, row);

@@ -7,6 +7,7 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.commons.io.IOUtils;
@@ -235,12 +236,14 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     public void testGetNode() throws Exception {
         CmisObject cmisObject;
         cmisObject = con.getNode("/Datenverzeichnis");
+        if (cmisObject == null)
+            cmisObject = con.getNode("/Data Dictionary");
         ((FileableCmisObject) cmisObject).getPaths();
         assertThat(cmisObject, Matchers.notNullValue());
         assertThat(cmisObject, Matchers.instanceOf(Folder.class));
         cmisObject = con.getNode("/Datenverzeichnis/Skripte/backup.js.sample");
-        //cmisObject = con.getNode("/Archiv/Dokumente/Banken/Deka/Volltext.pdf");
-        ((FileableCmisObject) cmisObject).getPaths();
+        if (cmisObject == null)
+            cmisObject = con.getNode("/Data Dictionary/Scripts/backup.js.sample");
         assertThat(cmisObject, Matchers.notNullValue());
         assertThat(cmisObject, Matchers.instanceOf(Document.class));
     }
@@ -249,10 +252,13 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     public void testGetNodeById() throws Exception {
         CmisObject cmisObject;
         cmisObject = con.getNode("/Datenverzeichnis");
+        if (cmisObject == null)
+            cmisObject = con.getNode("/Data Dictionary");
         assertThat(cmisObject, Matchers.notNullValue());
         cmisObject = con.getNodeById(cmisObject.getId());
         assertThat(cmisObject, Matchers.notNullValue());
-        assertThat(cmisObject.getName(), Matchers.equalTo("Datenverzeichnis"));
+        assertThat(cmisObject.getName(), Matchers.anyOf(Matchers.is("Datenverzeichnis"), Matchers.is("Data Dictionary")));
+   //     thrown.expect(CmisObjectNotFoundException.class);
         cmisObject = con.getNodeById("xyz");
         assertThat(cmisObject, Matchers.nullValue());
     }
@@ -260,6 +266,8 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     @Test
     public void testCheckout() throws Exception {
         CmisObject cmisObject = con.getNode("/Datenverzeichnis/Skripte/backup.js.sample");
+        if (cmisObject == null)
+            cmisObject = con.getNode("/Data Dictionary/Scripts/backup.js.sample");
         CmisObject cmisObjectCheckedOut = con.checkOutDocument((Document) cmisObject);
         thrown.expect(CmisVersioningException.class);
         con.checkOutDocument((Document) cmisObject);

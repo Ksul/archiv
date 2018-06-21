@@ -266,7 +266,7 @@ public class ArchivController {
 
             for (CmisObject cmisObject : cmisObjects) {
 
-                list.add(convertObjectToJson(model.getFolderId(), cmisObject, operationContext));
+                list.add(convertObjectToJson(cmisObject, operationContext));
             }
 
             resp.setRecordsTotal(cmisObjects.getTotalNumItems());
@@ -324,8 +324,14 @@ public class ArchivController {
         else
             cmisObjects = con.findDocument(model.getCmisQuery(), model.getOrders(), model.getColumns()).skipTo(start).getPage(model.getLength());
 
+        OperationContext operationContext = con.getSession().createOperationContext();
+        operationContext.setIncludeAcls(false);
+        operationContext.setIncludePolicies(false);
+        operationContext.setIncludeAllowableActions(false);
+
+
         for (CmisObject cmisObject : cmisObjects) {
-            list.add(convertCmisObjectToJSON(cmisObject, true));
+            list.add(convertObjectToJson(cmisObject, operationContext));
         }
 
 
@@ -680,7 +686,7 @@ public class ArchivController {
                     operationContext.setIncludeAcls(false);
                     operationContext.setIncludePolicies(false);
                     operationContext.setIncludeAllowableActions(false);
-                    obj.setData(convertObjectToJson(model.getDestinationId(), fileableCmisObject, operationContext));
+                    obj.setData(convertObjectToJson(fileableCmisObject, operationContext));
                     // Quell und Zielordner zurückgeben
                     obj.setSource(convertCmisObjectToJSON(oldFolder, true));
                     obj.setTarget(convertCmisObjectToJSON(newFolder, true));
@@ -1228,8 +1234,7 @@ public class ArchivController {
     private Map<String, Object> convertCmisObjectToJSON(CmisObject cmisObject,
                                                         boolean searchParents) {
 
-        List<Property<?>> properties = cmisObject.getProperties();
-        Map<String, Object> props = convProperties(properties);
+        Map<String, Object> props = convProperties(cmisObject.getProperties());
 
         // Parents suchen
         if (searchParents) {
@@ -1284,13 +1289,11 @@ public class ArchivController {
     /**
      * konvertiert ein Objekt in ein JSON Objekt
      *
-     * @param parentId   die Id des Parent Objektes
      * @param cmisObject das zu konvertierende CMIS Objekt
      * @param operationContext  ein Operationskontext
      * @return JSONObject             das gefüllte JSON Objekt
      */
-    private Map<String, Object> convertObjectToJson(String parentId,
-                                                    CmisObject cmisObject,
+    private Map<String, Object> convertObjectToJson(CmisObject cmisObject,
                                                     OperationContext operationContext) {
 
         Map<String, Object> o = convertCmisObjectToJSON(cmisObject, true);
@@ -1319,7 +1322,6 @@ public class ArchivController {
                 o.put("versions", versions);
             }
         }
-        o.put("parentId", parentId);
 
         return o;
     }

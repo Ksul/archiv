@@ -79,10 +79,8 @@ public class AlfrescoConnector {
 //            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
 //            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
 //            "WHERE IN_FOLDER(d, ?) ";
-    private final static String DOCUMENT_SQL_STRING = "select d.cmis:objectId, d.cmis:name, o.cm:title  from my:archivContent as d " +
+    private final static String DOCUMENT_SQL_STRING = "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, d.my:documentDate, o.cm:title  from my:archivContent as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
-//            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
-//            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
             "WHERE IN_FOLDER(d, ?) ";
     private final static String FOLDER_SQL_STRING = "select d.*, o.* from cmis:folder as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
@@ -399,9 +397,8 @@ public class AlfrescoConnector {
      * sucht ein Objekt nach seiner ObjektId
      * @param  nodeId                die Id des Objektes
      * @return das CmisObject
-     * @throws ArchivException
      */
-    public CmisObject getNodeById(String nodeId) throws ArchivException {
+    public CmisObject getNodeById(String nodeId) {
         OperationContext operationContext = getOperationContext();
         CmisObject cmisObject = this.session.getObject(this.session.createObjectId(nodeId), operationContext);
         if (cmisObject != null)
