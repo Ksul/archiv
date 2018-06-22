@@ -80,7 +80,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
     @Test
     public void testOpenDocument() throws Exception {
         ObjectByIdRequest request = new ObjectByIdRequest();
-        request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
+        request.setDocumentId(con.getNode("/" + con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample").getId());
         this.mockMvc.perform(post("/openDocument")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content( objectMapper.writeValueAsBytes(request))
@@ -235,7 +235,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
     @Test
     public void testGetNode() throws Exception {
         ObjectByPathRequest request = new ObjectByPathRequest();
-        request.setFilePath("/Datenverzeichnis");
+        request.setFilePath("/" +con.getDataDictionaryName());
         this.mockMvc.perform(post("/getNode")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsBytes(request))
@@ -246,9 +246,9 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.error", nullValue()))
                 .andExpect(jsonPath("$.data", isA(LinkedHashMap.class)))
                 .andExpect(jsonPath("$.data.parentId", notNullValue()))
-                .andExpect(jsonPath("$.data.path", is("/Datenverzeichnis")))
-                .andExpect(jsonPath("$.data.name", is("Datenverzeichnis")));
-        request.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
+                .andExpect(jsonPath("$.data.path", is("/" +con.getDataDictionaryName())))
+                .andExpect(jsonPath("$.data.name", is("/" +con.getDataDictionaryName())));
+        request.setFilePath("/" +con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample");
         this.mockMvc.perform(post("/getNode")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsBytes(request))
@@ -276,7 +276,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
     @Test
     public void testGetNodeById() throws Exception {
         ObjectByIdRequest request = new ObjectByIdRequest();
-        request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
+        request.setDocumentId(con.getNode("/" + con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample").getId());
         this.mockMvc.perform(post("/getNodeById")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsBytes(request))
@@ -370,7 +370,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
     @Test
     public void testGetDocumentContent() throws Exception {
         ObjectByIdRequest request = new ObjectByIdRequest();
-        request.setDocumentId(con.getNode("/Datenverzeichnis/Skripte/backup.js.sample").getId());
+        request.setDocumentId(con.getNode("/" + con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample").getId());
         this.mockMvc.perform(post("/getDocumentContent")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsBytes(request))

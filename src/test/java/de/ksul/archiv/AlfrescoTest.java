@@ -57,7 +57,7 @@ public abstract class AlfrescoTest {
             ((Document) cmisObject).cancelCheckOut();
         if (cmisObject != null && cmisObject instanceof Document)
             cmisObject.delete(true);
-        cmisObject = con.getNode("/Datenverzeichnis/Skripte/backup.js.sample");
+        cmisObject = con.getNode("/" + con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample");
         if (cmisObject != null && cmisObject instanceof Document) {
             if (((Document) cmisObject).isVersionSeriesCheckedOut())
                 ((Document) cmisObject).cancelCheckOut();

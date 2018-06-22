@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = ArchivTestProperties.PREFIX)
 public class ArchivTestProperties {
 
-    public static final String PREFIX = "schulte.archiv.test";
+    public static final String PREFIX = "ksul.archiv.test";
 
     private String testPDF;
 

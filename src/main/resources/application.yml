@@ -17,6 +17,10 @@ ksul:
     binding: http://localhost:9080/alfresco/api/-default-/public/cmis/versions/1.1/atom
     user: admin
     password: admin
+    company-home-name: Company Home
+    data-dictionary-name: Data Dictionary
+    script-directory-name: Scripts
+
 
 server:
   servlet:

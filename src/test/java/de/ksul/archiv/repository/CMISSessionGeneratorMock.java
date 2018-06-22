@@ -1,6 +1,7 @@
 package de.ksul.archiv.repository;
 
 import de.ksul.archiv.PDFConnector;
+import de.ksul.archiv.configuration.ArchivProperties;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
 import org.apache.chemistry.opencmis.client.runtime.*;
@@ -67,7 +68,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
 
 
-    public CMISSessionGeneratorMock(ResourceLoader resourceLoader) {
+    public CMISSessionGeneratorMock(ResourceLoader resourceLoader, ArchivProperties archivProperties) {
 
 
         //       cmisBindingHelper = mock(CmisBindingHelper.class);
@@ -111,13 +112,13 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         Map<String, Object> properties = new HashMap<>();
 
         repository.insert(null, createFileableCmisObject(null,  null, "/", folderType, null));
-        repository.insert("/", createFileableCmisObject(null, "/", "Datenverzeichnis",  folderType, null));
-        repository.insert("/Datenverzeichnis", createFileableCmisObject(null, "/Datenverzeichnis", "Skripte",  folderType,  null));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "backup.js.sample", documentType, "application/x-javascript"), createStream("// "));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "alfresco docs.js.sample",  documentType, "application/x-javascript"), createStream("// "));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "doc.xml",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "doc.xsd",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
-        repository.insert("/Datenverzeichnis/Skripte", createFileableCmisObject(null, "/Datenverzeichnis/Skripte", "recognition.js",  documentType, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
+        repository.insert("/", createFileableCmisObject(null, "/", archivProperties.getDataDictionaryName(),  folderType, null));
+        repository.insert("/" + archivProperties.getDataDictionaryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(),  folderType,  null));
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", documentType, "application/x-javascript"), createStream("// "));
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample",  documentType, "application/x-javascript"), createStream("// "));
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js",  documentType, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
 
 
     }

@@ -47,7 +47,14 @@ public class ArchivConfiguration {
 
     @Bean
     AlfrescoConnector getConnector() {
-        return new AlfrescoConnector(getSession(), archivProperties.getServer(), archivProperties.getBinding(), archivProperties.getUser(), archivProperties.getPassword());
+        return new AlfrescoConnector(getSession(),
+                archivProperties.getServer(),
+                archivProperties.getBinding(),
+                archivProperties.getUser(),
+                archivProperties.getPassword(),
+                archivProperties.getCompanyHomeName(),
+                archivProperties.getDataDictionaryName(),
+                archivProperties.getScriptDirectoryName());
 
     }
 

@@ -53,12 +53,15 @@ public class AlfrescoConnector {
     private static final String NODES_URL = "service/api/node/workspace/SpacesStore/";
     private static final String LOGIN_URL = "service/api/login";
     private static Logger logger = LoggerFactory.getLogger(AlfrescoConnector.class.getName());
-    private String user = null;
-    private String password = null;
-    private String binding = null;
-    private String server = null;
+    private String user;
+    private String password;
+    private String binding;
+    private String server;
+    private String companyHomeName;
+    private String dataDictionaryName;
+    private String scriptFolderName;
     private ObjectMapper mapper = new ObjectMapper();
-    private Session session = null;
+    private Session session;
     private OperationContext operationContext;
     private static enum RequestType {
         POST("POST"),
@@ -101,18 +104,21 @@ public class AlfrescoConnector {
 
     /**
      * Konstruktor
-     * @param session
-     * @param server
-     * @param binding
-     * @param user
-     * @param password
+     * @param session  die CMIS Session
+     * @param server   die Url zum Server
+     * @param binding  die Url zum Binding
+     * @param user     der User vom Server
+     * @param password das Password auf dem Server
      */
-    public AlfrescoConnector(Session session, String server, String binding, String user, String password) {
+    public AlfrescoConnector(Session session, String server, String binding, String user, String password, String companyHomeName, String dataDictionaryName, String scriptFolderName) {
         this.session = session;
         this.server = server;
         this.binding = binding;
         this.user = user;
         this.password = password;
+        this.companyHomeName = companyHomeName;
+        this.dataDictionaryName = dataDictionaryName;
+        this.scriptFolderName = scriptFolderName;
     }
 
     /**
@@ -145,6 +151,18 @@ public class AlfrescoConnector {
      */
     public String getServer() {
         return server;
+    }
+
+    public String getCompanyHomeName() {
+        return companyHomeName;
+    }
+
+    public String getDataDictionaryName() {
+        return dataDictionaryName;
+    }
+
+    public String getScriptFolderName() {
+        return scriptFolderName;
     }
 
     /**
@@ -399,13 +417,14 @@ public class AlfrescoConnector {
      * @return das CmisObject
      */
     public CmisObject getNodeById(String nodeId) {
-        OperationContext operationContext = getOperationContext();
-        CmisObject cmisObject = this.session.getObject(this.session.createObjectId(nodeId), operationContext);
-        if (cmisObject != null)
+        try {
+            OperationContext operationContext = getOperationContext();
+            CmisObject cmisObject = this.session.getObject(this.session.createObjectId(nodeId), operationContext);
             logger.trace("getNodeById with " + nodeId + " found " + cmisObject.getId());
-        else
-            logger.info("getNodeById with " + nodeId + " found no object");
-        return cmisObject;
+            return cmisObject;
+        } catch (CmisObjectNotFoundException e) {
+            return null;
+        }
     }
 
 
