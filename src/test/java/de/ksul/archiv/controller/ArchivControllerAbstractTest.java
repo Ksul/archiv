@@ -219,20 +219,18 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         CmisObject document = buildDocument("Test", folder);
         String searchText ="Test";
         QueryRequest request = new QueryRequest();
-        request.setCmisQuery( "select d.*, o.*, c.*, i.* from my:archivContent as d " +
+        request.setCmisQuery( "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, d.my:documentDate, o.cm:title  from my:archivContent as d " +
                 "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
-                "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
-                "join my:idable as i on d.cmis:objectId = i.cmis:objectId  WHERE IN_TREE(d, '" + folder.getId() + "') AND ( CONTAINS(d, 'cmis:name:*" + searchText + "* OR TEXT:" + searchText + "') OR CONTAINS(o, 'cm:title:*" + searchText + "*'))");
+                "WHERE IN_TREE(d, '" + folder.getId() + "') AND ( CONTAINS(d, 'cmis:name:*" + searchText + "* OR TEXT:" + searchText + "') OR CONTAINS(o, 'cm:title:*" + searchText + "*'))");
         RestResponse obj = services.query(request);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
         assertThat(((ArrayList) obj.getData()).size(), Matchers.greaterThan(0));
         searchText ="T1est";
-        request.setCmisQuery( "select d.*, o.*, c.*, i.* from my:archivContent as d " +
+        request.setCmisQuery( "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, d.my:documentDate, o.cm:title  from my:archivContent as d " +
                 "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
-                "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
-                "join my:idable as i on d.cmis:objectId = i.cmis:objectId  WHERE IN_TREE(d, '" + folder.getId() + "') AND ( CONTAINS(d, 'cmis:name:*" + searchText + "* OR TEXT:" + searchText + "') OR CONTAINS(o, 'cm:title:*" + searchText + "*'))");
+                "WHERE IN_TREE(d, '" + folder.getId() + "') AND ( CONTAINS(d, 'cmis:name:*" + searchText + "* OR TEXT:" + searchText + "') OR CONTAINS(o, 'cm:title:*" + searchText + "*'))");
         obj = services.query(request);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));

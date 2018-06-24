@@ -247,7 +247,7 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
                 .andExpect(jsonPath("$.data", isA(LinkedHashMap.class)))
                 .andExpect(jsonPath("$.data.parentId", notNullValue()))
                 .andExpect(jsonPath("$.data.path", is("/" +con.getDataDictionaryName())))
-                .andExpect(jsonPath("$.data.name", is("/" +con.getDataDictionaryName())));
+                .andExpect(jsonPath("$.data.name", is(con.getDataDictionaryName())));
         request.setFilePath("/" +con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample");
         this.mockMvc.perform(post("/getNode")
                 .contentType(APPLICATION_JSON_UTF8)

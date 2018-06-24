@@ -5,6 +5,7 @@ import de.ksul.archiv.configuration.ArchivProperties;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
 import org.apache.chemistry.opencmis.client.runtime.*;
+import org.apache.chemistry.opencmis.client.runtime.cache.Cache;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
@@ -29,6 +30,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -63,6 +65,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     private CmisBinding binding;
     private ObjectFactory objectFactory;
     private ObjectServiceImpl objectService;
+    private Cache cache;
     private AuthenticationProvider authenticationProvider;
     private Repository repository = new Repository();
 
@@ -89,6 +92,18 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         when(sessionImpl.getRepositoryId()).thenReturn("0");
         objectFactory.initialize(sessionImpl, null);
         sessionFactory = mockSessionFactory();
+        cache = mockCache();
+
+        try {
+            Field bindingField = SessionImpl.class.getDeclaredField("binding");
+            bindingField.setAccessible(true);
+            bindingField.set(sessionImpl, binding);
+            Field cacheField = SessionImpl.class.getDeclaredField("cache");
+            cacheField.setAccessible(true);
+            cacheField.set(sessionImpl, cache);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
 
         FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
         folderTypeDefinition.setPropertyDefinitions(propertyDefinitionMap);
@@ -581,21 +596,9 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return new ObjectIdImpl((String) invocation.getArguments()[0]);
             }
         });
-        when(session.getObject(any(ObjectId.class))).thenAnswer(new Answer<FileableCmisObject>() {
-            public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
-                return repository.getById(((ObjectId) invocation.getArguments()[0]).getId());
-            }
-        });
-        when(session.getObject(anyString(), any(OperationContext.class))).thenAnswer(new Answer<FileableCmisObject>() {
-            public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
-                return repository.getById((String) invocation.getArguments()[0]);
-            }
-        });
-        when(session.getObject(any(ObjectId.class), any(OperationContext.class))).thenAnswer(new Answer<FileableCmisObject>() {
-            public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
-                return repository.getById(((ObjectId) invocation.getArguments()[0]).getId());
-            }
-        });
+        when(session.getObject(any(ObjectId.class))).thenCallRealMethod();
+        when(session.getObject(anyString(), any(OperationContext.class))).thenCallRealMethod();
+        when(session.getObject(any(ObjectId.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.getObjectByPath(anyString())).thenAnswer(new Answer<FileableCmisObject>() {
             public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
                 FileableCmisObject cmisObject = repository.getByPath((String) invocation.getArguments()[0]);
@@ -998,7 +1001,10 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         when(objectService.getObject(anyString(), anyString(), any(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), anyBoolean(), any())).thenAnswer(new Answer<ObjectData>() {
             public ObjectData answer(InvocationOnMock invocation) throws Throwable {
                 String objectId = (String) invocation.getArguments()[1];
-                return getObjectDataFromCmisObject(repository.getById(objectId));
+                FileableCmisObject cmisObject = repository.getById(objectId);
+                if (cmisObject == null)
+                    throw new CmisObjectNotFoundException((String) invocation.getArguments()[1] + " not found!");
+                return getObjectDataFromCmisObject(cmisObject);
             }
         });
         doAnswer(new Answer() {
@@ -1104,6 +1110,15 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         when(info.getId()).thenReturn("0");
         when(info.getRootFolderId()).thenReturn(repository.getRootId());
         return info;
+    }
+
+    private Cache mockCache() {
+        Cache cache = mock(Cache.class);
+        when(cache.containsId(any(), any())).thenReturn(false);
+        when(cache.containsPath(any(), any())).thenReturn(false);
+        when((cache.getById(any(), any()))).thenReturn(null);
+        when(cache.getByPath(any(), any())).thenReturn(null);
+        return cache;
     }
 
     private  Properties convertProperties(final Map<String, Object> props) {

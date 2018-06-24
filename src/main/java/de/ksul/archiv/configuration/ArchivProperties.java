@@ -34,17 +34,17 @@ public class ArchivProperties {
     /**
      * der Name des CompanyHome Verzeichnisses
      */
-    private String companyHomeName;
+    private String companyHomeName = "Company Home";
 
     /**
      * der Name der Data Dictionary Verzeichnisses
      */
-    private String dataDictionaryName;
+    private String dataDictionaryName = "Data Dictionary";
 
     /**
      * der Name für das Verzeichnis der Skripte
      */
-    private String scriptDirectoryName;
+    private String scriptDirectoryName = "Scripts";
 
     public String getUser() {
         return user;

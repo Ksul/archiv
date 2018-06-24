@@ -735,7 +735,7 @@ function loadAlfrescoTable() {
                     render: function(obj, type, row) {
 
                         const id = uuid();
-                        let sel = "<select id=\"" + id + "\" onchange=\"handleVersionChange('" + id + "')\">";
+                        let sel = "<select id=\"" + id + "\" onchange=\"handleVersionChange('" + id + "', alfrescoTabelle)\">";
                         for( let version in row.versions){
                             sel = sel + "<option ";
                             sel = sel + "value='" + version + "' ";
@@ -1470,7 +1470,7 @@ function loadAlfrescoSearchTable() {
                     render: function(obj, type, row) {
 
                         const id = uuid();
-                        let sel = "<select id=\"" + id + "\" onchange=\"handleVersionChange('" + id + "')\">";
+                        let sel = "<select id=\"" + id + "\" onchange=\"handleVersionChange('" + id + "', alfrescoSearchTabelle)\">";
                         for( let version in row.versions){
                             sel = sel + "<option ";
                             sel = sel + "value='" + version + "' ";
@@ -2375,11 +2375,11 @@ function aimNode(data) {
     return false;
 }
 
-function handleVersionChange(uid) {
+function handleVersionChange(uid, tabelle) {
     const box = $('#' + uid);
     const parent = box.parent().parent()[0];
     if (parent && parent.id) {
-        const row = alfrescoTabelle.row('#' + parent.id);
+        const row = tabelle.row('#' + parent.id);
         if (row && row.data()) {
             let d = row.data().versions[box.val()];
             if (row.data().parents)
@@ -4217,7 +4217,7 @@ function createVerteilungMenus() {
                 autoClose: true,
                 actionMenuVerteilungTxtWork: {
                     title: "Erkennung starten",
-                    className: "fas fa-cog fa-1x",
+                    className: "fas fa-binoculars fa-1x",
                     disabled: true,
                     autoClose: true,
                     action: function () {

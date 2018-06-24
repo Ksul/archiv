@@ -1,12 +1,14 @@
 package de.ksul.archiv;
 
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
+import de.ksul.archiv.configuration.ArchivTestProperties;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
