@@ -36,6 +36,11 @@ import java.util.zip.ZipInputStream;
 @CrossOrigin
 public class ArchivController {
 
+    public static final String COMPANY_HOME = "companyHome";
+    public static final String DATA_DICTIONARY = "dataDictionary";
+    public static final String SCRIPT_FOLDER = "scriptFolder";
+
+
     private AlfrescoConnector con;
 
     private static Logger logger = LoggerFactory.getLogger(ArchivController.class.getName());
@@ -69,8 +74,8 @@ public class ArchivController {
      * liefert die vorhandenen Titel
      *
      * @return obj               ein Object mit den Feldern     success: true     die Operation war erfolgreich
-     * false    ein Fehler ist aufgetreten
-     * data              die Titel als String
+     *                                                                   false    ein Fehler ist aufgetreten
+     *                                                          data              die Titel als String
      */
     @RequestMapping(value = "/getTitles", produces = "application/json")
     public @ResponseBody
@@ -80,6 +85,29 @@ public class ArchivController {
         obj.setSuccess(true);
         obj.setData(titles);
 
+        return obj;
+    }
+
+    /**
+     * liefert die Server Pfade aus den Properties
+     * @return obj               ein Object mit den Feldern     success: true     die Operation war erfolgreich
+     *                                                                   false    ein Fehler ist aufgetreten
+     *                                                          data              die Pfade
+     */
+    @RequestMapping(value = "/getServerPaths", produces = "application/json")
+    RestResponse getServerPaths() {
+
+        RestResponse obj = new RestResponse();
+        try {
+            obj.setSuccess(true);
+            HashMap<String, String> paths = new HashMap<>(3);
+            paths.put(COMPANY_HOME, con.getCompanyHomeName());
+            paths.put(DATA_DICTIONARY, con.getDataDictionaryName());
+            paths.put(SCRIPT_FOLDER, con.getScriptFolderName());
+            obj.setData(paths);
+        } catch (Exception e) {
+            obj.setSuccess(false);
+        }
         return obj;
     }
 

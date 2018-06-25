@@ -1,5 +1,6 @@
 package de.ksul.archiv.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import de.ksul.archiv.AlfrescoTest;
 import de.ksul.archiv.FileEntry;
 import de.ksul.archiv.VerteilungConstants;
@@ -15,13 +16,13 @@ import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.commons.codec.binary.Base64;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -129,12 +130,12 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/Datenverzeichnis/Skripte/");
+        request.setFilePath("/" + ((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.DATA_DICTIONARY) + "/" +((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.SCRIPT_FOLDER) + "/");
         obj = services.getNodeId(request);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
+        request.setFilePath("/" + ((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.DATA_DICTIONARY) + "/" +((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.SCRIPT_FOLDER) + "/backup.js.sample");
         obj = services.getNodeId(request);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
@@ -150,12 +151,12 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/Datenverzeichnis/Skripte/");
+        request.setFilePath("/" + ((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.DATA_DICTIONARY) + "/" +((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.SCRIPT_FOLDER) + "/");
         obj = services.getNode(request);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        request.setFilePath("/Datenverzeichnis/Skripte/backup.js.sample");
+        request.setFilePath("/" + ((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.DATA_DICTIONARY) + "/" +((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.SCRIPT_FOLDER) + "/backup.js.sample");
         obj = services.getNode(request);
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
@@ -172,7 +173,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
-        obj = services.getNodeId(new ObjectByPathRequest("/Datenverzeichnis/Skripte/backup.js.sample"));
+        obj = services.getNodeId(new ObjectByPathRequest("/" + ((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.DATA_DICTIONARY) + "/" +((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.SCRIPT_FOLDER) + "/backup.js.sample"));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());
@@ -241,7 +242,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testGetDocumentContent() throws Exception {
-        RestResponse obj = services.getDocumentContent(new ObjectByIdRequest((String) ((Map <String, Object>) services.getNodeId(new ObjectByPathRequest("/Datenverzeichnis/Skripte/backup.js.sample")).getData()).get("objectID")));
+        RestResponse obj = services.getDocumentContent(new ObjectByIdRequest((String) ((Map <String, Object>) services.getNodeId(new ObjectByPathRequest("/" + ((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.DATA_DICTIONARY) + "/" +((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.SCRIPT_FOLDER) + "/backup.js.sample")).getData()).get("objectID")));
         assertThat(obj, notNullValue());
         assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
         assertThat(obj.getData(), notNullValue());

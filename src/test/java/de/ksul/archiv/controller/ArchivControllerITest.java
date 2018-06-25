@@ -9,22 +9,20 @@ import de.ksul.archiv.request.ObjectByIdRequest;
 import de.ksul.archiv.response.RestResponse;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +31,7 @@ import static org.junit.Assert.assertThat;
  * Time: 09:54
  * To change this template use File | Settings | File Templates.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @EnableConfigurationProperties({ArchivTestProperties.class})
 @SpringBootTest(classes = {ArchivConfiguration.class})
@@ -48,7 +46,7 @@ public class ArchivControllerITest extends  ArchivControllerAbstractTest  {
     @Autowired
     AlfrescoConnector con;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         setCon(con);
         super.setUp();
@@ -59,7 +57,7 @@ public class ArchivControllerITest extends  ArchivControllerAbstractTest  {
         fileZip = testProperties.getTestZIP();
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws Exception {
         super.shutDown();
     }

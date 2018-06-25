@@ -4,23 +4,20 @@ import de.ksul.archiv.model.Column;
 import de.ksul.archiv.model.Order;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.*;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,8 +27,6 @@ import static org.junit.Assert.assertThat;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
-
-    @Rule public ExpectedException thrown = ExpectedException.none();
 
     protected String filePdf;
 
@@ -261,7 +256,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     public void testCheckout() throws Exception {
         CmisObject cmisObject = con.getNode("/" + con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample");
         CmisObject cmisObjectCheckedOut = con.checkOutDocument((Document) cmisObject);
-        thrown.expect(CmisVersioningException.class);
+        Assertions.assertThrows(CmisVersioningException.class, () -> {});
         con.checkOutDocument((Document) cmisObject);
         con.cancelCheckout((Document) cmisObject);
     }

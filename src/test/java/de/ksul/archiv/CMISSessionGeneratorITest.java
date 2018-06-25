@@ -6,12 +6,13 @@ import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import de.ksul.archiv.repository.CMISSessionGeneratorImpl;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,7 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * Time: 17:18
  * To change this template use File | Settings | File Templates.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {ArchivTestConfiguration.class, ArchivConfiguration.class})
 public class CMISSessionGeneratorITest {
 
@@ -32,7 +33,7 @@ public class CMISSessionGeneratorITest {
     public void testGenerateSession() throws Exception {
       CMISSessionGeneratorImpl gen = new CMISSessionGeneratorImpl(properties.getUser(), properties.getPassword(), properties.getBinding(), "Archiv");
       Session ses = gen.generateSession();
-      Assert.assertThat(ses, Matchers.notNullValue());
-      Assert.assertThat(gen.getRepositoryName(), Matchers.equalTo("Archiv"));
+      assertThat(ses, Matchers.notNullValue());
+      assertThat(gen.getRepositoryName(), Matchers.equalTo("Archiv"));
     }
 }

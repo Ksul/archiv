@@ -4,19 +4,21 @@ import de.ksul.archiv.configuration.ArchivConfiguration;
 import de.ksul.archiv.configuration.ArchivTestProperties;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +27,7 @@ import static org.junit.Assert.assertThat;
  * Time: 13:06
  * To change this template use File | Settings | File Templates.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
 @EnableConfigurationProperties({ArchivTestProperties.class})
 @SpringBootTest(classes = {ArchivConfiguration.class})
@@ -37,7 +39,7 @@ public class AlfrescoConnectorITest extends AlfrescoConnectorAbstractTest {
     @Autowired
     AlfrescoConnector con;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         setCon(con);
         filePdf = testProperties.getTestPDF();

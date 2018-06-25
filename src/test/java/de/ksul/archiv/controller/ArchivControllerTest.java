@@ -2,13 +2,15 @@ package de.ksul.archiv.controller;
 
 import de.ksul.archiv.AlfrescoConnector;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * Date: 28.11.16
  * Time: 13:15
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes={ArchivTestConfiguration.class})
 @DirtiesContext
 public class ArchivControllerTest extends  ArchivControllerAbstractTest {
@@ -25,7 +27,7 @@ public class ArchivControllerTest extends  ArchivControllerAbstractTest {
     @Autowired
     AlfrescoConnector con;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception{
         setCon(con);
         super.setUp();
@@ -35,7 +37,7 @@ public class ArchivControllerTest extends  ArchivControllerAbstractTest {
         fileZip = "/src/test/resources/Sample.zip";
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws Exception{
         super.shutDown();
     }

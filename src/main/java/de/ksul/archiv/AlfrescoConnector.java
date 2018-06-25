@@ -563,7 +563,7 @@ public class AlfrescoConnector {
         ContentStream contentStream = new ContentStreamImpl(documentName, BigInteger.valueOf(documentContent.length), documentType, stream);
 
         newDocument = parentFolder.createDocument(convertProperties(properties), contentStream, versioningState);
-
+        
         return newDocument;
     }
 

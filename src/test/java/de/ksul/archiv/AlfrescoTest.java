@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.*;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created with IntelliJ IDEA.
