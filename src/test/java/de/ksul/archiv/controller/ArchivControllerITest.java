@@ -39,34 +39,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @SpringBootTest(classes = {ArchivConfiguration.class})
 public class ArchivControllerITest extends  ArchivControllerAbstractTest  {
 
-    ArchivTestProperties testProperties;
     ArchivProperties properties;
-    AlfrescoConnector con;
-
-    @Autowired
-    public void setTestProperties(ArchivTestProperties testProperties) {
-        this.testProperties = testProperties;
-    }
-
-    @Autowired
-    public void setProperties(ArchivProperties properties) {
-        this.properties = properties;
-    }
-
-    @Autowired
-    public void setCon(AlfrescoConnector con) {
-        this.con = con;
-    }
 
     @BeforeEach
-    public void setUp() throws Exception {
-        setCon(con);
-        super.setUp();
+    public void setUp(@Autowired AlfrescoConnector connector,
+                      @Autowired ArchivProperties properties,
+                      @Autowired ArchivTestProperties testProperties) throws Exception {
+        con = connector;
+        Assertions.assertNotNull(con);
         services = new ArchivController(con);
-        assertThat(services, Matchers.notNullValue());
+        Assertions.assertNotNull(services);
+        Assertions.assertNotNull(properties);
+        this.properties = properties;
+        Assertions.assertNotNull(testProperties);
         filePdf = testProperties.getTestPDF();
         fileTxt = testProperties.getTestTXT();
         fileZip = testProperties.getTestZIP();
+        super.setUp();
     }
 
     @AfterEach

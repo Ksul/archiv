@@ -3,9 +3,7 @@ package de.ksul.archiv;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import de.ksul.archiv.controller.ArchivController;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,24 +26,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({ArchivTestConfiguration.class, ArchivController.class})
 public class ArchivApplicationRestControllerTest extends ArchivApplicationRestControllerAbstractTest {
 
-    @Autowired
-    AlfrescoConnector con;
-
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-
     @BeforeEach
-    public void setUp() throws Exception {
-        setVariables(con, mockMvc, objectMapper);
+    public void setUp(@Autowired AlfrescoConnector connector,
+                      @Autowired MockMvc mockMvc,
+                      @Autowired ObjectMapper objectMapper) throws Exception {
+        con = connector;
+        Assertions.assertNotNull(con);
+        this.mockMvc = mockMvc;
+        Assertions.assertNotNull(mockMvc);
+        this.objectMapper = objectMapper;
+        Assertions.assertNotNull(objectMapper);
         filePdf = "/src/test/resources/Test.pdf";
         fileTxt = "/src/test/resources/test.txt";
         fileZip = "/src/test/resources/Sample.zip";
         super.setUp();
+    }
+
+    @AfterEach
+    public void shutDown() throws Exception {
+        super.shutDown();
     }
 
     @Test

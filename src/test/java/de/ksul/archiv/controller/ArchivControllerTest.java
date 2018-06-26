@@ -29,14 +29,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @DirtiesContext
 public class ArchivControllerTest extends  ArchivControllerAbstractTest {
 
-
-    @Autowired
-    AlfrescoConnector con;
-
     @BeforeEach
-    public void setup() throws Exception{
-        setCon(con);
-        super.setUp();
+    public void setup(@Autowired AlfrescoConnector connector) throws Exception{
+        con = connector;
+        Assertions.assertNotNull(con);
         services = new ArchivController(con);
         filePdf = "/src/test/resources/Test.pdf";
         fileTxt = "/src/test/resources/test.txt";

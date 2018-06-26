@@ -7,9 +7,7 @@ import de.ksul.archiv.controller.ArchivController;
 import de.ksul.archiv.request.CommentRequest;
 import de.ksul.archiv.request.ObjectByIdRequest;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -34,26 +32,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @EnableConfigurationProperties({ArchivTestProperties.class})
 public class ArchivApplicationRestControllerITest extends ArchivApplicationRestControllerAbstractTest {
 
-    @Autowired
-    AlfrescoConnector con;
-
-    @Autowired
-    ArchivTestProperties testProperties;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-
     @BeforeEach
-    public void setUp() throws Exception {
-        setVariables(con, mockMvc, objectMapper);
+    public void setUp(@Autowired AlfrescoConnector connector,
+                      @Autowired ArchivTestProperties testProperties,
+                      @Autowired MockMvc mockMvc,
+                      @Autowired ObjectMapper objectMapper) throws Exception {
+        con = connector;
+        Assertions.assertNotNull(con);
+        this.mockMvc = mockMvc;
+        Assertions.assertNotNull(mockMvc);
+        this.objectMapper = objectMapper;
+        Assertions.assertNotNull(objectMapper);
+        Assertions.assertNotNull(testProperties);
         filePdf = testProperties.getTestPDF();
         fileTxt = testProperties.getTestTXT();
         fileZip = testProperties.getTestZIP();
         super.setUp();
+    }
+
+    @AfterEach
+    public void shutDown() throws Exception {
+        super.shutDown();
     }
 
     @Test

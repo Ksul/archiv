@@ -4,9 +4,7 @@ import de.ksul.archiv.configuration.ArchivConfiguration;
 import de.ksul.archiv.configuration.ArchivTestProperties;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -33,19 +31,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @SpringBootTest(classes = {ArchivConfiguration.class})
 public class AlfrescoConnectorITest extends AlfrescoConnectorAbstractTest {
 
-    @Autowired
-    ArchivTestProperties testProperties;
-
-    @Autowired
-    AlfrescoConnector con;
-
     @BeforeEach
-    public void setUp() throws Exception {
-        setCon(con);
+    public void setUp(@Autowired AlfrescoConnector connector, @Autowired ArchivTestProperties testProperties) throws Exception {
+        con = connector;
+        Assertions.assertNotNull(con);
+        Assertions.assertNotNull(testProperties);
         filePdf = testProperties.getTestPDF();
         fileTxt = testProperties.getTestTXT();
         fileZip = testProperties.getTestZIP();
         super.setUp();
+    }
+
+    @AfterEach
+    public void shutDown() throws Exception {
+        super.shutDown();
     }
 
     @Test

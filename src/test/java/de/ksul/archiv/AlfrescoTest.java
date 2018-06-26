@@ -7,6 +7,9 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,12 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public abstract class AlfrescoTest {
 
 
-    private AlfrescoConnector con;
-
-    public void setCon(AlfrescoConnector con) {
-        this.con = con;
-    }
-
+     protected AlfrescoConnector con;
 
     public void setUp() throws Exception {
         if (needsProxy()) {

@@ -15,14 +15,15 @@ import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.util.Asserts;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
-
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,13 +35,9 @@ import static org.hamcrest.CoreMatchers.*;
 
 public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
-
     ArchivController services;
-
     String filePdf;
-
     String fileTxt;
-
     String fileZip;
 
 
@@ -760,7 +757,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
 
     @Test
     public void testOpenFilePdf() throws Exception {
-        assertThat(filePdf, Matchers.notNullValue());
+        Assertions.assertNotNull(filePdf);
         String fullPath = "file:///" + System.getProperty("user.dir").replace("\\", "/") + filePdf;
         ObjectByPathRequest request = new ObjectByPathRequest();
         request.setFilePath(fullPath);

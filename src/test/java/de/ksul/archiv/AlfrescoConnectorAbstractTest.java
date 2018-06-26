@@ -29,17 +29,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
 
     protected String filePdf;
-
     protected String fileTxt;
-
     protected String fileZip;
 
-    private AlfrescoConnector con;
-
-    public void setCon(AlfrescoConnector con) {
-        this.con = con;
-        super.setCon(con);
-    }
 
 
    @Test

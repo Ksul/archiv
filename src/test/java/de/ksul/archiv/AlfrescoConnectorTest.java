@@ -3,9 +3,7 @@ package de.ksul.archiv;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -26,16 +24,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @DirtiesContext
 public class AlfrescoConnectorTest extends AlfrescoConnectorAbstractTest {
 
-    @Autowired
-    AlfrescoConnector con;
-
     @BeforeEach
-    public void setUp() throws Exception {
-        setCon(con);
+    public void setUp(@Autowired AlfrescoConnector connector) throws Exception {
+        con = connector;
+        Assertions.assertNotNull(con);
         filePdf = "/src/test/resources/Test.pdf";
         fileTxt = "/src/test/resources/test.txt";
         fileZip = "/src/test/resources/Sample.zip";
         super.setUp();
+    }
+
+    @AfterEach
+    public void shutDown() throws Exception {
+        super.shutDown();
     }
 
     @Test
