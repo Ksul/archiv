@@ -256,9 +256,8 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     public void testCheckout() throws Exception {
         CmisObject cmisObject = con.getNode("/" + con.getDataDictionaryName() + "/" + con.getScriptFolderName() + "/backup.js.sample");
         CmisObject cmisObjectCheckedOut = con.checkOutDocument((Document) cmisObject);
-        Assertions.assertThrows(CmisVersioningException.class, () -> {});
-        con.checkOutDocument((Document) cmisObject);
-        con.cancelCheckout((Document) cmisObject);
+        Assertions.assertThrows(CmisVersioningException.class, () -> { con.checkOutDocument((Document) cmisObject);});
+        con.cancelCheckout((Document) cmisObjectCheckedOut);
     }
 
     @Test
