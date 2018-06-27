@@ -2375,13 +2375,19 @@ function aimNode(data) {
     return false;
 }
 
+/**
+ * handelt den Wechsel der Versionen zur Anzeige in der Tabelle
+ * @param uid       die Id der Combobox
+ * @param tabelle   die Tabelle
+ */
 function handleVersionChange(uid, tabelle) {
     const box = $('#' + uid);
     const parent = box.parent().parent()[0];
     if (parent && parent.id) {
         const row = tabelle.row('#' + parent.id);
         if (row && row.data()) {
-            let d = row.data().versions[box.val()];
+            // hier muss unbedingt geclont werden, denn sonst gibt es ein circuläres Objekt
+            let d = jQuery.extend({}, row.data().versions[box.val()]);
             if (row.data().parents)
                 d.parents = row.data().parents;
             if (row.data().versions)
