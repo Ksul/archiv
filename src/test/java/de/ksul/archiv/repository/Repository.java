@@ -116,7 +116,7 @@ public class Repository {
         }
     }
 
-    void update(FileableCmisObject cmisObject, FileableCmisObject cmisObjectNew) {
+    void update(FileableCmisObject cmisObject, FileableCmisObject cmisObjectNew, String version) {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         if (cmisObjectNew == null)
@@ -127,7 +127,7 @@ public class Repository {
         if (node == null)
             throw new RuntimeException("Node with Id " + cmisObject.getId() + " not found!");
         else
-        node.updateNode(cmisObjectNew);
+        node.updateNode(cmisObjectNew, version);
         logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] changed in repository!");
     }
 
@@ -167,10 +167,10 @@ public class Repository {
     }
 
     void insert(String parent, FileableCmisObject cmisObject) {
-        insert(parent, cmisObject, null);
+        insert(parent, cmisObject, null, null);
     }
 
-    void insert(String parentPath, FileableCmisObject cmisObject, ContentStream contentStream) {
+    void insert(String parentPath, FileableCmisObject cmisObject, ContentStream contentStream, String version) {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
@@ -182,7 +182,7 @@ public class Repository {
                 throw new RuntimeException("no Root Node!");
             TreeNode<FileableCmisObject> node = root.findTreeNodeForPath(parentPath);
             if (node != null)
-                node.addNode(id, name, cmisObject, contentStream);
+                node.addNode(id, name, cmisObject, contentStream, version);
             else
                 throw new RuntimeException("Parent " + parentPath + " not found!");
         }

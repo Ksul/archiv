@@ -1,6 +1,7 @@
 package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.commons.collections4.OrderedMap;
 
 import java.util.*;
 
@@ -14,11 +15,11 @@ import java.util.*;
 
 public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
-    private T data;
     private ContentStream contentStream;
     private String id;
     private String name;
     private String path;
+    private TreeMap<String, T> data = new TreeMap<>();
     private TreeNode<T> parent;
     Map<String, TreeNode<T>> children;
 
@@ -36,17 +37,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.data = data;
+        this.data.put("" ,data);
         this.children = new HashMap<>();
         this.elementsIndex = new LinkedList<TreeNode<T>>();
         this.elementsIndex.add(this);
     }
 
-    TreeNode(String id, String name,  T data, ContentStream contentStream) {
+    TreeNode(String id, String name,  T data, ContentStream contentStream, String version) {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.data = data;
+        this.data.put(version == null ? "" : version, data);
         this.contentStream = contentStream;
         this.children = new HashMap<>();
         this.elementsIndex = new LinkedList<TreeNode<T>>();
@@ -54,7 +55,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
     public T getData() {
-        return data;
+        return data.get(data.firstKey());
     }
 
     ContentStream getContentStream() {
@@ -76,8 +77,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
     
 
-    TreeNode<T> addNode(String id, String name, T child, ContentStream contentStream) {
-        TreeNode<T> childNode = new TreeNode<T>(id, name, child, contentStream);
+    TreeNode<T> addNode(String id, String name, T child, ContentStream contentStream, String version) {
+        TreeNode<T> childNode = new TreeNode<T>(id, name, child, contentStream, version);
         childNode.parent = this;
         this.children.put(name, childNode);
         StringBuilder pfad = new StringBuilder(name);
@@ -115,7 +116,11 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
     void updateNode(T child) {
-        this.data = child;
+        this.data.put("", child);
+    }
+
+    void updateNode(T child, String version) {
+        this.data.put(version, child);
     }
 
     int getLevel() {
@@ -176,16 +181,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
             }
         }
         return false;
-    }
-
-    private  TreeNode<T> findTreeNode(Comparable<T> cmp) {
-        for (TreeNode<T> element : this.elementsIndex) {
-            T elData = element.data;
-            if (cmp.compareTo(elData) == 0)
-                return element;
-        }
-
-        return null;
     }
 
     public TreeNode<T> getByPath(String path) {

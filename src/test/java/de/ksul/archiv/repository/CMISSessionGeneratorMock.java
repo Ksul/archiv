@@ -129,11 +129,11 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         repository.insert(null, createFileableCmisObject(null,  null, "/", folderType, null));
         repository.insert("/", createFileableCmisObject(null, "/", archivProperties.getDataDictionaryName(),  folderType, null));
         repository.insert("/" + archivProperties.getDataDictionaryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(),  folderType,  null));
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", documentType, "application/x-javascript"), createStream("// "));
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample",  documentType, "application/x-javascript"), createStream("// "));
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xml"));
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"));
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js",  documentType, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"));
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", documentType, "application/x-javascript"), createStream("// "), "1.0");
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample",  documentType, "application/x-javascript"), createStream("// "), "1.0");
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xml"), "1.0");
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd",  documentType, "text/xml"), createFileStream("classpath:static/rules/doc.xsd"), "1.0");
+        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), createFileableCmisObject(null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js",  documentType, "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"), "1.0");
 
 
     }
@@ -367,6 +367,16 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyIsMajorVersionDefinition.setPropertyType(PropertyType.BOOLEAN);
         propertyIsMajorVersionDefinition.setUpdatability(Updatability.READONLY);
         map.put("cmis:isMajorVersion", propertyIsMajorVersionDefinition);
+
+        PropertyBooleanDefinitionImpl propertyVersionSeriesIdDefinition = new PropertyBooleanDefinitionImpl();
+        propertyVersionSeriesIdDefinition.setId("cmis:versionSeriesId");
+        propertyVersionSeriesIdDefinition.setDisplayName("Version series Id");
+        propertyVersionSeriesIdDefinition.setQueryName("cmis:versionSeriesId");
+        propertyVersionSeriesIdDefinition.setLocalName("versionSeriesId");
+        propertyVersionSeriesIdDefinition.setCardinality(Cardinality.SINGLE);
+        propertyVersionSeriesIdDefinition.setPropertyType(PropertyType.ID);
+        propertyVersionSeriesIdDefinition.setUpdatability(Updatability.READONLY);
+        map.put("cmis:versionSeriesId", propertyVersionSeriesIdDefinition);
 
         PropertyStringDefinitionImpl propertyCheckinCommentDefinition = new PropertyStringDefinitionImpl();
         propertyCheckinCommentDefinition.setId("cmis:checkinComment");
@@ -685,7 +695,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             props.put("cmis:versionLabel", "0.1");
         if (!folder) {
             newObject = createFileableCmisObject(props, path, name,  objectType,  ((ContentStream) invocation.getArguments()[2]).getMimeType());
-            repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2]);
+            repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2], newObject.getProperty("cmis:versionLabel").getValueAsString());
         }
         else {
             newObject = createFileableCmisObject(props, path, name, objectType, null);
@@ -1019,14 +1029,17 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                     properties.addProperty(property);
                 }
 
-                if (cmisObject.getType() instanceof FolderType)
+                if (cmisObject.getType() instanceof FolderType) {
                     cmisObjectNew = new FolderImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
+                    repository.update(cmisObject, cmisObjectNew, "");
+                }
                 else {
 
                     cmisObjectNew = new DocumentImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
                     ((PropertyImpl) cmisObjectNew.getProperty("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
+                    repository.update(cmisObject, cmisObjectNew, ((DocumentImpl) cmisObjectNew).getVersionLabel());
                 }
-                repository.update(cmisObject, cmisObjectNew);
+
                 return null;
             }
         }).when(objectService).updateProperties(anyString(), any(Holder.class), any(Holder.class), any(Properties.class), any());

@@ -427,9 +427,19 @@ public class AlfrescoConnector {
         }
     }
 
-
-
-
+    /**
+     * sucht ein Objekt nach seiner ObjektId und einem Versionslabel.
+     * @param nodeId         die Id des Objektes
+     * @param versionLabel   das Versionslabel
+     * @return
+     */
+    public CmisObject getNodeById(String nodeId, String versionLabel) {
+        if (nodeId.contains(";"))
+            nodeId = nodeId.substring(0, nodeId.lastIndexOf(";") - 1);
+        nodeId = nodeId + ";" + versionLabel;
+        return getNodeById(nodeId);
+    }
+    
     /**
      * sucht Dokumente
      * @param queryString           die Abfragequery
