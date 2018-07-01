@@ -2387,7 +2387,7 @@ function handleVersionChange(uid, tabelle) {
         const row = tabelle.row('#' + parent.id);
         if (row && row.data()) {
             // hier muss unbedingt geclont werden, denn sonst gibt es ein circuläres Objekt
-            let d = jQuery.extend({}, row.data().versions[box.val()]);
+            let d = $.extend({}, row.data().versions[box.val()]);
             if (row.data().parents)
                 d.parents = row.data().parents;
             if (row.data().versions)

@@ -454,16 +454,23 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     private FileableCmisObject createFileableCmisObject(Map<String, Object> props, String path, String name, ObjectType objectType, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
-        String objectId = repository.getId();
+        String versionSeriesId = repository.getId();
         PropertiesImpl properties;
         ObjectDataImpl objectData = new ObjectDataImpl();
         if (props == null)
             properties = new PropertiesImpl();
         else
             properties = (PropertiesImpl) convertProperties(props);
-        if (!properties.getProperties().containsKey("cmis:objectId")) {
+        if (!properties.getProperties().containsKey("cmis:versionSeriesId")) {
 
-            properties.addProperty(fillProperty("cmis:objectId", objectId));
+            properties.addProperty(fillProperty("cmis:versionSeriesId", versionSeriesId));
+        }
+        if (!properties.getProperties().containsKey("cmis:objectId")) {
+            if (properties.getProperties().containsKey("cmis:versionLabel")) {
+                properties.addProperty(fillProperty("cmis:objectId", versionSeriesId + ";" + properties.getProperties().get("cmis:versionLabel").getFirstValue().toString()));
+            } else {
+                properties.addProperty(fillProperty("cmis:objectId", versionSeriesId));
+            }
         }
         if (!properties.getProperties().containsKey("cmis:name")) {
             properties.addProperty(fillProperty("cmis:name", name));
@@ -486,7 +493,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         if (objectType.getId().equalsIgnoreCase("cmis:folder")) {
             if (path == null) {
                 parentId = "-1";
-                repository.setRootId(objectId);
+                repository.setRootId(versionSeriesId);
             } else
                 parentId = repository.getByPath(path).getId();
             if (!properties.getProperties().containsKey("cmis:parentId")) {
@@ -600,12 +607,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 return repository.deleteTree(cmisObject);
             }
         });
-        when(session.createObjectId(anyString())).thenAnswer(new Answer<ObjectId>() {
-
-            public ObjectId answer(InvocationOnMock invocation) throws Throwable {
-                return new ObjectIdImpl((String) invocation.getArguments()[0]);
-            }
-        });
+        when(session.createObjectId(anyString())).thenCallRealMethod();
         when(session.getObject(any(ObjectId.class))).thenCallRealMethod();
         when(session.getObject(anyString(), any(OperationContext.class))).thenCallRealMethod();
         when(session.getObject(any(ObjectId.class), any(OperationContext.class))).thenCallRealMethod();
@@ -689,11 +691,11 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         FileableCmisObject cmis = (FileableCmisObject) args[1];
         String path = cmis.getPaths().get(0) ;
         FileableCmisObject newObject;
-        if (!folder && invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
-           props.put("cmis:versionLabel", "1.0");
-        else
-            props.put("cmis:versionLabel", "0.1");
         if (!folder) {
+            if (invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
+                props.put("cmis:versionLabel", "1.0");
+            else
+                props.put("cmis:versionLabel", "0.1");
             newObject = createFileableCmisObject(props, path, name,  objectType,  ((ContentStream) invocation.getArguments()[2]).getMimeType());
             repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2], newObject.getProperty("cmis:versionLabel").getValueAsString());
         }
@@ -957,7 +959,8 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
                         Holder<String> holder = (Holder) invocation.getArguments()[1];
-                        Document document = (Document) repository.getById(holder.getValue());
+                        String[] parts = holder.getValue().split(";");
+                        Document document = (Document) repository.getById(parts[0]);
                         if (document.isPrivateWorkingCopy()) throw new CmisVersioningException();
                         ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(true);
                         return null;
@@ -971,7 +974,8 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         Properties properties = (Properties) invocation.getArguments()[3];
                         ContentStream stream = (ContentStream) invocation.getArguments()[4];
                         String checkinComment = (String) invocation.getArguments()[5];
-                        Document document = (Document) repository.getById(holder.getValue());
+                        String[] parts = holder.getValue().split(";");
+                        Document document = (Document) repository.getById(parts[0]);
                         if (!document.isPrivateWorkingCopy()) throw new CmisVersioningException();
                         if (properties != null && properties.getProperties() != null && !properties.getProperties().isEmpty()) {
                             document.updateProperties(properties.getProperties());
@@ -980,13 +984,17 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                             repository.changeContent(document, stream);
                         }
                         ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(false);
+                        String version;
                         if (major)
-                            ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("1")).toString());
-                        else
-                            ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString());
+                            version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("1")).toString();
+                       else
+                            version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString();
+                        ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(version);
+                        holder.setValue(parts[0]+ ";" + version);
                         if (checkinComment != null && !checkinComment.isEmpty())
                             ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);
                         ((PropertyImpl) document.getProperty("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
+
                         return null;
                     }
                 }).when(versioningService).checkIn(anyString(), any(Holder.class), anyBoolean(), any(Properties.class), any(), any(), any(), any(), any(), any());

@@ -235,7 +235,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     @Test
     public void testGetNodeById() throws Exception {
         CmisObject cmisObject;
-        cmisObject = con.getNode("/" +con.getDataDictionaryName());
+        cmisObject = con.getNode("/" + con.getDataDictionaryName());
         assertThat(cmisObject, Matchers.notNullValue());
         cmisObject = con.getNodeById(cmisObject.getId());
         assertThat(cmisObject, Matchers.notNullValue());

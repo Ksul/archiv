@@ -1,15 +1,19 @@
 package de.ksul.archiv.repository;
 
+import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,19 +28,18 @@ public class Repository {
     TreeNode<FileableCmisObject> root;
 
 
-    private long id;
-    private long rootId;
+    private String rootId;
 
     String getId() {
-        return Long.toString(id++);
+        return UUID.randomUUID().toString();
     }
 
     String getRootId() {
-        return Long.toString(rootId);
+        return rootId;
     }
 
     void setRootId(String id) {
-        this.rootId = Long.parseLong(id);
+        this.rootId = UUID.randomUUID().toString();
     }
 
     List<FileableCmisObject> query(String query) {
@@ -174,7 +177,7 @@ public class Repository {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
-        String id = cmisObject.getId();
+        String id = cmisObject instanceof Folder ? cmisObject.getId() : ((Document) cmisObject).getVersionSeriesId();
         if (parentPath == null) {
             root = new TreeNode<>(id, name, cmisObject);
         } else {
@@ -229,8 +232,15 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
-        if (node != null)
-            return node.getData();
+        if (node != null) {
+            String[] parts = id.split(";");
+            if (parts.length == 1)
+                return node.getData();
+            else if (node.containsData(parts[1]))
+                return node.getData(parts[1]);
+            else
+                throw new CmisObjectNotFoundException(("version not found!"));
+        }
         else
             return null;
     }

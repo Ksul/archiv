@@ -58,6 +58,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         return data.get(data.firstKey());
     }
 
+    public T getData(String version) {
+        return data.get(version);
+    }
+
+    public boolean containsData (String version){ return data.containsKey(version);}
+
     ContentStream getContentStream() {
         return contentStream;
     }
@@ -145,9 +151,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     TreeNode<T> findTreeNodeForId(String id) {
         if (id == null)
             throw new RuntimeException("Id must be set!");
+        String[] parts = id.split(";");
         for (TreeNode<T> element : this.elementsIndex) {
             String objectId = element.id;
-            if (id.matches(objectId))
+            if (parts[0].matches(objectId))
                 return element;
         }
         return null;

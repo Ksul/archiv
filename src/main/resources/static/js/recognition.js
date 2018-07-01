@@ -1352,13 +1352,13 @@ function ArchivTyp(srch, parentType) {
     this.makeNewVersion = function (doc, newDoc) {
         if (doc.isLocked)
             doc.unlock();
-        var workingCopy = doc.createVersion("", true);
-        var newFile = search.findNode(workingCopy.nodeRef);
-        newFile.properties.content.write( newDoc.properties.content);
-        newFile.properties['my:documentDate'] = newDoc.properties['my:documentDate'];
+        var workingCopy = doc.checkout();
+        workingCopy.properties.content.write( newDoc.properties.content);
+        workingCopy.properties['cm:title'] = newDoc.properties['cm:title'];
+        workingCopy.properties['my:documentDate'] = newDoc.properties['my:documentDate'];
         if (newDoc.properties['my:amount'])
-            newFile.properties['my:amount'] = newDoc.properties['my:amount'];
-        newFile.save();
+            workingCopy.properties['my:amount'] = newDoc.properties['my:amount'];
+        workingCopy.checkin("", true);
         newDoc.remove();
         Logger.log(Level.INFO, "Neue Version des Dokumentes erstellt");
         return true;
