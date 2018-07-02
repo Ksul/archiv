@@ -1,8 +1,13 @@
 package de.ksul.archiv.repository;
 
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.Property;
+import org.apache.chemistry.opencmis.client.runtime.DocumentImpl;
+import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.commons.collections4.OrderedMap;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -19,7 +24,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     private String id;
     private String name;
     private String path;
-    private TreeMap<String, T> data = new TreeMap<>();
+    private TreeMap<String, T> data = new TreeMap<>(Collections.reverseOrder());
     private TreeNode<T> parent;
     Map<String, TreeNode<T>> children;
 
@@ -216,6 +221,26 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         }
         return null;
     }
+
+    TreeNode<T> makeNewVersion(String version) {
+    T data = this.getData();
+    if (data instanceof Folder)
+        throw new RuntimeException("no version for folder");
+        List<Property<?>> props = ((Document) data).getProperties();
+        List<Property<?>> newProps = new ArrayList<>();
+        for (Property<?> p : props) {
+            newProps.add(new PropertyImpl(p));
+        }
+        try {
+            Field propertiesField = DocumentImpl.class.getDeclaredField("properties");
+            propertiesField.setAccessible(true);
+            propertiesField.set(this, newProps);
+        } catch (Exception e) {
+            throw new RuntimeException(("Properties not set!"));
+        }
+        return this;
+    }
+
 
     @Override
     public String toString() {

@@ -245,6 +245,15 @@ public class Repository {
             return null;
     }
 
+    FileableCmisObject makeNewVersion(String id, String version) {
+        if (root == null)
+            throw new RuntimeException("no Root Node!");
+        if (id == null)
+            throw new RuntimeException("id must be set!");
+        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+        return node.makeNewVersion(version).getData();
+    }
+
     ContentStream getContent(FileableCmisObject cmisObject) {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");

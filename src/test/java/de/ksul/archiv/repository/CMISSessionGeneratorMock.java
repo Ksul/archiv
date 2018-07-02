@@ -977,6 +977,14 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         String[] parts = holder.getValue().split(";");
                         Document document = (Document) repository.getById(parts[0]);
                         if (!document.isPrivateWorkingCopy()) throw new CmisVersioningException();
+                        String version;
+                        if (major)
+                            version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("1")).toString();
+                        else
+                            version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString();
+                        document = (Document) repository.makeNewVersion(parts[0], version);
+                        ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(version);
+
                         if (properties != null && properties.getProperties() != null && !properties.getProperties().isEmpty()) {
                             document.updateProperties(properties.getProperties());
                         }
@@ -984,13 +992,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                             repository.changeContent(document, stream);
                         }
                         ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(false);
-                        String version;
-                        if (major)
-                            version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("1")).toString();
-                       else
-                            version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString();
-                        ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(version);
-                        holder.setValue(parts[0]+ ";" + version);
+                         holder.setValue(parts[0]+ ";" + version);
                         if (checkinComment != null && !checkinComment.isEmpty())
                             ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);
                         ((PropertyImpl) document.getProperty("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
