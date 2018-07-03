@@ -996,15 +996,12 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                         else
                             version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString();
                         document = (Document) repository.makeNewVersion(parts[0], version);
-                        ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(version);
-                        ((PropertyImpl) document.getProperty("cmis:objectId")).setValue(parts[0] + ";" + version);
                         if (properties != null && properties.getProperties() != null && !properties.getProperties().isEmpty()) {
                             document.updateProperties(properties.getProperties());
                         }
                         if (stream != null) {
                             repository.changeContent(document, stream);
                         }
-                        ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(false);
                          holder.setValue(parts[0]+ ";" + version);
                         if (checkinComment != null && !checkinComment.isEmpty())
                             ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);

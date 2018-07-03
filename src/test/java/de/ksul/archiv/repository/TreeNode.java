@@ -1,12 +1,14 @@
 package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.DocumentImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -24,7 +26,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     private String id;
     private String name;
     private String path;
-    private TreeMap<String, T> data = new TreeMap<>(Collections.reverseOrder());
+    private T obj;
+    private TreeMap<String,  LinkedHashMap<String, Property<?>>> data = new TreeMap<>(Collections.reverseOrder());
     private TreeNode<T> parent;
     Map<String, TreeNode<T>> children;
 
@@ -38,32 +41,48 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
     private List<TreeNode<T>> elementsIndex;
 
-    TreeNode(String id, String name, T data) {
+    TreeNode(String id, String name, T obj) {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.data.put("" ,data);
+        this.obj = obj;
         this.children = new HashMap<>();
         this.elementsIndex = new LinkedList<TreeNode<T>>();
         this.elementsIndex.add(this);
     }
 
-    TreeNode(String id, String name,  T data, String version) {
+    TreeNode(String id, String name,  T obj, String version) {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.data.put(version == null ? "" : version, data);
+        this.obj = obj;
         this.children = new HashMap<>();
         this.elementsIndex = new LinkedList<TreeNode<T>>();
         this.elementsIndex.add(this);
+        if (version != null) {
+            LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
+            for (Property<?> p : ((FileableCmisObject) obj).getProperties()) {
+                props.put(p.getId(), new PropertyImpl(p));
+            }
+            this.data.put(version, props);
+        }
     }
 
-    public T getData() {
-        return data.get(data.firstKey());
+    public T getObj() {
+        return obj;
     }
 
-    public T getData(String version) {
-        return data.get(version);
+    public T getObj(String version) {
+        if (!data.containsKey(version))
+            throw new CmisVersioningException("version not found");
+        try {
+            Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
+            propertiesField.setAccessible(true);
+            propertiesField.set(obj, data.get(version));
+        } catch (Exception e) {
+            throw new RuntimeException(("Properties not set!"));
+        }
+        return obj;
     }
 
     public boolean containsData (String version){ return data.containsKey(version);}
@@ -121,12 +140,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         return this;
     }
 
-    void updateNode(T child) {
-        this.data.put("", child);
-    }
-
-    void updateNode(T child, String version) {
-        this.data.put(version, child);
+    void updateNode(T obj, String version) {
+        LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
+        for (Property<?> p : ((FileableCmisObject) obj).getProperties()) {
+            props.put(p.getId(), new PropertyImpl(p));
+        }
+        this.data.put(version, props);
     }
 
     int getLevel() {
@@ -218,30 +237,20 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
     TreeNode<T> makeNewVersion(String version) {
-    T data = this.getData();
-    if (data instanceof Folder)
-        throw new RuntimeException("no version for folder");
-        List<Property<?>> props = ((Document) data).getProperties();
+        List<Property<?>> props = ((FileableCmisObject) obj).getProperties();
         LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
         for (Property<?> p : props) {
             newProps.put(p.getId(), new PropertyImpl(p));
         }
-        try {
-            Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
-            propertiesField.setAccessible(true);
-            propertiesField.set(data, newProps);
-        } catch (Exception e) {
-            throw new RuntimeException(("Properties not set!"));
-        }
-        this.data.put(version, data);
+        ((PropertyImpl) newProps.get("cmis:versionLabel")).setValue(version);
+        ((PropertyImpl) newProps.get("cmis:objectId")).setValue(((FileableCmisObject) obj).getProperty("cmis:versionSeriesId").getValueAsString() + ";" + version);
+        ((PropertyImpl) newProps.get("cmis:isPrivateWorkingCopy")).setValue(false);
+       // ((PropertyImpl) newProps.get("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
+
+        this.data.put(version, newProps);
         return this;
     }
 
-
-    @Override
-    public String toString() {
-        return data != null ? data.toString() : "[data null]";
-    }
 
     @Override
     public Iterator<TreeNode<T>> iterator() {

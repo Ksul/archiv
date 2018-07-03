@@ -59,7 +59,7 @@ public class Repository {
         query = query.replace("%", ".*");
         for (TreeNode<FileableCmisObject> node : root){
             if (node.getName().matches(query))
-                list.add(node.getData());
+                list.add(node.getObj());
         }
         return list;
     }
@@ -81,7 +81,7 @@ public class Repository {
                 if (node.getParent() != null && node.getParent().equals(startNode)) {
                     skip--;
                     if (skip <= 0)
-                        ret.add(node.getData());
+                        ret.add(node.getObj());
                     if (i >= maxItems)
                         break;
                     i++;
@@ -101,7 +101,7 @@ public class Repository {
         if (startNode != null) {
             for (TreeNode<FileableCmisObject> node : startNode) {
                 if (node.getParent() != null && node.getParent().equals(startNode)) {
-                        ret.add(node.getData());
+                        ret.add(node.getObj());
                         ret.addAll(getChildrenForAllLevels(node.getId()));
                 }
             }
@@ -121,7 +121,7 @@ public class Repository {
             if (node.getParent() == null)
                 return null;
             else
-                return node.getParent().getData();
+                return node.getParent().getObj();
         }
     }
 
@@ -172,7 +172,7 @@ public class Repository {
         TreeNode<FileableCmisObject> sourceFolder = node.getParent();
         TreeNode<FileableCmisObject> movedNode = node.moveNode(parent);
         logger.info(node.getName() + " [ID: " + cmisObject.getId() + "] from Path: " + sourceFolder.getName() + " [ID: " + sourceFolder.getId() + "] to Path: " + parent.getName() + " [ID: " + parent.getId() + "] moved!");
-        return movedNode.getData();
+        return movedNode.getObj();
     }
 
     void insert(String parent, FileableCmisObject cmisObject) {
@@ -231,7 +231,7 @@ public class Repository {
             path = path.substring(0, path.length() - 1);
         TreeNode<FileableCmisObject> node = root.findTreeNodeForPath(path);
         if (node != null)
-            return node.getData();
+            return node.getObj();
         else
             return null;
     }
@@ -245,9 +245,9 @@ public class Repository {
         if (node != null) {
             String[] parts = id.split(";");
             if (parts.length == 1)
-                return node.getData();
+                return node.getObj();
             else if (node.containsData(parts[1]))
-                return node.getData(parts[1]);
+                return node.getObj(parts[1]);
             else
                 throw new CmisObjectNotFoundException(("version not found!"));
         }
@@ -261,7 +261,7 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
-        return node.makeNewVersion(version).getData();
+        return node.makeNewVersion(version).getObj();
     }
 
     ContentStream getContent(FileableCmisObject cmisObject) {
@@ -275,7 +275,7 @@ public class Repository {
             throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        return getContentService().getContent((UUID) ((Document) root.findTreeNodeForId(id.getId()).getData()).getPropertyValue("cmis:contentStreamId"));
+        return getContentService().getContent((UUID) ((Document) root.findTreeNodeForId(id.getId()).getObj()).getPropertyValue("cmis:contentStreamId"));
     }
 
     void changeContent(FileableCmisObject cmisObject, ContentStream newContent) {
