@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -26,9 +27,14 @@ public class Repository {
     private static Logger logger = LoggerFactory.getLogger(Repository.class.getName());
 
     TreeNode<FileableCmisObject> root;
+    private ContentService contentService = new ContentService();
 
 
     private String rootId;
+
+    public ContentService getContentService() {
+        return contentService;
+    }
 
     String getId() {
         return UUID.randomUUID().toString();
@@ -184,8 +190,12 @@ public class Repository {
             if (root == null)
                 throw new RuntimeException("no Root Node!");
             TreeNode<FileableCmisObject> node = root.findTreeNodeForPath(parentPath);
-            if (node != null)
-                node.addNode(id, name, cmisObject, contentStream, version);
+            if (node != null) {
+                node.addNode(id, name, cmisObject, version);
+                if (contentStream != null) {
+                    ((Document) cmisObject).setContentStream(contentStream, true);
+                }
+            }
             else
                 throw new RuntimeException("Parent " + parentPath + " not found!");
         }
@@ -265,7 +275,7 @@ public class Repository {
             throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        return root.findTreeNodeForId(id.getId()).getContentStream();
+        return getContentService().getContent((UUID) ((Document) root.findTreeNodeForId(id.getId()).getData()).getPropertyValue("cmis:contentStreamId"));
     }
 
     void changeContent(FileableCmisObject cmisObject, ContentStream newContent) {

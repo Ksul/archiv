@@ -3,6 +3,7 @@ package de.ksul.archiv.repository;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Property;
+import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.DocumentImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -20,7 +21,6 @@ import java.util.*;
 
 public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
-    private ContentStream contentStream;
     private String id;
     private String name;
     private String path;
@@ -48,12 +48,11 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.elementsIndex.add(this);
     }
 
-    TreeNode(String id, String name,  T data, ContentStream contentStream, String version) {
+    TreeNode(String id, String name,  T data, String version) {
         this.id = id;
         this.name = name;
         this.path ="/";
         this.data.put(version == null ? "" : version, data);
-        this.contentStream = contentStream;
         this.children = new HashMap<>();
         this.elementsIndex = new LinkedList<TreeNode<T>>();
         this.elementsIndex.add(this);
@@ -68,10 +67,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
     public boolean containsData (String version){ return data.containsKey(version);}
-
-    ContentStream getContentStream() {
-        return contentStream;
-    }
 
     public String getName() {
         return name;
@@ -88,8 +83,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
     
 
-    TreeNode<T> addNode(String id, String name, T child, ContentStream contentStream, String version) {
-        TreeNode<T> childNode = new TreeNode<T>(id, name, child, contentStream, version);
+    TreeNode<T> addNode(String id, String name, T child, String version) {
+        TreeNode<T> childNode = new TreeNode<T>(id, name, child, version);
         childNode.parent = this;
         this.children.put(name, childNode);
         StringBuilder pfad = new StringBuilder(name);
@@ -227,17 +222,18 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     if (data instanceof Folder)
         throw new RuntimeException("no version for folder");
         List<Property<?>> props = ((Document) data).getProperties();
-        List<Property<?>> newProps = new ArrayList<>();
+        LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
         for (Property<?> p : props) {
-            newProps.add(new PropertyImpl(p));
+            newProps.put(p.getId(), new PropertyImpl(p));
         }
         try {
-            Field propertiesField = DocumentImpl.class.getDeclaredField("properties");
+            Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
             propertiesField.setAccessible(true);
-            propertiesField.set(this, newProps);
+            propertiesField.set(data, newProps);
         } catch (Exception e) {
             throw new RuntimeException(("Properties not set!"));
         }
+        this.data.put(version, data);
         return this;
     }
 

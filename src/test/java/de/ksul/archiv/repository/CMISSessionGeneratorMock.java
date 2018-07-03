@@ -396,8 +396,18 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         propertyContentStreamMimeTypeDefinition.setCardinality(Cardinality.SINGLE);
         propertyContentStreamMimeTypeDefinition.setPropertyType(PropertyType.STRING);
         propertyContentStreamMimeTypeDefinition.setUpdatability(Updatability.READONLY);
-
         map.put("cmis:contentStreamMimeType", propertyContentStreamMimeTypeDefinition);
+
+        PropertyIdDefinitionImpl propertyContentStreamIdTypeDefinition = new PropertyIdDefinitionImpl();
+        propertyContentStreamIdTypeDefinition.setId("cmis:contentStreamId");
+        propertyContentStreamIdTypeDefinition.setDisplayName("Content Stream Id");
+        propertyContentStreamIdTypeDefinition.setQueryName("cmis:contentStreamId");
+        propertyContentStreamIdTypeDefinition.setLocalName("contentStreamId");
+        propertyContentStreamIdTypeDefinition.setCardinality(Cardinality.SINGLE);
+        propertyContentStreamIdTypeDefinition.setPropertyType(PropertyType.STRING);
+        propertyContentStreamIdTypeDefinition.setUpdatability(Updatability.READONLY);
+        map.put("cmis:contentStreamId", propertyContentStreamIdTypeDefinition);
+
         PropertyIdDefinitionImpl propertySecondaryObjectTypeIdDefinition = new PropertyIdDefinitionImpl();
         propertySecondaryObjectTypeIdDefinition.setId("cmis:secondaryObjectTypeIds");
         propertySecondaryObjectTypeIdDefinition.setDisplayName("Secondary Object Type Id");
@@ -518,6 +528,9 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             }
             if (!properties.getProperties().containsKey("cmis:versionLabel")) {
                 properties.addProperty(fillProperty("cmis:versionLabel", "1.0"));
+            }
+            if (!properties.getProperties().containsKey("cmis:contentStreamId")) {
+                properties.addProperty(fillProperty("cmis:contentStreamId", null));
             }
             if (!properties.getProperties().containsKey("cmis:contentStreamMimeType")) {
                 properties.addProperty(fillProperty("cmis:contentStreamMimeType", mimeType));
@@ -984,7 +997,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                             version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString();
                         document = (Document) repository.makeNewVersion(parts[0], version);
                         ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(version);
-
+                        ((PropertyImpl) document.getProperty("cmis:objectId")).setValue(parts[0] + ";" + version);
                         if (properties != null && properties.getProperties() != null && !properties.getProperties().isEmpty()) {
                             document.updateProperties(properties.getProperties());
                         }
@@ -1010,10 +1023,15 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         ObjectServiceImpl objectService = mock(ObjectServiceImpl.class);
         doAnswer(new Answer() {
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                Holder<String> holder = (Holder) invocation.getArguments()[1];
-                String objectId = holder.getValue();
-                ContentStreamImpl stream = (ContentStreamImpl) repository.getContent(new ObjectIdImpl(objectId));
-                stream.setStream(((ContentStream) invocation.getArguments()[4]).getStream());
+                Holder<String> idHolder = (Holder) invocation.getArguments()[1];
+                String objectId = idHolder.getValue();
+                boolean overwrite = invocation.getArgument(2);
+                UUID uuid = repository.getContentService().createContent(objectId, ((ContentStream) invocation.getArguments()[4]), overwrite);
+                DocumentImpl document = (DocumentImpl) repository.getById(objectId);
+                ((PropertyImpl) document.getProperty("cmis:contentStreamId")).setValue(uuid);
+
+                //ContentStreamImpl stream = (ContentStreamImpl) repository.getContent(new ObjectIdImpl(objectId));
+                //stream.setStream(((ContentStream) invocation.getArguments()[4]).getStream());
                 return null;
             }
 
