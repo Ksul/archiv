@@ -75,10 +75,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     public T getObj(String version) {
         if (!data.containsKey(version))
             throw new CmisVersioningException("version not found");
+        LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
+        LinkedHashMap<String, Property<?>> versionProps = data.get(version);
+        Iterator<String> it = versionProps.keySet().iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            props.put(key, new PropertyImpl<>(versionProps.get(key)));
+        }
         try {
             Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
             propertiesField.setAccessible(true);
-            propertiesField.set(obj, data.get(version));
+            propertiesField.set(obj, props);
         } catch (Exception e) {
             throw new RuntimeException(("Properties not set!"));
         }
