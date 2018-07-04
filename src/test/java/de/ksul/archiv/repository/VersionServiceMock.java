@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
  */
 public class VersionServiceMock {
 
-    private VersioningService versioningService;
+    private static VersioningService versioningService;
 
     public VersionServiceMock(Repository repository) {
         if (versioningService == null)

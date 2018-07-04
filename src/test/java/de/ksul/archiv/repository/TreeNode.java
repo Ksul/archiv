@@ -73,6 +73,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
     public T getObj(String version) {
+        if (((FileableCmisObject) obj).getPropertyValue("cmis:versionLabel").toString().equals(version))
+            return obj;
         if (!data.containsKey(version))
             throw new CmisVersioningException("version not found");
         LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
