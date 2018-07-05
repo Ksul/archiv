@@ -68,6 +68,15 @@ public class VersionServiceMock {
                     version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("1")).toString();
                 else
                     version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString();
+                if (checkinComment != null && !checkinComment.isEmpty())
+                    ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);
+                ((PropertyImpl) document.getProperty("cmis:lastModificationDate")).setValue(MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
+
+
+                ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(version);
+                ((PropertyImpl) document.getProperty("cmis:objectId")).setValue(document.getProperty("cmis:versionSeriesId").getValueAsString() + ";" + version);
+                ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(false);
+
                 document = (Document) repository.makeNewVersion(parts[0], version);
                 if (properties != null && properties.getProperties() != null && !properties.getProperties().isEmpty()) {
                     document.updateProperties(properties.getProperties());
@@ -76,9 +85,7 @@ public class VersionServiceMock {
                     repository.changeContent(document, stream);
                 }
                 holder.setValue(parts[0] + ";" + version);
-                if (checkinComment != null && !checkinComment.isEmpty())
-                    ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);
-                ((PropertyImpl) document.getProperty("cmis:lastModificationDate")).setValue(MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
+
 
                 return null;
             }

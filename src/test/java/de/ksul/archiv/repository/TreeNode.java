@@ -8,6 +8,7 @@ import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.DocumentImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 
 import java.lang.reflect.Field;
@@ -82,7 +83,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         Iterator<String> it = versionProps.keySet().iterator();
         while (it.hasNext()) {
             String key = it.next();
-            props.put(key, new PropertyImpl<>(versionProps.get(key)));
+            props.put(key, versionProps.get(key));
         }
         try {
             Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
@@ -149,12 +150,14 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         return this;
     }
 
-    void updateNode(T obj, String version) {
-        LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
-        for (Property<?> p : ((FileableCmisObject) obj).getProperties()) {
-            props.put(p.getId(), new PropertyImpl(p));
+    void updateNode(LinkedHashMap<String, Property<?>>  properties) {
+        try {
+            Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
+            propertiesField.setAccessible(true);
+            propertiesField.set(obj, properties);
+        } catch (Exception e) {
+            throw new RuntimeException(("Properties not set!"));
         }
-        this.data.put(version, props);
     }
 
     int getLevel() {
@@ -251,10 +254,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         for (Property<?> p : props) {
             newProps.put(p.getId(), new PropertyImpl(p));
         }
-        ((PropertyImpl) newProps.get("cmis:versionLabel")).setValue(version);
-        ((PropertyImpl) newProps.get("cmis:objectId")).setValue(((FileableCmisObject) obj).getProperty("cmis:versionSeriesId").getValueAsString() + ";" + version);
-        ((PropertyImpl) newProps.get("cmis:isPrivateWorkingCopy")).setValue(false);
-       // ((PropertyImpl) newProps.get("cmis:lastModificationDate")).setValue( copyDateTimeValue(new Date().getTime()));
 
         this.data.put(version, newProps);
         return this;

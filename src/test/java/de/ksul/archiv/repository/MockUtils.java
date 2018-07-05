@@ -314,6 +314,14 @@ public class MockUtils {
          return secondaryPropertyDefinitionMap;
     }
 
+    Map<String, PropertyDefinition<?>> getAllPropertyDefinitionMap() {
+        Map<String, PropertyDefinition<?>>  allPropertyDefinitionMap = new HashMap<>();
+        allPropertyDefinitionMap.putAll(propertyDefinitionMap);
+        allPropertyDefinitionMap.putAll(secondaryPropertyDefinitionMap);
+        return allPropertyDefinitionMap;
+        
+    }
+
     private static Map<String, SecondaryType> secondaryTypeStore;
 
     Map<String, SecondaryType>  getSecondaryTypeStore(SessionImpl sessionImpl){

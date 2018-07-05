@@ -1,20 +1,18 @@
 package de.ksul.archiv.repository;
 
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ObjectId;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
+import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.Properties;
+import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -125,19 +123,41 @@ public class Repository {
         }
     }
 
-    void update(FileableCmisObject cmisObject, FileableCmisObject cmisObjectNew, String version) {
-        if (cmisObject == null)
-            throw new RuntimeException("cmisObject must be set!");
-        if (cmisObjectNew == null)
-            throw new RuntimeException("cmisObjectNew must be set!");
+    void update(String id , Map<String, PropertyData<?>> properties) {
+        if (id == null)
+            throw new RuntimeException("id must be set!");
+        if (properties == null)
+            throw new RuntimeException("properties must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(cmisObject.getId());
+        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
         if (node == null)
-            throw new RuntimeException("Node with Id " + cmisObject.getId() + " not found!");
-        else
-        node.updateNode(cmisObjectNew, version);
-        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] changed in repository!");
+            throw new RuntimeException("Node with Id " + id + " not found!");
+        List<Property<?>> props = node.getObj().getProperties();
+        LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
+        for (Property<?> p : props) {
+            newProps.put(p.getId(), new PropertyImpl(p));
+        }
+        Iterator<String> it = properties.keySet().iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            newProps.put(key,  new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(key), properties.get(key).getValues()));
+        }
+        node.updateNode(newProps);
+
+//        for (PropertyData p : properties.) {
+//
+//            PropertyImpl property = new PropertyImpl()
+//            properties.addProperty(property);
+//        }
+//        Iterator<String> it = versionProps.keySet().iterator();
+//        while (it.hasNext()) {
+//            String key = it.next();
+//            props.put(key, new PropertyImpl<>(versionProps.get(key)));
+//        }
+//        node.updateNode(cmisObjectNew, version);
+//        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] changed in repository!");
+
     }
 
     List<String> deleteTree(FileableCmisObject cmisObject) {
@@ -261,6 +281,7 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+
         return node.makeNewVersion(version).getObj();
     }
 

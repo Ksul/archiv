@@ -78,26 +78,9 @@ public class ObjectServiceMock {
         doAnswer(new Answer() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                FileableCmisObject cmisObjectNew;
                 String objectId = (String) ((Holder) invocation.getArguments()[1]).getValue();
-                FileableCmisObject cmisObject = repository.getById(objectId);
-                ObjectDataImpl objectData = (ObjectDataImpl) MockUtils.getInstance().getObjectDataFromCmisObject(cmisObject);
-                for (PropertyData property : ((Properties) invocation.getArguments()[3]).getPropertyList()) {
-                    PropertiesImpl properties = (PropertiesImpl) objectData.getProperties();
-                    properties.addProperty(property);
-                }
 
-                if (cmisObject.getType() instanceof FolderType) {
-                    cmisObjectNew = new FolderImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
-                    repository.update(cmisObject, cmisObjectNew, "");
-                }
-                else {
-
-                    cmisObjectNew = new DocumentImpl(sessionImpl, cmisObject.getType(), objectData, new OperationContextImpl());
-                    ((PropertyImpl) cmisObjectNew.getProperty("cmis:lastModificationDate")).setValue( MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
-                    repository.update(cmisObject, cmisObjectNew, ((DocumentImpl) cmisObjectNew).getVersionLabel());
-                }
-
+                repository.update(objectId, ((Properties) invocation.getArguments()[3]).getProperties());
                 return null;
             }
         }).when(objectService).updateProperties(anyString(), any(Holder.class), any(Holder.class), any(Properties.class), any());

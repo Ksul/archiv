@@ -840,7 +840,7 @@ public class AlfrescoConnector {
                         try {
                             Long value = Long.parseLong((String) properties.get(key));
                             date.setTime(value);
-                        } catch (NumberFormatException e) {}
+                        } catch (NumberFormatException ignored) {}
                     }
                     props.put(key, date);
                 } else if (definition instanceof PropertyDecimalDefinition) {
