@@ -3,6 +3,7 @@ package de.ksul.archiv.repository;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
@@ -48,7 +49,7 @@ public class VersionServiceMock {
                 String[] parts = holder.getValue().split(";");
                 Document document = (Document) repository.getById(parts[0]);
                 if (document.isPrivateWorkingCopy()) throw new CmisVersioningException();
-                ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(true);
+                ((PropertyImpl) document.getProperty(PropertyIds.IS_PRIVATE_WORKING_COPY)).setValue(true);
                 return null;
             }
         }).when(versioningService).checkOut(anyString(), any(Holder.class), any(), any());
@@ -65,25 +66,27 @@ public class VersionServiceMock {
                 if (!document.isPrivateWorkingCopy()) throw new CmisVersioningException();
                 String version;
                 if (major)
-                    version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("1")).toString();
+                    version = new BigDecimal(document.getProperty(PropertyIds.VERSION_LABEL).getValueAsString()).add(new BigDecimal("1")).toString();
                 else
-                    version = new BigDecimal(document.getProperty("cmis:versionLabel").getValueAsString()).add(new BigDecimal("0.1")).toString();
+                    version = new BigDecimal(document.getProperty(PropertyIds.VERSION_LABEL).getValueAsString()).add(new BigDecimal("0.1")).toString();
                 if (checkinComment != null && !checkinComment.isEmpty())
-                    ((PropertyImpl) document.getProperty("cmis:checkinComment")).setValue(checkinComment);
-                ((PropertyImpl) document.getProperty("cmis:lastModificationDate")).setValue(MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
+                    ((PropertyImpl) document.getProperty(PropertyIds.CHECKIN_COMMENT)).setValue(checkinComment);
+                ((PropertyImpl) document.getProperty(PropertyIds.LAST_MODIFICATION_DATE)).setValue(MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
 
 
-                ((PropertyImpl) document.getProperty("cmis:versionLabel")).setValue(version);
-                ((PropertyImpl) document.getProperty("cmis:objectId")).setValue(document.getProperty("cmis:versionSeriesId").getValueAsString() + ";" + version);
-                ((PropertyImpl) document.getProperty("cmis:isPrivateWorkingCopy")).setValue(false);
+                ((PropertyImpl) document.getProperty(PropertyIds.VERSION_LABEL)).setValue(version);
+                ((PropertyImpl) document.getProperty(PropertyIds.OBJECT_ID)).setValue(document.getProperty(PropertyIds.VERSION_SERIES_ID).getValueAsString() + ";" + version);
+                ((PropertyImpl) document.getProperty(PropertyIds.IS_PRIVATE_WORKING_COPY)).setValue(false);
+
+                if (stream != null) {
+                    repository.changeContent(document, stream);
+                }
 
                 document = (Document) repository.makeNewVersion(parts[0], version);
                 if (properties != null && properties.getProperties() != null && !properties.getProperties().isEmpty()) {
                     document.updateProperties(properties.getProperties());
                 }
-                if (stream != null) {
-                    repository.changeContent(document, stream);
-                }
+
                 holder.setValue(parts[0] + ";" + version);
 
 

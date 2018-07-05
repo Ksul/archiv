@@ -14,28 +14,28 @@ import java.util.UUID;
  */
 public class ContentService {
 
-    private TreeMap<UUID, ContentStream> contents = new TreeMap<>();
-    private TreeMap<String, UUID> ids = new TreeMap<>();
+    private TreeMap<String, ContentStream> contents = new TreeMap<>();
+    private TreeMap<String, String> ids = new TreeMap<>();
 
-    public UUID createContent( String id, ContentStream content, boolean overwrite) {
+    public String createContent( String id, ContentStream content, boolean overwrite) {
         if (ids.containsKey(id) && !overwrite)
             throw new CmisContentAlreadyExistsException();
-        UUID uuid = UUID.randomUUID();
+        String uuid = UUID.randomUUID().toString();
         contents.put(uuid, content);
         ids.put(id, uuid);
         return uuid;
     }
 
-    public ContentStream getContent(UUID uuid) {
+    public ContentStream getContent(String uuid) {
         if (contents.containsKey(uuid))
             return contents.get(uuid);
         else
             return null;
     }
 
-    public ContentStream getContent(String id) {
-        if (ids.containsKey(id))
-            return getContent(ids.get(id));
+    public ContentStream getContentForObjectId(String objectId) {
+        if (ids.containsKey(objectId))
+            return getContent(ids.get(objectId));
         else
             return null;
     }

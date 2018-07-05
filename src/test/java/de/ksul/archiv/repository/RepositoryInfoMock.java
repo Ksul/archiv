@@ -1,6 +1,8 @@
 package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,7 +30,11 @@ public class RepositoryInfoMock {
 
         RepositoryInfo info = mock(RepositoryInfo.class);
         when(info.getId()).thenReturn("0");
-        when(info.getRootFolderId()).thenReturn(repository.getRootId());
+        when(info.getRootFolderId()).thenAnswer(new Answer<String>() {
+            public String answer(InvocationOnMock invocation) throws Throwable {
+                  return repository.getRootId();
+            }
+        });
         return info;
     }
 }

@@ -6,6 +6,7 @@ import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.bindings.spi.BindingSession;
 import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
 import org.apache.chemistry.opencmis.client.runtime.*;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
@@ -56,9 +57,9 @@ public class ObjectServiceMock {
                 Holder<String> idHolder = (Holder) invocation.getArguments()[1];
                 String objectId = idHolder.getValue();
                 boolean overwrite = invocation.getArgument(2);
-                UUID uuid = repository.getContentService().createContent(objectId, ((ContentStream) invocation.getArguments()[4]), overwrite);
+                String uuid = repository.getContentService().createContent(objectId, ((ContentStream) invocation.getArguments()[4]), overwrite);
                 DocumentImpl document = (DocumentImpl) repository.getById(objectId);
-                ((PropertyImpl) document.getProperty("cmis:contentStreamId")).setValue(uuid);
+                ((PropertyImpl) document.getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(uuid);
 
                 //ContentStreamImpl stream = (ContentStreamImpl) repository.getContent(new ObjectIdImpl(objectId));
                 //stream.setStream(((ContentStream) invocation.getArguments()[4]).getStream());
@@ -93,7 +94,7 @@ public class ObjectServiceMock {
                 FileableCmisObject cmisObject = repository.getById(objectId);
                 repository.move(targetFolderId, cmisObject);
                 for (Property property : cmisObject.getProperties()) {
-                    if (property.getId().equalsIgnoreCase("cmis:parentId")) {
+                    if (property.getId().equalsIgnoreCase(PropertyIds.PARENT_ID)) {
                         ((PropertyImpl) property).setValue(targetFolderId);
                         break;
                     }

@@ -3,6 +3,7 @@ package de.ksul.archiv.repository;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
@@ -34,7 +35,7 @@ public class Repository {
         return contentService;
     }
 
-    String getId() {
+    String UUId() {
         return UUID.randomUUID().toString();
     }
 
@@ -42,8 +43,8 @@ public class Repository {
         return rootId;
     }
 
-    void setRootId(String id) {
-        this.rootId = UUID.randomUUID().toString();
+    void setRootId(String uuid) {
+        this.rootId = uuid;
     }
 
     List<FileableCmisObject> query(String query) {
@@ -156,7 +157,7 @@ public class Repository {
 //            props.put(key, new PropertyImpl<>(versionProps.get(key)));
 //        }
 //        node.updateNode(cmisObjectNew, version);
-//        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "][Path: " + cmisObject.getPaths().get(0) + "] changed in repository!");
+//        logger.info(cmisObject.getName() + " [ID: " + cmisObject.UUId() + "][Path: " + cmisObject.getPaths().get(0) + "] changed in repository!");
 
     }
 
@@ -296,7 +297,7 @@ public class Repository {
             throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        return getContentService().getContent((UUID) ((Document) root.findTreeNodeForId(id.getId()).getObj()).getPropertyValue("cmis:contentStreamId"));
+        return getContentService().getContent(root.findTreeNodeForId(id.getId()).getObj().getPropertyValue(PropertyIds.CONTENT_STREAM_ID));
     }
 
     void changeContent(FileableCmisObject cmisObject, ContentStream newContent) {

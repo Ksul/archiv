@@ -465,7 +465,7 @@ public class MockUtils {
      FileableCmisObject createFileableCmisObject(Repository repository, SessionImpl sessionImpl, Map<String, Object> props, String path, String name, ObjectType objectType, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
-        String versionSeriesId = repository.getId();
+        String versionSeriesId = repository.UUId();
         PropertiesImpl properties;
         ObjectDataImpl objectData = new ObjectDataImpl();
         if (props == null)

@@ -105,36 +105,15 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         return contentStream;
     }
 
-
-
-
-
-
-
     @Override
     public Session generateSession() {
 
         return sessionImpl;
     }
 
-
-
-
-
-
-
     private CollectionIterable<FileableCmisObject> mockCollectionIterable() {
         CollectionIterable<FileableCmisObject> collectionIterable = mock(CollectionIterable.class);
         return collectionIterable;
     }
-
-
-
-
-
-
-
-
-
 
 }
