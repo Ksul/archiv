@@ -5,10 +5,12 @@ import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -284,6 +286,22 @@ public class Repository {
         TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
 
         return node.makeNewVersion(version).getObj();
+    }
+
+    List<ObjectData> getAllVersions(String id) {
+        if (root == null)
+            throw new RuntimeException("no Root Node!");
+        if (id == null)
+            throw new RuntimeException("id must be set!");
+        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+        List<ObjectData> versions = new ArrayList<>();
+        Iterator<LinkedHashMap<String, Property<?>>> it = node.getAllVersions().values().iterator();
+        while (it.hasNext()) {
+            ObjectDataImpl objectData = new ObjectDataImpl();
+            objectData.setProperties(new PropertiesImpl(((Collection<PropertyData<?>>) ((Collection<?>) it.next().values()))));
+            versions.add(objectData);
+        }
+        return versions;
     }
 
     ContentStream getContent(FileableCmisObject cmisObject) {

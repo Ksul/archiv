@@ -5,6 +5,7 @@ import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
@@ -14,12 +15,14 @@ import org.mockito.stubbing.Answer;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +45,7 @@ public class VersionServiceMock {
 
     private VersioningService getMock(Repository repository) {
         VersioningService versioningService = mock(VersioningService.class);
+
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -93,6 +97,15 @@ public class VersionServiceMock {
                 return null;
             }
         }).when(versioningService).checkIn(anyString(), any(Holder.class), anyBoolean(), any(Properties.class), any(), any(), any(), any(), any(), any());
+
+        when(versioningService.getAllVersions(anyString(), anyString(), anyString(), any(), anyBoolean(), any())).then(new Answer<List<ObjectData>>() {
+            @Override
+            public List<ObjectData> answer(InvocationOnMock invocation) throws Throwable {
+                String objectId = (String) invocation.getArgument(1);
+                return repository.getAllVersions(objectId);
+            }
+        });
+
         return versioningService;
     }
 }

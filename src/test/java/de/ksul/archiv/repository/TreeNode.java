@@ -7,9 +7,14 @@ import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.DocumentImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.apache.chemistry.opencmis.commons.enums.PropertyType;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -74,7 +79,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
     public T getObj(String version) {
-        if (((FileableCmisObject) obj).getPropertyValue("cmis:versionLabel").toString().equals(version))
+        if (((FileableCmisObject) obj).getPropertyValue(PropertyIds.VERSION_LABEL).toString().equals(version))
             return obj;
         if (!data.containsKey(version))
             throw new CmisVersioningException("version not found");
@@ -251,12 +256,50 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     TreeNode<T> makeNewVersion(String version) {
         List<Property<?>> props = ((FileableCmisObject) obj).getProperties();
         LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
+        Map<String, PropertyDefinition<?>> definitions = MockUtils.getInstance().getAllPropertyDefinitionMap();
+        AbstractPropertyData<?> property = null;
         for (Property<?> p : props) {
+            PropertyDefinition<?> definition = definitions.get(p.getId());
+            switch (definition.getPropertyType()) {
+                case STRING:
+                    property = new PropertyStringImpl(definition, p);
+                    break;
+                case ID:
+                    property = new PropertyIdImpl();
+                    break;
+                case BOOLEAN:
+                    property = new PropertyBooleanImpl();
+                    break;
+                case INTEGER:
+                    property = new PropertyIntegerImpl();
+                    break;
+                case DECIMAL:
+                    property = new PropertyDecimalImpl();
+                    break;
+                case DATETIME:
+                    property = new PropertyDateTimeImpl();
+                    break;
+                case HTML:
+                    property = new PropertyHtmlImpl();
+                    break;
+                case URI:
+                    property = new PropertyUriImpl();
+                    break;
+                default:
+                    throw new CmisRuntimeException("Unknown property data type!");
+            }
+            }
+
+
             newProps.put(p.getId(), new PropertyImpl(p));
         }
 
         this.data.put(version, newProps);
         return this;
+    }
+
+    TreeMap<String,  LinkedHashMap<String, Property<?>>> getAllVersions() {
+        return data;
     }
 
 

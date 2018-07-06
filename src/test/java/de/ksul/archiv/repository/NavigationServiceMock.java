@@ -3,6 +3,7 @@ package de.ksul.archiv.repository;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.FolderType;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderList;
@@ -70,7 +71,7 @@ public class NavigationServiceMock {
                 ObjectParentDataImpl objectData = new ObjectParentDataImpl();
                 objectData.setObject(MockUtils.getInstance().getObjectDataFromCmisObject(parentObject));
                 if (cmisObject.getType() instanceof FolderType)
-                    objectData.setRelativePathSegment(parentObject.getPropertyValue("cmis:path"));
+                    objectData.setRelativePathSegment(parentObject.getPropertyValue(PropertyIds.PATH));
                 else
                     objectData.setRelativePathSegment(cmisObject.getName());
 
@@ -88,7 +89,7 @@ public class NavigationServiceMock {
                 for (FileableCmisObject cmisObject : results) {
                     ObjectInFolderDataImpl objectInFolderData = new ObjectInFolderDataImpl();
                     objectInFolderData.setObject(MockUtils.getInstance().getObjectDataFromCmisObject(cmisObject));
-                    objectInFolderData.setPathSegment(cmisObject.getPropertyValue("cmis:path"));
+                    objectInFolderData.setPathSegment(cmisObject.getPropertyValue(PropertyIds.PATH));
                     folderDatas.add(objectInFolderData);
                 }
                 if (invocation.getArguments()[3] != null) {
