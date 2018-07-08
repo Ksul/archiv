@@ -17,6 +17,8 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -256,47 +258,15 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     TreeNode<T> makeNewVersion(String version) {
         List<Property<?>> props = ((FileableCmisObject) obj).getProperties();
         LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
-        Map<String, PropertyDefinition<?>> definitions = MockUtils.getInstance().getAllPropertyDefinitionMap();
-        AbstractPropertyData<?> property = null;
         for (Property<?> p : props) {
-            PropertyDefinition<?> definition = definitions.get(p.getId());
-            switch (definition.getPropertyType()) {
-                case STRING:
-                    property = new PropertyStringImpl(definition, p);
-                    break;
-                case ID:
-                    property = new PropertyIdImpl();
-                    break;
-                case BOOLEAN:
-                    property = new PropertyBooleanImpl();
-                    break;
-                case INTEGER:
-                    property = new PropertyIntegerImpl();
-                    break;
-                case DECIMAL:
-                    property = new PropertyDecimalImpl();
-                    break;
-                case DATETIME:
-                    property = new PropertyDateTimeImpl();
-                    break;
-                case HTML:
-                    property = new PropertyHtmlImpl();
-                    break;
-                case URI:
-                    property = new PropertyUriImpl();
-                    break;
-                default:
-                    throw new CmisRuntimeException("Unknown property data type!");
-            }
-            }
-
-
             newProps.put(p.getId(), new PropertyImpl(p));
         }
 
-        this.data.put(version, newProps);
+        this.data.put(version,  newProps);
         return this;
     }
+
+
 
     TreeMap<String,  LinkedHashMap<String, Property<?>>> getAllVersions() {
         return data;

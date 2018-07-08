@@ -9,6 +9,7 @@ import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
@@ -298,8 +299,8 @@ public class Repository {
         Iterator<LinkedHashMap<String, Property<?>>> it = node.getAllVersions().values().iterator();
         while (it.hasNext()) {
             ObjectDataImpl objectData = new ObjectDataImpl();
-            objectData.setProperties(new PropertiesImpl(((Collection<PropertyData<?>>) ((Collection<?>) it.next().values()))));
-            versions.add(objectData);
+            objectData.setProperties(MockUtils.getInstance().getObjectDataFromProperies((List<Property<?>>) it.next().values()));
+            versions.add();
         }
         return versions;
     }
