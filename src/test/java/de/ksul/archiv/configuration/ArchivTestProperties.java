@@ -23,6 +23,8 @@ public class ArchivTestProperties {
 
     private String testTXT;
 
+    private String testData;
+
     public String getTestPDF() {
         return testPDF;
     }
@@ -45,5 +47,13 @@ public class ArchivTestProperties {
 
     public void setTestTXT(String testTXT) {
         this.testTXT = testTXT;
+    }
+
+    public String getTestData() {
+        return testData;
+    }
+
+    public void setTestData(String testData) {
+        this.testData = testData;
     }
 }

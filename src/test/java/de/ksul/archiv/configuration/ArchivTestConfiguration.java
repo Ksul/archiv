@@ -3,10 +3,12 @@ package de.ksul.archiv.configuration;
 import de.ksul.archiv.AlfrescoConnector;
 import de.ksul.archiv.repository.CMISSessionGenerator;
 import de.ksul.archiv.repository.CMISSessionGeneratorMock;
+import de.ksul.archiv.repository.Repository;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 
@@ -17,10 +19,19 @@ import org.springframework.core.io.ResourceLoader;
  * Time: 12:40
  */
 @Configuration
-@EnableConfigurationProperties({ArchivProperties.class})
+@EnableConfigurationProperties({ArchivProperties.class, ArchivTestProperties.class})
+@ComponentScan(basePackages = "de.ksul.archiv.repository")
 public class ArchivTestConfiguration {
 
     private ArchivProperties archivProperties;
+    private  ArchivTestProperties archivTestProperties;
+    private Repository repository;
+
+    @Autowired
+    public void setRepository(Repository repository, ArchivTestProperties archivTestProperties) {
+        this.repository = repository;
+        this.repository.setFile(archivTestProperties.getTestData());
+    }
 
     public ArchivProperties getArchivProperties() {
         return archivProperties;
@@ -31,6 +42,15 @@ public class ArchivTestConfiguration {
         this.archivProperties = archivProperties;
     }
 
+    public ArchivTestProperties getArchivTestProperties() {
+        return archivTestProperties;
+    }
+
+    @Autowired
+    public void setArchivTestProperties(ArchivTestProperties archivTestProperties) {
+        this.archivTestProperties = archivTestProperties;
+    }
+
     public ArchivTestConfiguration() {
 
     }
@@ -39,10 +59,11 @@ public class ArchivTestConfiguration {
     @Autowired
     public Session getSession(ResourceLoader resourceLoader) {
         Session session;
-        CMISSessionGenerator gen = new CMISSessionGeneratorMock(resourceLoader, getArchivProperties());
+        CMISSessionGenerator gen = new CMISSessionGeneratorMock(this.repository, resourceLoader, getArchivProperties(), getArchivTestProperties());
         session = gen.generateSession();
         return session;
     }
+
 
     @Bean
     @Autowired

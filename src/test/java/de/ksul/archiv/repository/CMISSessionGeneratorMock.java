@@ -1,43 +1,27 @@
 package de.ksul.archiv.repository;
 
-import de.ksul.archiv.PDFConnector;
 import de.ksul.archiv.configuration.ArchivProperties;
-import org.apache.chemistry.opencmis.client.api.*;
-import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
-import org.apache.chemistry.opencmis.client.runtime.*;
-import org.apache.chemistry.opencmis.client.runtime.cache.Cache;
-import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
-import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
-import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
-import org.apache.chemistry.opencmis.client.runtime.repository.ObjectFactoryImpl;
+import de.ksul.archiv.configuration.ArchivTestProperties;
+import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.client.runtime.util.CollectionIterable;
-import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.*;
-import org.apache.chemistry.opencmis.commons.data.Properties;
-import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
-import org.apache.chemistry.opencmis.commons.enums.*;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
-import org.apache.chemistry.opencmis.commons.spi.*;
-import org.apache.commons.io.IOUtils;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created with IntelliJ IDEA.
@@ -52,25 +36,22 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     private ResourceLoader resourceLoader;
 
     private SessionImpl sessionImpl;
-    private Repository repository = new Repository();
+    private Repository repository;
+
+    private ArchivTestProperties archivTestProperties;
 
 
 
-    public CMISSessionGeneratorMock(ResourceLoader resourceLoader, ArchivProperties archivProperties) {
+    public CMISSessionGeneratorMock(Repository repository, ResourceLoader resourceLoader, ArchivProperties archivProperties, ArchivTestProperties archivTestProperties) {
 
-
-        //       cmisBindingHelper = mock(CmisBindingHelper.class);
-        //      given(cmisBindingHelper.createBinding(anyMap(), any(AuthenticationProvider.class), any(TypeDefinitionCache.class))).willReturn(binding);
+        this.repository = repository;
+        this.archivTestProperties = archivTestProperties;
         this.resourceLoader = resourceLoader;
 
         mockCollectionIterable();
 
         sessionImpl = new SessionMock(repository).getSession();
         when(sessionImpl.getRepositoryId()).thenReturn("0");
-
-        //sessionFactory = mockSessionFactory();
-        //objectService = ObjectServiceMock.getMock(repository, sessionImpl);
-
 
 
         Map<String, Object> properties = new HashMap<>();
@@ -115,5 +96,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         CollectionIterable<FileableCmisObject> collectionIterable = mock(CollectionIterable.class);
         return collectionIterable;
     }
+
+
 
 }

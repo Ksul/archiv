@@ -95,13 +95,7 @@ public class CMISSessionGeneratorImpl implements CMISSessionGenerator {
             // connection settings
             parameter.put(SessionParameter.ATOMPUB_URL, getAtomPubURL());
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-//		parameter.put(SessionParameter.REPOSITORY_ID, this.repositoryName);
-//		Session session = factory.createSession(parameter);
 
-            // Set the alfresco object factory
-            //parameter.put(SessionParameter.OBJECT_FACTORY_CLASS, "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
-
-            // create session
 
             List<Repository> repositories = factory.getRepositories(parameter);
             session = repositories.get(0).createSession();

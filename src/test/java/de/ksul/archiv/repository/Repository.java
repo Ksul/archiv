@@ -1,5 +1,7 @@
 package de.ksul.archiv.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
@@ -9,13 +11,16 @@ import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -24,15 +29,24 @@ import java.util.*;
  * Date: 4/12/17
  * Time: 11:24 AM
  */
+@Component
 public class Repository {
+
+    private String file;
 
     private static Logger logger = LoggerFactory.getLogger(Repository.class.getName());
 
-    TreeNode<FileableCmisObject> root;
+    private TreeNode<FileableCmisObject> root;
     private ContentService contentService = new ContentService();
 
-
     private String rootId;
+
+    public Repository() {
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
 
     public ContentService getContentService() {
         return contentService;
@@ -295,12 +309,19 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+        TreeMap<String, LinkedHashMap<String, Property<?>>> allVersions = node.getAllVersions();
         List<ObjectData> versions = new ArrayList<>();
-        Iterator<LinkedHashMap<String, Property<?>>> it = node.getAllVersions().values().iterator();
+        Collection<PropertyData<?>> props = new ArrayList<>();
+        Iterator<String> it = allVersions.keySet().iterator();
         while (it.hasNext()) {
             ObjectDataImpl objectData = new ObjectDataImpl();
-            objectData.setProperties(MockUtils.getInstance().getObjectDataFromProperies((List<Property<?>>) it.next().values()));
-            versions.add();
+            String key = it.next();
+            for (Property p : allVersions.get(key).values()) {
+                props.add(MockUtils.getInstance().fillProperty(p.getId(), p.getValue()));
+            }
+            Properties properties = new PropertiesImpl(props);
+            objectData.setProperties(properties);
+            versions.add(objectData);
         }
         return versions;
     }
@@ -323,5 +344,15 @@ public class Repository {
         ContentStreamImpl streamCurrent = (ContentStreamImpl) getContent(new ObjectIdImpl(cmisObject.getId()));
         streamCurrent.setStream(newContent.getStream());
         logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "] changed content!");
+    }
+
+    @PreDestroy
+    public void shutDown() throws IOException {
+        if (file != null && !file.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            mapper.writeValue(new File(file), this);
+        }
+
     }
 }

@@ -444,7 +444,9 @@ public class MockUtils {
         GregorianCalendar result = null;
         if (source != null) {
             GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-            if (source instanceof Number) {
+            if (source instanceof  GregorianCalendar) {
+                result = (GregorianCalendar) source;
+            } else if (source instanceof Number) {
                 cal.setTimeInMillis(((Number) source).longValue());
                 result = cal;
             } else if (source instanceof Date){
@@ -700,44 +702,6 @@ public class MockUtils {
         return result;
     }
 
-     Properties getPropertiesFromProperty(List<Property<?>> props) {
-
-        Map<String, PropertyDefinition<?>> definitions = MockUtils.getInstance().getAllPropertyDefinitionMap();
-        AbstractPropertyData<?> property = null;
-        for (Property<?> p : props) {
-            PropertyDefinition<?> definition = definitions.get(p.getId());
-            switch (definition.getPropertyType()) {
-                case STRING:
-                    property = new PropertyStringImpl((PropertyDefinition<String>) definition, (List<String>) p.getValues());
-                    break;
-                case ID:
-                    property = new PropertyIdImpl((PropertyDefinition<String>) definition, (List<String>) p.getValues());
-                    break;
-                case BOOLEAN:
-                    property = new PropertyBooleanImpl((PropertyDefinition<Boolean>) definition, (List<Boolean>) p.getValues());
-                    break;
-                case INTEGER:
-                    property = new PropertyIntegerImpl((PropertyDefinition<BigInteger>) definition, (List<BigInteger>) p.getValues());
-                    break;
-                case DECIMAL:
-                    property = new PropertyDecimalImpl((PropertyDefinition<BigDecimal>) definition, (List<BigDecimal>) p.getValues());
-                    break;
-                case DATETIME:
-                    property = new PropertyDateTimeImpl((PropertyDefinition<GregorianCalendar>) definition, (List<GregorianCalendar>) p.getValues());
-                    break;
-                case HTML:
-                    property = new PropertyHtmlImpl((PropertyDefinition<String>) definition, (List<String>) p.getValues());
-                    break;
-                case URI:
-                    property = new PropertyUriImpl((PropertyDefinition<String>) definition, (List<String>) p.getValues());
-                    break;
-                default:
-                    throw new CmisRuntimeException("Unknown property data type!");
-            }
-
-        }
-        return property;
-    }
-
+    
 
 }
