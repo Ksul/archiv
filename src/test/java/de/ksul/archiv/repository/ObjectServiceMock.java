@@ -57,12 +57,7 @@ public class ObjectServiceMock {
                 Holder<String> idHolder = (Holder) invocation.getArguments()[1];
                 String objectId = idHolder.getValue();
                 boolean overwrite = invocation.getArgument(2);
-                String uuid = repository.getContentService().createContent(objectId, ((ContentStream) invocation.getArguments()[4]), overwrite);
-                DocumentImpl document = (DocumentImpl) repository.getById(objectId);
-                ((PropertyImpl) document.getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(uuid);
-
-                //ContentStreamImpl stream = (ContentStreamImpl) repository.getContent(new ObjectIdImpl(objectId));
-                //stream.setStream(((ContentStream) invocation.getArguments()[4]).getStream());
+                repository.createContent(objectId,  ((ContentStream) invocation.getArguments()[4]), overwrite);
                 return null;
             }
 

@@ -139,7 +139,7 @@ public class SessionMock {
             public ContentStream answer(InvocationOnMock invocation) {
                 Object[] args = invocation.getArguments();
                 Document document = (Document) args[0];
-                return repository.getContent(document);
+                return repository.getContent(document.getId());
             }
         });
         when(session.getTypeDefinition(anyString())).thenAnswer(new Answer<ObjectType>() {

@@ -19,7 +19,7 @@ public class TreeNodeIter<T> implements Iterator<TreeNode<T>> {
     public TreeNodeIter(TreeNode<T> treeNode) {
         this.treeNode = treeNode;
         this.doNext = ProcessStages.ProcessParent;
-        this.childrenCurNodeIter = treeNode.children.values().iterator();
+        this.childrenCurNodeIter = treeNode.childs.values().iterator();
     }
 
     private ProcessStages doNext;

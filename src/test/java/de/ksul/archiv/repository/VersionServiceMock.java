@@ -83,7 +83,7 @@ public class VersionServiceMock {
                 ((PropertyImpl) document.getProperty(PropertyIds.IS_PRIVATE_WORKING_COPY)).setValue(false);
 
                 if (stream != null) {
-                    repository.changeContent(document, stream);
+                    repository.changeContent(document.getId(), stream);
                 }
 
                 document = (Document) repository.makeNewVersion(parts[0], version);

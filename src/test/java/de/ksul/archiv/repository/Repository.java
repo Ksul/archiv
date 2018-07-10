@@ -37,7 +37,6 @@ public class Repository {
     private static Logger logger = LoggerFactory.getLogger(Repository.class.getName());
 
     private TreeNode<FileableCmisObject> root;
-    private ContentService contentService = new ContentService();
 
     private String rootId;
 
@@ -46,10 +45,6 @@ public class Repository {
 
     public void setFile(String file) {
         this.file = file;
-    }
-
-    public ContentService getContentService() {
-        return contentService;
     }
 
     String UUId() {
@@ -326,24 +321,33 @@ public class Repository {
         return versions;
     }
 
-    ContentStream getContent(FileableCmisObject cmisObject) {
-        if (cmisObject == null)
-            throw new RuntimeException("cmisObject must be set!");
-        return getContent(new ObjectIdImpl(cmisObject.getId()));
-    }
 
-    ContentStream getContent(ObjectId id) {
+    ContentStream getContent(String id) {
         if (id == null)
             throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        return getContentService().getContent(root.findTreeNodeForId(id.getId()).getObj().getPropertyValue(PropertyIds.CONTENT_STREAM_ID));
+        return root.findTreeNodeForId(id).getContent();
     }
 
-    void changeContent(FileableCmisObject cmisObject, ContentStream newContent) {
-        ContentStreamImpl streamCurrent = (ContentStreamImpl) getContent(new ObjectIdImpl(cmisObject.getId()));
+    void createContent(String objectId, ContentStream content, boolean overwrite) {
+        if (objectId == null)
+            throw new RuntimeException("id must be set!");
+        if (root == null)
+            throw new RuntimeException("no Root Node!");
+        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(objectId);
+        String uuid = node.createContent(content, overwrite);
+        ((PropertyImpl) node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(uuid);
+    }
+
+    void changeContent(String objectId, ContentStream newContent) {
+        if (objectId == null)
+        throw new RuntimeException("id must be set!");
+        if (root == null)
+            throw new RuntimeException("no Root Node!");
+        ContentStreamImpl streamCurrent = (ContentStreamImpl) getContent(objectId);
         streamCurrent.setStream(newContent.getStream());
-        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "] changed content!");
+        logger.info("[ID: " + objectId + "] changed content!");
     }
 
     @PreDestroy
@@ -351,7 +355,7 @@ public class Repository {
         if (file != null && !file.isEmpty()) {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            mapper.writeValue(new File(file), this);
+            mapper.writeValue(new File(file), root);
         }
 
     }

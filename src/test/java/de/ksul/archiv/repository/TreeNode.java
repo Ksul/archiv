@@ -1,10 +1,14 @@
 package de.ksul.archiv.repository;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 
 import java.lang.reflect.Field;
@@ -18,22 +22,28 @@ import java.util.*;
  */
 
 
+@JsonIgnoreProperties({"obj", "content"})
 public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
     private String id;
     private String name;
     private String path;
     private T obj;
+    @JsonProperty("data")
     private TreeMap<String,  LinkedHashMap<String, Property<?>>> data = new TreeMap<>(Collections.reverseOrder());
     private TreeNode<T> parent;
-    Map<String, TreeNode<T>> children;
+    @JsonProperty("childs")
+    Map<String, TreeNode<T>> childs;
+    private TreeMap<String, ContentStream> contents = new TreeMap<>();
+    private TreeMap<String, String> contentIds = new TreeMap<>();
+
 
     private boolean isRoot() {
         return parent == null;
     }
 
     public boolean isLeaf() {
-        return children.size() == 0;
+        return childs.size() == 0;
     }
 
     private List<TreeNode<T>> elementsIndex;
@@ -43,7 +53,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.name = name;
         this.path ="/";
         this.obj = obj;
-        this.children = new HashMap<>();
+        this.childs = new HashMap<>();
         this.elementsIndex = new LinkedList<TreeNode<T>>();
         this.elementsIndex.add(this);
     }
@@ -53,7 +63,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.name = name;
         this.path ="/";
         this.obj = obj;
-        this.children = new HashMap<>();
+        this.childs = new HashMap<>();
         this.elementsIndex = new LinkedList<TreeNode<T>>();
         this.elementsIndex.add(this);
         if (version != null) {
@@ -111,7 +121,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     TreeNode<T> addNode(String id, String name, T child, String version) {
         TreeNode<T> childNode = new TreeNode<T>(id, name, child, version);
         childNode.parent = this;
-        this.children.put(name, childNode);
+        this.childs.put(name, childNode);
         StringBuilder pfad = new StringBuilder(name);
         TreeNode<T> parentNode = this;
         while (parentNode != null) {
@@ -126,13 +136,13 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
     void removeNode() {
         if (this.parent!= null)
-            this.getParent().children.remove(this.name);
+            this.getParent().childs.remove(this.name);
         deRegisterChild(this);
     }
 
     TreeNode<T> moveNode(TreeNode<T> newParent) {
         this.parent = newParent;
-        newParent.children.put(name, this);
+        newParent.childs.put(name, this);
         StringBuilder pfad = new StringBuilder(name);
         TreeNode<T> parentNode = newParent;
         while (parentNode != null) {
@@ -230,8 +240,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         for (String part : parts) {
             if (part.isEmpty())
                 part = part + "/";
-            if (this.children.containsKey(part)) {
-               TreeNode<T> node = this.children.get(part);
+            if (this.childs.containsKey(part)) {
+               TreeNode<T> node = this.childs.get(part);
                 if (parentNode != null && !node.parent.equals(parentNode))
                     return null;
                 parentNode = node;
@@ -266,5 +276,22 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     public Iterator<TreeNode<T>> iterator() {
         return new TreeNodeIter<T>(this);
     }
+
+    public String createContent(ContentStream content, boolean overwrite) {
+        if (contentIds.containsKey(id) && !overwrite)
+            throw new CmisContentAlreadyExistsException();
+        String uuid = UUID.randomUUID().toString();
+        contents.put(uuid, content);
+        contentIds.put(this.getId(), uuid);
+        return uuid;
+    }
+
+    public ContentStream getContent() {
+        if ( !contents.containsKey(((FileableCmisObject) obj).getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString()))
+            return null;
+        return contents.get(((FileableCmisObject) obj).getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString());
+    }
+
+
 
 }
