@@ -1,8 +1,6 @@
 package de.ksul.archiv.repository;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
@@ -23,10 +21,13 @@ import java.util.*;
  */
 
 
-@JsonIgnoreProperties({"obj", "content"})
-public class TreeNode<T> implements Iterable<TreeNode<T>> {
+@JsonIgnoreProperties({"obj"})
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
+public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
-    private static String rootId = UUID.randomUUID().toString();
+    private static String rootId ;
     private String id;
     private String name;
     private String path;
@@ -37,25 +38,31 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
     @JsonProperty("contents")
-    private static TreeMap<String, ContentStream> contents = new TreeMap<>();
+    private TreeMap<String, ContentStream> contents;
     @JsonProperty("contentIds")
-    private static TreeMap<String, String> contentIds = new TreeMap<>();
-
+    private TreeMap<String, String> contentIds;
+    @JsonProperty("elementsIndex")
+    private Set<TreeNode<T>> elementsIndex ;
 
 
     public boolean isLeaf() {
         return childs.size() == 0;
     }
 
-    private static List<TreeNode<?>> elementsIndex = new LinkedList<TreeNode<?>>();
+    public TreeNode() {
+    }
 
     TreeNode(String id, String name, T obj) {
+        rootId = id;
         this.id = id;
         this.name = name;
         this.path ="/";
         this.obj = obj;
         this.childs = new HashMap<>();
+        elementsIndex = new TreeSet<TreeNode<T>>();
         elementsIndex.add(this);
+        contents = new TreeMap<>();
+        contentIds = new TreeMap<>();
     }
 
     TreeNode(String id, String name,  T obj, String version) {
@@ -64,7 +71,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.path ="/";
         this.obj = obj;
         this.childs = new HashMap<>();
-        elementsIndex.add(this);
         if (version != null) {
             LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
             for (Property<?> p : ((FileableCmisObject) obj).getProperties()) {
@@ -131,6 +137,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     TreeNode<T> addNode(String id, String name, T child, String version) {
         TreeNode<T> childNode = new TreeNode<T>(id, name, child, version);
         childNode.parent = this;
+        childNode.contents = this.contents;
+        childNode.contentIds = this.contentIds;
+        childNode.elementsIndex = this.elementsIndex;
+        this.elementsIndex.add(this);
         this.childs.put(name, childNode);
         StringBuilder pfad = new StringBuilder(name);
         TreeNode<T> parentNode = this;
@@ -199,10 +209,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         if (id == null)
             throw new RuntimeException("Id must be set!");
         String[] parts = id.split(";");
-        for (TreeNode<?> element : elementsIndex) {
+        for (TreeNode<T> element : elementsIndex) {
             String objectId = element.id;
             if (parts[0].matches(objectId))
-                return (TreeNode<T>) element;
+                return element;
         }
         return null;
     }
@@ -211,10 +221,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     TreeNode<T> findTreeNodeForPath (String path) {
         if (path == null)
             throw new RuntimeException("Path must be set!");
-        for (TreeNode<?> element : elementsIndex) {
+        for (TreeNode<T> element : elementsIndex) {
             String objectPath = element.path;
             if (objectPath != null && path.matches(objectPath))
-                return (TreeNode<T>) element;
+                return element;
         }
         return null;
     }
@@ -303,5 +313,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
 
-
+    @Override
+    public int compareTo(Object o) {
+        return this.getId().compareTo(((TreeNode<T>) o).getId());
+    }
 }

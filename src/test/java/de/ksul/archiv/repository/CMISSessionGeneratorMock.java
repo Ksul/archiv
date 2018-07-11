@@ -10,6 +10,7 @@ import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     private ArchivTestProperties archivTestProperties;
 
 
-
+    @Autowired
     public CMISSessionGeneratorMock(Repository repository, ResourceLoader resourceLoader, ArchivProperties archivProperties, ArchivTestProperties archivTestProperties) {
 
         this.repository = repository;

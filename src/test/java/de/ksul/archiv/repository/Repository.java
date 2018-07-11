@@ -3,8 +3,10 @@ package de.ksul.archiv.repository;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import de.ksul.archiv.configuration.ArchivTestProperties;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
@@ -19,8 +21,10 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
@@ -42,12 +46,9 @@ public class Repository {
     private TreeNode<FileableCmisObject> root;
 
 
-
-    public Repository() {
-    }
-
-    public void setFile(String file) {
-        this.file = file;
+    @Autowired
+    public Repository(ArchivTestProperties archivTestProperties) {
+        this.file = archivTestProperties.getTestData();
     }
 
     String UUId() {
@@ -357,5 +358,20 @@ public class Repository {
             mapper.writeValue(new File(file), root);
         }
 
+    }
+
+    @PostConstruct
+    public void setup() throws Exception{
+        if (file != null && !file.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            File jsonFile = new File(file);
+            root = mapper.readValue(jsonFile, new TypeReference<TreeNode<?>>() {
+            });
+        }
     }
 }

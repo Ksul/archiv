@@ -23,52 +23,23 @@ import org.springframework.core.io.ResourceLoader;
 @ComponentScan(basePackages = "de.ksul.archiv.repository")
 public class ArchivTestConfiguration {
 
-    private ArchivProperties archivProperties;
-    private  ArchivTestProperties archivTestProperties;
-    private Repository repository;
-
-    @Autowired
-    public void setRepository(Repository repository, ArchivTestProperties archivTestProperties) {
-        this.repository = repository;
-        this.repository.setFile(archivTestProperties.getTestData());
-    }
-
-    public ArchivProperties getArchivProperties() {
-        return archivProperties;
-    }
-
-    @Autowired
-    public void setArchivProperties(ArchivProperties archivProperties) {
-        this.archivProperties = archivProperties;
-    }
-
-    public ArchivTestProperties getArchivTestProperties() {
-        return archivTestProperties;
-    }
-
-    @Autowired
-    public void setArchivTestProperties(ArchivTestProperties archivTestProperties) {
-        this.archivTestProperties = archivTestProperties;
-    }
-
     public ArchivTestConfiguration() {
 
     }
 
     @Bean
     @Autowired
-    public Session getSession(ResourceLoader resourceLoader) {
+    public Session getSession(CMISSessionGeneratorMock cmisSessionGeneratorMock) {
         Session session;
-        CMISSessionGenerator gen = new CMISSessionGeneratorMock(this.repository, resourceLoader, getArchivProperties(), getArchivTestProperties());
-        session = gen.generateSession();
+         session = cmisSessionGeneratorMock.generateSession();
         return session;
     }
 
 
     @Bean
     @Autowired
-    AlfrescoConnector getConnector(ResourceLoader resourceLoader) {
-        return  new AlfrescoConnector(getSession(resourceLoader), null, null, null, null, getArchivProperties().getCompanyHomeName(), getArchivProperties().getDataDictionaryName(), getArchivProperties().getScriptDirectoryName());
+    AlfrescoConnector getConnector(Session session, ArchivProperties archivProperties) {
+        return  new AlfrescoConnector(session, null, null, null, null, archivProperties.getCompanyHomeName(), archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName());
 
     }
 
