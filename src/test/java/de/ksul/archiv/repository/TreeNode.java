@@ -26,6 +26,7 @@ import java.util.*;
 @JsonIgnoreProperties({"obj", "content"})
 public class TreeNode<T> implements Iterable<TreeNode<T>> {
 
+    private static String rootId = UUID.randomUUID().toString();
     private String id;
     private String name;
     private String path;
@@ -36,19 +37,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
     @JsonProperty("contents")
-    private TreeMap<String, ContentStream> contents = new TreeMap<>();
+    private static TreeMap<String, ContentStream> contents = new TreeMap<>();
     @JsonProperty("contentIds")
-    private TreeMap<String, String> contentIds = new TreeMap<>();
+    private static TreeMap<String, String> contentIds = new TreeMap<>();
 
-    private boolean isRoot() {
-        return parent == null;
-    }
+
 
     public boolean isLeaf() {
         return childs.size() == 0;
     }
 
-    private List<TreeNode<T>> elementsIndex;
+    private static List<TreeNode<?>> elementsIndex = new LinkedList<TreeNode<?>>();
 
     TreeNode(String id, String name, T obj) {
         this.id = id;
@@ -56,8 +55,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.path ="/";
         this.obj = obj;
         this.childs = new HashMap<>();
-        this.elementsIndex = new LinkedList<TreeNode<T>>();
-        this.elementsIndex.add(this);
+        elementsIndex.add(this);
     }
 
     TreeNode(String id, String name,  T obj, String version) {
@@ -66,8 +64,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         this.path ="/";
         this.obj = obj;
         this.childs = new HashMap<>();
-        this.elementsIndex = new LinkedList<TreeNode<T>>();
-        this.elementsIndex.add(this);
+        elementsIndex.add(this);
         if (version != null) {
             LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
             for (Property<?> p : ((FileableCmisObject) obj).getProperties()) {
@@ -76,6 +73,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
             this.data.put(version, props);
         }
     }
+
+
+
+    static String getRootId() {
+        return rootId;
+    }
+
+    private boolean isRoot() {
+        return parent == null;
+    }
+
 
     public T getObj() {
         return obj;
@@ -191,10 +199,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
         if (id == null)
             throw new RuntimeException("Id must be set!");
         String[] parts = id.split(";");
-        for (TreeNode<T> element : this.elementsIndex) {
+        for (TreeNode<?> element : elementsIndex) {
             String objectId = element.id;
             if (parts[0].matches(objectId))
-                return element;
+                return (TreeNode<T>) element;
         }
         return null;
     }
@@ -203,16 +211,16 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     TreeNode<T> findTreeNodeForPath (String path) {
         if (path == null)
             throw new RuntimeException("Path must be set!");
-        for (TreeNode<T> element : this.elementsIndex) {
+        for (TreeNode<?> element : elementsIndex) {
             String objectPath = element.path;
             if (objectPath != null && path.matches(objectPath))
-                return element;
+                return (TreeNode<T>) element;
         }
         return null;
     }
 
     boolean containsPath( String path){
-        for (TreeNode<T> element : this.elementsIndex) {
+        for (TreeNode<?> element : elementsIndex) {
             if (element.path.matches(path)){
                 return true;
             }
@@ -221,7 +229,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     }
 
     boolean containsId( String id){
-        for (TreeNode<T> element : this.elementsIndex) {
+        for (TreeNode<?> element : elementsIndex) {
             if (element.id.matches(id)){
                 return true;
             }

@@ -41,7 +41,7 @@ public class Repository {
 
     private TreeNode<FileableCmisObject> root;
 
-    private String rootId;
+
 
     public Repository() {
     }
@@ -52,14 +52,6 @@ public class Repository {
 
     String UUId() {
         return UUID.randomUUID().toString();
-    }
-
-    String getRootId() {
-        return rootId;
-    }
-
-    void setRootId(String uuid) {
-        this.rootId = uuid;
     }
 
     List<FileableCmisObject> query(String query) {

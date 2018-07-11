@@ -506,7 +506,6 @@ public class MockUtils {
         if (objectType.getId().equalsIgnoreCase("cmis:folder")) {
             if (path == null) {
                 parentId = "-1";
-                repository.setRootId(versionSeriesId);
             } else
                 parentId = repository.getByPath(path).getId();
             if (!properties.getProperties().containsKey("cmis:parentId")) {
