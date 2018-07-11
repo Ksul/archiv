@@ -1,5 +1,6 @@
 package de.ksul.archiv.repository;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
@@ -34,9 +35,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>> {
     private TreeNode<T> parent;
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
+    @JsonProperty("contents")
     private TreeMap<String, ContentStream> contents = new TreeMap<>();
+    @JsonProperty("contentIds")
     private TreeMap<String, String> contentIds = new TreeMap<>();
-
 
     private boolean isRoot() {
         return parent == null;
