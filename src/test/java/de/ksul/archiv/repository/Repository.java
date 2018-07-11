@@ -370,7 +370,8 @@ public class Repository {
             mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             File jsonFile = new File(file);
-            root = mapper.readValue(jsonFile, new TypeReference<TreeNode<?>>() {
+            if (jsonFile.exists())
+                root = mapper.readValue(jsonFile, new TypeReference<TreeNode<?>>() {
             });
         }
     }

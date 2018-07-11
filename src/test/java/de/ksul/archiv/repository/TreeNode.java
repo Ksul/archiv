@@ -1,6 +1,7 @@
 package de.ksul.archiv.repository;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
@@ -33,6 +34,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     private String path;
     private T obj;
     @JsonProperty("data")
+    @JsonDeserialize(contentAs = PropertyImpl.class)
     private TreeMap<String,  LinkedHashMap<String, Property<?>>> data = new TreeMap<>(Collections.reverseOrder());
     private TreeNode<T> parent;
     @JsonProperty("childs")
