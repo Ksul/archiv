@@ -6,15 +6,22 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.ksul.archiv.configuration.ArchivTestProperties;
+import de.ksul.archiv.repository.deserializer.ContentStreamDeserializer;
+import de.ksul.archiv.repository.deserializer.PropertyDeserializer;
+import de.ksul.archiv.repository.serializer.*;
 import org.apache.chemistry.opencmis.client.api.*;
-import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.enums.Cardinality;
+import org.apache.chemistry.opencmis.commons.enums.DateTimeResolution;
+import org.apache.chemistry.opencmis.commons.enums.PropertyType;
+import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectDataImpl;
@@ -355,6 +362,13 @@ public class Repository {
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(PropertyType.class, new PropertyTypeSerializer());
+            module.addSerializer(Cardinality.class, new CardinalitySerializer());
+            module.addSerializer(DateTimeResolution.class, new DateTimeResolutionSerializer());
+            module.addSerializer(Updatability.class, new UpdatabilitySerializer());
+            module.addSerializer(ContentStream.class, new ContentStreamSerializer());
+            mapper.registerModule(module);
             mapper.writeValue(new File(file), root);
         }
 
@@ -369,6 +383,10 @@ public class Repository {
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            SimpleModule module = new SimpleModule();
+            module.addDeserializer(Property.class, new PropertyDeserializer<FileableCmisObject>());
+            module.addDeserializer(ContentStream.class, new ContentStreamDeserializer());
+            mapper.registerModule(module);
             File jsonFile = new File(file);
             if (jsonFile.exists())
                 root = mapper.readValue(jsonFile, new TypeReference<TreeNode<?>>() {

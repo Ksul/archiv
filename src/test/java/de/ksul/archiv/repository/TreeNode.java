@@ -34,7 +34,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     private String path;
     private T obj;
     @JsonProperty("data")
-    @JsonDeserialize(contentAs = PropertyImpl.class)
     private TreeMap<String,  LinkedHashMap<String, Property<?>>> data = new TreeMap<>(Collections.reverseOrder());
     private TreeNode<T> parent;
     @JsonProperty("childs")
