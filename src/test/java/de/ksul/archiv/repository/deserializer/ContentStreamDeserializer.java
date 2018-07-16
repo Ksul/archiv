@@ -27,8 +27,14 @@ public class ContentStreamDeserializer  extends JsonDeserializer<ContentStream> 
     public ContentStream deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
         ContentStreamImpl contentStream = new ContentStreamImpl();
         JsonNode node = jp.getCodec().readTree(jp);
-        contentStream.setLength(BigInteger.valueOf(node.get("length").asLong()));
-        contentStream.setStream(new ByteArrayInputStream(node.get("stream").binaryValue()));
+        if (node.has("length"))
+            contentStream.setLength(BigInteger.valueOf(node.get("length").asLong()));
+        if (node.has("stream"))
+            contentStream.setStream(new ByteArrayInputStream(node.get("stream").binaryValue()));
+        if (node.has("fileName"))
+            contentStream.setFileName(node.get("fileName").asText());
+        if (node.has("mimeType"))
+            contentStream.setMimeType(node.get("mimeType").asText());
         return contentStream;
     }
 }

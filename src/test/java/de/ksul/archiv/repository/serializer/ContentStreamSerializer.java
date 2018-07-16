@@ -37,11 +37,11 @@ public class ContentStreamSerializer extends StdSerializer<ContentStream> {
         jsonGenerator.writeNumber(contentStream.getLength());
         if (contentStream.getFileName() != null) {
             jsonGenerator.writeFieldName("fileName");
-            jsonGenerator.writeNumber(contentStream.getFileName());
+            jsonGenerator.writeString(contentStream.getFileName());
         }
         if (contentStream.getMimeType() != null) {
             jsonGenerator.writeFieldName("mimeType");
-            jsonGenerator.writeNumber(contentStream.getMimeType());
+            jsonGenerator.writeString(contentStream.getMimeType());
         }
         if (contentStream.getStream() != null) {
             jsonGenerator.writeFieldName("stream");
