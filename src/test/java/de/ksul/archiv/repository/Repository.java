@@ -298,14 +298,14 @@ public class Repository {
 
     }
 
-    FileableCmisObject makeNewVersion(String id, String version) {
+    FileableCmisObject checkin(String id, String version, String checkinComment) {
         if (root == null)
             throw new RuntimeException("no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
-
-        return node.makeNewVersion(version).getObj();
+        node.checkin(version, checkinComment);
+        return node.getObj();
     }
 
     List<ObjectData> getAllVersions(String id) {
@@ -314,12 +314,11 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
-        TreeMap<String, List<Property<?>>> allVersions = node.getAllVersions();
+        TreeMap<String, Type> allVersions = node.getAllVersions();
         List<ObjectData> versions = new ArrayList<>();
-        Collection<PropertyData<?>> props = new ArrayList<>();
-        Iterator<List<Property<?>>> it = allVersions.values().iterator();
+        Iterator<Type> it = allVersions.values().iterator();
         while (it.hasNext()) {
-            ObjectData objectData = MockUtils.getInstance().getObjectDataFromProperties(it.next());
+            ObjectData objectData = MockUtils.getInstance().getObjectDataFromProperties(it.next().getProperties());
             versions.add(objectData);
         }
         return versions;

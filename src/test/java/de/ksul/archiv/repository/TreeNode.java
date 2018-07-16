@@ -21,8 +21,6 @@ import java.util.*;
  * Time: 10:51 AM
  */
 
-
-@JsonIgnoreProperties({"obj"})
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
@@ -31,8 +29,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     private String id;
     private String name;
     private String path;
-    private List<Property<?>> obj;
-    private TreeMap<String,  List<Property<?>>> versions = new TreeMap<>(Collections.reverseOrder());
+    private Type obj;
+    private TreeMap<String, Type> versions = new TreeMap<>(Collections.reverseOrder());
     private TreeNode<T> parent;
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
@@ -48,7 +46,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.obj = obj.getProperties();
+        this.obj = new Type(obj.getProperties());
         this.childs = new HashMap<>();
      }
 
@@ -56,10 +54,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.obj = obj.getProperties();
+        this.obj = new Type(obj.getProperties());
         this.childs = new HashMap<>();
         if (version != null) {
-            this.versions.put(version, obj.getProperties());
+            this.versions.put(version, this.obj);
         }
     }
 
@@ -76,13 +74,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     public T getObj(String version) {
-        if (obj.stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_LABEL)).findFirst().get().getValueAsString().equals(version))
+        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_LABEL)).findFirst().get().getValueAsString().equals(version))
             return (T) MockUtils.getInstance().createObject(obj);
         if (!versions.containsKey(version))
             throw new CmisVersioningException("version not found");
         LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
-       List<Property<?>> versionProps = versions.get(version);
-       return (T) MockUtils.getInstance().createObject(versionProps);
+        return (T) MockUtils.getInstance().createObject(versions.get(version));
     }
 
     /*private T createObj(List<Property<?>> properties) {
@@ -162,7 +159,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     void updateNode(List<Property<?>>  properties) {
-        obj = properties;
+        obj.setProperties(properties);
     }
 
     int getLevel() {
@@ -211,19 +208,32 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return null;
     }
 
-    TreeNode<T> makeNewVersion(String version) {
-         this.versions.put(version,  ((FileableCmisObject) obj).getProperties());
-        return this;
-    }
 
-    TreeMap<String,  List<Property<?>>> getAllVersions() {
+    TreeMap<String,  Type> getAllVersions() {
         return versions;
     }
 
     TreeNode<T> checkout() {
-        if (obj.stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get().getValue())
+        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get().getValue())
             return null;
-        ((PropertyImpl) obj.stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get()).setValue(true);
+        ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get()).setValue(true);
+        return this;
+    }
+
+    TreeNode checkin(String version, String checkinComment) {
+
+        if (checkinComment != null && !checkinComment.isEmpty())
+            ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CHECKIN_COMMENT)).findFirst().get()).setValue(checkinComment);
+        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.LAST_MODIFICATION_DATE)).findFirst().get()).setValue(MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
+        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_LABEL)).findFirst().get()).setValue(version);
+        String versionSeriesId =  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_SERIES_ID)).findFirst().get().getValue();
+        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).setValue(versionSeriesId + ";" + version);
+        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).setValue(versionSeriesId + ";" + version);
+        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get()).setValue(false);
+
+        try {
+            this.versions.put(version, obj.clone());
+        } catch (CloneNotSupportedException ignored) {}
         return this;
     }
 

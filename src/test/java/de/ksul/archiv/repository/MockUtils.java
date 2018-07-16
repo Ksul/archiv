@@ -4,10 +4,7 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.SecondaryType;
-import org.apache.chemistry.opencmis.client.runtime.DocumentImpl;
-import org.apache.chemistry.opencmis.client.runtime.FolderImpl;
-import org.apache.chemistry.opencmis.client.runtime.OperationContextImpl;
-import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
+import org.apache.chemistry.opencmis.client.runtime.*;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
@@ -23,6 +20,7 @@ import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -727,13 +725,31 @@ public class MockUtils {
         return result;
     }
 
-    FileableCmisObject createObject(List<Property<?>> properties) {
-        FileableCmisObject cmisObject = null;
-        ObjectData objectData = MockUtils.getInstance().getObjectDataFromProperties(properties);
-        if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:folder"))
+    FileableCmisObject createObject(Type obj) {
+        FileableCmisObject cmisObject;
+        ObjectData objectData = MockUtils.getInstance().getObjectDataFromProperties(obj.getProperties());
+        if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:folder")) {
             cmisObject = new FolderImpl(sessionImpl, getFolderType(), objectData, new OperationContextImpl());
-        else
+
+        }
+        else  if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:document")) {
             cmisObject = new DocumentImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
+
+        } else {
+            cmisObject = new DocumentImpl(sessionImpl, getArchivType(), objectData, new OperationContextImpl());
+
+        }
+        LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
+        for (Property<?> p : obj.getProperties()) {
+            newProps.put(p.getId(), p);
+        }
+        try {
+            Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
+            propertiesField.setAccessible(true);
+            propertiesField.set(cmisObject, newProps);
+        } catch (Exception e) {
+            throw new RuntimeException(("Object not set!"));
+        }
         return cmisObject;
     }
 
