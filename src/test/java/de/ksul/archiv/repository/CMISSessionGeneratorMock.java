@@ -1,12 +1,27 @@
 package de.ksul.archiv.repository;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.ksul.archiv.configuration.ArchivProperties;
 import de.ksul.archiv.configuration.ArchivTestProperties;
+import de.ksul.archiv.repository.deserializer.ContentStreamDeserializer;
+import de.ksul.archiv.repository.deserializer.PropertyDeserializer;
+import de.ksul.archiv.repository.serializer.*;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.client.runtime.util.CollectionIterable;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.enums.Cardinality;
+import org.apache.chemistry.opencmis.commons.enums.DateTimeResolution;
+import org.apache.chemistry.opencmis.commons.enums.PropertyType;
+import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -35,36 +53,21 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(CMISSessionGeneratorMock.class.getName());
     private ResourceLoader resourceLoader;
-
+    private String file;
     private SessionImpl sessionImpl;
     private Repository repository;
 
-    private ArchivTestProperties archivTestProperties;
+    private ArchivProperties archivProperties;
 
 
     @Autowired
-    public CMISSessionGeneratorMock(Repository repository, ResourceLoader resourceLoader, ArchivProperties archivProperties, ArchivTestProperties archivTestProperties) {
+    public CMISSessionGeneratorMock(ResourceLoader resourceLoader, ArchivProperties archivProperties, ArchivTestProperties archivTestProperties) {
 
-        this.repository = repository;
-        this.archivTestProperties = archivTestProperties;
+        this.file = archivTestProperties.getTestData();
+        this.archivProperties = archivProperties;
         this.resourceLoader = resourceLoader;
 
         mockCollectionIterable();
-
-        sessionImpl = new SessionMock(repository).getSession();
-        when(sessionImpl.getRepositoryId()).thenReturn("0");
-
-
-        Map<String, Object> properties = new HashMap<>();
-
-        repository.insert(null, MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null,  null, "/", MockUtils.getInstance().getFolderType(sessionImpl), null));
-        repository.insert("/", MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null, "/", archivProperties.getDataDictionaryName(),  MockUtils.getInstance().getFolderType(sessionImpl), null));
-        repository.insert("/" + archivProperties.getDataDictionaryName(), MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(),  MockUtils.getInstance().getFolderType(sessionImpl),  null));
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", MockUtils.getInstance().getDocumentType(sessionImpl), "application/x-javascript"), createStream("// "), "1.0");
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample",  MockUtils.getInstance().getDocumentType(sessionImpl), "application/x-javascript"), createStream("// "), "1.0");
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml",  MockUtils.getInstance().getDocumentType(sessionImpl), "text/xml"), createFileStream("classpath:static/rules/doc.xml"), "1.0");
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd",  MockUtils.getInstance().getDocumentType(sessionImpl), "text/xml"), createFileStream("classpath:static/rules/doc.xsd"), "1.0");
-        repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js",  MockUtils.getInstance().getDocumentType(sessionImpl), "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"), "1.0");
 
 
     }
@@ -98,6 +101,61 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         return collectionIterable;
     }
 
+    @PreDestroy
+    public void shutDown() throws IOException {
+        if (file != null && !file.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            mapper.configure(SerializationFeature.INDENT_OUTPUT,true);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(PropertyType.class, new PropertyTypeSerializer());
+            module.addSerializer(Cardinality.class, new CardinalitySerializer());
+            module.addSerializer(DateTimeResolution.class, new DateTimeResolutionSerializer());
+            module.addSerializer(Updatability.class, new UpdatabilitySerializer());
+            module.addSerializer(ContentStream.class, new ContentStreamSerializer());
+            mapper.registerModule(module);
+            mapper.writeValue(new File(file), repository);
+        }
 
+    }
+
+    @PostConstruct
+    public void setup() throws Exception {
+        if (file != null && !file.isEmpty()) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+            SimpleModule module = new SimpleModule();
+            module.addDeserializer(Property.class, new PropertyDeserializer<FileableCmisObject>());
+            module.addDeserializer(ContentStream.class, new ContentStreamDeserializer());
+            mapper.registerModule(module);
+            File jsonFile = new File(file);
+            if (jsonFile.exists()) {
+                repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
+                });
+                sessionImpl = new SessionMock(repository).getSession();
+                MockUtils.setSession(sessionImpl);
+            }
+        }
+        if (repository == null) {
+            repository = new Repository();
+            sessionImpl = new SessionMock(repository).getSession();
+            MockUtils.setSession(sessionImpl);
+            repository.insert(null, MockUtils.getInstance().createFileableCmisObject(repository, null, null, "/", MockUtils.getInstance().getFolderType(), null));
+            repository.insert("/", MockUtils.getInstance().createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), MockUtils.getInstance().getFolderType(), null));
+            repository.insert("/" + archivProperties.getDataDictionaryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), MockUtils.getInstance().getFolderType(), null));
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// "), "1.0");
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// "), "1.0");
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xml"), "1.0");
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xsd"), "1.0");
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"), "1.0");
+        }
+    }
 
 }

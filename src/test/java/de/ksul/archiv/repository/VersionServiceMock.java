@@ -51,9 +51,8 @@ public class VersionServiceMock {
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 Holder<String> holder = (Holder) invocation.getArguments()[1];
                 String[] parts = holder.getValue().split(";");
-                Document document = (Document) repository.getById(parts[0]);
+                Document document = (Document) repository.checkout(parts[0]);
                 if (document.isPrivateWorkingCopy()) throw new CmisVersioningException();
-                ((PropertyImpl) document.getProperty(PropertyIds.IS_PRIVATE_WORKING_COPY)).setValue(true);
                 return null;
             }
         }).when(versioningService).checkOut(anyString(), any(Holder.class), any(), any());

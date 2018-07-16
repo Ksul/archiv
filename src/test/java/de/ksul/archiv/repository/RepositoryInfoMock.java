@@ -32,7 +32,7 @@ public class RepositoryInfoMock {
         when(info.getId()).thenReturn("0");
         when(info.getRootFolderId()).thenAnswer(new Answer<String>() {
             public String answer(InvocationOnMock invocation) throws Throwable {
-                  return TreeNode.getRootId();
+                  return repository.getRootId();
             }
         });
         return info;

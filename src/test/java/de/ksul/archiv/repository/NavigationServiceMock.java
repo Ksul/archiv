@@ -2,7 +2,6 @@ package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.FolderType;
-import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderData;
@@ -58,7 +57,7 @@ public class NavigationServiceMock {
                 FileableCmisObject result = null;
                 FileableCmisObject cmisObject = repository.getParent(id);
                 if (cmisObject != null)
-                    return MockUtils.getInstance().getObjectDataFromCmisObject(cmisObject);
+                    return MockUtils.getInstance().getObjectDataFromProperties(cmisObject.getProperties());
                 else
                     return null;
             }
@@ -69,7 +68,7 @@ public class NavigationServiceMock {
                 FileableCmisObject cmisObject = repository.getById((String) invocation.getArguments()[1]);
                 FileableCmisObject parentObject = repository.getParent((String) invocation.getArguments()[1]);
                 ObjectParentDataImpl objectData = new ObjectParentDataImpl();
-                objectData.setObject(MockUtils.getInstance().getObjectDataFromCmisObject(parentObject));
+                objectData.setObject(MockUtils.getInstance().getObjectDataFromProperties(parentObject.getProperties()));
                 if (cmisObject.getType() instanceof FolderType)
                     objectData.setRelativePathSegment(parentObject.getPropertyValue(PropertyIds.PATH));
                 else
@@ -88,7 +87,7 @@ public class NavigationServiceMock {
                 List<FileableCmisObject> results = repository.getChildren((String) invocation.getArguments()[1], ((BigInteger) invocation.getArguments()[9]).intValue(), ((BigInteger) invocation.getArguments()[8]).intValue());
                 for (FileableCmisObject cmisObject : results) {
                     ObjectInFolderDataImpl objectInFolderData = new ObjectInFolderDataImpl();
-                    objectInFolderData.setObject(MockUtils.getInstance().getObjectDataFromCmisObject(cmisObject));
+                    objectInFolderData.setObject(MockUtils.getInstance().getObjectDataFromProperties(cmisObject.getProperties()));
                     objectInFolderData.setPathSegment(cmisObject.getPropertyValue(PropertyIds.PATH));
                     folderDatas.add(objectInFolderData);
                 }

@@ -6,11 +6,15 @@ import de.ksul.archiv.request.QueryRequest;
 import de.ksul.archiv.response.RestResponse;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -26,11 +30,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes={ArchivTestConfiguration.class})
+@TestPropertySource(properties={"ksul.archiv.test.testData="})
 @DirtiesContext
 public class ArchivControllerTest extends  ArchivControllerAbstractTest {
 
     @BeforeEach
     public void setup(@Autowired AlfrescoConnector connector) throws Exception{
+
         con = connector;
         Assertions.assertNotNull(con);
         services = new ArchivController(con);

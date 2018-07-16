@@ -58,7 +58,7 @@ public class SessionMock {
         CmisBinding binding = new CmisBindingMock(repository, session).getBinding();
         when(session.getBinding()).thenReturn(binding);
         when(session.getRepositoryInfo()).thenReturn(repositoryInfo);
-
+        when(session.getRepositoryId()).thenReturn("0");
         when(session.getObjectFactory()).thenReturn(objectFactory);
         when(session.createOperationContext()).thenCallRealMethod();
         when(session.getDefaultContext()).thenReturn(new OperationContextImpl(null, false, true, false,
@@ -147,15 +147,15 @@ public class SessionMock {
                 Object[] args = invocation.getArguments();
                 String string = (String) args[0];
                 if (string.equalsIgnoreCase("cmis:document"))
-                    return MockUtils.getInstance().getDocumentType(session);
+                    return MockUtils.getInstance().getDocumentType();
                 else if (string.equalsIgnoreCase("cmis:folder"))
-                    return MockUtils.getInstance().getFolderType(session);
+                    return MockUtils.getInstance().getFolderType();
                 else if (string.contains("my:archivContent"))
-                    return MockUtils.getInstance().getArchivType(session);
+                    return MockUtils.getInstance().getArchivType();
                 else if (string.startsWith("P:"))
-                    return MockUtils.getInstance().getSecondaryTypeStore(session).get(string);
+                    return MockUtils.getInstance().getSecondaryTypeStore().get(string);
                 else
-                    return MockUtils.getInstance().getDocumentType(session);
+                    return MockUtils.getInstance().getDocumentType();
             }
         });
         when(session.getTypeDefinition(anyString(), anyBoolean())).thenAnswer(new Answer<ObjectType>() {
@@ -163,14 +163,14 @@ public class SessionMock {
                 Object[] args = invocation.getArguments();
                 String string = (String) args[0];
                 if (string.equalsIgnoreCase("cmis:document"))
-                    return MockUtils.getInstance().getDocumentType(session);
+                    return MockUtils.getInstance().getDocumentType();
                 else if (string.equalsIgnoreCase("cmis:folder"))
-                    return MockUtils.getInstance().getFolderType(session);
+                    return MockUtils.getInstance().getFolderType();
                 else if (string.contains("my:archivContent"))
-                    return MockUtils.getInstance().getArchivType(session);
+                    return MockUtils.getInstance().getArchivType();
                 else if (string.startsWith("P:"))
-                    return MockUtils.getInstance().getSecondaryTypeStore(session).get(string);
-                return MockUtils.getInstance().getDocumentType(session);
+                    return MockUtils.getInstance().getSecondaryTypeStore().get(string);
+                return MockUtils.getInstance().getDocumentType();
             }
         });
 
@@ -201,11 +201,11 @@ public class SessionMock {
         }
         String objectTypeName = (String) props.get(PropertyIds.OBJECT_TYPE_ID);
         if (objectTypeName.contains(BaseTypeId.CMIS_DOCUMENT.value()))
-            objectType = MockUtils.getInstance().getDocumentType(sessionImpl);
+            objectType = MockUtils.getInstance().getDocumentType();
         else if (objectTypeName.contains(BaseTypeId.CMIS_FOLDER.value()))
-            objectType = MockUtils.getInstance().getFolderType(sessionImpl);
+            objectType = MockUtils.getInstance().getFolderType();
         else
-            objectType = MockUtils.getInstance().getArchivType(sessionImpl);
+            objectType = MockUtils.getInstance().getArchivType();
         String name = (String) props.get(PropertyIds.NAME);
         FileableCmisObject cmis = (FileableCmisObject) args[1];
         String path = cmis.getPaths().get(0) ;
@@ -215,11 +215,11 @@ public class SessionMock {
                 props.put("cmis:versionLabel", "1.0");
             else
                 props.put("cmis:versionLabel", "0.1");
-            newObject = MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, props, path, name,  objectType,  ((ContentStream) invocation.getArguments()[2]).getMimeType());
+            newObject = MockUtils.getInstance().createFileableCmisObject(repository, props, path, name,  objectType,  ((ContentStream) invocation.getArguments()[2]).getMimeType());
             repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2], newObject.getProperty("cmis:versionLabel").getValueAsString());
         }
         else {
-            newObject = MockUtils.getInstance().createFileableCmisObject(repository, sessionImpl, props, path, name, objectType, null);
+            newObject = MockUtils.getInstance().createFileableCmisObject(repository, props, path, name, objectType, null);
             repository.insert(path, newObject);
         }
 

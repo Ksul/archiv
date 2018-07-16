@@ -3,11 +3,15 @@ package de.ksul.archiv;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,11 +25,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes={ArchivTestConfiguration.class})
+@TestPropertySource(properties={"ksul.archiv.test.testData="})
 @DirtiesContext
 public class AlfrescoConnectorTest extends AlfrescoConnectorAbstractTest {
 
     @BeforeEach
     public void setUp(@Autowired AlfrescoConnector connector) throws Exception {
+
         con = connector;
         Assertions.assertNotNull(con);
         filePdf = "/src/test/resources/Test.pdf";

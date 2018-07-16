@@ -133,7 +133,7 @@ public class DiscoveryServiceMock {
                 for (FileableCmisObject cmisObject : liste) {
 
                     if (helper.isObjectType(cmisObject, typ) && helper.isObjectInSearch(cmisObject, contains))
-                        list.add(MockUtils.getInstance().getObjectDataFromCmisObject(cmisObject));
+                        list.add(MockUtils.getInstance().getObjectDataFromProperties(cmisObject.getProperties()));
                 }
 
                 if (statement.contains("ORDER BY")) {

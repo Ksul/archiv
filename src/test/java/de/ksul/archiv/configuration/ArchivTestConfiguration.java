@@ -31,7 +31,7 @@ public class ArchivTestConfiguration {
     @Autowired
     public Session getSession(CMISSessionGeneratorMock cmisSessionGeneratorMock) {
         Session session;
-         session = cmisSessionGeneratorMock.generateSession();
+        session = cmisSessionGeneratorMock.generateSession();
         return session;
     }
 

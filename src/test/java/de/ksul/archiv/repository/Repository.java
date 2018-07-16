@@ -1,40 +1,22 @@
 package de.ksul.archiv.repository;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import de.ksul.archiv.configuration.ArchivTestProperties;
-import de.ksul.archiv.repository.deserializer.ContentStreamDeserializer;
-import de.ksul.archiv.repository.deserializer.PropertyDeserializer;
-import de.ksul.archiv.repository.serializer.*;
-import org.apache.chemistry.opencmis.client.api.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.chemistry.opencmis.client.api.Document;
+import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
-import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
-import org.apache.chemistry.opencmis.commons.enums.Cardinality;
-import org.apache.chemistry.opencmis.commons.enums.DateTimeResolution;
-import org.apache.chemistry.opencmis.commons.enums.PropertyType;
-import org.apache.chemistry.opencmis.commons.enums.Updatability;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectDataImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -43,23 +25,27 @@ import java.util.*;
  * Date: 4/12/17
  * Time: 11:24 AM
  */
-@Component
 public class Repository {
 
-    private String file;
-
     private static Logger logger = LoggerFactory.getLogger(Repository.class.getName());
-
+    private String rootId ;
     private TreeNode<FileableCmisObject> root;
+    @JsonProperty("nodes")
+    private TreeMap<String, TreeNode<FileableCmisObject>> nodes = new TreeMap<>() ;
+    @JsonProperty("contents")
+    private TreeMap<String, ContentStream> contents = new TreeMap<>();
+    @JsonProperty("contentIds")
+    private TreeMap<String, String> contentIds = new TreeMap<>();
 
-
-    @Autowired
-    public Repository(ArchivTestProperties archivTestProperties) {
-        this.file = archivTestProperties.getTestData();
+    public Repository() {
     }
 
     String UUId() {
         return UUID.randomUUID().toString();
+    }
+
+    String getRootId() {
+        return rootId;
     }
 
     List<FileableCmisObject> query(String query) {
@@ -89,7 +75,7 @@ public class Repository {
         List<FileableCmisObject> ret = new ArrayList<>();
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> startNode = root.findTreeNodeForId(id);
+        TreeNode<FileableCmisObject> startNode = findTreeNodeForId(id);
         if (startNode != null) {
             for (TreeNode<FileableCmisObject> node : startNode) {
                 if (node.getParent() != null && node.getParent().equals(startNode)) {
@@ -111,7 +97,7 @@ public class Repository {
         List<FileableCmisObject> ret = new ArrayList<>();
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> startNode = root.findTreeNodeForId(id);
+        TreeNode<FileableCmisObject> startNode = findTreeNodeForId(id);
         if (startNode != null) {
             for (TreeNode<FileableCmisObject> node : startNode) {
                 if (node.getParent() != null && node.getParent().equals(startNode)) {
@@ -128,7 +114,7 @@ public class Repository {
             throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
         if (node == null)
             return null;
         else {
@@ -146,33 +132,20 @@ public class Repository {
             throw new RuntimeException("properties must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
         if (node == null)
             throw new RuntimeException("Node with Id " + id + " not found!");
         List<Property<?>> props = node.getObj().getProperties();
-        LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
+        List<Property<?>> newProps = new ArrayList<>();
         for (Property<?> p : props) {
-            newProps.put(p.getId(), new PropertyImpl(p));
+            newProps.add( new PropertyImpl(p));
         }
         Iterator<String> it = properties.keySet().iterator();
         while (it.hasNext()) {
             String key = it.next();
-            newProps.put(key,  new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(key), properties.get(key).getValues()));
+            newProps.add( new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(key), properties.get(key).getValues()));
         }
         node.updateNode(newProps);
-
-//        for (PropertyData p : properties.) {
-//
-//            PropertyImpl property = new PropertyImpl()
-//            properties.addProperty(property);
-//        }
-//        Iterator<String> it = versionProps.keySet().iterator();
-//        while (it.hasNext()) {
-//            String key = it.next();
-//            props.put(key, new PropertyImpl<>(versionProps.get(key)));
-//        }
-//        node.updateNode(cmisObjectNew, version);
-//        logger.info(cmisObject.getName() + " [ID: " + cmisObject.UUId() + "][Path: " + cmisObject.getPaths().get(0) + "] changed in repository!");
 
     }
 
@@ -189,7 +162,9 @@ public class Repository {
         if (root == null)
             throw new RuntimeException("no Root Node!");
         logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "] [Path: " + cmisObject.getPaths().get(0) + "] deleted from repository!");
-        root.findTreeNodeForId(cmisObject.getId()).removeNode();
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(cmisObject.getId());
+        node.removeNode();
+        nodes.remove(node.getId());
     }
 
     FileableCmisObject move(String parentId, FileableCmisObject cmisObject){
@@ -199,8 +174,8 @@ public class Repository {
             throw new RuntimeException("parentId must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(cmisObject.getId());
-        TreeNode<FileableCmisObject> parent = root.findTreeNodeForId(parentId);
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(cmisObject.getId());
+        TreeNode<FileableCmisObject> parent = findTreeNodeForId(parentId);
         if (node == null)
             throw new RuntimeException("Node with Id " + cmisObject.getId() + " not found!");
         if (parent == null)
@@ -222,12 +197,15 @@ public class Repository {
         String id = cmisObject instanceof Folder ? cmisObject.getId() : ((Document) cmisObject).getVersionSeriesId();
         if (parentPath == null) {
             root = new TreeNode<>(id, name, cmisObject);
+            nodes.put(root.getId(), root);
+            rootId = id;
         } else {
             if (root == null)
                 throw new RuntimeException("no Root Node!");
-            TreeNode<FileableCmisObject> node = root.findTreeNodeForPath(parentPath);
+            TreeNode<FileableCmisObject> node = findTreeNodeForPath(parentPath);
             if (node != null) {
-                node.addNode(id, name, cmisObject, version);
+                TreeNode<FileableCmisObject> newNode = node.addNode(id, name, cmisObject, version);
+                nodes.put(newNode.getId(), newNode);
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
@@ -236,6 +214,26 @@ public class Repository {
                 throw new RuntimeException("Parent " + parentPath + " not found!");
         }
         logger.info(name + " [ID: " + cmisObject.getId() + "] [Path: " + cmisObject.getPaths().get(0) + "] inserted into repository!");
+    }
+
+    TreeNode<FileableCmisObject> findTreeNodeForId(String id) {
+        if (id == null)
+            throw new RuntimeException("Id must be set!");
+        String[] parts = id.split(";");
+        if (nodes.containsKey(parts[0]))
+            return nodes.get(parts[0]);
+        return null;
+    }
+
+    TreeNode<FileableCmisObject> findTreeNodeForPath (String path) {
+        if (path == null)
+            throw new RuntimeException("Path must be set!");
+        for (TreeNode<FileableCmisObject> element : nodes.values()) {
+            String objectPath = element.getPath();
+            if (objectPath != null && path.matches(objectPath))
+                return element;
+        }
+        return null;
     }
 
 
@@ -247,15 +245,12 @@ public class Repository {
         path = path.replace(".", "\\.");
         path = path.replace("?", ".");
         path = path.replace("%", ".*");
-        return root.containsPath(path);
-    }
-
-    boolean containsId(String id) {
-        if (root == null)
-            throw new RuntimeException("no Root Node!");
-        if (id == null)
-            throw new RuntimeException("id must be set!");
-        return root.containsId(id);
+        for (TreeNode<?> element : nodes.values()) {
+            if (element.getPath().matches(path)){
+                return true;
+            }
+        }
+        return false;
     }
 
     FileableCmisObject getByPath(String path) {
@@ -265,7 +260,7 @@ public class Repository {
             throw new RuntimeException("path must be set!");
         if (path.length() > 1 && path.endsWith("/"))
             path = path.substring(0, path.length() - 1);
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForPath(path);
+        TreeNode<FileableCmisObject> node = findTreeNodeForPath(path);
         if (node != null)
             return node.getObj();
         else
@@ -277,7 +272,7 @@ public class Repository {
             throw new RuntimeException("no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
         if (node != null) {
             String[] parts = id.split(";");
             if (parts.length == 1)
@@ -291,12 +286,24 @@ public class Repository {
             return null;
     }
 
+    FileableCmisObject checkout(String id) {
+        if (root == null)
+            throw new RuntimeException("no Root Node!");
+        if (id == null)
+            throw new RuntimeException("id must be set!");
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
+        if (node.checkout() == null)
+            throw new CmisVersioningException("is PWC");
+        return node.getObj();
+
+    }
+
     FileableCmisObject makeNewVersion(String id, String version) {
         if (root == null)
             throw new RuntimeException("no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
 
         return node.makeNewVersion(version).getObj();
     }
@@ -306,31 +313,27 @@ public class Repository {
             throw new RuntimeException("no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(id);
-        TreeMap<String, LinkedHashMap<String, Property<?>>> allVersions = node.getAllVersions();
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
+        TreeMap<String, List<Property<?>>> allVersions = node.getAllVersions();
         List<ObjectData> versions = new ArrayList<>();
         Collection<PropertyData<?>> props = new ArrayList<>();
-        Iterator<String> it = allVersions.keySet().iterator();
+        Iterator<List<Property<?>>> it = allVersions.values().iterator();
         while (it.hasNext()) {
-            ObjectDataImpl objectData = new ObjectDataImpl();
-            String key = it.next();
-            for (Property p : allVersions.get(key).values()) {
-                props.add(MockUtils.getInstance().fillProperty(p.getId(), p.getValue()));
-            }
-            Properties properties = new PropertiesImpl(props);
-            objectData.setProperties(properties);
+            ObjectData objectData = MockUtils.getInstance().getObjectDataFromProperties(it.next());
             versions.add(objectData);
         }
         return versions;
     }
-
 
     ContentStream getContent(String id) {
         if (id == null)
             throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        return root.findTreeNodeForId(id).getContent();
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
+        if ( !contents.containsKey(node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString()))
+            return null;
+        return contents.get(node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString());
     }
 
     void createContent(String objectId, ContentStream content, boolean overwrite) {
@@ -338,8 +341,12 @@ public class Repository {
             throw new RuntimeException("id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> node = root.findTreeNodeForId(objectId);
-        String uuid = node.createContent(content, overwrite);
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(objectId);
+        if (contentIds.containsKey(node.getId()) && !overwrite)
+            throw new CmisContentAlreadyExistsException();
+        String uuid = UUID.randomUUID().toString();
+        contents.put(uuid, content);
+        contentIds.put(node.getId(), uuid);
         ((PropertyImpl) node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(uuid);
     }
 
@@ -353,44 +360,6 @@ public class Repository {
         logger.info("[ID: " + objectId + "] changed content!");
     }
 
-    @PreDestroy
-    public void shutDown() throws IOException {
-        if (file != null && !file.isEmpty()) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            mapper.configure(SerializationFeature.INDENT_OUTPUT,true);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            SimpleModule module = new SimpleModule();
-            module.addSerializer(PropertyType.class, new PropertyTypeSerializer());
-            module.addSerializer(Cardinality.class, new CardinalitySerializer());
-            module.addSerializer(DateTimeResolution.class, new DateTimeResolutionSerializer());
-            module.addSerializer(Updatability.class, new UpdatabilitySerializer());
-            module.addSerializer(ContentStream.class, new ContentStreamSerializer());
-            mapper.registerModule(module);
-            mapper.writeValue(new File(file), root);
-        }
 
-    }
 
-    @PostConstruct
-    public void setup() throws Exception{
-        if (file != null && !file.isEmpty()) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            SimpleModule module = new SimpleModule();
-            module.addDeserializer(Property.class, new PropertyDeserializer<FileableCmisObject>());
-            module.addDeserializer(ContentStream.class, new ContentStreamDeserializer());
-            mapper.registerModule(module);
-            File jsonFile = new File(file);
-            if (jsonFile.exists())
-                root = mapper.readValue(jsonFile, new TypeReference<TreeNode<?>>() {
-            });
-        }
-    }
 }

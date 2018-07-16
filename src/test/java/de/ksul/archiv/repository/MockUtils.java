@@ -11,6 +11,7 @@ import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
@@ -34,7 +35,7 @@ import java.util.*;
  */
 public class MockUtils {
 
-    //private static SessionImpl sessionImpl;
+    private static SessionImpl sessionImpl;
 
     private static  MockUtils mockUtils;
 
@@ -45,9 +46,15 @@ public class MockUtils {
         return mockUtils;
     }
 
+    public static SessionImpl getSession() {
+        return sessionImpl;
+    }
+
+    public static void setSession(SessionImpl sessionImpl) {
+        MockUtils.sessionImpl = sessionImpl;
+    }
+
     private Map<String, PropertyDefinition<?>> propertyDefinitionMap;
-
-
     Map<String, PropertyDefinition<?>> getPropertyDefinitionMap() {
 
         if (propertyDefinitionMap == null) {
@@ -324,7 +331,7 @@ public class MockUtils {
 
     private static Map<String, SecondaryType> secondaryTypeStore;
 
-    Map<String, SecondaryType>  getSecondaryTypeStore(SessionImpl sessionImpl){
+    Map<String, SecondaryType>  getSecondaryTypeStore(){
         if (secondaryTypeStore == null) {
             secondaryTypeStore = new HashMap<>();
             SecondaryTypeDefinitionImpl titled = new SecondaryTypeDefinitionImpl();
@@ -368,7 +375,7 @@ public class MockUtils {
 
     private static FolderTypeImpl folderType;
 
-    FolderTypeImpl getFolderType(SessionImpl sessionImpl){
+    FolderTypeImpl getFolderType(){
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
@@ -383,7 +390,7 @@ public class MockUtils {
 
     private static DocumentTypeImpl documentType;
 
-    DocumentTypeImpl getDocumentType(SessionImpl sessionImpl) {
+    DocumentTypeImpl getDocumentType() {
 
         if (documentType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
@@ -398,7 +405,7 @@ public class MockUtils {
 
     private static DocumentTypeImpl archivType;
 
-    DocumentTypeImpl getArchivType(SessionImpl sessionImpl) {
+    DocumentTypeImpl getArchivType() {
 
         if (archivType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
@@ -412,13 +419,12 @@ public class MockUtils {
         return archivType;
     }
 
-    ObjectData getObjectDataFromCmisObject(FileableCmisObject cmisObject) {
-        if (cmisObject == null)
-            throw new RuntimeException("cmisObject must be set!");
+    ObjectData getObjectDataFromProperties(List<Property<?>> properties) {
+
         AbstractPropertyData propertyData = null;
         ObjectDataImpl objectData = new ObjectDataImpl();
         Collection<PropertyData<?>> list = new ArrayList<PropertyData<?>>();
-        for (Property property : cmisObject.getProperties()) {
+        for (Property property : properties) {
             if (property.getType().equals(PropertyType.ID))
                 propertyData = new PropertyIdImpl();
             else if (property.getType().equals(PropertyType.STRING))
@@ -464,7 +470,7 @@ public class MockUtils {
         return result;
     }
 
-     FileableCmisObject createFileableCmisObject(Repository repository, SessionImpl sessionImpl, Map<String, Object> props, String path, String name, ObjectType objectType, String mimeType) {
+     FileableCmisObject createFileableCmisObject(Repository repository, Map<String, Object> props, String path, String name, ObjectType objectType, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
         String versionSeriesId = repository.UUId();
@@ -559,6 +565,26 @@ public class MockUtils {
 
         return result;
     }
+
+    Map<String, Object> convProperties(List<Property<?>> properties) {
+    Map<String, Object> props = new HashMap<>();
+        for (Property prop : properties) {
+        if (prop.getDefinition().getPropertyType().equals(PropertyType.DATETIME) && prop.getValue() != null) {
+            props.put(prop.getLocalName(), ((GregorianCalendar) prop.getValue()).getTime().getTime());
+        } else if (prop.getDefinition().getPropertyType().equals(PropertyType.DECIMAL) && prop.getValue() != null) {
+            props.put(prop.getLocalName(), prop.getValue());
+        } else if (prop.getDefinition().getPropertyType().equals(PropertyType.BOOLEAN) && prop.getValue() != null) {
+            props.put(prop.getLocalName(), prop.getValue());
+        } else if (prop.getDefinition().getPropertyType().equals(PropertyType.INTEGER) && prop.getValue() != null) {
+            props.put(prop.getLocalName(), prop.getValue());
+        } else {
+            if (prop.getValueAsString() != null)
+                props.put(prop.getLocalName(), prop.getValueAsString());
+        }
+    }
+        return props;
+}
+
 
     AbstractPropertyData<?> fillProperty(String id, Object value) {
 
@@ -701,6 +727,15 @@ public class MockUtils {
         return result;
     }
 
-    
+    FileableCmisObject createObject(List<Property<?>> properties) {
+        FileableCmisObject cmisObject = null;
+        ObjectData objectData = MockUtils.getInstance().getObjectDataFromProperties(properties);
+        if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:folder"))
+            cmisObject = new FolderImpl(sessionImpl, getFolderType(), objectData, new OperationContextImpl());
+        else
+            cmisObject = new DocumentImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
+        return cmisObject;
+    }
+
 
 }

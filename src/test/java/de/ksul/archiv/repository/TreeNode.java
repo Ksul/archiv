@@ -1,14 +1,14 @@
 package de.ksul.archiv.repository;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 
 import java.lang.reflect.Field;
@@ -28,23 +28,14 @@ import java.util.*;
         property = "id")
 public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
-    private static String rootId ;
     private String id;
     private String name;
     private String path;
-    private T obj;
-    @JsonProperty("data")
-    private TreeMap<String,  LinkedHashMap<String, Property<?>>> data = new TreeMap<>(Collections.reverseOrder());
+    private List<Property<?>> obj;
+    private TreeMap<String,  List<Property<?>>> versions = new TreeMap<>(Collections.reverseOrder());
     private TreeNode<T> parent;
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
-    @JsonProperty("contents")
-    private TreeMap<String, ContentStream> contents;
-    @JsonProperty("contentIds")
-    private TreeMap<String, String> contentIds;
-    @JsonProperty("elementsIndex")
-    private Set<TreeNode<T>> elementsIndex ;
-
 
     public boolean isLeaf() {
         return childs.size() == 0;
@@ -53,60 +44,58 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     public TreeNode() {
     }
 
-    TreeNode(String id, String name, T obj) {
-        rootId = id;
+    TreeNode(String id, String name, FileableCmisObject obj) {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.obj = obj;
+        this.obj = obj.getProperties();
         this.childs = new HashMap<>();
-        elementsIndex = new TreeSet<TreeNode<T>>();
-        elementsIndex.add(this);
-        contents = new TreeMap<>();
-        contentIds = new TreeMap<>();
-    }
+     }
 
-    TreeNode(String id, String name,  T obj, String version) {
+    TreeNode(String id, String name,  FileableCmisObject obj, String version) {
         this.id = id;
         this.name = name;
         this.path ="/";
-        this.obj = obj;
+        this.obj = obj.getProperties();
         this.childs = new HashMap<>();
         if (version != null) {
-            LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
-            for (Property<?> p : ((FileableCmisObject) obj).getProperties()) {
-                props.put(p.getId(), new PropertyImpl(p));
-            }
-            this.data.put(version, props);
+            this.versions.put(version, obj.getProperties());
         }
     }
 
 
 
-    static String getRootId() {
-        return rootId;
-    }
+
 
     private boolean isRoot() {
         return parent == null;
     }
 
 
-    public T getObj() {
-        return obj;
+    public T getObj(){return (T) MockUtils.getInstance().createObject(obj);
     }
 
     public T getObj(String version) {
-        if (((FileableCmisObject) obj).getPropertyValue(PropertyIds.VERSION_LABEL).toString().equals(version))
-            return obj;
-        if (!data.containsKey(version))
+        if (obj.stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_LABEL)).findFirst().get().getValueAsString().equals(version))
+            return (T) MockUtils.getInstance().createObject(obj);
+        if (!versions.containsKey(version))
             throw new CmisVersioningException("version not found");
         LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
-        LinkedHashMap<String, Property<?>> versionProps = data.get(version);
-        Iterator<String> it = versionProps.keySet().iterator();
+       List<Property<?>> versionProps = versions.get(version);
+       return (T) MockUtils.getInstance().createObject(versionProps);
+    }
+
+    /*private T createObj(List<Property<?>> properties) {
+        ObjectDataImpl objectData = new ObjectDataImpl();
+        PropertiesImpl props = (PropertiesImpl) MockUtils.getInstance().convProperties(properties);
+        objectData.setProperties(props);
+        props.getProperties().get(PropertyIds.OBJECT_TYPE_ID).
+        T obj = new FolderImpl()
+        LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
+        Iterator<String> it = properties.keySet().iterator();
         while (it.hasNext()) {
             String key = it.next();
-            props.put(key, versionProps.get(key));
+            props.put(key, properties.get(key));}
         }
         try {
             Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
@@ -115,10 +104,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         } catch (Exception e) {
             throw new RuntimeException(("Properties not set!"));
         }
-        return obj;
-    }
+    }*/
 
-    public boolean containsData (String version){ return data.containsKey(version);}
+    public boolean containsData (String version){ return versions.containsKey(version);}
 
     public String getName() {
         return name;
@@ -135,13 +123,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
     
 
-    TreeNode<T> addNode(String id, String name, T child, String version) {
+    TreeNode<T> addNode(String id, String name, FileableCmisObject child, String version) {
         TreeNode<T> childNode = new TreeNode<T>(id, name, child, version);
         childNode.parent = this;
-        childNode.contents = this.contents;
-        childNode.contentIds = this.contentIds;
-        childNode.elementsIndex = this.elementsIndex;
-        this.elementsIndex.add(this);
         this.childs.put(name, childNode);
         StringBuilder pfad = new StringBuilder(name);
         TreeNode<T> parentNode = this;
@@ -177,14 +161,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return this;
     }
 
-    void updateNode(LinkedHashMap<String, Property<?>>  properties) {
-        try {
-            Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
-            propertiesField.setAccessible(true);
-            propertiesField.set(obj, properties);
-        } catch (Exception e) {
-            throw new RuntimeException(("Properties not set!"));
-        }
+    void updateNode(List<Property<?>>  properties) {
+        obj = properties;
     }
 
     int getLevel() {
@@ -195,57 +173,15 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     private void registerChild(TreeNode<T> node) {
-        elementsIndex.add(node);
+
         if (parent != null)
             parent.registerChild(node);
     }
 
     private void deRegisterChild(TreeNode<T> node) {
-        elementsIndex.remove(node);
+
         if (parent != null)
             parent.deRegisterChild(node);
-    }
-
-    TreeNode<T> findTreeNodeForId(String id) {
-        if (id == null)
-            throw new RuntimeException("Id must be set!");
-        String[] parts = id.split(";");
-        for (TreeNode<T> element : elementsIndex) {
-            String objectId = element.id;
-            if (parts[0].matches(objectId))
-                return element;
-        }
-        return null;
-    }
-
-
-    TreeNode<T> findTreeNodeForPath (String path) {
-        if (path == null)
-            throw new RuntimeException("Path must be set!");
-        for (TreeNode<T> element : elementsIndex) {
-            String objectPath = element.path;
-            if (objectPath != null && path.matches(objectPath))
-                return element;
-        }
-        return null;
-    }
-
-    boolean containsPath( String path){
-        for (TreeNode<?> element : elementsIndex) {
-            if (element.path.matches(path)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    boolean containsId( String id){
-        for (TreeNode<?> element : elementsIndex) {
-            if (element.id.matches(id)){
-                return true;
-            }
-        }
-        return false;
     }
 
     public TreeNode<T> getByPath(String path) {
@@ -276,43 +212,25 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     TreeNode<T> makeNewVersion(String version) {
-        List<Property<?>> props = ((FileableCmisObject) obj).getProperties();
-        LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
-        for (Property<?> p : props) {
-            newProps.put(p.getId(), new PropertyImpl(p));
-        }
-
-        this.data.put(version,  newProps);
+         this.versions.put(version,  ((FileableCmisObject) obj).getProperties());
         return this;
     }
 
-
-
-    TreeMap<String,  LinkedHashMap<String, Property<?>>> getAllVersions() {
-        return data;
+    TreeMap<String,  List<Property<?>>> getAllVersions() {
+        return versions;
     }
 
+    TreeNode<T> checkout() {
+        if (obj.stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get().getValue())
+            return null;
+        ((PropertyImpl) obj.stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get()).setValue(true);
+        return this;
+    }
 
     @Override
     public Iterator<TreeNode<T>> iterator() {
         return new TreeNodeIter<T>(this);
     }
-
-    public String createContent(ContentStream content, boolean overwrite) {
-        if (contentIds.containsKey(id) && !overwrite)
-            throw new CmisContentAlreadyExistsException();
-        String uuid = UUID.randomUUID().toString();
-        contents.put(uuid, content);
-        contentIds.put(this.getId(), uuid);
-        return uuid;
-    }
-
-    public ContentStream getContent() {
-        if ( !contents.containsKey(((FileableCmisObject) obj).getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString()))
-            return null;
-        return contents.get(((FileableCmisObject) obj).getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString());
-    }
-
 
     @Override
     public int compareTo(Object o) {
