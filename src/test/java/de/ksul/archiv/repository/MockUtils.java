@@ -94,7 +94,7 @@ public class MockUtils {
             propertyObjectTypeIdDefinition.setLocalName("objectTypeId");
             propertyObjectTypeIdDefinition.setCardinality(Cardinality.SINGLE);
             propertyObjectTypeIdDefinition.setPropertyType(PropertyType.ID);
-            propertyObjectTypeIdDefinition.setUpdatability(Updatability.READONLY);
+            propertyObjectTypeIdDefinition.setUpdatability(Updatability.ONCREATE);
             propertyDefinitionMap.put("cmis:objectTypeId", propertyObjectTypeIdDefinition);
 
             PropertyIdDefinitionImpl propertyBaseTypeIdDefinition = new PropertyIdDefinitionImpl();
@@ -511,7 +511,7 @@ public class MockUtils {
                 properties.addProperty(fillProperty("cmis:isPrivateWorkingCopy", false));
             }
             if (!properties.getProperties().containsKey("cmis:versionLabel")) {
-                properties.addProperty(fillProperty("cmis:versionLabel", "1.0"));
+                properties.addProperty(fillProperty("cmis:versionLabel", "0.1"));
             }
             if (!properties.getProperties().containsKey("cmis:contentStreamId")) {
                 properties.addProperty(fillProperty("cmis:contentStreamId", null));
@@ -541,24 +541,20 @@ public class MockUtils {
         return result;
     }
 
-    Map<String, Object> convProperties(List<Property<?>> properties) {
-    Map<String, Object> props = new HashMap<>();
+    Map<String, PropertyData<?>> convProperties(List<Property<?>> properties) {
+        Map<String, PropertyData<?>> props = new HashMap<>();
         for (Property prop : properties) {
-        if (prop.getDefinition().getPropertyType().equals(PropertyType.DATETIME) && prop.getValue() != null) {
-            props.put(prop.getLocalName(), ((GregorianCalendar) prop.getValue()).getTime().getTime());
-        } else if (prop.getDefinition().getPropertyType().equals(PropertyType.DECIMAL) && prop.getValue() != null) {
-            props.put(prop.getLocalName(), prop.getValue());
-        } else if (prop.getDefinition().getPropertyType().equals(PropertyType.BOOLEAN) && prop.getValue() != null) {
-            props.put(prop.getLocalName(), prop.getValue());
-        } else if (prop.getDefinition().getPropertyType().equals(PropertyType.INTEGER) && prop.getValue() != null) {
-            props.put(prop.getLocalName(), prop.getValue());
-        } else {
-            if (prop.getValueAsString() != null)
-                props.put(prop.getLocalName(), prop.getValueAsString());
+            props.put(prop.getId(), prop);
         }
-    }
         return props;
-}
+    }
+
+    List<Property<?>> convPropertyData(Map<String, PropertyData<?>> propertyDataMap){
+        List<Property<?>> properties = new ArrayList<>();
+       for (PropertyData<?> prop : propertyDataMap.values())
+           properties.add(new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(prop.getId()), prop.getValues()));
+       return properties;
+    }
 
 
     AbstractPropertyData<?> fillProperty(String id, Object value) {
@@ -612,15 +608,24 @@ public class MockUtils {
                 break;
             case DATETIME:
                 property = new PropertyDateTimeImpl();
-                ((PropertyDateTimeImpl) property).setValue(copyDateTimeValue(value));
+                if (value instanceof  List)
+                    ((PropertyDateTimeImpl) property).setValues(copyDateTimeValues((List) value));
+                else
+                    ((PropertyDateTimeImpl) property).setValue(copyDateTimeValue(value));
                 break;
             case HTML:
                 property = new PropertyHtmlImpl();
-                ((PropertyHtmlImpl) property).setValue(copyStringValue(value));
+                if (value instanceof  List)
+                    ((PropertyHtmlImpl) property).setValues(copyStringValues((List) value));
+                else
+                    ((PropertyHtmlImpl) property).setValue(copyStringValue(value));
                 break;
             case URI:
                 property = new PropertyUriImpl();
-                ((PropertyUriImpl) property).setValue(copyStringValue(value));
+                if (value instanceof  List)
+                    ((PropertyUriImpl) property).setValues(copyStringValues((List) value));
+                else
+                    ((PropertyUriImpl) property).setValue(copyStringValue(value));
                 break;
             default:
                 throw new CmisRuntimeException("Unknown property data type!");
@@ -635,6 +640,32 @@ public class MockUtils {
         return property;
     }
 
+    List<GregorianCalendar> copyDateTimeValues(List<Object> source) {
+        List<GregorianCalendar> result = null;
+        if (source != null) {
+            result = new ArrayList<GregorianCalendar>(source.size());
+            for (Object obj : source) {
+                GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+                if (obj instanceof  GregorianCalendar) {
+                    result.add((GregorianCalendar) obj);
+                } else if (obj instanceof Number) {
+                    cal.setTimeInMillis(((Number) obj).longValue());
+                    result.add(cal);
+                } else if (obj instanceof Date){
+                    cal.setTime((Date) obj);
+                    result.add(cal);
+                } else if (obj instanceof String) {
+                    Long value = Long.parseLong((String) obj);
+                    cal.setTime(new Date(value));
+                    result.add(cal);
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + obj);
+                }
+            }
+        }
+
+        return result;
+    }
 
     GregorianCalendar copyDateTimeValue(Object source) {
         GregorianCalendar result = null;

@@ -209,6 +209,8 @@ public class Repository {
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
+                if (version != null)
+                    node.checkin(version, null);
             }
             else
                 throw new RuntimeException("Parent " + parentPath + " not found!");

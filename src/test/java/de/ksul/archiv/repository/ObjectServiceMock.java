@@ -122,24 +122,15 @@ public class ObjectServiceMock {
 
                 ObjectType objectType;
                 PropertiesImpl props = (PropertiesImpl) invocation.getArguments()[1];
-
-                String objectTypeName = (String) props.getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue();
-                if (objectTypeName.contains(BaseTypeId.CMIS_DOCUMENT.value()))
-                    objectType = MockUtils.getInstance().getDocumentType();
-                else if (objectTypeName.contains(BaseTypeId.CMIS_FOLDER.value()))
-                    objectType = MockUtils.getInstance().getFolderType();
-                else
+                objectType = MockUtils.getInstance().getDocumentType();
+                if(props.getProperties().containsKey(PropertyIds.OBJECT_TYPE_ID) && ((String) props.getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue()).equalsIgnoreCase("D:my:archivContent"))
                     objectType = MockUtils.getInstance().getArchivType();
+
                 String name = (String) props.getProperties().get(PropertyIds.NAME).getFirstValue();
                 FileableCmisObject cmis = repository.getById((String) invocation.getArguments()[2]);
                 String path = cmis.getPaths().get(0);
-                FileableCmisObject newObject;
-                if (invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
-                    ((PropertyImpl) props.getProperties().get(PropertyIds.VERSION_LABEL)).setValue("1.0");
-                else
-                    ((PropertyImpl) props.getProperties().get(PropertyIds.VERSION_LABEL)).setValue("0.1");
-                newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, objectType, ((ContentStream) invocation.getArguments()[2]).getMimeType());
-                repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2], newObject.getProperty("cmis:versionLabel").getValueAsString());
+                FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, objectType, ((ContentStream) invocation.getArguments()[3]).getMimeType());
+                repository.insert(path, newObject, (ContentStream) invocation.getArguments()[3], ((VersioningState) invocation.getArguments()[4]).equals(VersioningState.MAJOR) ? "1.0" : "0.1");
 
                 return newObject.getId();
             }

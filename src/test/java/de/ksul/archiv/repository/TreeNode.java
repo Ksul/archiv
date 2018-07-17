@@ -9,6 +9,8 @@ import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.AbstractCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 
 import java.lang.reflect.Field;
@@ -199,18 +201,24 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     TreeNode checkin(String version, String checkinComment) {
 
         if (checkinComment != null && !checkinComment.isEmpty())
-            ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CHECKIN_COMMENT)).findFirst().get()).setValue(checkinComment);
-        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.LAST_MODIFICATION_DATE)).findFirst().get()).setValue(MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
-        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_LABEL)).findFirst().get()).setValue(version);
-        String versionSeriesId =  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_SERIES_ID)).findFirst().get().getValue();
-        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).setValue(versionSeriesId + ";" + version);
-        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).setValue(versionSeriesId + ";" + version);
-        ((PropertyImpl)  obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.IS_PRIVATE_WORKING_COPY)).findFirst().get()).setValue(false);
+            changePropertie(PropertyIds.CHECKIN_COMMENT, checkinComment);
+        changePropertie(PropertyIds.LAST_MODIFICATION_DATE, MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
+        changePropertie(PropertyIds.VERSION_LABEL, version);
+        changePropertie(PropertyIds.IS_PRIVATE_WORKING_COPY, false);
+        String versionSeriesId = obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_SERIES_ID)).findFirst().get().getValue();
 
+        ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).setValue(versionSeriesId + ";" + version);
         try {
             this.versions.put(version, obj.clone());
-        } catch (CloneNotSupportedException ignored) {}
+        } catch (CloneNotSupportedException ignored) {
+        }
         return this;
+    }
+
+    private void changePropertie(String id, Object value){
+        Map<String, PropertyData<?>> props = MockUtils.getInstance().convProperties(obj.getProperties());
+        props.put(id, MockUtils.getInstance().fillProperty(id, value));
+        obj.setProperties(MockUtils.getInstance().convPropertyData(props));
     }
 
     @Override
