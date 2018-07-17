@@ -444,31 +444,9 @@ public class MockUtils {
         return objectData;
     }
 
-    GregorianCalendar copyDateTimeValue(Object source) {
-        GregorianCalendar result = null;
-        if (source != null) {
-            GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-            if (source instanceof  GregorianCalendar) {
-                result = (GregorianCalendar) source;
-            } else if (source instanceof Number) {
-                cal.setTimeInMillis(((Number) source).longValue());
-                result = cal;
-            } else if (source instanceof Date){
-                cal.setTime((Date) source);
-                result = cal;
-            } else if (source instanceof String) {
-                Long value = Long.parseLong((String) source);
-                cal.setTime(new Date(value));
-                result = cal;
-            } else {
-                throw new CmisRuntimeException("Invalid property value: " + source);
-            }
-        }
 
-        return result;
-    }
 
-     FileableCmisObject createFileableCmisObject(Repository repository, Map<String, Object> props, String path, String name, ObjectType objectType, String mimeType) {
+     FileableCmisObject createFileableCmisObject(Repository repository, Map<String, PropertyData<?>> props, String path, String name, ObjectType objectType, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
         String versionSeriesId = repository.UUId();
@@ -550,14 +528,13 @@ public class MockUtils {
         return fileableCmisObject;
     }
 
-    Properties convertProperties(final Map<String, Object> props) {
+    Properties convertProperties(final Map<String, PropertyData<?>> props) {
 
         PropertiesImpl result = new PropertiesImpl();
-        PropertyDefinition<?> definition;
 
         for (String id : props.keySet()) {
 
-            result.addProperty(fillProperty(id, props.get(id)));
+            result.addProperty(fillProperty(id, props.get(id).getValues()));
 
         }
 
@@ -600,6 +577,9 @@ public class MockUtils {
         switch (definition.getPropertyType()) {
             case STRING:
                 property = new PropertyStringImpl();
+                if (value instanceof  List)
+                    ((PropertyStringImpl) property).setValues(copyStringValues((List) value));
+                else
                 ((PropertyStringImpl) property).setValue(copyStringValue(value));
                 break;
             case ID:
@@ -611,15 +591,24 @@ public class MockUtils {
                 break;
             case BOOLEAN:
                 property = new PropertyBooleanImpl();
-                ((PropertyBooleanImpl) property).setValue(copyBooleanValue(value));
+                if (value instanceof  List)
+                    ((PropertyBooleanImpl) property).setValues(copyBooleanValues((List) value));
+                else
+                    ((PropertyBooleanImpl) property).setValue(copyBooleanValue(value));
                 break;
             case INTEGER:
                 property = new PropertyIntegerImpl();
-                ((PropertyIntegerImpl) property).setValue(copyIntegerValue(value));
+                if (value instanceof  List)
+                    ((PropertyIntegerImpl) property).setValues(copyIntegerValues((List) value));
+                else
+                    ((PropertyIntegerImpl) property).setValue(copyIntegerValue(value));
                 break;
             case DECIMAL:
                 property = new PropertyDecimalImpl();
-                ((PropertyDecimalImpl) property).setValue(copyDecimalValue(value));
+                if (value instanceof  List)
+                    ((PropertyDecimalImpl) property).setValues(copyDecimalValues((List) value));
+                else
+                    ((PropertyDecimalImpl) property).setValue(copyDecimalValue(value));
                 break;
             case DATETIME:
                 property = new PropertyDateTimeImpl();
@@ -646,6 +635,30 @@ public class MockUtils {
         return property;
     }
 
+
+    GregorianCalendar copyDateTimeValue(Object source) {
+        GregorianCalendar result = null;
+        if (source != null) {
+            GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+            if (source instanceof  GregorianCalendar) {
+                result = (GregorianCalendar) source;
+            } else if (source instanceof Number) {
+                cal.setTimeInMillis(((Number) source).longValue());
+                result = cal;
+            } else if (source instanceof Date){
+                cal.setTime((Date) source);
+                result = cal;
+            } else if (source instanceof String) {
+                Long value = Long.parseLong((String) source);
+                cal.setTime(new Date(value));
+                result = cal;
+            } else {
+                throw new CmisRuntimeException("Invalid property value: " + source);
+            }
+        }
+
+        return result;
+    }
 
     List<String> copyStringValues(List<Object> source) {
         List<String> result = null;
@@ -676,6 +689,24 @@ public class MockUtils {
         return result;
     }
 
+    List<Boolean> copyBooleanValues(List<Object> source) {
+        List<Boolean> result = null;
+        if (source != null) {
+            result = new ArrayList<Boolean>(source.size());
+            for (Object obj : source) {
+                if (obj instanceof Boolean) {
+                    result.add((Boolean) obj);
+                } else if (obj instanceof String) {
+                    result.add(Boolean.parseBoolean(obj.toString()));
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + obj);
+                }
+            }
+        }
+
+        return result;
+    }
+
     Boolean copyBooleanValue(Object source) {
         Boolean result = null;
         if (source != null) {
@@ -691,6 +722,24 @@ public class MockUtils {
         return result;
     }
 
+    List<BigInteger> copyIntegerValues(List<Object> source) {
+        List<BigInteger> result = null;
+        if (source != null) {
+            result = new ArrayList<BigInteger>(source.size());
+            for (Object obj : source) {
+                if (obj instanceof Integer) {
+                    result.add((BigInteger) obj);
+                } else if (obj instanceof String) {
+                    result.add(new BigInteger(obj.toString()));
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + obj);
+                }
+            }
+        }
+
+        return result;
+    }
+
     BigInteger copyIntegerValue(Object source) {
         BigInteger result = null;
         if (source != null) {
@@ -700,6 +749,28 @@ public class MockUtils {
                 result = new BigInteger((String) source);
             } else {
                 throw new CmisRuntimeException("Invalid property value: " + source);
+            }
+        }
+
+        return result;
+    }
+
+    List<BigDecimal> copyDecimalValues(List<Object> source) {
+        List<BigDecimal> result = null;
+        if (source != null) {
+            result = new ArrayList<BigDecimal>(source.size());
+            for (Object obj : source) {
+                if (obj instanceof BigDecimal) {
+                    result.add( (BigDecimal) obj);
+                } else if (obj instanceof BigInteger) {
+                    result.add(new BigDecimal((BigInteger) obj));
+                } else if(obj instanceof String) {
+                    result.add( new BigDecimal((String) obj));
+                } else if(obj instanceof Double) {
+                    result.add(new BigDecimal((Double) obj));
+                } else {
+                    throw new CmisRuntimeException("Invalid property value: " + obj);
+                }
             }
         }
 

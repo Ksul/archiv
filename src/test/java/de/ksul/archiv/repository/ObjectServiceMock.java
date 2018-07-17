@@ -1,25 +1,35 @@
 package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.ObjectId;
+import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
-import org.apache.chemistry.opencmis.client.runtime.*;
+import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
+import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
+import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.FailedToDeleteData;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
+import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
+import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.FailedToDeleteDataImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.Map;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -89,6 +99,67 @@ public class ObjectServiceMock {
                 return null;
             }
         }).when(objectService).moveObject(anyString(), any(Holder.class), anyString(), anyString(), any());
+        when(objectService.getObjectByPath(anyString(), anyString(), any(), anyBoolean(), any(IncludeRelationships.class), anyString(), anyBoolean(), anyBoolean(), any())).then(new Answer<ObjectData>() {
+                @Override
+                public ObjectData answer(InvocationOnMock invocation)  {
+                    FileableCmisObject cmisObject = repository.getByPath((String) invocation.getArguments()[1]);
+                    if (cmisObject == null)
+                        throw new CmisObjectNotFoundException((String) invocation.getArguments()[0] + " not found!");
+                    return MockUtils.getInstance().getObjectDataFromProperties(cmisObject.getProperties());
+                }
+            });
+        when(objectService.deleteTree(anyString(), anyString(), anyBoolean(), any(UnfileObject.class), anyBoolean(), any())).then(new Answer<FailedToDeleteData>() {
+            @Override
+            public FailedToDeleteData answer(InvocationOnMock invocation) throws Throwable {
+                FileableCmisObject cmisObject = repository.getById((String) invocation.getArguments()[1]);
+                repository.deleteTree(cmisObject);
+                return new FailedToDeleteDataImpl();
+            }
+        });
+        when(objectService.createDocument(anyString(),any(Properties.class), anyString(),any(), any(VersioningState.class), any(), any(), any(), any())).then(new Answer<String>() {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable {
+
+                ObjectType objectType;
+                PropertiesImpl props = (PropertiesImpl) invocation.getArguments()[1];
+
+                String objectTypeName = (String) props.getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue();
+                if (objectTypeName.contains(BaseTypeId.CMIS_DOCUMENT.value()))
+                    objectType = MockUtils.getInstance().getDocumentType();
+                else if (objectTypeName.contains(BaseTypeId.CMIS_FOLDER.value()))
+                    objectType = MockUtils.getInstance().getFolderType();
+                else
+                    objectType = MockUtils.getInstance().getArchivType();
+                String name = (String) props.getProperties().get(PropertyIds.NAME).getFirstValue();
+                FileableCmisObject cmis = repository.getById((String) invocation.getArguments()[2]);
+                String path = cmis.getPaths().get(0);
+                FileableCmisObject newObject;
+                if (invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
+                    ((PropertyImpl) props.getProperties().get(PropertyIds.VERSION_LABEL)).setValue("1.0");
+                else
+                    ((PropertyImpl) props.getProperties().get(PropertyIds.VERSION_LABEL)).setValue("0.1");
+                newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, objectType, ((ContentStream) invocation.getArguments()[2]).getMimeType());
+                repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2], newObject.getProperty("cmis:versionLabel").getValueAsString());
+
+                return newObject.getId();
+            }
+        });
+        when(objectService.createFolder(anyString(), any(Properties.class), anyString(),any(), any(), any(), any())).then(new Answer<String>() {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable {
+
+                PropertiesImpl props = (PropertiesImpl) invocation.getArguments()[1];
+
+                String name = (String) props.getProperties().get(PropertyIds.NAME).getFirstValue();
+                FileableCmisObject cmis = repository.getById((String) invocation.getArguments()[2]);
+                String path = cmis.getPaths().get(0);
+                FileableCmisObject newObject;
+                newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, MockUtils.getInstance().getFolderType(), null);
+                repository.insert(path, newObject);
+
+                return newObject.getId();
+            }
+        });
 /*        when(objectService.createFolder(anyString(), any(Properties.class), anyString(), anyListOf(String.class), any(Acl.class), any(Acl.class), any(ExtensionsData.class))).thenAnswer(new Answer<ObjectId>() {
 
             public ObjectId answer(InvocationOnMock invocation) throws Throwable {

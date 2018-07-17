@@ -59,7 +59,7 @@ public class SessionMock {
         when(session.getBinding()).thenReturn(binding);
         when(session.getRepositoryInfo()).thenReturn(repositoryInfo);
         when(session.getRepositoryId()).thenReturn("0");
-        when(session.getObjectFactory()).thenReturn(objectFactory);
+        when(session.getObjectFactory()).thenCallRealMethod();
         when(session.createOperationContext()).thenCallRealMethod();
         when(session.getDefaultContext()).thenReturn(new OperationContextImpl(null, false, true, false,
                 IncludeRelationships.NONE, null, true, null, true, 100));
@@ -73,32 +73,10 @@ public class SessionMock {
         when(session.query(anyString(), any(Boolean.class))).thenCallRealMethod();
         when(session.queryObjects(anyString(), anyString(), anyBoolean(),any(OperationContext.class))).thenCallRealMethod();
 
-        when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class))).thenAnswer(new Answer<ObjectId>() {
-
-            public ObjectId answer(InvocationOnMock invocation) throws Throwable {
-                return createFileableCmisObject(repository, session, invocation, false);
-            }
-        });
-        when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class), any(), any(), any())).thenAnswer(new Answer<ObjectId>() {
-
-            public ObjectId answer(InvocationOnMock invocation) throws Throwable {
-                return createFileableCmisObject(repository, session, invocation, false);
-            }
-        });
-        when(session.createFolder(anyMap(), any(ObjectId.class), any(), any(), any())).thenAnswer(new Answer<ObjectId>() {
-
-            public ObjectId answer(InvocationOnMock invocation)  {
-
-                return createFileableCmisObject(repository, session, invocation, true);
-            }
-        });
-        when(session.createFolder(anyMap(), any(ObjectId.class))).thenAnswer(new Answer<ObjectId>() {
-
-            public ObjectId answer(InvocationOnMock invocation) throws Throwable {
-
-                return createFileableCmisObject(repository, session, invocation, true);
-            }
-        });
+        when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class))).thenCallRealMethod();
+        when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class), any(), any(), any())).thenCallRealMethod();
+        when(session.createFolder(anyMap(), any(ObjectId.class), any(), any(), any())).thenCallRealMethod();
+        when(session.createFolder(anyMap(), any(ObjectId.class))).thenCallRealMethod();
         doAnswer(new Answer() {
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 String objectId = ((ObjectId) invocation.getArguments()[0]).getId();
@@ -108,33 +86,13 @@ public class SessionMock {
             }
 
         }).when(session).delete(any(ObjectId.class), anyBoolean());
-        when(session.deleteTree(any(ObjectId.class), anyBoolean(), any(UnfileObject.class), anyBoolean())).thenAnswer(new Answer<List<String>>() {
-            public List<String> answer(InvocationOnMock invocation) throws Throwable {
-                String objectId = ((ObjectId) invocation.getArguments()[0]).getId();
-                FileableCmisObject cmisObject = repository.getById(objectId);
-                return repository.deleteTree(cmisObject);
-            }
-        });
+        when(session.deleteTree(any(ObjectId.class), anyBoolean(), any(UnfileObject.class), anyBoolean())).thenCallRealMethod();
         when(session.createObjectId(anyString())).thenCallRealMethod();
         when(session.getObject(any(ObjectId.class))).thenCallRealMethod();
         when(session.getObject(anyString(), any(OperationContext.class))).thenCallRealMethod();
         when(session.getObject(any(ObjectId.class), any(OperationContext.class))).thenCallRealMethod();
-        when(session.getObjectByPath(anyString())).thenAnswer(new Answer<FileableCmisObject>() {
-            public FileableCmisObject answer(InvocationOnMock invocation) throws Throwable {
-                FileableCmisObject cmisObject = repository.getByPath((String) invocation.getArguments()[0]);
-                if (cmisObject == null)
-                    throw new CmisObjectNotFoundException((String) invocation.getArguments()[0] + " not found!");
-                return cmisObject;
-            }
-        });
-        when(session.getObjectByPath(any(String.class), any(OperationContext.class))).thenAnswer(new Answer<FileableCmisObject>() {
-            public FileableCmisObject answer(InvocationOnMock invocation)  {
-                FileableCmisObject cmisObject = repository.getByPath((String) invocation.getArguments()[0]);
-                if (cmisObject == null)
-                    throw new CmisObjectNotFoundException((String) invocation.getArguments()[0] + " not found!");
-                return cmisObject;
-            }
-        });
+        when(session.getObjectByPath(anyString())).thenCallRealMethod();
+        when(session.getObjectByPath(any(String.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.getContentStream(any(ObjectId.class), any(), any(), any())).thenAnswer(new Answer<ContentStream>() {
             public ContentStream answer(InvocationOnMock invocation) {
                 Object[] args = invocation.getArguments();
@@ -181,49 +139,13 @@ public class SessionMock {
             Field cacheField = SessionImpl.class.getDeclaredField("cache");
             cacheField.setAccessible(true);
             cacheField.set(session, cache);
+            Field objectFactoryField = SessionImpl.class.getDeclaredField("objectFactory");
+            objectFactoryField.setAccessible(true);
+            objectFactoryField.set(session, objectFactory);
         } catch (Exception e) {
            throw new RuntimeException(e.getMessage());
         }
         return session;
-    }
-
-    private ObjectId createFileableCmisObject(Repository repository, SessionImpl sessionImpl, InvocationOnMock invocation, boolean folder) {
-        boolean majorVersion = false;
-        ObjectType objectType;
-        Object[] args = invocation.getArguments();
-        Map<String, Object> props = (Map<String, Object>) args[0];
-
-        if (props.get(PropertyIds.OBJECT_TYPE_ID) == null) {
-            throw new IllegalArgumentException();
-        }
-        if (props.get(PropertyIds.NAME) == null) {
-            throw new IllegalArgumentException();
-        }
-        String objectTypeName = (String) props.get(PropertyIds.OBJECT_TYPE_ID);
-        if (objectTypeName.contains(BaseTypeId.CMIS_DOCUMENT.value()))
-            objectType = MockUtils.getInstance().getDocumentType();
-        else if (objectTypeName.contains(BaseTypeId.CMIS_FOLDER.value()))
-            objectType = MockUtils.getInstance().getFolderType();
-        else
-            objectType = MockUtils.getInstance().getArchivType();
-        String name = (String) props.get(PropertyIds.NAME);
-        FileableCmisObject cmis = (FileableCmisObject) args[1];
-        String path = cmis.getPaths().get(0) ;
-        FileableCmisObject newObject;
-        if (!folder) {
-            if (invocation.getArguments().length > 2 && ((VersioningState) invocation.getArguments()[3]).equals(VersioningState.MAJOR))
-                props.put("cmis:versionLabel", "1.0");
-            else
-                props.put("cmis:versionLabel", "0.1");
-            newObject = MockUtils.getInstance().createFileableCmisObject(repository, props, path, name,  objectType,  ((ContentStream) invocation.getArguments()[2]).getMimeType());
-            repository.insert(path, newObject, (ContentStream) invocation.getArguments()[2], newObject.getProperty("cmis:versionLabel").getValueAsString());
-        }
-        else {
-            newObject = MockUtils.getInstance().createFileableCmisObject(repository, props, path, name, objectType, null);
-            repository.insert(path, newObject);
-        }
-
-        return new ObjectIdImpl(newObject.getId());
     }
 
 }

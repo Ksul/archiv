@@ -149,11 +149,11 @@ public class Repository {
 
     }
 
-    List<String> deleteTree(FileableCmisObject cmisObject) {
+    void deleteTree(FileableCmisObject cmisObject) {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         delete(cmisObject);
-        return new ArrayList<>();
+        return;
     }
 
     void delete(FileableCmisObject cmisObject) {

@@ -61,10 +61,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         }
     }
 
-
-
-
-
     private boolean isRoot() {
         return parent == null;
     }
@@ -81,27 +77,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
         return (T) MockUtils.getInstance().createObject(versions.get(version));
     }
-
-    /*private T createObj(List<Property<?>> properties) {
-        ObjectDataImpl objectData = new ObjectDataImpl();
-        PropertiesImpl props = (PropertiesImpl) MockUtils.getInstance().convProperties(properties);
-        objectData.setProperties(props);
-        props.getProperties().get(PropertyIds.OBJECT_TYPE_ID).
-        T obj = new FolderImpl()
-        LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
-        Iterator<String> it = properties.keySet().iterator();
-        while (it.hasNext()) {
-            String key = it.next();
-            props.put(key, properties.get(key));}
-        }
-        try {
-            Field propertiesField = AbstractCmisObject.class.getDeclaredField("properties");
-            propertiesField.setAccessible(true);
-            propertiesField.set(obj, props);
-        } catch (Exception e) {
-            throw new RuntimeException(("Properties not set!"));
-        }
-    }*/
+    
 
     public boolean containsData (String version){ return versions.containsKey(version);}
 
