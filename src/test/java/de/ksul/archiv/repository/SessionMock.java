@@ -8,6 +8,7 @@ import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.client.runtime.cache.Cache;
 import org.apache.chemistry.opencmis.client.runtime.repository.ObjectFactoryImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
@@ -20,8 +21,10 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -77,11 +80,7 @@ public class SessionMock {
         when(session.getDefaultContext()).thenReturn(new OperationContextImpl(null, false, true, false,
                 IncludeRelationships.NONE, null, true, null, true, 100));
 
-        when(session.createQueryStatement(any(String.class))).then(new Answer<QueryStatement>() {
-            public QueryStatement answer(InvocationOnMock invocation) throws Throwable {
-                return new QueryStatementImpl(session, (String) invocation.getArguments()[0]);
-            }
-        });
+        when(session.createQueryStatement(any(String.class))).thenCallRealMethod();
         when(session.query(anyString(), any(Boolean.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.query(anyString(), any(Boolean.class))).thenCallRealMethod();
         when(session.queryObjects(anyString(), anyString(), anyBoolean(), any(OperationContext.class))).thenCallRealMethod();
@@ -99,8 +98,13 @@ public class SessionMock {
         when(session.getObjectByPath(anyString())).thenCallRealMethod();
         when(session.getObjectByPath(any(String.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.getContentStream(any(ObjectId.class), any(), any(), any())).thenCallRealMethod();
-
+        when(session.getTypeDefinition(anyString())).thenCallRealMethod();
         when(session.getTypeDefinition(anyString(), anyBoolean())).thenCallRealMethod();
+
+        Map<String, String> parameter = new HashMap<>();
+        parameter.put(SessionParameter.CACHE_SIZE_OBJECTS, "5");
+        parameter.put(SessionParameter.CACHE_SIZE_LINKS, "5");
+        parameter.put(SessionParameter.CACHE_SIZE_REPOSITORIES, "2");
 
 
         try {
@@ -113,6 +117,12 @@ public class SessionMock {
             Field objectFactoryField = SessionImpl.class.getDeclaredField("objectFactory");
             objectFactoryField.setAccessible(true);
             objectFactoryField.set(session, objectFactory);
+            Field lockField = SessionImpl.class.getDeclaredField("lock");
+            lockField.setAccessible(true);
+            lockField.set(session, new ReentrantReadWriteLock());
+            Field parametersField = SessionImpl.class.getDeclaredField("parameters");
+            parametersField.setAccessible(true);
+            parametersField.set(session, parameter);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

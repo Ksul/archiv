@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
  */
 public class NavigationServiceMock {
 
-    private static NavigationService navigationService;
+    private NavigationService navigationService;
     private Repository repository;
 
     public NavigationServiceMock() {

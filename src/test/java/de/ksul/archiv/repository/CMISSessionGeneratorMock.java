@@ -104,6 +104,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     @PreDestroy
     public void shutDown() throws IOException {
         if (file != null && !file.isEmpty()) {
+            logger.info("Save Data...");
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             mapper.configure(SerializationFeature.INDENT_OUTPUT,true);
@@ -118,6 +119,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             module.addSerializer(ContentStream.class, new ContentStreamSerializer());
             mapper.registerModule(module);
             mapper.writeValue(new File(file), repository);
+            logger.info("Data saved!");
         }
 
     }
@@ -137,10 +139,12 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             mapper.registerModule(module);
             File jsonFile = new File(file);
             if (jsonFile.exists()) {
+                logger.info("Load Data...");
                 repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
                 });
                 sessionImpl = new SessionMock().setRepository(repository).getSession();
                 MockUtils.getInstance().setSession(sessionImpl);
+                logger.info("Data loaded!");
             }
         }
         if (repository == null) {
