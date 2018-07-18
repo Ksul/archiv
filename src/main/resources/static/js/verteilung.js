@@ -1079,15 +1079,19 @@ function sendScript() {
  */
 function sendToInbox() {
     try {
-        const json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successmessage": "Dokument " + name + " wurde erfolgreich in die Inbox verschoben!"}, [
+        const json = executeService({"name": "createDocument", "errorMessage": "Dokument konnte nicht auf den Server geladen werden:", "successmessage": "Dokument " + Verteilung.textEditor.file + " wurde erfolgreich in die Inbox verschoben!"}, [
             {"name": "documentId", "value": inboxFolderId},
             {"name": "fileName", "value": Verteilung.textEditor.file},
             {"name": "content", "value": Verteilung.textEditor.content.original, "type": "byte"},
             // TODO Richtigen Mimetype ermitteln
             {"name": "mimeType", "value": Verteilung.textEditor.typ},
-            {"name": "extraProperties", "value": {}},
+            {"name": "extraProperties", "value": {'P:cm:titled': {},'D:my:archivContent': {}}},
             {"name": "versionState", "value": "none"}
         ]);
+        if (json.success)
+            alertify.success("Dokument " + Verteilung.textEditor.file + " wurde erfolgreich in die Inbox verschoben!");
+        else
+            alertify.error("Dokument konnte nicht auf den Server geladen werden");
     } catch (e) {
         errorHandler(e);
     }
