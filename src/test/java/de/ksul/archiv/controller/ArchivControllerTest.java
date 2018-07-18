@@ -43,6 +43,7 @@ public class ArchivControllerTest extends  ArchivControllerAbstractTest {
         filePdf = "/src/test/resources/Test.pdf";
         fileTxt = "/src/test/resources/test.txt";
         fileZip = "/src/test/resources/Sample.zip";
+        super.setUp();
     }
 
     @AfterEach

@@ -110,6 +110,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
             parentNode = parentNode.parent;
         }
         childNode.path = pfad.toString();
+        if (version != null)
+            childNode.checkin(version, null);
         this.registerChild(childNode);
         return childNode;
     }

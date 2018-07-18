@@ -33,9 +33,9 @@ import java.util.*;
  */
 public class MockUtils {
 
-    private static SessionImpl sessionImpl;
+    private SessionImpl sessionImpl;
 
-    private static  MockUtils mockUtils;
+    private static MockUtils mockUtils;
 
 
     static MockUtils getInstance() {
@@ -44,12 +44,12 @@ public class MockUtils {
         return mockUtils;
     }
 
-    public static SessionImpl getSession() {
+    public SessionImpl getSession() {
         return sessionImpl;
     }
 
-    public static void setSession(SessionImpl sessionImpl) {
-        MockUtils.sessionImpl = sessionImpl;
+    public void setSession(SessionImpl sessionImpl) {
+        this.sessionImpl = sessionImpl;
     }
 
     private Map<String, PropertyDefinition<?>> propertyDefinitionMap;

@@ -15,18 +15,23 @@ import static org.mockito.Mockito.when;
  */
 public class RepositoryInfoMock {
 
-    private static RepositoryInfo repositoryInfo;
+    private RepositoryInfo repositoryInfo;
+    private Repository repository;
 
-    public RepositoryInfoMock(Repository repository) {
-        if (repositoryInfo == null)
-            repositoryInfo = getMock(repository);
+    public RepositoryInfoMock() {
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 
     public RepositoryInfo getRepositoryInfo() {
+        if (repositoryInfo == null)
+            repositoryInfo = getMock();
         return repositoryInfo;
     }
 
-    private RepositoryInfo getMock(Repository repository){
+    private RepositoryInfo getMock(){
 
         RepositoryInfo info = mock(RepositoryInfo.class);
         when(info.getId()).thenReturn("0");

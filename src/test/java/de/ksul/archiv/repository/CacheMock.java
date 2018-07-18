@@ -14,14 +14,15 @@ import static org.mockito.Mockito.when;
  */
 public class CacheMock {
 
-    private static Cache cache;
+    private Cache cache;
 
     public CacheMock() {
-        if (cache == null)
-            cache = getMock();
+
     }
 
     public Cache getCache() {
+        if (cache == null)
+            cache = getMock();
         return cache;
     }
 

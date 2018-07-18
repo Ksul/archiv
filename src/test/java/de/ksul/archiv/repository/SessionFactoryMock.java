@@ -16,22 +16,28 @@ import static org.mockito.Mockito.when;
  */
 public class SessionFactoryMock {
 
-    private static SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
+    private SessionImpl session;
 
     public SessionFactoryMock(SessionImpl session) {
-        if (sessionFactory == null)
-            sessionFactory = getMock(session);
+
     }
 
-    public static SessionFactory getSessionFactory() {
+    public void setSession(SessionImpl session) {
+        this.session = session;
+    }
+
+    public SessionFactory getSessionFactory() {
+        if (sessionFactory == null)
+            sessionFactory = getMock();
         return sessionFactory;
     }
 
-    private SessionFactory getMock(SessionImpl sessionImpl) {
+    private SessionFactory getMock() {
 
         SessionFactory sessionFactory = mock(SessionFactory.class);
         when(sessionFactory.createSession(null)).thenThrow(new NullPointerException("Parameters null"));
-        when(sessionFactory.createSession(new HashMap<>())).thenReturn(sessionImpl);
+        when(sessionFactory.createSession(new HashMap<>())).thenReturn(session);
         when(sessionFactory.getRepositories(null)).thenThrow(new NullPointerException("Parameters null"));
         return sessionFactory;
 

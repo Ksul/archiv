@@ -37,17 +37,23 @@ import static org.mockito.Mockito.when;
 public class NavigationServiceMock {
 
     private static NavigationService navigationService;
+    private Repository repository;
 
-    public NavigationServiceMock(Repository repository) {
-        if (navigationService == null)
-            navigationService = getMock(repository);
+    public NavigationServiceMock() {
+
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 
     public NavigationService getNavigationService() {
+        if (navigationService == null)
+            navigationService = getMock();
         return navigationService;
     }
 
-    private  NavigationService getMock(Repository repository) {
+    private NavigationService getMock() {
 
         NavigationService navigationService = mock(NavigationService.class);
         when(navigationService.getFolderParent(anyString(), anyString(), anyString(), any())).then(new Answer<ObjectData>() {

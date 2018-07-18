@@ -33,7 +33,7 @@ public abstract class AlfrescoTest {
     public void setUp() throws Exception {
         if (needsProxy()) {
             System.getProperties().put("proxySet", "true");
-            System.getProperties().put("proxyHost", "www-proxy");
+            System.getProperties().put("proxyHost", "http-proxy.lvm.de");
             System.getProperties().put("proxyPort", "8080");
         } else {
             System.getProperties().put("proxySet", "false");

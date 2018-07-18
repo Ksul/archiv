@@ -149,20 +149,20 @@ public class Repository {
 
     }
 
-    void deleteTree(FileableCmisObject cmisObject) {
-        if (cmisObject == null)
-            throw new RuntimeException("cmisObject must be set!");
-        delete(cmisObject);
+    void deleteTree(String id) {
+        if (id == null)
+            throw new RuntimeException("Id must be set!");
+        delete(id);
         return;
     }
 
-    void delete(FileableCmisObject cmisObject) {
-        if (cmisObject == null)
-            throw new RuntimeException("cmisObject must be set!");
+    void delete(String id) {
+        if (id == null)
+            throw new RuntimeException("Id must be set!");
         if (root == null)
             throw new RuntimeException("no Root Node!");
-        logger.info(cmisObject.getName() + " [ID: " + cmisObject.getId() + "] [Path: " + cmisObject.getPaths().get(0) + "] deleted from repository!");
-        TreeNode<FileableCmisObject> node = findTreeNodeForId(cmisObject.getId());
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
+        logger.info(node.getName() + " [ID: " + node.getId() + "] [Path: " + node.getPath() + "] deleted from repository!");
         node.removeNode();
         nodes.remove(node.getId());
     }
@@ -209,8 +209,7 @@ public class Repository {
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
-                if (version != null)
-                    node.checkin(version, null);
+
             }
             else
                 throw new RuntimeException("Parent " + parentPath + " not found!");
@@ -343,8 +342,12 @@ public class Repository {
         if (root == null)
             throw new RuntimeException("no Root Node!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(objectId);
-        if (contentIds.containsKey(node.getId()) && !overwrite)
-            throw new CmisContentAlreadyExistsException();
+        try {
+            if (contentIds.containsKey(node.getId()) && !overwrite)
+                throw new CmisContentAlreadyExistsException();
+        } catch (NullPointerException e) {
+            objectId = "";
+        }
         String uuid = UUID.randomUUID().toString();
         contents.put(uuid, content);
         contentIds.put(node.getId(), uuid);

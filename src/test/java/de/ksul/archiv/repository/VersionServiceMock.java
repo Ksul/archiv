@@ -31,18 +31,24 @@ import static org.mockito.Mockito.when;
  */
 public class VersionServiceMock {
 
-    private static VersioningService versioningService;
+    private VersioningService versioningService;
+    private Repository repository;
 
-    public VersionServiceMock(Repository repository) {
-        if (versioningService == null)
-            versioningService = getMock(repository);
+    public VersionServiceMock() {
+
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 
     public VersioningService getVersioningService() {
+        if (versioningService == null)
+            versioningService = getMock();
         return versioningService;
     }
 
-    private VersioningService getMock(Repository repository) {
+    private VersioningService getMock() {
         VersioningService versioningService = mock(VersioningService.class);
 
         doAnswer(new Answer() {

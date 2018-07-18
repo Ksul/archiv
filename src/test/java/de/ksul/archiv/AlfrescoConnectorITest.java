@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @EnableAutoConfiguration
 @EnableConfigurationProperties({ArchivTestProperties.class})
 @SpringBootTest(classes = {ArchivConfiguration.class})
+@DirtiesContext
 public class AlfrescoConnectorITest extends AlfrescoConnectorAbstractTest {
 
     @BeforeEach

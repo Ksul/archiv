@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,26 +34,41 @@ import static org.mockito.Mockito.when;
  */
 public class SessionMock {
 
-    private static SessionImpl session;
+    private SessionImpl session;
+    private Repository repository;
+    private CmisBindingMock cmisBindingMock;
+    private RepositoryInfoMock repositoryInfoMock;
+    private CacheMock cacheMock;
 
-    public SessionMock(Repository repo) {
-        if (session == null)
-            session = getMock(repo);
+    public SessionMock() {
+        cmisBindingMock = new CmisBindingMock();
+        repositoryInfoMock = new RepositoryInfoMock();
+        cacheMock = new CacheMock();
     }
 
     public SessionImpl getSession() {
+        if (session == null)
+            session = getMock();
+        cmisBindingMock.setSessionImpl(session);
         return session;
     }
 
-    private SessionImpl getMock(Repository repository) {
+    public SessionMock setRepository(Repository repository) {
+        this.repository = repository;
+        cmisBindingMock.setRepository(repository);
+        repositoryInfoMock.setRepository(repository);
+        return this;
+    }
+
+    private SessionImpl getMock() {
 
         SessionImpl session = mock(SessionImpl.class);
 
         ObjectFactory objectFactory = new ObjectFactoryImpl();
         objectFactory.initialize(session, null);
-        RepositoryInfo repositoryInfo = new RepositoryInfoMock(repository).getRepositoryInfo();
-        Cache cache = new CacheMock().getCache();
-        CmisBinding binding = new CmisBindingMock(repository, session).getBinding();
+        RepositoryInfo repositoryInfo = repositoryInfoMock.getRepositoryInfo();
+        Cache cache = cacheMock.getCache();
+        CmisBinding binding = cmisBindingMock.getBinding();
         when(session.getBinding()).thenReturn(binding);
         when(session.getRepositoryInfo()).thenReturn(repositoryInfo);
         when(session.getRepositoryId()).thenReturn("0");
@@ -71,21 +84,13 @@ public class SessionMock {
         });
         when(session.query(anyString(), any(Boolean.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.query(anyString(), any(Boolean.class))).thenCallRealMethod();
-        when(session.queryObjects(anyString(), anyString(), anyBoolean(),any(OperationContext.class))).thenCallRealMethod();
+        when(session.queryObjects(anyString(), anyString(), anyBoolean(), any(OperationContext.class))).thenCallRealMethod();
 
         when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class))).thenCallRealMethod();
         when(session.createDocument(anyMap(), any(ObjectId.class), any(ContentStream.class), any(VersioningState.class), any(), any(), any())).thenCallRealMethod();
         when(session.createFolder(anyMap(), any(ObjectId.class), any(), any(), any())).thenCallRealMethod();
         when(session.createFolder(anyMap(), any(ObjectId.class))).thenCallRealMethod();
-        doAnswer(new Answer() {
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                String objectId = ((ObjectId) invocation.getArguments()[0]).getId();
-                FileableCmisObject cmisObject = repository.getById(objectId);
-                repository.delete(cmisObject);
-                return null;
-            }
-
-        }).when(session).delete(any(ObjectId.class), anyBoolean());
+        doCallRealMethod().when(session).delete(any(ObjectId.class), anyBoolean());
         when(session.deleteTree(any(ObjectId.class), anyBoolean(), any(UnfileObject.class), anyBoolean())).thenCallRealMethod();
         when(session.createObjectId(anyString())).thenCallRealMethod();
         when(session.getObject(any(ObjectId.class))).thenCallRealMethod();
@@ -93,44 +98,10 @@ public class SessionMock {
         when(session.getObject(any(ObjectId.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.getObjectByPath(anyString())).thenCallRealMethod();
         when(session.getObjectByPath(any(String.class), any(OperationContext.class))).thenCallRealMethod();
-        when(session.getContentStream(any(ObjectId.class), any(), any(), any())).thenAnswer(new Answer<ContentStream>() {
-            public ContentStream answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                Document document = (Document) args[0];
-                return repository.getContent(document.getId());
-            }
-        });
-        when(session.getTypeDefinition(anyString())).thenAnswer(new Answer<ObjectType>() {
-            public ObjectType answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                String string = (String) args[0];
-                if (string.equalsIgnoreCase("cmis:document"))
-                    return MockUtils.getInstance().getDocumentType();
-                else if (string.equalsIgnoreCase("cmis:folder"))
-                    return MockUtils.getInstance().getFolderType();
-                else if (string.contains("my:archivContent"))
-                    return MockUtils.getInstance().getArchivType();
-                else if (string.startsWith("P:"))
-                    return MockUtils.getInstance().getSecondaryTypeStore().get(string);
-                else
-                    return MockUtils.getInstance().getDocumentType();
-            }
-        });
-        when(session.getTypeDefinition(anyString(), anyBoolean())).thenAnswer(new Answer<ObjectType>() {
-            public ObjectType answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                String string = (String) args[0];
-                if (string.equalsIgnoreCase("cmis:document"))
-                    return MockUtils.getInstance().getDocumentType();
-                else if (string.equalsIgnoreCase("cmis:folder"))
-                    return MockUtils.getInstance().getFolderType();
-                else if (string.contains("my:archivContent"))
-                    return MockUtils.getInstance().getArchivType();
-                else if (string.startsWith("P:"))
-                    return MockUtils.getInstance().getSecondaryTypeStore().get(string);
-                return MockUtils.getInstance().getDocumentType();
-            }
-        });
+        when(session.getContentStream(any(ObjectId.class), any(), any(), any())).thenCallRealMethod();
+
+        when(session.getTypeDefinition(anyString(), anyBoolean())).thenCallRealMethod();
+
 
         try {
             Field bindingField = SessionImpl.class.getDeclaredField("binding");
@@ -143,7 +114,7 @@ public class SessionMock {
             objectFactoryField.setAccessible(true);
             objectFactoryField.set(session, objectFactory);
         } catch (Exception e) {
-           throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
         return session;
     }

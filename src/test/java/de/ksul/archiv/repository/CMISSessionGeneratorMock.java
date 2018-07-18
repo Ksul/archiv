@@ -139,14 +139,14 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             if (jsonFile.exists()) {
                 repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
                 });
-                sessionImpl = new SessionMock(repository).getSession();
-                MockUtils.setSession(sessionImpl);
+                sessionImpl = new SessionMock().setRepository(repository).getSession();
+                MockUtils.getInstance().setSession(sessionImpl);
             }
         }
         if (repository == null) {
             repository = new Repository();
-            sessionImpl = new SessionMock(repository).getSession();
-            MockUtils.setSession(sessionImpl);
+            sessionImpl = new SessionMock().setRepository(repository).getSession();
+            MockUtils.getInstance().setSession(sessionImpl);
             repository.insert(null, MockUtils.getInstance().createFileableCmisObject(repository, null, null, "/", MockUtils.getInstance().getFolderType(), null));
             repository.insert("/", MockUtils.getInstance().createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), MockUtils.getInstance().getFolderType(), null));
             repository.insert("/" + archivProperties.getDataDictionaryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), MockUtils.getInstance().getFolderType(), null));

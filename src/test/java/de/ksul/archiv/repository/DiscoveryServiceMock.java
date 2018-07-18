@@ -34,17 +34,27 @@ import static org.mockito.Mockito.when;
 public class DiscoveryServiceMock {
 
     private DiscoveryService discoveryService;
+    private SessionImpl session;
+    private Repository repository;
 
-    public DiscoveryServiceMock(Repository repository, SessionImpl session) {
-        if (discoveryService == null)
-            discoveryService = getMock(repository, session);
+    public DiscoveryServiceMock() {
+    }
+
+    public void setSession(SessionImpl session) {
+        this.session = session;
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 
     public DiscoveryService getDiscoveryService() {
+        if (discoveryService == null)
+            discoveryService = getMock();
         return discoveryService;
     }
 
-    private DiscoveryService getMock(Repository repository, SessionImpl session) {
+    private DiscoveryService getMock() {
         DiscoveryService discoveryService = mock(DiscoveryService.class);
         when(discoveryService.query(any(String.class), any(String.class), any(Boolean.class), any(Boolean.class), any(IncludeRelationships.class), any(String.class), any(BigInteger.class), any(BigInteger.class), any())).then(new Answer<ObjectList>() {
 
