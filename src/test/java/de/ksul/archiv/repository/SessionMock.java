@@ -38,7 +38,6 @@ import static org.mockito.Mockito.*;
 public class SessionMock {
 
     private SessionImpl session;
-    private Repository repository;
     private CmisBindingMock cmisBindingMock;
     private RepositoryInfoMock repositoryInfoMock;
     private CacheMock cacheMock;
@@ -57,7 +56,6 @@ public class SessionMock {
     }
 
     public SessionMock setRepository(Repository repository) {
-        this.repository = repository;
         cmisBindingMock.setRepository(repository);
         repositoryInfoMock.setRepository(repository);
         return this;
