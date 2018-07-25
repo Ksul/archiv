@@ -1155,7 +1155,7 @@ public class ArchivController {
     }
 
     /**
-     * öfnnet eine Datei und liest den Inhalt
+     * öffnet eine Datei und liest den Inhalt
      *
      * @param model das Requestmodel
      * @return obj

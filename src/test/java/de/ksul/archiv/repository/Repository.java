@@ -1,6 +1,7 @@
 package de.ksul.archiv.repository;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.ksul.archiv.repository.script.RecognizeEndpoints;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -17,6 +18,13 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.*;
 
 /**
@@ -209,9 +217,27 @@ public class Repository {
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
+                if (node.getName().equals("Inbox")) {
+                    ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+                    try {
+                        RecognizeEndpoints.setDocument(newNode);
+                        Object rec = engine.eval(new FileReader(new File(Repository.class.getResource("/static/js/recognition.js").getFile())));
 
-            }
-            else
+                        Invocable invocable = (Invocable) engine;
+                        engine.eval("logger = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints.JSLogger');");
+                        engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document();");
+                        engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script();");
+                        Object result = invocable.invokeMethod(rec, "run");
+                    } catch (FileNotFoundException e1) {
+                        logger.error("Script not found!", e1);
+                    } catch (ScriptException e2) {
+                        logger.error("Script error!", e2);
+                    } catch (NoSuchMethodException e3)  {
+                        logger.error("Java Script Function not found", e3);
+                    }
+
+                }
+            } else
                 throw new RuntimeException("Parent " + parentPath + " not found!");
         }
         logger.info(name + " [ID: " + cmisObject.getId() + "] [Path: " + cmisObject.getPaths().get(0) + "] inserted into repository!");
