@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import de.ksul.archiv.VerteilungConstants;
 import de.ksul.archiv.configuration.ArchivProperties;
 import de.ksul.archiv.configuration.ArchivTestProperties;
 import de.ksul.archiv.repository.deserializer.ContentStreamDeserializer;
@@ -72,18 +73,20 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     }
 
-    private ContentStream createStream(String content) {
+    private ContentStream createStream(String content, String mimeType) {
         ContentStreamImpl contentStream = new ContentStreamImpl();
         contentStream.setStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+        contentStream.setMimeType(mimeType);
         return contentStream;
     }
 
-    private ContentStream createFileStream(String fileName) {
+    private ContentStream createFileStream(String fileName, String mimeType) {
         ContentStreamImpl contentStream = new ContentStreamImpl();
         try {
             MarkableFileInputStream markableFileInputStream = new MarkableFileInputStream(new FileInputStream(resourceLoader.getResource(fileName).getFile()));
             markableFileInputStream.mark(0);
             contentStream.setStream(markableFileInputStream);
+            contentStream.setMimeType(mimeType);
         } catch (IOException e) {
             contentStream.setStream(new ByteArrayInputStream(("Can't read File: " + fileName).getBytes(StandardCharsets.UTF_8)));
         }
@@ -142,23 +145,24 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 logger.info("Load Data...");
                 repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
                 });
+                Repository.setInstance(repository);
                 sessionImpl = new SessionMock().setRepository(repository).getSession();
                 MockUtils.getInstance().setSession(sessionImpl);
                 logger.info("Data loaded!");
             }
         }
         if (repository == null) {
-            repository = new Repository();
+            repository = Repository.getInstance();
             sessionImpl = new SessionMock().setRepository(repository).getSession();
             MockUtils.getInstance().setSession(sessionImpl);
-            repository.insert(null, MockUtils.getInstance().createFileableCmisObject(repository, null, null, "/", MockUtils.getInstance().getFolderType(), null));
-            repository.insert("/", MockUtils.getInstance().createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), MockUtils.getInstance().getFolderType(), null));
-            repository.insert("/" + archivProperties.getDataDictionaryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), MockUtils.getInstance().getFolderType(), null));
-            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// "), "1.0");
-            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// "), "1.0");
-            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xml"), "1.0");
-            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xsd"), "1.0");
-            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createFileStream("classpath:static/js/recognition.js"), "1.0");
+            repository.insert(null, MockUtils.getInstance().createFileableCmisObject(repository, null, null, "/", MockUtils.getInstance().getFolderType(), null), false);
+            repository.insert("/", MockUtils.getInstance().createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), MockUtils.getInstance().getFolderType(), null), false);
+            repository.insert("/" + archivProperties.getDataDictionaryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), MockUtils.getInstance().getFolderType(), null), false);
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// ", "application/x-javascript"), "1.0", false);
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// ", "application/x-javascript"), "1.0", false);
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xml", "text/xml"), "1.0", false);
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xsd", "text/xml"), "1.0", false);
+            repository.insert("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createFileStream("classpath:static/js/recognition.js", "application/x-javascript"), "1.0", false);
         }
     }
 

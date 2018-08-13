@@ -137,7 +137,7 @@ public class ObjectServiceMock {
                 FileableCmisObject cmis = repository.getById((String) invocation.getArguments()[2]);
                 String path = cmis.getPaths().get(0);
                 FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, objectType, ((ContentStream) invocation.getArguments()[3]).getMimeType());
-                repository.insert(path, newObject, (ContentStream) invocation.getArguments()[3], ((VersioningState) invocation.getArguments()[4]).equals(VersioningState.MAJOR) ? "1.0" : "0.1");
+                repository.insert(path, newObject, (ContentStream) invocation.getArguments()[3], ((VersioningState) invocation.getArguments()[4]).equals(VersioningState.MAJOR) ? "1.0" : "0.1", true);
 
                 return newObject.getId();
             }
@@ -153,7 +153,7 @@ public class ObjectServiceMock {
                 String path = cmis.getPaths().get(0);
                 FileableCmisObject newObject;
                 newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, MockUtils.getInstance().getFolderType(), null);
-                repository.insert(path, newObject);
+                repository.insert(path, newObject, true);
 
                 return newObject.getId();
             }

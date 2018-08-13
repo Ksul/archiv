@@ -460,28 +460,27 @@ public class MockUtils {
 
             properties.addProperty(fillProperty("cmis:versionSeriesId", versionSeriesId));
         }
-        if (!properties.getProperties().containsKey("cmis:objectId")) {
+
             if (properties.getProperties().containsKey("cmis:versionLabel")) {
                 properties.addProperty(fillProperty("cmis:objectId", versionSeriesId + ";" + properties.getProperties().get("cmis:versionLabel").getFirstValue().toString()));
             } else {
                 properties.addProperty(fillProperty("cmis:objectId", versionSeriesId));
             }
-        }
-        if (!properties.getProperties().containsKey("cmis:name")) {
+
             properties.addProperty(fillProperty("cmis:name", name));
-        }
-        if (!properties.getProperties().containsKey("cmis:baseTypeId")) {
+
+       // if (!properties.getProperties().containsKey("cmis:baseTypeId")) {
             properties.addProperty(fillProperty("cmis:baseTypeId", objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
-        }
+       // }
         if (!properties.getProperties().containsKey("cmis:objectTypeId")) {
             properties.addProperty(fillProperty("cmis:objectTypeId", objectType.getId()));
         }
-        if (!properties.getProperties().containsKey("cmis:creationDate")) {
+      //  if (!properties.getProperties().containsKey("cmis:creationDate")) {
             properties.addProperty(fillProperty("cmis:creationDate", new Date().getTime()));
-        }
-        if (!properties.getProperties().containsKey("cmis:lastModificationDate")) {
+       // }
+       // if (!properties.getProperties().containsKey("cmis:lastModificationDate")) {
             properties.addProperty(fillProperty("cmis:lastModificationDate", new Date().getTime()));
-        }
+      //  }
         if (!properties.getProperties().containsKey("cmis:secondaryObjectTypeIds")) {
             properties.addProperty(fillProperty("cmis:secondaryObjectTypeIds", Collections.emptyList()));
         }
@@ -504,24 +503,24 @@ public class MockUtils {
                 Thread.sleep(1);
             } catch (InterruptedException ignored) {
             }
-            if (!properties.getProperties().containsKey("cmis:isVersionSeriesCheckedOut")) {
+        //    if (!properties.getProperties().containsKey("cmis:isVersionSeriesCheckedOut")) {
                 properties.addProperty(fillProperty("cmis:isVersionSeriesCheckedOut", false));
-            }
-            if (!properties.getProperties().containsKey("cmis:isPrivateWorkingCopy")) {
+         //   }
+         //   if (!properties.getProperties().containsKey("cmis:isPrivateWorkingCopy")) {
                 properties.addProperty(fillProperty("cmis:isPrivateWorkingCopy", false));
-            }
-            if (!properties.getProperties().containsKey("cmis:versionLabel")) {
+         //   }
+          //  if (!properties.getProperties().containsKey("cmis:versionLabel")) {
                 properties.addProperty(fillProperty("cmis:versionLabel", "0.1"));
-            }
-            if (!properties.getProperties().containsKey("cmis:contentStreamId")) {
+        //    }
+         //   if (!properties.getProperties().containsKey("cmis:contentStreamId")) {
                 properties.addProperty(fillProperty("cmis:contentStreamId", null));
-            }
-            if (!properties.getProperties().containsKey("cmis:contentStreamMimeType")) {
+         //   }
+        //    if (!properties.getProperties().containsKey("cmis:contentStreamMimeType")) {
                 properties.addProperty(fillProperty("cmis:contentStreamMimeType", mimeType));
-            }
-            if (!properties.getProperties().containsKey("cmis:checkinComment")) {
+         //   }
+         //   if (!properties.getProperties().containsKey("cmis:checkinComment")) {
                 properties.addProperty(fillProperty("cmis:checkinComment", "Initial Version"));
-            }
+          //  }
             objectData.setProperties(properties);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         }

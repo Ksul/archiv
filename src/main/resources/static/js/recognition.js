@@ -3717,7 +3717,7 @@ REC = {
                     logger.log(message);
             });
             Logger.log(Level.INFO, "Aufruf Erkennungsskript");
-            this.recognize(document, this.getRules(), space.name !== "Inbox");
+            this.recognize(document, this.getRules());
             Logger.log(Level.INFO, "Ende Erkennungsskript");
         } catch (e) {
             var str = e.toString() + "\n";

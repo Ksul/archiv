@@ -1,6 +1,9 @@
 package de.ksul.archiv.repository;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.ksul.archiv.PDFConnector;
+import de.ksul.archiv.VerteilungConstants;
 import de.ksul.archiv.repository.script.RecognizeEndpoints;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
@@ -15,6 +18,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExists
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +26,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -44,8 +46,20 @@ public class Repository {
     private TreeMap<String, ContentStream> contents = new TreeMap<>();
     @JsonProperty("contentIds")
     private TreeMap<String, String> contentIds = new TreeMap<>();
+    @JsonIgnore
+    public static Repository repository;
 
-    public Repository() {
+    private Repository() {
+    }
+
+    static Repository getInstance() {
+        if (repository == null)
+            repository = new Repository();
+        return repository;
+    }
+
+    static void setInstance(Repository repo) {
+        repository = repo;
     }
 
     String UUId() {
@@ -60,7 +74,7 @@ public class Repository {
         if (query == null)
             throw new RuntimeException("query must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("query:no Root Node!");
         List<FileableCmisObject> list = new ArrayList<>();
         query = query.replace(".", "\\.");
         query = query.replace("?", ".");
@@ -82,7 +96,7 @@ public class Repository {
         int i = 0;
         List<FileableCmisObject> ret = new ArrayList<>();
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("getChildren:no Root Node!");
         TreeNode<FileableCmisObject> startNode = findTreeNodeForId(id);
         if (startNode != null) {
             for (TreeNode<FileableCmisObject> node : startNode) {
@@ -104,7 +118,7 @@ public class Repository {
             throw new RuntimeException("id must be set!");
         List<FileableCmisObject> ret = new ArrayList<>();
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("getChildrenForAllLevels:no Root Node!");
         TreeNode<FileableCmisObject> startNode = findTreeNodeForId(id);
         if (startNode != null) {
             for (TreeNode<FileableCmisObject> node : startNode) {
@@ -121,7 +135,7 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("id must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("getParent:no Root Node!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
         if (node == null)
             return null;
@@ -139,7 +153,7 @@ public class Repository {
         if (properties == null)
             throw new RuntimeException("properties must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("update:no Root Node!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
         if (node == null)
             throw new RuntimeException("Node with Id " + id + " not found!");
@@ -168,7 +182,7 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("Id must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("delete:no Root Node!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
         logger.info(node.getName() + " [ID: " + node.getId() + "] [Path: " + node.getPath() + "] deleted from repository!");
         node.removeNode();
@@ -181,7 +195,7 @@ public class Repository {
         if (parentId == null)
             throw new RuntimeException("parentId must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("move:no Root Node!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(cmisObject.getId());
         TreeNode<FileableCmisObject> parent = findTreeNodeForId(parentId);
         if (node == null)
@@ -194,39 +208,44 @@ public class Repository {
         return movedNode.getObj();
     }
 
-    void insert(String parent, FileableCmisObject cmisObject) {
-        insert(parent, cmisObject, null, null);
+    TreeNode<FileableCmisObject> insert(String parent, FileableCmisObject cmisObject, boolean executeRule) {
+        return insert(parent, cmisObject, null, null, executeRule);
     }
 
-    void insert(String parentPath, FileableCmisObject cmisObject, ContentStream contentStream, String version) {
+    TreeNode<FileableCmisObject> insert(String parentPath, FileableCmisObject cmisObject, ContentStream contentStream, String version, boolean executeRule) {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
         String id = cmisObject instanceof Folder ? cmisObject.getId() : ((Document) cmisObject).getVersionSeriesId();
+        TreeNode<FileableCmisObject> newNode;
         if (parentPath == null) {
-            root = new TreeNode<>(id, name, cmisObject);
-            nodes.put(root.getId(), root);
+            newNode = new TreeNode<>(id, name, cmisObject);
+            nodes.put(newNode.getId(), newNode);
+            root = newNode;
             rootId = id;
         } else {
             if (root == null)
-                throw new RuntimeException("no Root Node!");
+                throw new RuntimeException("insert:no Root Node!");
             TreeNode<FileableCmisObject> node = findTreeNodeForPath(parentPath);
             if (node != null) {
-                TreeNode<FileableCmisObject> newNode = node.addNode(id, name, cmisObject, version);
+                newNode = node.addNode(id, name, cmisObject, version);
                 nodes.put(newNode.getId(), newNode);
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
-                if (node.getName().equals("Inbox")) {
+                if (node.getName().equals("Inbox") && executeRule) {
                     ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
                     try {
                         RecognizeEndpoints.setDocument(newNode);
+                        RecognizeEndpoints.setRepository(this);
+                        RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
                         Object rec = engine.eval(new FileReader(new File(Repository.class.getResource("/static/js/recognition.js").getFile())));
 
                         Invocable invocable = (Invocable) engine;
                         engine.eval("logger = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints.JSLogger');");
-                        engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document();");
-                        engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script();");
+                        engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
+                        engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
+                        engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
                         Object result = invocable.invokeMethod(rec, "run");
                     } catch (FileNotFoundException e1) {
                         logger.error("Script not found!", e1);
@@ -240,7 +259,8 @@ public class Repository {
             } else
                 throw new RuntimeException("Parent " + parentPath + " not found!");
         }
-        logger.info(name + " [ID: " + cmisObject.getId() + "] [Path: " + cmisObject.getPaths().get(0) + "] inserted into repository!");
+        logger.info(name + " [ID: " + newNode.getId() + "] [Path: " + newNode.getObj().getPaths().get(0) + "] inserted into repository!");
+        return newNode;
     }
 
     TreeNode<FileableCmisObject> findTreeNodeForId(String id) {
@@ -252,7 +272,7 @@ public class Repository {
         return null;
     }
 
-    TreeNode<FileableCmisObject> findTreeNodeForPath (String path) {
+    public TreeNode<FileableCmisObject> findTreeNodeForPath (String path) {
         if (path == null)
             throw new RuntimeException("Path must be set!");
         for (TreeNode<FileableCmisObject> element : nodes.values()) {
@@ -266,7 +286,7 @@ public class Repository {
 
     boolean containsPath(String path) {
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("containsPath:no Root Node!");
         if (path == null)
             throw new RuntimeException("path must be set!");
         path = path.replace(".", "\\.");
@@ -282,7 +302,7 @@ public class Repository {
 
     FileableCmisObject getByPath(String path) {
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("getByPath:no Root Node!");
         if (path == null)
             throw new RuntimeException("path must be set!");
         if (path.length() > 1 && path.endsWith("/"))
@@ -296,7 +316,7 @@ public class Repository {
 
     FileableCmisObject getById(String id) {
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("getById:no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
@@ -315,7 +335,7 @@ public class Repository {
 
     FileableCmisObject checkout(String id) {
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("checkout:no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
@@ -327,7 +347,7 @@ public class Repository {
 
     FileableCmisObject checkin(String id, String version, String checkinComment) {
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("checkin:no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
@@ -337,7 +357,7 @@ public class Repository {
 
     List<ObjectData> getAllVersions(String id) {
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("getAllVersions:no Root Node!");
         if (id == null)
             throw new RuntimeException("id must be set!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
@@ -355,41 +375,59 @@ public class Repository {
         if (id == null)
             throw new RuntimeException("id must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("getContent:no Root Node!");
         TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
         if ( !contents.containsKey(node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString()))
             return null;
         return contents.get(node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID).getValueAsString());
     }
 
-    void createContent(String objectId, ContentStream content, boolean overwrite) {
-        if (objectId == null)
+    void createContent(String nodeId, ContentStream content, boolean overwrite) {
+        if (nodeId == null)
             throw new RuntimeException("id must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
-        TreeNode<FileableCmisObject> node = findTreeNodeForId(objectId);
+            throw new RuntimeException("createContent:no Root Node!");
+        TreeNode<FileableCmisObject> node = findTreeNodeForId(nodeId);
         try {
             if (contentIds.containsKey(node.getId()) && !overwrite)
                 throw new CmisContentAlreadyExistsException();
         } catch (NullPointerException e) {
-            objectId = "";
+            nodeId = "";
         }
         String uuid = UUID.randomUUID().toString();
         contents.put(uuid, content);
         contentIds.put(node.getId(), uuid);
         ((PropertyImpl) node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(uuid);
+        setTreeNodeCcontent(node, content);
+        logger.info("[ID: " + nodeId + "] set content!");
     }
 
     void changeContent(String objectId, ContentStream newContent) {
         if (objectId == null)
         throw new RuntimeException("id must be set!");
         if (root == null)
-            throw new RuntimeException("no Root Node!");
+            throw new RuntimeException("changeContent:no Root Node!");
         ContentStreamImpl streamCurrent = (ContentStreamImpl) getContent(objectId);
         streamCurrent.setStream(newContent.getStream());
+        setTreeNodeCcontent(findTreeNodeForId(objectId), streamCurrent);
         logger.info("[ID: " + objectId + "] changed content!");
     }
 
+    private void setTreeNodeCcontent(TreeNode<FileableCmisObject> node, ContentStream stream) {
 
+        if (stream != null) {
+            try {
+                if (stream.getMimeType().equals(VerteilungConstants.DOCUMENT_TYPE_PDF)) {
+                    PDFConnector con = new PDFConnector();
+                    node.setContent(con.pdftoText(stream.getStream()));
+                    stream.getStream().reset();
+                } else {
+                    node.setContent(IOUtils.toString(stream.getStream(), "UTF-8"));
+                    stream.getStream().reset();
+                }
+            } catch (IOException ignored) {
+            }
+        }
+    }
 
 }
