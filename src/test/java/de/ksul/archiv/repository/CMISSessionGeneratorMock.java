@@ -128,7 +128,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     }
 
     @PostConstruct
-    public void setup() throws Exception {
+    public void setup()  {
         if (file != null && !file.isEmpty()) {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -143,12 +143,16 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             File jsonFile = new File(file);
             if (jsonFile.exists()) {
                 logger.info("Load Data...");
-                repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
-                });
-                Repository.setInstance(repository);
-                sessionImpl = new SessionMock().setRepository(repository).getSession();
-                MockUtils.getInstance().setSession(sessionImpl);
-                logger.info("Data loaded!");
+                try {
+                    repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
+                    });
+                    Repository.setInstance(repository);
+                    sessionImpl = new SessionMock().setRepository(repository).getSession();
+                    MockUtils.getInstance().setSession(sessionImpl);
+                    logger.info("Data loaded!");
+                } catch (Exception e) {
+                    logger.error("Data not loaded!", e);
+                }
             }
         }
         if (repository == null) {

@@ -53,6 +53,7 @@ public class MockUtils {
     }
 
     private Map<String, PropertyDefinition<?>> propertyDefinitionMap;
+
     Map<String, PropertyDefinition<?>> getPropertyDefinitionMap() {
 
         if (propertyDefinitionMap == null) {
@@ -250,7 +251,7 @@ public class MockUtils {
         return propertyDefinitionMap;
     }
 
-    private static Map<String, PropertyDefinition<?>> secondaryPropertyDefinitionMap ;
+    private static Map<String, PropertyDefinition<?>> secondaryPropertyDefinitionMap;
 
     Map<String, PropertyDefinition<?>> getSecondaryPropertyDefinitionMap() {
 
@@ -316,20 +317,20 @@ public class MockUtils {
             propertyDescriptionDefinition.setUpdatability(Updatability.READWRITE);
             secondaryPropertyDefinitionMap.put("cm:description", propertyDescriptionDefinition);
         }
-         return secondaryPropertyDefinitionMap;
+        return secondaryPropertyDefinitionMap;
     }
 
     Map<String, PropertyDefinition<?>> getAllPropertyDefinitionMap() {
-        Map<String, PropertyDefinition<?>>  allPropertyDefinitionMap = new HashMap<>();
+        Map<String, PropertyDefinition<?>> allPropertyDefinitionMap = new HashMap<>();
         allPropertyDefinitionMap.putAll(getPropertyDefinitionMap());
         allPropertyDefinitionMap.putAll(getSecondaryPropertyDefinitionMap());
         return allPropertyDefinitionMap;
-        
+
     }
 
     private static Map<String, SecondaryType> secondaryTypeStore;
 
-    Map<String, SecondaryType>  getSecondaryTypeStore(){
+    Map<String, SecondaryType> getSecondaryTypeStore() {
         if (secondaryTypeStore == null) {
             secondaryTypeStore = new HashMap<>();
             SecondaryTypeDefinitionImpl titled = new SecondaryTypeDefinitionImpl();
@@ -368,12 +369,12 @@ public class MockUtils {
             emailed.setPropertyDefinitions(getSecondaryPropertyDefinitionMap());
             secondaryTypeStore.put("P:cm:emailed", new SecondaryTypeImpl(sessionImpl, emailed));
         }
-        return  secondaryTypeStore;
+        return secondaryTypeStore;
     }
 
     private static FolderTypeImpl folderType;
 
-    FolderTypeImpl getFolderType(){
+    FolderTypeImpl getFolderType() {
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
@@ -445,8 +446,7 @@ public class MockUtils {
     }
 
 
-
-     FileableCmisObject createFileableCmisObject(Repository repository, Map<String, PropertyData<?>> props, String path, String name, ObjectType objectType, String mimeType) {
+    FileableCmisObject createFileableCmisObject(Repository repository, Map<String, PropertyData<?>> props, String path, String name, ObjectType objectType, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
         String versionSeriesId = repository.UUId();
@@ -461,26 +461,22 @@ public class MockUtils {
             properties.addProperty(fillProperty("cmis:versionSeriesId", versionSeriesId));
         }
 
-            if (properties.getProperties().containsKey("cmis:versionLabel")) {
-                properties.addProperty(fillProperty("cmis:objectId", versionSeriesId + ";" + properties.getProperties().get("cmis:versionLabel").getFirstValue().toString()));
-            } else {
-                properties.addProperty(fillProperty("cmis:objectId", versionSeriesId));
-            }
+        properties.addProperty(fillProperty("cmis:objectId", versionSeriesId));
 
-            properties.addProperty(fillProperty("cmis:name", name));
+        properties.addProperty(fillProperty("cmis:name", name));
 
-       // if (!properties.getProperties().containsKey("cmis:baseTypeId")) {
-            properties.addProperty(fillProperty("cmis:baseTypeId", objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
-       // }
+        // if (!properties.getProperties().containsKey("cmis:baseTypeId")) {
+        properties.addProperty(fillProperty("cmis:baseTypeId", objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
+        // }
         if (!properties.getProperties().containsKey("cmis:objectTypeId")) {
             properties.addProperty(fillProperty("cmis:objectTypeId", objectType.getId()));
         }
-      //  if (!properties.getProperties().containsKey("cmis:creationDate")) {
-            properties.addProperty(fillProperty("cmis:creationDate", new Date().getTime()));
-       // }
-       // if (!properties.getProperties().containsKey("cmis:lastModificationDate")) {
-            properties.addProperty(fillProperty("cmis:lastModificationDate", new Date().getTime()));
-      //  }
+        //  if (!properties.getProperties().containsKey("cmis:creationDate")) {
+        properties.addProperty(fillProperty("cmis:creationDate", new Date().getTime()));
+        // }
+        // if (!properties.getProperties().containsKey("cmis:lastModificationDate")) {
+        properties.addProperty(fillProperty("cmis:lastModificationDate", new Date().getTime()));
+        //  }
         if (!properties.getProperties().containsKey("cmis:secondaryObjectTypeIds")) {
             properties.addProperty(fillProperty("cmis:secondaryObjectTypeIds", Collections.emptyList()));
         }
@@ -503,24 +499,24 @@ public class MockUtils {
                 Thread.sleep(1);
             } catch (InterruptedException ignored) {
             }
-        //    if (!properties.getProperties().containsKey("cmis:isVersionSeriesCheckedOut")) {
-                properties.addProperty(fillProperty("cmis:isVersionSeriesCheckedOut", false));
-         //   }
-         //   if (!properties.getProperties().containsKey("cmis:isPrivateWorkingCopy")) {
-                properties.addProperty(fillProperty("cmis:isPrivateWorkingCopy", false));
-         //   }
-          //  if (!properties.getProperties().containsKey("cmis:versionLabel")) {
-                properties.addProperty(fillProperty("cmis:versionLabel", "0.1"));
-        //    }
-         //   if (!properties.getProperties().containsKey("cmis:contentStreamId")) {
-                properties.addProperty(fillProperty("cmis:contentStreamId", null));
-         //   }
-        //    if (!properties.getProperties().containsKey("cmis:contentStreamMimeType")) {
-                properties.addProperty(fillProperty("cmis:contentStreamMimeType", mimeType));
-         //   }
-         //   if (!properties.getProperties().containsKey("cmis:checkinComment")) {
-                properties.addProperty(fillProperty("cmis:checkinComment", "Initial Version"));
-          //  }
+            //    if (!properties.getProperties().containsKey("cmis:isVersionSeriesCheckedOut")) {
+            properties.addProperty(fillProperty("cmis:isVersionSeriesCheckedOut", false));
+            //   }
+            //   if (!properties.getProperties().containsKey("cmis:isPrivateWorkingCopy")) {
+            properties.addProperty(fillProperty("cmis:isPrivateWorkingCopy", false));
+            //   }
+            //  if (!properties.getProperties().containsKey("cmis:versionLabel")) {
+            properties.addProperty(fillProperty("cmis:versionLabel", "0.1"));
+            //    }
+            //   if (!properties.getProperties().containsKey("cmis:contentStreamId")) {
+            properties.addProperty(fillProperty("cmis:contentStreamId", null));
+            //   }
+            //    if (!properties.getProperties().containsKey("cmis:contentStreamMimeType")) {
+            properties.addProperty(fillProperty("cmis:contentStreamMimeType", mimeType));
+            //   }
+            //   if (!properties.getProperties().containsKey("cmis:checkinComment")) {
+            properties.addProperty(fillProperty("cmis:checkinComment", "Initial Version"));
+            //  }
             objectData.setProperties(properties);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         }
@@ -548,11 +544,11 @@ public class MockUtils {
         return props;
     }
 
-    List<Property<?>> convPropertyData(Map<String, PropertyData<?>> propertyDataMap){
+    List<Property<?>> convPropertyData(Map<String, PropertyData<?>> propertyDataMap) {
         List<Property<?>> properties = new ArrayList<>();
-       for (PropertyData<?> prop : propertyDataMap.values())
-           properties.add(new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(prop.getId()), prop.getValues()));
-       return properties;
+        for (PropertyData<?> prop : propertyDataMap.values())
+            properties.add(new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(prop.getId()), prop.getValues()));
+        return properties;
     }
 
 
@@ -572,56 +568,56 @@ public class MockUtils {
         switch (definition.getPropertyType()) {
             case STRING:
                 property = new PropertyStringImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyStringImpl) property).setValues(copyStringValues((List) value));
                 else
-                ((PropertyStringImpl) property).setValue(copyStringValue(value));
+                    ((PropertyStringImpl) property).setValue(copyStringValue(value));
                 break;
             case ID:
                 property = new PropertyIdImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyIdImpl) property).setValues(copyStringValues((List) value));
                 else
                     ((PropertyIdImpl) property).setValue(copyStringValue(value));
                 break;
             case BOOLEAN:
                 property = new PropertyBooleanImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyBooleanImpl) property).setValues(copyBooleanValues((List) value));
                 else
                     ((PropertyBooleanImpl) property).setValue(copyBooleanValue(value));
                 break;
             case INTEGER:
                 property = new PropertyIntegerImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyIntegerImpl) property).setValues(copyIntegerValues((List) value));
                 else
                     ((PropertyIntegerImpl) property).setValue(copyIntegerValue(value));
                 break;
             case DECIMAL:
                 property = new PropertyDecimalImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyDecimalImpl) property).setValues(copyDecimalValues((List) value));
                 else
                     ((PropertyDecimalImpl) property).setValue(copyDecimalValue(value));
                 break;
             case DATETIME:
                 property = new PropertyDateTimeImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyDateTimeImpl) property).setValues(copyDateTimeValues((List) value));
                 else
                     ((PropertyDateTimeImpl) property).setValue(copyDateTimeValue(value));
                 break;
             case HTML:
                 property = new PropertyHtmlImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyHtmlImpl) property).setValues(copyStringValues((List) value));
                 else
                     ((PropertyHtmlImpl) property).setValue(copyStringValue(value));
                 break;
             case URI:
                 property = new PropertyUriImpl();
-                if (value instanceof  List)
+                if (value instanceof List)
                     ((PropertyUriImpl) property).setValues(copyStringValues((List) value));
                 else
                     ((PropertyUriImpl) property).setValue(copyStringValue(value));
@@ -645,12 +641,12 @@ public class MockUtils {
             result = new ArrayList<GregorianCalendar>(source.size());
             for (Object obj : source) {
                 GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-                if (obj instanceof  GregorianCalendar) {
+                if (obj instanceof GregorianCalendar) {
                     result.add((GregorianCalendar) obj);
                 } else if (obj instanceof Number) {
                     cal.setTimeInMillis(((Number) obj).longValue());
                     result.add(cal);
-                } else if (obj instanceof Date){
+                } else if (obj instanceof Date) {
                     cal.setTime((Date) obj);
                     result.add(cal);
                 } else if (obj instanceof String) {
@@ -670,12 +666,12 @@ public class MockUtils {
         GregorianCalendar result = null;
         if (source != null) {
             GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-            if (source instanceof  GregorianCalendar) {
+            if (source instanceof GregorianCalendar) {
                 result = (GregorianCalendar) source;
             } else if (source instanceof Number) {
                 cal.setTimeInMillis(((Number) source).longValue());
                 result = cal;
-            } else if (source instanceof Date){
+            } else if (source instanceof Date) {
                 cal.setTime((Date) source);
                 result = cal;
             } else if (source instanceof String) {
@@ -743,7 +739,7 @@ public class MockUtils {
             if (source instanceof Boolean) {
                 result = (Boolean) source;
             } else if (source instanceof String) {
-                result =  Boolean.parseBoolean((String) source);
+                result = Boolean.parseBoolean((String) source);
             } else {
                 throw new CmisRuntimeException("Invalid property value: " + source);
             }
@@ -791,12 +787,12 @@ public class MockUtils {
             result = new ArrayList<BigDecimal>(source.size());
             for (Object obj : source) {
                 if (obj instanceof BigDecimal) {
-                    result.add( (BigDecimal) obj);
+                    result.add((BigDecimal) obj);
                 } else if (obj instanceof BigInteger) {
                     result.add(new BigDecimal((BigInteger) obj));
-                } else if(obj instanceof String) {
-                    result.add( new BigDecimal((String) obj));
-                } else if(obj instanceof Double) {
+                } else if (obj instanceof String) {
+                    result.add(new BigDecimal((String) obj));
+                } else if (obj instanceof Double) {
                     result.add(new BigDecimal((Double) obj));
                 } else {
                     throw new CmisRuntimeException("Invalid property value: " + obj);
@@ -814,9 +810,9 @@ public class MockUtils {
                 result = (BigDecimal) source;
             } else if (source instanceof BigInteger) {
                 result = new BigDecimal((BigInteger) source);
-            } else if(source instanceof String) {
+            } else if (source instanceof String) {
                 result = new BigDecimal((String) source);
-            } else if(source instanceof Double) {
+            } else if (source instanceof Double) {
                 result = new BigDecimal((Double) source);
             } else {
                 throw new CmisRuntimeException("Invalid property value: " + source);
@@ -832,8 +828,7 @@ public class MockUtils {
         if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:folder")) {
             cmisObject = new FolderImpl(sessionImpl, getFolderType(), objectData, new OperationContextImpl());
 
-        }
-        else  if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:document")) {
+        } else if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:document")) {
             cmisObject = new DocumentImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
 
         } else {

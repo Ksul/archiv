@@ -216,20 +216,19 @@ public class Repository {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
-        String id = cmisObject instanceof Folder ? cmisObject.getId() : ((Document) cmisObject).getVersionSeriesId();
         TreeNode<FileableCmisObject> newNode;
         if (parentPath == null) {
-            newNode = new TreeNode<>(id, name, cmisObject);
+            newNode = new TreeNode<>(cmisObject);
             nodes.put(newNode.getId(), newNode);
             root = newNode;
-            rootId = id;
+            rootId = newNode.getId();
         } else {
             if (root == null)
                 throw new RuntimeException("insert:no Root Node!");
             TreeNode<FileableCmisObject> node = findTreeNodeForPath(parentPath);
             if (node != null) {
-                newNode = node.addNode(id, name, cmisObject, version);
-                nodes.put(newNode.getId(), newNode);
+                newNode = node.addNode( name, cmisObject, version);
+                nodes.put(newNode.getId().split(";")[0], newNode);
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
