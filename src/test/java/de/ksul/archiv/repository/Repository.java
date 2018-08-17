@@ -7,7 +7,6 @@ import de.ksul.archiv.VerteilungConstants;
 import de.ksul.archiv.repository.script.RecognizeEndpoints;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
-import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -208,16 +207,16 @@ public class Repository {
         return movedNode.getObj();
     }
 
-    TreeNode<FileableCmisObject> insert(String parent, FileableCmisObject cmisObject, boolean executeRule) {
+    TreeNode<FileableCmisObject> insert( TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, boolean executeRule) {
         return insert(parent, cmisObject, null, null, executeRule);
     }
 
-    TreeNode<FileableCmisObject> insert(String parentPath, FileableCmisObject cmisObject, ContentStream contentStream, String version, boolean executeRule) {
+    TreeNode<FileableCmisObject> insert(TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, ContentStream contentStream, String version, boolean executeRule) {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
         TreeNode<FileableCmisObject> newNode;
-        if (parentPath == null) {
+        if (parent == null) {
             newNode = new TreeNode<>(cmisObject);
             nodes.put(newNode.getId(), newNode);
             root = newNode;
@@ -225,14 +224,13 @@ public class Repository {
         } else {
             if (root == null)
                 throw new RuntimeException("insert:no Root Node!");
-            TreeNode<FileableCmisObject> node = findTreeNodeForPath(parentPath);
-            if (node != null) {
-                newNode = node.addNode( name, cmisObject, version);
+            if (parent != null) {
+                newNode = parent.addNode(cmisObject, version);
                 nodes.put(newNode.getId().split(";")[0], newNode);
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
-                if (node.getName().equals("Inbox") && executeRule) {
+                if (parent.getName().equals("Inbox") && executeRule) {
                     ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
                     try {
                         RecognizeEndpoints.setDocument(newNode);
@@ -256,7 +254,7 @@ public class Repository {
 
                 }
             } else
-                throw new RuntimeException("Parent " + parentPath + " not found!");
+                throw new RuntimeException("Parent not found!");
         }
         logger.info(name + " [ID: " + newNode.getId() + "] [Path: " + newNode.getObj().getPaths().get(0) + "] inserted into repository!");
         return newNode;
@@ -274,6 +272,8 @@ public class Repository {
     public TreeNode<FileableCmisObject> findTreeNodeForPath (String path) {
         if (path == null)
             throw new RuntimeException("Path must be set!");
+        if (path.length() > 1 && path.endsWith("/"))
+            path = path.substring(0, path.length() - 1);
         for (TreeNode<FileableCmisObject> element : nodes.values()) {
             String objectPath = element.getPath();
             if (objectPath != null && path.matches(objectPath))
@@ -397,7 +397,7 @@ public class Repository {
         contents.put(uuid, content);
         contentIds.put(node.getId(), uuid);
         ((PropertyImpl) node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(uuid);
-        setTreeNodeCcontent(node, content);
+        setTreeNodeContent(node, content);
         logger.info("[ID: " + nodeId + "] set content!");
     }
 
@@ -408,11 +408,11 @@ public class Repository {
             throw new RuntimeException("changeContent:no Root Node!");
         ContentStreamImpl streamCurrent = (ContentStreamImpl) getContent(objectId);
         streamCurrent.setStream(newContent.getStream());
-        setTreeNodeCcontent(findTreeNodeForId(objectId), streamCurrent);
+        setTreeNodeContent(findTreeNodeForId(objectId), streamCurrent);
         logger.info("[ID: " + objectId + "] changed content!");
     }
 
-    private void setTreeNodeCcontent(TreeNode<FileableCmisObject> node, ContentStream stream) {
+    private void setTreeNodeContent(TreeNode<FileableCmisObject> node, ContentStream stream) {
 
         if (stream != null) {
             try {

@@ -134,10 +134,10 @@ public class ObjectServiceMock {
                     objectType = MockUtils.getInstance().getArchivType();
 
                 String name = (String) props.getProperties().get(PropertyIds.NAME).getFirstValue();
-                FileableCmisObject cmis = repository.getById((String) invocation.getArguments()[2]);
-                String path = cmis.getPaths().get(0);
+                TreeNode parent = repository.findTreeNodeForId((String) invocation.getArguments()[2]);
+                String path = parent.getPath();
                 FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, objectType, ((ContentStream) invocation.getArguments()[3]).getMimeType());
-                repository.insert(path, newObject, (ContentStream) invocation.getArguments()[3], ((VersioningState) invocation.getArguments()[4]).equals(VersioningState.MAJOR) ? "1.0" : "0.1", true);
+                repository.insert(parent, newObject, (ContentStream) invocation.getArguments()[3], ((VersioningState) invocation.getArguments()[4]).equals(VersioningState.MAJOR) ? "1.0" : "0.1", true);
 
                 return newObject.getId();
             }
@@ -149,11 +149,11 @@ public class ObjectServiceMock {
                 PropertiesImpl props = (PropertiesImpl) invocation.getArguments()[1];
 
                 String name = (String) props.getProperties().get(PropertyIds.NAME).getFirstValue();
-                FileableCmisObject cmis = repository.getById((String) invocation.getArguments()[2]);
-                String path = cmis.getPaths().get(0);
+                TreeNode parent = repository.findTreeNodeForId((String) invocation.getArguments()[2]);
+                String path = parent.getPath();
                 FileableCmisObject newObject;
                 newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, MockUtils.getInstance().getFolderType(), null);
-                repository.insert(path, newObject, true);
+                repository.insert(parent, newObject, true);
 
                 return newObject.getId();
             }

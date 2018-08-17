@@ -3,11 +3,11 @@ package de.ksul.archiv.repository;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import de.ksul.archiv.VerteilungConstants;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedException;
@@ -29,9 +29,9 @@ import java.util.*;
 public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     private String id;
-    private String name;
+    public String name;
     private String path;
-    public String displayPath;
+    public String displayPath = "";
     private Type obj;
     private TreeMap<String, Type> versions = new TreeMap<>(Collections.reverseOrder());
     public TreeNode<T> parent;
@@ -54,7 +54,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
         this.path ="/";
-        this.displayPath ="/";
         this.obj = new Type(obj.getProperties());
         this.childs = new HashMap<>();
      }
@@ -67,7 +66,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
         this.path ="/";
-        this.displayPath ="/";
         this.obj = new Type(obj.getProperties());
         this.childs = new HashMap<>();
         if (version != null) {
@@ -110,19 +108,13 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
     
 
-    TreeNode<T> addNode( String name, FileableCmisObject child, String version) {
+    TreeNode<T> addNode(FileableCmisObject child, String version) {
         TreeNode<T> childNode = new TreeNode<T>( child, version);
         childNode.parent = this;
+        String name = child.getName();
         this.childs.put(name, childNode);
-        StringBuilder pfad = new StringBuilder(name);
-        TreeNode<T> parentNode = this;
-        while (parentNode != null) {
-            pfad.insert(0, (parentNode.getName().equalsIgnoreCase("/") ? "" : "/"));
-            pfad.insert(0, parentNode.getName());
-            parentNode = parentNode.parent;
-        }
-        childNode.path = pfad.toString();
-        childNode.displayPath = pfad.toString().substring(0, pfad.toString().indexOf("/"));
+        childNode.path = this.path + (this.path.equals("/") ? "" : "/") + name;
+        childNode.displayPath = this.displayPath + "/" + this.getName();
         if (version != null)
             childNode.checkin(version, null);
         this.registerChild(childNode);
@@ -147,15 +139,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     TreeNode<T> moveNode(TreeNode<T> newParent) {
         this.parent = newParent;
         newParent.childs.put(getName(), this);
-        StringBuilder pfad = new StringBuilder(getName());
-        TreeNode<T> parentNode = newParent;
-        while (parentNode != null) {
-            pfad.insert(0, (parentNode.getName().equalsIgnoreCase("/") ? "" : "/"));
-            pfad.insert(0, parentNode.getName());
-            parentNode = parentNode.parent;
-        }
-        this.path = pfad.toString();
-        this.displayPath = pfad.toString().substring(0, pfad.toString().indexOf("/"));
+        this.path = newParent.path + (newParent.path.equals("/") ? "" : "/") + name;
+        this.displayPath = newParent.displayPath + "/" + newParent.getName();
         deRegisterChild(this);
         newParent.registerChild(this);
         return this;
@@ -279,8 +264,13 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
             String newName = getName().substring(0, getName().lastIndexOf(".") + 1) + "txt";
             String newPath = path.substring(0, path.lastIndexOf("/")) ;
             FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, MockUtils.getInstance().getDocumentType(), "text/plain");
-            return (TreeNode<T>) Repository.getInstance().insert(newPath, newObject, false);
-
+            TreeNode<T> transform = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this.parent, newObject, false);
+//            if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get().getValue().equals(VerteilungConstants.DOCUMENT_TYPE_PDF)){
+//                ((PropertyImpl) ((FileableCmisObject) transform.getObj()).getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get()).setValue(VerteilungConstants.DOCUMENT_TYPE_PDF);
+//                Repository.getInstance().createContent(transform.getId(), , true);
+//            }
+            transform.setContent(this.content);
+            return transform;
         }
         return null;
     }
@@ -292,6 +282,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public TreeNode<T> createFolder(String name) {
+        FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType(), null);
+        return ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, true);
+        
     }
 
     @Override
@@ -307,4 +303,5 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     public void setContent(String content) {
         this.content = content;
     }
+
 }

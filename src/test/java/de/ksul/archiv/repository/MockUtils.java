@@ -456,41 +456,31 @@ public class MockUtils {
             properties = new PropertiesImpl();
         else
             properties = (PropertiesImpl) convertProperties(props);
-        if (!properties.getProperties().containsKey("cmis:versionSeriesId")) {
+        if (!properties.getProperties().containsKey(PropertyIds.VERSION_SERIES_ID)) {
 
-            properties.addProperty(fillProperty("cmis:versionSeriesId", versionSeriesId));
+            properties.addProperty(fillProperty(PropertyIds.VERSION_SERIES_ID, versionSeriesId));
         }
-
-        properties.addProperty(fillProperty("cmis:objectId", versionSeriesId));
-
-        properties.addProperty(fillProperty("cmis:name", name));
-
-        // if (!properties.getProperties().containsKey("cmis:baseTypeId")) {
-        properties.addProperty(fillProperty("cmis:baseTypeId", objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
-        // }
-        if (!properties.getProperties().containsKey("cmis:objectTypeId")) {
-            properties.addProperty(fillProperty("cmis:objectTypeId", objectType.getId()));
+        properties.addProperty(fillProperty(PropertyIds.OBJECT_ID, versionSeriesId));
+        properties.addProperty(fillProperty(PropertyIds.BASE_TYPE_ID, objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
+        if (!properties.getProperties().containsKey(PropertyIds.OBJECT_TYPE_ID)) {
+            properties.addProperty(fillProperty(PropertyIds.OBJECT_TYPE_ID, objectType.getId()));
         }
-        //  if (!properties.getProperties().containsKey("cmis:creationDate")) {
-        properties.addProperty(fillProperty("cmis:creationDate", new Date().getTime()));
-        // }
-        // if (!properties.getProperties().containsKey("cmis:lastModificationDate")) {
-        properties.addProperty(fillProperty("cmis:lastModificationDate", new Date().getTime()));
-        //  }
-        if (!properties.getProperties().containsKey("cmis:secondaryObjectTypeIds")) {
-            properties.addProperty(fillProperty("cmis:secondaryObjectTypeIds", Collections.emptyList()));
+        properties.addProperty(fillProperty(PropertyIds.CREATION_DATE, new Date().getTime()));
+        properties.addProperty(fillProperty(PropertyIds.LAST_MODIFICATION_DATE, new Date().getTime()));
+        if (!properties.getProperties().containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)) {
+            properties.addProperty(fillProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Collections.emptyList()));
         }
         if (objectType.getId().equalsIgnoreCase("cmis:folder")) {
             if (path == null) {
                 parentId = "-1";
-            } else
+                properties.addProperty(fillProperty(PropertyIds.PATH, "/"));
+
+            } else {
                 parentId = repository.getByPath(path).getId();
-            if (!properties.getProperties().containsKey("cmis:parentId")) {
-                properties.addProperty(fillProperty("cmis:parentId", parentId));
+                properties.addProperty(fillProperty(PropertyIds.PATH, (path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/") + name));
             }
-            if (!properties.getProperties().containsKey("cmis:path")) {
-                properties.addProperty(fillProperty("cmis:path", (path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/") + name));
-            }
+            properties.addProperty(fillProperty(PropertyIds.NAME, name));
+            properties.addProperty(fillProperty(PropertyIds.PARENT_ID, parentId));
 
             objectData.setProperties(properties);
             fileableCmisObject = new FolderImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
@@ -499,24 +489,13 @@ public class MockUtils {
                 Thread.sleep(1);
             } catch (InterruptedException ignored) {
             }
-            //    if (!properties.getProperties().containsKey("cmis:isVersionSeriesCheckedOut")) {
-            properties.addProperty(fillProperty("cmis:isVersionSeriesCheckedOut", false));
-            //   }
-            //   if (!properties.getProperties().containsKey("cmis:isPrivateWorkingCopy")) {
-            properties.addProperty(fillProperty("cmis:isPrivateWorkingCopy", false));
-            //   }
-            //  if (!properties.getProperties().containsKey("cmis:versionLabel")) {
-            properties.addProperty(fillProperty("cmis:versionLabel", "0.1"));
-            //    }
-            //   if (!properties.getProperties().containsKey("cmis:contentStreamId")) {
-            properties.addProperty(fillProperty("cmis:contentStreamId", null));
-            //   }
-            //    if (!properties.getProperties().containsKey("cmis:contentStreamMimeType")) {
-            properties.addProperty(fillProperty("cmis:contentStreamMimeType", mimeType));
-            //   }
-            //   if (!properties.getProperties().containsKey("cmis:checkinComment")) {
-            properties.addProperty(fillProperty("cmis:checkinComment", "Initial Version"));
-            //  }
+            properties.addProperty(fillProperty(PropertyIds.NAME, name));
+            properties.addProperty(fillProperty(PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, false));
+            properties.addProperty(fillProperty(PropertyIds.IS_PRIVATE_WORKING_COPY, false));
+            properties.addProperty(fillProperty(PropertyIds.VERSION_LABEL, "0.1"));
+            properties.addProperty(fillProperty(PropertyIds.CONTENT_STREAM_ID, null));
+            properties.addProperty(fillProperty(PropertyIds.CONTENT_STREAM_MIME_TYPE, mimeType));
+            properties.addProperty(fillProperty(PropertyIds.CHECKIN_COMMENT, "Initial Version"));
             objectData.setProperties(properties);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         }
