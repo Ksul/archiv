@@ -210,14 +210,16 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         TreeNode<T> n = this;
         for (String part : parts) {
             Iterator<String> it = n.childs.keySet().iterator();
+            boolean found = false;
             while (it.hasNext()) {
                 String id = it.next();
                 if (n.childs.get(id).getName().equals(part)) {
+                    found = true;
                     n = n.childs.get(id);
                     break;
                 }
             }
-            if ( n == this)
+            if ( !found)
                 return null;
         }
         return n;
@@ -288,6 +290,19 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType(), null);
         return ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, true);
         
+    }
+
+    public boolean isSubType(String name) {
+        //TODO Implementierung
+        return true;
+    }
+
+    public void specializeType(String name) {
+        //TODO Implementierung
+    }
+
+    public void addAspect(String name) {
+        //TODO Implementierung
     }
 
     @Override

@@ -236,7 +236,7 @@ public class Repository {
                         RecognizeEndpoints.setDocument(newNode);
                         RecognizeEndpoints.setRepository(this);
                         RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
-                        Object rec = engine.eval(new FileReader(new File(Repository.class.getResource("/static/js/recognition.js").getFile())));
+                        Object rec = engine.eval("load(\"src/main/resources/static/js/recognition.js\");");
 
                         Invocable invocable = (Invocable) engine;
                         engine.eval("logger = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints.JSLogger');");
@@ -244,8 +244,6 @@ public class Repository {
                         engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
                         engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
                         Object result = invocable.invokeMethod(rec, "run");
-                    } catch (FileNotFoundException e1) {
-                        logger.error("Script not found!", e1);
                     } catch (ScriptException e2) {
                         logger.error("Script error!", e2);
                     } catch (NoSuchMethodException e3)  {
