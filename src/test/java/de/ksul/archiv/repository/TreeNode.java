@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import de.ksul.archiv.VerteilungConstants;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
@@ -303,6 +304,21 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     public void addAspect(String name) {
         //TODO Implementierung
+    }
+
+    public boolean hasAspect(String name) {
+        //TODO Implementierung
+        return true;
+    }
+
+    public void addTag(String name) {
+        //TODO Implementierung
+    }
+
+    public void save() {}
+
+    public void properties(String mirror){
+        System.out.println(mirror);
     }
 
     @Override

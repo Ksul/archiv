@@ -53,7 +53,6 @@ import static org.mockito.Mockito.when;
 public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(CMISSessionGeneratorMock.class.getName());
-    private ResourceLoader resourceLoader;
     private String file;
     private SessionImpl sessionImpl;
     private Repository repository;
@@ -66,32 +65,13 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
         this.file = archivTestProperties.getTestData();
         this.archivProperties = archivProperties;
-        this.resourceLoader = resourceLoader;
+        MockUtils.getInstance().setResourceLoader(resourceLoader);
 
         mockCollectionIterable();
 
 
     }
 
-    private ContentStream createStream(String content, String mimeType) {
-        ContentStreamImpl contentStream = new ContentStreamImpl();
-        contentStream.setStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
-        contentStream.setMimeType(mimeType);
-        return contentStream;
-    }
-
-    private ContentStream createFileStream(String fileName, String mimeType) {
-        ContentStreamImpl contentStream = new ContentStreamImpl();
-        try {
-            MarkableFileInputStream markableFileInputStream = new MarkableFileInputStream(new FileInputStream(resourceLoader.getResource(fileName).getFile()));
-            markableFileInputStream.mark(0);
-            contentStream.setStream(markableFileInputStream);
-            contentStream.setMimeType(mimeType);
-        } catch (IOException e) {
-            contentStream.setStream(new ByteArrayInputStream(("Can't read File: " + fileName).getBytes(StandardCharsets.UTF_8)));
-        }
-        return contentStream;
-    }
 
     @Override
     public Session generateSession() {
@@ -163,11 +143,11 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             node = repository.insert(null, MockUtils.getInstance().createFileableCmisObject(repository, null, null, archivProperties.getCompanyHomeName(), MockUtils.getInstance().getFolderType(), null), false);
             node = repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), MockUtils.getInstance().getFolderType(), null), false);
             node = repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), MockUtils.getInstance().getFolderType(), null), false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// ", "application/x-javascript"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createStream("// ", "application/x-javascript"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xml", "text/xml"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd", MockUtils.getInstance().getDocumentType(), "text/xml"), createFileStream("classpath:static/rules/doc.xsd", "text/xml"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), createFileStream("classpath:static/js/recognition.js", "application/x-javascript"), "1.0", false);
+            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), MockUtils.getInstance().createStream("// ", "application/x-javascript"), "1.0", false);
+            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), MockUtils.getInstance().createStream("// ", "application/x-javascript"), "1.0", false);
+            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", MockUtils.getInstance().getDocumentType(), "text/xml"), MockUtils.getInstance().createFileStream("classpath:static/rules/doc.xml", "text/xml"), "1.0", false);
+            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd", MockUtils.getInstance().getDocumentType(), "text/xml"), MockUtils.getInstance().createFileStream("classpath:static/rules/doc.xsd", "text/xml"), "1.0", false);
+            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), MockUtils.getInstance().createFileStream("classpath:static/js/recognition.js", "application/x-javascript"), "1.0", false);
         }
     }
 

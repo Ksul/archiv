@@ -9,6 +9,7 @@ import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
@@ -19,10 +20,15 @@ import org.apache.chemistry.opencmis.commons.enums.PropertyType;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
+import org.springframework.core.io.ResourceLoader;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -34,11 +40,12 @@ import java.util.*;
 public class MockUtils {
 
     private SessionImpl sessionImpl;
+    private ResourceLoader resourceLoader;
 
     private static MockUtils mockUtils;
 
 
-    static MockUtils getInstance() {
+    public static MockUtils getInstance() {
         if (mockUtils == null)
             mockUtils = new MockUtils();
         return mockUtils;
@@ -46,6 +53,10 @@ public class MockUtils {
 
     public SessionImpl getSession() {
         return sessionImpl;
+    }
+
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
     }
 
     public void setSession(SessionImpl sessionImpl) {
@@ -374,7 +385,7 @@ public class MockUtils {
 
     private static FolderTypeImpl folderType;
 
-    FolderTypeImpl getFolderType() {
+    public FolderTypeImpl getFolderType() {
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
@@ -389,7 +400,7 @@ public class MockUtils {
 
     private static DocumentTypeImpl documentType;
 
-    DocumentTypeImpl getDocumentType() {
+    public DocumentTypeImpl getDocumentType() {
 
         if (documentType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
@@ -446,7 +457,7 @@ public class MockUtils {
     }
 
 
-    FileableCmisObject createFileableCmisObject(Repository repository, Map<String, PropertyData<?>> props, String path, String name, ObjectType objectType, String mimeType) {
+    public FileableCmisObject createFileableCmisObject(Repository repository, Map<String, PropertyData<?>> props, String path, String name, ObjectType objectType, String mimeType) {
         FileableCmisObject fileableCmisObject;
         String parentId;
         String versionSeriesId = repository.UUId();
@@ -827,6 +838,27 @@ public class MockUtils {
         }
         return cmisObject;
     }
+
+    public ContentStream createStream(String content, String mimeType) {
+        ContentStreamImpl contentStream = new ContentStreamImpl();
+        contentStream.setStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+        contentStream.setMimeType(mimeType);
+        return contentStream;
+    }
+
+    public ContentStream createFileStream(String fileName, String mimeType) {
+        ContentStreamImpl contentStream = new ContentStreamImpl();
+        try {
+            MarkableFileInputStream markableFileInputStream = new MarkableFileInputStream(new FileInputStream(resourceLoader.getResource(fileName).getFile()));
+            markableFileInputStream.mark(0);
+            contentStream.setStream(markableFileInputStream);
+            contentStream.setMimeType(mimeType);
+        } catch (IOException e) {
+            contentStream.setStream(new ByteArrayInputStream(("Can't read File: " + fileName).getBytes(StandardCharsets.UTF_8)));
+        }
+        return contentStream;
+    }
+
 
 
 }

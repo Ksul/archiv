@@ -51,7 +51,7 @@ public class Repository {
     private Repository() {
     }
 
-    static Repository getInstance() {
+    public static Repository getInstance() {
         if (repository == null)
             repository = new Repository();
         return repository;
@@ -207,11 +207,11 @@ public class Repository {
         return movedNode.getObj();
     }
 
-    TreeNode<FileableCmisObject> insert( TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, boolean executeRule) {
+    public TreeNode<FileableCmisObject> insert( TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, boolean executeRule) {
         return insert(parent, cmisObject, null, null, executeRule);
     }
 
-    TreeNode<FileableCmisObject> insert(TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, ContentStream contentStream, String version, boolean executeRule) {
+    public TreeNode<FileableCmisObject> insert(TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, ContentStream contentStream, String version, boolean executeRule) {
         if (cmisObject == null)
             throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
