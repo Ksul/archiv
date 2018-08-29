@@ -7,6 +7,7 @@ import org.apache.chemistry.opencmis.client.api.SecondaryType;
 import org.apache.chemistry.opencmis.client.runtime.*;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
+import org.apache.chemistry.opencmis.client.runtime.objecttype.ItemTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -20,6 +21,7 @@ import org.apache.chemistry.opencmis.commons.enums.PropertyType;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
+import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumBaseObjectTypeIds;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.ByteArrayInputStream;
@@ -383,6 +385,19 @@ public class MockUtils {
         return secondaryTypeStore;
     }
 
+    private static ItemTypeImpl itemType;
+
+    public ItemTypeImpl getItemType() {
+        if (itemType == null) {
+            ItemTypeDefinitionImpl itemTypeDefinition = new ItemTypeDefinitionImpl();
+            itemTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
+            itemType = new ItemTypeImpl(sessionImpl, itemTypeDefinition);
+            itemType.setId(("I:cm:category_root"));
+            itemType.setBaseTypeId(BaseTypeId.CMIS_ITEM);
+        }
+        return itemType;
+    }
+
     private static FolderTypeImpl folderType;
 
     public FolderTypeImpl getFolderType() {
@@ -391,7 +406,7 @@ public class MockUtils {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
             folderTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
             folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
-            folderType.setId("cmis:folder");
+            folderType.setId(EnumBaseObjectTypeIds.CMIS_FOLDER.value());
             folderType.setBaseTypeId(BaseTypeId.CMIS_FOLDER);
         }
         return folderType;
@@ -406,7 +421,7 @@ public class MockUtils {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
             documentTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
             documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
-            documentType.setId("cmis:document");
+            documentType.setId(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value());
             documentType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
             documentType.setIsVersionable(true);
         }
@@ -481,7 +496,7 @@ public class MockUtils {
         if (!properties.getProperties().containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)) {
             properties.addProperty(fillProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Collections.emptyList()));
         }
-        if (objectType.getId().equalsIgnoreCase("cmis:folder")) {
+        if (objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value())) {
             if (path == null) {
                 parentId = "-1";
                 properties.addProperty(fillProperty(PropertyIds.PATH, "/"));
@@ -814,11 +829,13 @@ public class MockUtils {
 
     FileableCmisObject createObject(Type obj) {
         FileableCmisObject cmisObject;
-        ObjectData objectData = MockUtils.getInstance().getObjectDataFromProperties(obj.getProperties());
-        if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:folder")) {
+        ObjectData objectData = getObjectDataFromProperties(obj.getProperties());
+        if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value())) {
             cmisObject = new FolderImpl(sessionImpl, getFolderType(), objectData, new OperationContextImpl());
 
-        } else if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase("cmis:document")) {
+        } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value())) {
+            cmisObject = new ItemImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
+        } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value())) {
             cmisObject = new DocumentImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
 
         } else {

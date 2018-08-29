@@ -46,7 +46,7 @@ public class ScriptTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        root = Repository.getInstance().findTreeNodeForPath("/");
+        root = Repository.getInstance().getRoot();
         TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/","Archiv", MockUtils.getInstance().getFolderType(), null), false);
         Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Inbox", MockUtils.getInstance().getFolderType(), null), false);
         Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Unbekannt", MockUtils.getInstance().getFolderType(), null), false);
@@ -62,6 +62,7 @@ public class ScriptTest {
 
         engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
         engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
+        engine.eval("classification = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').categoryhome;");
 
     }
 

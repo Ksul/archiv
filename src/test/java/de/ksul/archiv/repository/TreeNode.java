@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import de.ksul.archiv.VerteilungConstants;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.ItemType;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -54,7 +55,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         if (! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().isPresent())
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
-        this.path ="/";
+        this.path ="";
         this.obj = new Type(obj.getProperties());
         this.childs = new HashMap<>();
      }
@@ -66,7 +67,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         if (! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().isPresent())
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
-        this.path ="/";
+        this.path ="";
         this.obj = new Type(obj.getProperties());
         this.childs = new HashMap<>();
         if (version != null) {
@@ -100,6 +101,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     public String getPath() {
         return path;
+    }
+
+    protected void setPath(String path) {
+        this.path = path;
     }
 
     public String getId() { return id;}
@@ -313,6 +318,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     public void addTag(String name) {
         //TODO Implementierung
+    }
+
+    public List<TreeNode<T>> getRootCategories(String name) {
+        if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
+            throw new CmisRuntimeException("no category node");
+        return null;
     }
 
     public void save() {}

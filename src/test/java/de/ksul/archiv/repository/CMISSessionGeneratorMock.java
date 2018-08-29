@@ -138,16 +138,20 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         if (repository == null) {
             repository = Repository.getInstance();
             sessionImpl = new SessionMock().setRepository(repository).getSession();
-            MockUtils.getInstance().setSession(sessionImpl);
+            MockUtils mockUtils = MockUtils.getInstance();
+            mockUtils.setSession(sessionImpl);
             TreeNode node;
-            node = repository.insert(null, MockUtils.getInstance().createFileableCmisObject(repository, null, null, archivProperties.getCompanyHomeName(), MockUtils.getInstance().getFolderType(), null), false);
-            node = repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), MockUtils.getInstance().getFolderType(), null), false);
-            node = repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), MockUtils.getInstance().getFolderType(), null), false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), MockUtils.getInstance().createStream("// ", "application/x-javascript"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), MockUtils.getInstance().createStream("// ", "application/x-javascript"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", MockUtils.getInstance().getDocumentType(), "text/xml"), MockUtils.getInstance().createFileStream("classpath:static/rules/doc.xml", "text/xml"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd", MockUtils.getInstance().getDocumentType(), "text/xml"), MockUtils.getInstance().createFileStream("classpath:static/rules/doc.xsd", "text/xml"), "1.0", false);
-            repository.insert(node, MockUtils.getInstance().createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js", MockUtils.getInstance().getDocumentType(), "application/x-javascript"), MockUtils.getInstance().createFileStream("classpath:static/js/recognition.js", "application/x-javascript"), "1.0", false);
+            node = repository.insert(null, mockUtils.createFileableCmisObject(repository, null, null, archivProperties.getCompanyHomeName(), mockUtils.getFolderType(), null), false);
+            node = repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), mockUtils.getFolderType(), null), false);
+            node = repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), mockUtils.getFolderType(), null), false);
+            repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", mockUtils.getDocumentType(), "application/x-javascript"), mockUtils.createStream("// ", "application/x-javascript"), "1.0", false);
+            repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", mockUtils.getDocumentType(), "application/x-javascript"), mockUtils.createStream("// ", "application/x-javascript"), "1.0", false);
+            repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", mockUtils.getDocumentType(), "text/xml"), mockUtils.createFileStream("classpath:static/rules/doc.xml", "text/xml"), "1.0", false);
+            repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xsd", mockUtils.getDocumentType(), "text/xml"), mockUtils.createFileStream("classpath:static/rules/doc.xsd", "text/xml"), "1.0", false);
+            repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "recognition.js", mockUtils.getDocumentType(), "application/x-javascript"), mockUtils.createFileStream("classpath:static/js/recognition.js", "application/x-javascript"), "1.0", false);
+
+            repository.insert(null, mockUtils.createFileableCmisObject(repository, null, null, "categories", mockUtils.getItemType(), null), false);
+
         }
     }
 

@@ -16,6 +16,7 @@ import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumBaseObjectTypeIds;
 import org.apache.chemistry.opencmis.commons.spi.DiscoveryService;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -611,9 +612,9 @@ public class AlfrescoConnector {
         logger.trace("createFolder: " + targetFolder.getPath() + " Properties: " + properties);
 
         if (!properties.containsKey(PropertyIds.OBJECT_TYPE_ID))
-            properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
-        else if (!((String) properties.get(PropertyIds.OBJECT_TYPE_ID)).toUpperCase().startsWith("D:") && !((String) properties.get(PropertyIds.OBJECT_TYPE_ID)).toLowerCase().contains("cmis:folder"))
-            properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder," + properties.get(PropertyIds.OBJECT_TYPE_ID));
+            properties.put(PropertyIds.OBJECT_TYPE_ID, EnumBaseObjectTypeIds.CMIS_FOLDER.value());
+        else if (!((String) properties.get(PropertyIds.OBJECT_TYPE_ID)).toUpperCase().startsWith("D:") && !((String) properties.get(PropertyIds.OBJECT_TYPE_ID)).toLowerCase().contains(EnumBaseObjectTypeIds.CMIS_FOLDER.value()))
+            properties.put(PropertyIds.OBJECT_TYPE_ID, EnumBaseObjectTypeIds.CMIS_FOLDER.value() + "," + properties.get(PropertyIds.OBJECT_TYPE_ID));
 
         return targetFolder.createFolder(properties);
     }

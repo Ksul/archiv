@@ -19,10 +19,12 @@ public class RecognizeEndpoints {
     public static TreeNode<FileableCmisObject> document;
     public static TreeNode<FileableCmisObject> script;
     public static TreeNode<FileableCmisObject> companyhome;
+    public static TreeNode<FileableCmisObject> categoryhome;
 
     public static void setRepository(Repository repository) {
         RecognizeEndpoints.repository = repository;
-        companyhome = repository.findTreeNodeForPath("/");
+        companyhome = repository.getRoot();
+        categoryhome = repository.getCategoryroot();
     }
 
     public static void setScript(String path) {

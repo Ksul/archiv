@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.ksul.archiv.PDFConnector;
 import de.ksul.archiv.VerteilungConstants;
 import de.ksul.archiv.repository.script.RecognizeEndpoints;
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
-import org.apache.chemistry.opencmis.client.api.Property;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -37,8 +35,8 @@ import java.util.*;
 public class Repository {
 
     private static Logger logger = LoggerFactory.getLogger(Repository.class.getName());
-    private String rootId ;
     private TreeNode<FileableCmisObject> root;
+    private TreeNode<FileableCmisObject> categoryroot;
     @JsonProperty("nodes")
     private TreeMap<String, TreeNode<FileableCmisObject>> nodes = new TreeMap<>() ;
     @JsonProperty("contents")
@@ -66,7 +64,15 @@ public class Repository {
     }
 
     String getRootId() {
-        return rootId;
+        return root.getId();
+    }
+
+    public TreeNode<FileableCmisObject> getRoot() {
+        return root;
+    }
+
+    public TreeNode<FileableCmisObject> getCategoryroot() {
+        return categoryroot;
     }
 
     List<FileableCmisObject> query(String query) {
@@ -216,11 +222,17 @@ public class Repository {
             throw new RuntimeException("cmisObject must be set!");
         String name = cmisObject.getName();
         TreeNode<FileableCmisObject> newNode;
-        if (parent == null) {
+        if (parent == null && cmisObject.getType() instanceof FolderType) {
             newNode = new TreeNode<>(cmisObject);
+            newNode.setPath("/");
             nodes.put(newNode.getId(), newNode);
             root = newNode;
-            rootId = newNode.getId();
+            logger.info(name + " [ID: " + newNode.getId() + "] inserted into repository!");
+        } else if (parent == null && cmisObject.getType() instanceof ItemType) {
+            newNode = new TreeNode<>(cmisObject);
+            nodes.put(newNode.getId(), newNode);
+            categoryroot = newNode;
+            logger.info(name + " [ID: " + newNode.getId() + "] inserted into repository!");
         } else {
             if (root == null)
                 throw new RuntimeException("insert:no Root Node!");
@@ -243,6 +255,7 @@ public class Repository {
                         engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
                         engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
                         engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
+                        engine.eval("classification = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').categoryhome;");
                         Object result = invocable.invokeMethod(rec, "run");
                     } catch (ScriptException e2) {
                         logger.error("Script error!", e2);
@@ -251,10 +264,11 @@ public class Repository {
                     }
 
                 }
+                logger.info(name + " [ID: " + newNode.getId() + "] [Path: " + newNode.getObj().getPaths().get(0) + "] inserted into repository!");
             } else
                 throw new RuntimeException("Parent not found!");
         }
-        logger.info(name + " [ID: " + newNode.getId() + "] [Path: " + newNode.getObj().getPaths().get(0) + "] inserted into repository!");
+
         return newNode;
     }
 
