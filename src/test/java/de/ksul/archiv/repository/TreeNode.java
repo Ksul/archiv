@@ -313,7 +313,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     public boolean hasAspect(String name) {
         //TODO Implementierung
-        return true;
+        return false;
     }
 
     public void addTag(String name) {
@@ -326,7 +326,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return null;
     }
 
-    public TreeNode<T> createRootCategory(String name) {
+    public TreeNode<T> createRootCategory(String aspect, String name) {
+        if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
+            throw new CmisRuntimeException("no category node");
+        Repository repository =  Repository.getInstance();
+        MockUtils mockUtils = MockUtils.getInstance();
+        return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
+    }
+
+    public TreeNode<T> createSubCategory(String name) {
+        if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
+            throw new CmisRuntimeException("no category node");
         Repository repository =  Repository.getInstance();
         MockUtils mockUtils = MockUtils.getInstance();
         return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
