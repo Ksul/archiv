@@ -392,7 +392,7 @@ public class MockUtils {
             ItemTypeDefinitionImpl itemTypeDefinition = new ItemTypeDefinitionImpl();
             itemTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
             itemType = new ItemTypeImpl(sessionImpl, itemTypeDefinition);
-            itemType.setId(("I:cm:category_root"));
+            itemType.setId(EnumBaseObjectTypeIds.CMIS_ITEM.value());
             itemType.setBaseTypeId(BaseTypeId.CMIS_ITEM);
         }
         return itemType;

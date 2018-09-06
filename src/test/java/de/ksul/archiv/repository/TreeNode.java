@@ -326,6 +326,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return null;
     }
 
+    public TreeNode<T> createRootCategory(String name) {
+        Repository repository =  Repository.getInstance();
+        MockUtils mockUtils = MockUtils.getInstance();
+        return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
+    }
+
     public void save() {}
 
     public void properties(String mirror){

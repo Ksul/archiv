@@ -42,6 +42,8 @@ public class RepositoryServiceMock {
                     return MockUtils.getInstance().getDocumentType();
                 else if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value()))
                     return MockUtils.getInstance().getFolderType();
+                else if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value()))
+                    return MockUtils.getInstance().getItemType();
                 else if (string.contains("my:archivContent"))
                     return MockUtils.getInstance().getArchivType();
                 else if (string.startsWith("P:"))
