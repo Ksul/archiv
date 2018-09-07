@@ -34,14 +34,9 @@ import static org.mockito.Mockito.when;
 public class DiscoveryServiceMock {
 
     private DiscoveryService discoveryService;
-    private SessionImpl session;
     private Repository repository;
 
     public DiscoveryServiceMock() {
-    }
-
-    public void setSession(SessionImpl session) {
-        this.session = session;
     }
 
     public void setRepository(Repository repository) {

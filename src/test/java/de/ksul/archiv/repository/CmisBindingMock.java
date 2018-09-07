@@ -32,12 +32,6 @@ public class CmisBindingMock {
         repositoryServiceMock = new RepositoryServiceMock();
     }
 
-    public CmisBindingMock setSessionImpl(SessionImpl sessionImpl) {
-        this.sessionImpl = sessionImpl;
-        discoveryServiceMock.setSession(sessionImpl);
-        return this;
-    }
-
     public CmisBindingMock setRepository(Repository repository) {
         this.repository = repository;
         discoveryServiceMock.setRepository(repository);

@@ -40,7 +40,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     public String content;
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
-
+    public Map<String, Object> properties = new NodeProperties();
+    public Map<String, Object> childAssocs  = new NodeProperties();
     public boolean isLeaf() {
         return childs.size() == 0;
     }
@@ -58,6 +59,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.path ="";
         this.obj = new Type(obj.getProperties());
         this.childs = new HashMap<>();
+        copyValues();
      }
 
     TreeNode( FileableCmisObject obj, String version) {
@@ -73,6 +75,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         if (version != null) {
             this.versions.put(version, this.obj);
         }
+        copyValues();
     }
 
     private boolean isRoot() {
@@ -149,11 +152,13 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.displayPath = newParent.displayPath + "/" + newParent.getName();
         deRegisterChild(this);
         newParent.registerChild(this);
+        updateProperty(PropertyIds.PARENT_ID, newParent.getId());
         return this;
     }
 
     void updateNode(List<Property<?>>  properties) {
         obj.setProperties(properties);
+        copyValues();
     }
 
     int getLevel() {
@@ -320,6 +325,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         //TODO Implementierung
     }
 
+    public void createAssociation( Object target, String name){
+        childAssocs.put(name, target);
+    }
+
     public List<TreeNode<T>> getRootCategories(String name) {
         if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
             throw new CmisRuntimeException("no category node");
@@ -344,9 +353,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     public void save() {}
 
-    public void properties(String mirror){
-        System.out.println(mirror);
-    }
 
     @Override
     public Iterator<TreeNode<T>> iterator() {
@@ -360,6 +366,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    void updateProperty(String name, Object value) {
+        ((PropertyImpl) ((FileableCmisObject) getObj()).getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(value);
+        properties.put(name,value);
+    }
+
+    private void copyValues() {
+        for (Property property: obj.getProperties()){
+            properties.put(property.getId(), property.getValue());
+        }
     }
 
 }

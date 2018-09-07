@@ -408,7 +408,7 @@ public class Repository {
         String uuid = UUID.randomUUID().toString();
         contents.put(uuid, content);
         contentIds.put(node.getId(), uuid);
-        ((PropertyImpl) node.getObj().getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(uuid);
+        node.updateProperty(PropertyIds.CONTENT_STREAM_ID, uuid);
         setTreeNodeContent(node, content);
         logger.info("[ID: " + nodeId + "] set content!");
     }

@@ -90,12 +90,7 @@ public class ObjectServiceMock {
                 String sourceFolderId = (String) invocation.getArguments()[3];
                 FileableCmisObject cmisObject = repository.getById(objectId);
                 repository.move(targetFolderId, cmisObject);
-                for (Property property : cmisObject.getProperties()) {
-                    if (property.getId().equalsIgnoreCase(PropertyIds.PARENT_ID)) {
-                        ((PropertyImpl) property).setValue(targetFolderId);
-                        break;
-                    }
-                }
+
                 return null;
             }
         }).when(objectService).moveObject(anyString(), any(Holder.class), anyString(), anyString(), any());

@@ -51,7 +51,6 @@ public class SessionMock {
     public SessionImpl getSession() {
         if (session == null)
             session = getMock();
-        cmisBindingMock.setSessionImpl(session);
         return session;
     }
 
