@@ -828,7 +828,7 @@ public class MockUtils {
     }
 
     FileableCmisObject createObject(Type obj) {
-        FileableCmisObject cmisObject;
+        FileableCmisObject cmisObject = null;
         ObjectData objectData = getObjectDataFromProperties(obj.getProperties());
         if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value())) {
             cmisObject = new FolderImpl(sessionImpl, getFolderType(), objectData, new OperationContextImpl());
@@ -836,11 +836,11 @@ public class MockUtils {
         } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value())) {
             cmisObject = new ItemImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
         } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value())) {
-            cmisObject = new DocumentImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
-
-        } else {
-            cmisObject = new DocumentImpl(sessionImpl, getArchivType(), objectData, new OperationContextImpl());
-
+            if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value())) {
+                cmisObject = new DocumentImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
+            } else {
+                cmisObject = new DocumentImpl(sessionImpl, getArchivType(), objectData, new OperationContextImpl());
+            }
         }
         LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
         for (Property<?> p : obj.getProperties()) {
