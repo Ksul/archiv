@@ -35,6 +35,14 @@
 
     </properties>
 
+    <repositories>
+        <repository>
+            <id>alfresco</id>
+            <name>Alfresco</name>
+            <url>https://artifacts.alfresco.com/nexus/content/repositories/public/</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -208,6 +216,19 @@
             <groupId>com.googlecode.cqengine</groupId>
             <artifactId>cqengine</artifactId>
             <version>2.9.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-data-model</artifactId>
+            <version>8.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-repository</artifactId>
+            <version>7.9</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

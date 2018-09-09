@@ -6,6 +6,12 @@ import de.ksul.archiv.repository.MockUtils;
 import de.ksul.archiv.repository.Repository;
 import de.ksul.archiv.repository.TreeNode;
 import de.ksul.archiv.repository.script.RecognizeEndpoints;
+import org.alfresco.repo.dictionary.*;
+import org.alfresco.repo.tenant.SingleTServiceImpl;
+import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
+import org.alfresco.util.TraceableThreadFactory;
+import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -15,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -24,6 +31,12 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -83,5 +96,46 @@ public class ScriptTest {
         RecognizeEndpoints.setDocument(node);
         engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
         invocable.invokeMethod(rec, "run");
+    }
+
+    @Test
+    public void testModel() throws Exception {
+        List<String> bootstrapModels = new ArrayList<>();
+        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
+        bootstrapModels.add("alfresco/model/systemModel.xml");
+        bootstrapModels.add("org/alfresco/repo/security/authentication/userModel.xml");
+        bootstrapModels.add("alfresco/model/contentModel.xml");
+       // bootstrapModels.add("alfresco/model/wcmModel.xml");
+        bootstrapModels.add("alfresco/model/applicationModel.xml");
+        bootstrapModels.add("alfresco/model/bpmModel.xml");
+        //bootstrapModels.add("alfresco/model/wcmAppModel.xml");
+        bootstrapModels.add("alfresco/model/cmisModel.xml");
+        bootstrapModels.add("alfresco/workflow/workflowModel.xml");
+        bootstrapModels.add("alfresco/model/siteModel.xml");
+
+        TenantService tenantService = new SingleTServiceImpl();
+        DictionaryDAOImpl dictionaryDao = new DictionaryDAOImpl();
+        dictionaryDao.setTenantService(tenantService);
+        CompiledModelsCache compiledModelsCache = new CompiledModelsCache();
+        compiledModelsCache.setDictionaryDAO(dictionaryDao);
+        compiledModelsCache.setTenantService(tenantService);
+        compiledModelsCache.setRegistry(new DefaultAsynchronouslyRefreshedCacheRegistry());
+        TraceableThreadFactory threadFactory = new TraceableThreadFactory();
+        threadFactory.setThreadDaemon(true);
+        threadFactory.setThreadPriority(Thread.NORM_PRIORITY);
+
+        ThreadPoolExecutor threadPoolExecutor = new DynamicallySizedThreadPoolExecutor(20, 20, 90, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), threadFactory,
+                new ThreadPoolExecutor.CallerRunsPolicy());
+        compiledModelsCache.setThreadPoolExecutor(threadPoolExecutor);
+        dictionaryDao.setDictionaryRegistryCache(compiledModelsCache);
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/dictionaryModel.xml")));
+
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/contentModel.xml")));
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
+        bootstrap.setModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDao);
+        bootstrap.bootstrap();
+
+
     }
 }
