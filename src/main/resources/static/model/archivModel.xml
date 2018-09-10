@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<model name="my:archivModel" xmlns="http://www.alfresco.org/model/dictionary/1.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>BasisModel fÃ¼r das Archiv</description>
+    <author>Klaus Schulte</author>
+    <version>1.0</version>
+
+    <imports>
+        <!-- Import Alfresco Dictionary Definitions -->
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <!-- Import Alfresco Content Domain Model Definitions -->
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+    </imports>
+
+    <namespaces>
+        <!-- Define a Namespace for my new definitions -->
+        <namespace uri="archiv.model" prefix="my"/>
+    </namespaces>
+
+    <!-- Define constraints -->
+    <constraints>
+        <constraint name="my:person_constraint" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>Klaus</value>
+                    <value>Katja</value>
+                    <value>Till</value>
+                    <value>Kilian</value>
+                </list>
+            </parameter>
+        </constraint>
+    </constraints>
+
+
+    <!-- Type and Aspect definitions go here -->
+    <types>
+        <type name="my:archivFolder">
+            <title>FolderBasemodel</title>
+            <description>Basemodel for ArchivFolder</description>
+            <parent>cm:folder</parent>
+            <archive>true</archive>
+        </type>
+
+        <type name="my:archivContent">
+            <title>Basemodel</title>
+            <description>Basemodel for Archive</description>
+            <parent>cm:content</parent>
+            <archive>true</archive>
+            <properties>
+                <property name="my:documentDate">
+                    <title>Documentdate</title>
+                    <description>Datum des Dokuments</description>
+                    <type>d:date</type>
+                    <mandatory>true</mandatory>
+                </property>
+                <property name="my:person">
+                    <title>Referenced person</title>
+                    <description>Zugeordnete Person</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <default>Klaus</default>
+                    <index enabled="true">
+                        <tokenised>false</tokenised>
+                    </index>
+                    <constraints>
+                        <constraint ref="my:person_constraint"/>
+                    </constraints>
+                </property>
+            </properties>
+        </type>
+    </types>
+    <aspects>
+        <aspect name="my:linkable">
+            <title>Links</title>
+            <associations>
+                <association name="my:linkedDocs">
+                    <title>Linked Docs</title>
+                    <source>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </source>
+                    <target>
+                        <class>my:archivContent</class>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </target>
+                </association>
+            </associations>
+        </aspect>
+
+        <aspect name="my:amountable">
+            <title>Amountable</title>
+            <properties>
+                <property name="my:amount">
+                    <title>Amount</title>
+                    <description>Amount of document</description>
+                    <type>d:double</type>
+                </property>
+                <property name="my:tax">
+                    <title>Amount</title>
+                    <description>Relevant for tax</description>
+                    <type>d:boolean</type>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="my:idable">
+            <title>IDable</title>
+            <properties>
+                <property name="my:idvalue">
+                    <title>IDValue</title>
+                    <description>ID of Document</description>
+                    <type>d:text</type>
+                    <index enabled="true">
+                        <tokenised>false</tokenised>
+                    </index>
+                </property>
+            </properties>
+        </aspect>
+    </aspects>
+</model>

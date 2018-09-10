@@ -100,18 +100,18 @@ public class ScriptTest {
 
     @Test
     public void testModel() throws Exception {
-        List<String> bootstrapModels = new ArrayList<>();
-        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
-        bootstrapModels.add("alfresco/model/systemModel.xml");
-        bootstrapModels.add("org/alfresco/repo/security/authentication/userModel.xml");
-        bootstrapModels.add("alfresco/model/contentModel.xml");
-       // bootstrapModels.add("alfresco/model/wcmModel.xml");
-        bootstrapModels.add("alfresco/model/applicationModel.xml");
-        bootstrapModels.add("alfresco/model/bpmModel.xml");
-        //bootstrapModels.add("alfresco/model/wcmAppModel.xml");
-        bootstrapModels.add("alfresco/model/cmisModel.xml");
-        bootstrapModels.add("alfresco/workflow/workflowModel.xml");
-        bootstrapModels.add("alfresco/model/siteModel.xml");
+//        List<String> bootstrapModels = new ArrayList<>();
+//        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
+//        bootstrapModels.add("alfresco/model/systemModel.xml");
+//        bootstrapModels.add("org/alfresco/repo/security/authentication/userModel.xml");
+//        bootstrapModels.add("alfresco/model/contentModel.xml");
+//       // bootstrapModels.add("alfresco/model/wcmModel.xml");
+//        bootstrapModels.add("alfresco/model/applicationModel.xml");
+//        bootstrapModels.add("alfresco/model/bpmModel.xml");
+//        //bootstrapModels.add("alfresco/model/wcmAppModel.xml");
+//        bootstrapModels.add("alfresco/model/cmisModel.xml");
+//        bootstrapModels.add("alfresco/workflow/workflowModel.xml");
+//        bootstrapModels.add("alfresco/model/siteModel.xml");
 
         TenantService tenantService = new SingleTServiceImpl();
         DictionaryDAOImpl dictionaryDao = new DictionaryDAOImpl();
@@ -129,10 +129,19 @@ public class ScriptTest {
         compiledModelsCache.setThreadPoolExecutor(threadPoolExecutor);
         dictionaryDao.setDictionaryRegistryCache(compiledModelsCache);
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/dictionaryModel.xml")));
-
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/systemModel.xml")));
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/contentModel.xml")));
+
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/security/authentication/userModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/applicationModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/bpmModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/cmisModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/workflow/workflowModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/siteModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("src/main/resources/static/model/archivModel.xml")));
+
         DictionaryBootstrap bootstrap = new DictionaryBootstrap();
-        bootstrap.setModels(bootstrapModels);
+    //    bootstrap.setModels(bootstrapModels);
         bootstrap.setDictionaryDAO(dictionaryDao);
         bootstrap.bootstrap();
 
