@@ -9,6 +9,7 @@ import de.ksul.archiv.repository.script.RecognizeEndpoints;
 import org.alfresco.repo.dictionary.*;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
 import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.TraceableThreadFactory;
 import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
@@ -138,7 +139,11 @@ public class ScriptTest {
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/cmisModel.xml")));
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/workflow/workflowModel.xml")));
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/siteModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("src/main/resources/static/model/archivModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("static/model/archivModel.xml")));
+
+        dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{archiv.model}archivModel"))
+
+        dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}cmismodel")).getType(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}document")).getProperties()
 
         DictionaryBootstrap bootstrap = new DictionaryBootstrap();
     //    bootstrap.setModels(bootstrapModels);

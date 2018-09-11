@@ -2,7 +2,7 @@
 
 <model name="my:archivModel" xmlns="http://www.alfresco.org/model/dictionary/1.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>BasisModel fÃ¼r das Archiv</description>
+    <description>BasisModel für das Archiv</description>
     <author>Klaus Schulte</author>
     <version>1.0</version>
 
