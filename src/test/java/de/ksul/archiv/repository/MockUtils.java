@@ -43,6 +43,7 @@ public class MockUtils {
 
     private SessionImpl sessionImpl;
     private ResourceLoader resourceLoader;
+    private PropertyDefinitionWrapper propertyDefinitionWrapper = new PropertyDefinitionWrapper();
 
     private static MockUtils mockUtils;
 
@@ -434,7 +435,7 @@ public class MockUtils {
 
         if (archivType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            documentTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
+            documentTypeDefinition.setPropertyDefinitions(propertyDefinitionWrapper.getPropertyDefinitionMap("{archiv.model}archivModel"));
             archivType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             archivType.setId("D:my:archivContent");
             archivType.setIsVersionable(true);

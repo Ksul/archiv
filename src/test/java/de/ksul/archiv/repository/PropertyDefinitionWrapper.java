@@ -1,11 +1,5 @@
-package de.ksul.archiv;
+package de.ksul.archiv.repository;
 
-import de.ksul.archiv.configuration.ArchivProperties;
-import de.ksul.archiv.configuration.ArchivTestConfiguration;
-import de.ksul.archiv.repository.MockUtils;
-import de.ksul.archiv.repository.Repository;
-import de.ksul.archiv.repository.TreeNode;
-import de.ksul.archiv.repository.script.RecognizeEndpoints;
 import org.alfresco.opencmis.mapping.CMISMapping;
 import org.alfresco.repo.dictionary.*;
 import org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint;
@@ -22,7 +16,6 @@ import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ISO9075;
 import org.alfresco.util.TraceableThreadFactory;
 import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
-import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.Choice;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
@@ -30,31 +23,10 @@ import org.apache.chemistry.opencmis.commons.enums.Cardinality;
 import org.apache.chemistry.opencmis.commons.enums.PropertyType;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -62,80 +34,18 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created with IntelliJ IDEA.
  * User: Klaus Schulte (m500288)
- * Date: 28.08.18
- * Time: 10:18
+ * Date: 12.09.18
+ * Time: 16:58
  */
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ArchivTestConfiguration.class})
-@TestPropertySource(properties = {"ksul.archiv.test.testData="})
-@DirtiesContext
-public class ScriptTest {
+public class PropertyDefinitionWrapper {
 
-    private Invocable invocable;
-    private Object rec;
-    private ScriptEngine engine;
-    private TreeNode<FileableCmisObject> root;
+    private DictionaryDAOImpl dictionaryDao = new DictionaryDAOImpl();
+    private CMISMapping cmisMapping  = new CMISMapping();
+    private  TenantService tenantService = new SingleTServiceImpl();
+
+    public PropertyDefinitionWrapper() {
 
 
-    @BeforeEach
-    public void setUp() throws Exception {
-
-        root = Repository.getInstance().getRoot();
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/","Archiv", MockUtils.getInstance().getFolderType(), null), false);
-        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Inbox", MockUtils.getInstance().getFolderType(), null), false);
-        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Unbekannt", MockUtils.getInstance().getFolderType(), null), false);
-        TreeNode<FileableCmisObject> fehler = Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Fehler", MockUtils.getInstance().getFolderType(), null), false);
-        Repository.getInstance().insert(fehler, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv/Fehler","Doppelte", MockUtils.getInstance().getFolderType(), null), false);
-        engine = new ScriptEngineManager().getEngineByName("nashorn");
-        RecognizeEndpoints.setRepository(Repository.getInstance());
-        RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
-        rec = engine.eval("load(\"src/main/resources/static/js/recognition.js\");");
-
-        invocable = (Invocable) engine;
-        engine.eval("logger = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints.JSLogger');");
-
-        engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
-        engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
-        engine.eval("classification = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').categoryhome;");
-
-    }
-
-
-
-    @Test
-    public void testScriptForUnknown() throws Exception {
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.pdf", MockUtils.getInstance().getDocumentType(), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createFileStream("classpath:Test.pdf",  VerteilungConstants.DOCUMENT_TYPE_PDF), "1.0", false);
-        RecognizeEndpoints.setDocument(node);
-        engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
-        invocable.invokeMethod(rec, "run");
-        MatcherAssert.assertThat(Repository.getInstance().findTreeNodeForPath("/Archiv/Unbekannt/2011/Mai/Test.pdf"), Matchers.notNullValue());
-    }
-
-    @Test
-    public void testScript() throws Exception {
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.txt", MockUtils.getInstance().getDocumentType(), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createStream("Caffee Fausto   Rechnung Nr 12345 Bertrag 79€ 01.01.2010",  VerteilungConstants.DOCUMENT_TYPE_TEXT), "1.0", false);
-        RecognizeEndpoints.setDocument(node);
-        engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
-        invocable.invokeMethod(rec, "run");
-    }
-
-    @Test
-    public void testModel() throws Exception {
-//        List<String> bootstrapModels = new ArrayList<>();
-//        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
-//        bootstrapModels.add("alfresco/model/systemModel.xml");
-//        bootstrapModels.add("org/alfresco/repo/security/authentication/userModel.xml");
-//        bootstrapModels.add("alfresco/model/contentModel.xml");
-//       // bootstrapModels.add("alfresco/model/wcmModel.xml");
-//        bootstrapModels.add("alfresco/model/applicationModel.xml");
-//        bootstrapModels.add("alfresco/model/bpmModel.xml");
-//        //bootstrapModels.add("alfresco/model/wcmAppModel.xml");
-//        bootstrapModels.add("alfresco/model/cmisModel.xml");
-//        bootstrapModels.add("alfresco/workflow/workflowModel.xml");
-//        bootstrapModels.add("alfresco/model/siteModel.xml");
-
-        TenantService tenantService = new SingleTServiceImpl();
-        DictionaryDAOImpl dictionaryDao = new DictionaryDAOImpl();
         dictionaryDao.setTenantService(tenantService);
         CompiledModelsCache compiledModelsCache = new CompiledModelsCache();
         compiledModelsCache.setDictionaryDAO(dictionaryDao);
@@ -161,11 +71,11 @@ public class ScriptTest {
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/siteModel.xml")));
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("static/model/archivModel.xml")));
 
-      //  dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{archiv.model}archivModel"))
+        //  dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{archiv.model}archivModel"))
 
-     //   dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}cmismodel")).getType(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}document")).getProperties();
+        //   dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}cmismodel")).getType(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}document")).getProperties();
         org.alfresco.service.cmr.dictionary.PropertyDefinition propertyDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}cmismodel")).getType(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}document")).getProperties().get(QName.createQName("{http://www.alfresco.org/model/cmis/1.0/cs01}objectId"));
-        CMISMapping cmisMapping = new CMISMapping();
+
         cmisMapping.afterPropertiesSet();
         DictionaryComponent dictionaryComponent = new DictionaryComponent();
         dictionaryComponent.setDictionaryDAO(dictionaryDao);
@@ -173,16 +83,26 @@ public class ScriptTest {
         DictionaryNamespaceComponent namespaceComponent = new DictionaryNamespaceComponent();
         namespaceComponent.setNamespaceDAO(dictionaryDao);
         cmisMapping.setNamespaceService(namespaceComponent);
-        createPropertydefinition(cmisMapping, propertyDefinition);
-        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
-    //    bootstrap.setModels(bootstrapModels);
-        bootstrap.setDictionaryDAO(dictionaryDao);
-        bootstrap.bootstrap();
-
-
+        
     }
 
-    private PropertyDefinition createPropertydefinition (CMISMapping cmisMapping, org.alfresco.service.cmr.dictionary.PropertyDefinition propDef) {
+    public DictionaryDAO getDictionaryDao() {
+        return dictionaryDao;
+    }
+
+    public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name) {
+
+        Map<String, PropertyDefinition<?>> propertyDefinitionMap = new HashMap<>();
+
+        Collection<org.alfresco.service.cmr.dictionary.PropertyDefinition> propertyDefinitions = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName(name)).getProperties();
+        for (org.alfresco.service.cmr.dictionary.PropertyDefinition definition: propertyDefinitions){
+            propertyDefinitionMap.put(definition.getName().getLocalName(), createPropertydefinition(cmisMapping, definition));
+        }
+
+        return propertyDefinitionMap;
+    }
+
+    public PropertyDefinition createPropertydefinition (CMISMapping cmisMapping, org.alfresco.service.cmr.dictionary.PropertyDefinition propDef) {
 
         PropertyType datatype = cmisMapping.getDataType(propDef.getDataType());
         if (datatype == null)
