@@ -1,9 +1,7 @@
 package de.ksul.archiv.repository;
 
-import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
-import org.apache.chemistry.opencmis.client.api.ObjectType;
-import org.apache.chemistry.opencmis.client.api.Property;
-import org.apache.chemistry.opencmis.client.api.SecondaryType;
+import org.apache.chemistry.opencmis.client.api.*;
+import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
 import org.apache.chemistry.opencmis.client.runtime.*;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
@@ -22,6 +20,7 @@ import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumBaseObjectTypeIds;
+import org.apache.chemistry.opencmis.commons.spi.ObjectService;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.ByteArrayInputStream;
@@ -43,7 +42,7 @@ public class MockUtils {
 
     private SessionImpl sessionImpl;
     private ResourceLoader resourceLoader;
-    private PropertyDefinitionWrapper propertyDefinitionWrapper = new PropertyDefinitionWrapper();
+    private PropertyDefinitionBuilder propertyDefinitionBuilder = new PropertyDefinitionBuilder();
 
     private static MockUtils mockUtils;
 
@@ -391,7 +390,7 @@ public class MockUtils {
     public ItemTypeImpl getItemType() {
         if (itemType == null) {
             ItemTypeDefinitionImpl itemTypeDefinition = new ItemTypeDefinitionImpl();
-            itemTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
+            itemTypeDefinition.setPropertyDefinitions(propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}item", PropertyDefinitionBuilder.Typ.ITEM));
             itemType = new ItemTypeImpl(sessionImpl, itemTypeDefinition);
             itemType.setId(EnumBaseObjectTypeIds.CMIS_ITEM.value());
             itemType.setBaseTypeId(BaseTypeId.CMIS_ITEM);
@@ -405,7 +404,7 @@ public class MockUtils {
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
-            folderTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
+            folderTypeDefinition.setPropertyDefinitions(propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}folder", PropertyDefinitionBuilder.Typ.FOLDER));
             folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
             folderType.setId(EnumBaseObjectTypeIds.CMIS_FOLDER.value());
             folderType.setBaseTypeId(BaseTypeId.CMIS_FOLDER);
@@ -420,7 +419,7 @@ public class MockUtils {
 
         if (documentType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            documentTypeDefinition.setPropertyDefinitions(getPropertyDefinitionMap());
+            documentTypeDefinition.setPropertyDefinitions(propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT));
             documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             documentType.setId(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value());
             documentType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
@@ -435,7 +434,9 @@ public class MockUtils {
 
         if (archivType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            documentTypeDefinition.setPropertyDefinitions(propertyDefinitionWrapper.getPropertyDefinitionMap("{archiv.model}archivModel"));
+            Map<String, PropertyDefinition<?>> propertyDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            propertyDefinitionMap.putAll(propertyDefinitionBuilder.getPropertyDefinitionMap("{archiv.model}archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT));
+            documentTypeDefinition.setPropertyDefinitions(propertyDefinitionMap);
             archivType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             archivType.setId("D:my:archivContent");
             archivType.setIsVersionable(true);
@@ -474,7 +475,7 @@ public class MockUtils {
 
 
     public FileableCmisObject createFileableCmisObject(Repository repository, Map<String, PropertyData<?>> props, String path, String name, ObjectType objectType, String mimeType) {
-        FileableCmisObject fileableCmisObject;
+        FileableCmisObject fileableCmisObject = null;
         String parentId;
         String versionSeriesId = repository.UUId();
         PropertiesImpl properties;
@@ -483,10 +484,7 @@ public class MockUtils {
             properties = new PropertiesImpl();
         else
             properties = (PropertiesImpl) convertProperties(props);
-        if (!properties.getProperties().containsKey(PropertyIds.VERSION_SERIES_ID)) {
 
-            properties.addProperty(fillProperty(PropertyIds.VERSION_SERIES_ID, versionSeriesId));
-        }
         properties.addProperty(fillProperty(PropertyIds.OBJECT_ID, versionSeriesId));
         properties.addProperty(fillProperty(PropertyIds.BASE_TYPE_ID, objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
         if (!properties.getProperties().containsKey(PropertyIds.OBJECT_TYPE_ID)) {
@@ -497,6 +495,7 @@ public class MockUtils {
         if (!properties.getProperties().containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)) {
             properties.addProperty(fillProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Collections.emptyList()));
         }
+        properties.addProperty(fillProperty(PropertyIds.NAME, name));
         if (objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value())) {
             if (path == null) {
                 parentId = "-1";
@@ -506,17 +505,21 @@ public class MockUtils {
                 parentId = repository.getByPath(path).getId();
                 properties.addProperty(fillProperty(PropertyIds.PATH, (path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/") + name));
             }
-            properties.addProperty(fillProperty(PropertyIds.NAME, name));
+
             properties.addProperty(fillProperty(PropertyIds.PARENT_ID, parentId));
 
             objectData.setProperties(properties);
             fileableCmisObject = new FolderImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
-        } else {
+        } else if (objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value()) ){
             try {
                 Thread.sleep(1);
             } catch (InterruptedException ignored) {
             }
-            properties.addProperty(fillProperty(PropertyIds.NAME, name));
+            if (!properties.getProperties().containsKey(PropertyIds.VERSION_SERIES_ID)) {
+
+                properties.addProperty(fillProperty(PropertyIds.VERSION_SERIES_ID, versionSeriesId));
+            }
+
             properties.addProperty(fillProperty(PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, false));
             properties.addProperty(fillProperty(PropertyIds.IS_PRIVATE_WORKING_COPY, false));
             properties.addProperty(fillProperty(PropertyIds.VERSION_LABEL, "0.1"));
@@ -525,6 +528,9 @@ public class MockUtils {
             properties.addProperty(fillProperty(PropertyIds.CHECKIN_COMMENT, "Initial Version"));
             objectData.setProperties(properties);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
+        } else if(objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value()) ) {
+            objectData.setProperties(properties);
+            fileableCmisObject = new ItemImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         }
         return fileableCmisObject;
     }
@@ -553,7 +559,7 @@ public class MockUtils {
     List<Property<?>> convPropertyData(Map<String, PropertyData<?>> propertyDataMap) {
         List<Property<?>> properties = new ArrayList<>();
         for (PropertyData<?> prop : propertyDataMap.values())
-            properties.add(new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(prop.getId()), prop.getValues()));
+            properties.add(new PropertyImpl(, prop.getValues()));
         return properties;
     }
 

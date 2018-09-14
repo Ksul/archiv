@@ -40,8 +40,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     public String content;
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
-    public Map<String, Object> properties = new NodeProperties();
-    public Map<String, Object> childAssocs  = new NodeProperties();
+    public NodeProperties properties = new NodeProperties();
+    public NodeProperties childAssocs  = new NodeProperties();
     public boolean isLeaf() {
         return childs.size() == 0;
     }
@@ -370,12 +370,12 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     void updateProperty(String name, Object value) {
         ((PropertyImpl) ((FileableCmisObject) getObj()).getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(value);
-        properties.put(name,value);
+        properties._put(name,value);
     }
 
     private void copyValues() {
         for (Property property: obj.getProperties()){
-            properties.put(property.getId(), property.getValue());
+            properties._put(property.getId(), property.getValue());
         }
     }
 
