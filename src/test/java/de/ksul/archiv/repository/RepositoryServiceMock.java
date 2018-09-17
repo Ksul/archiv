@@ -48,8 +48,7 @@ public class RepositoryServiceMock {
                 else if (string.contains("my:archivContent"))
                     return MockUtils.getInstance().getArchivType();
                 else if (string.startsWith("P:"))
-                    throw new CmisRuntimeException("unknown Type");
-                    //return MockUtils.getInstance().getPropertyDefinitionCache().get(string);
+                    return MockUtils.getInstance().getSecondaryType(string.substring(2));
                 else
                     return MockUtils.getInstance().getDocumentType();
             }

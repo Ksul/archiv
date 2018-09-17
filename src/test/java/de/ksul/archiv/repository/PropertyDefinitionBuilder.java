@@ -11,6 +11,7 @@ import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.TraceableThreadFactory;
 import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
 import java.util.Collection;
@@ -73,6 +74,7 @@ public class PropertyDefinitionBuilder {
 
         namespaceComponent.setNamespaceDAO(dictionaryDao);
         cmisMapping.setNamespaceService(namespaceComponent);
+        cmisMapping.setCmisVersion(CmisVersion.CMIS_1_1);
 
 
     }
@@ -89,14 +91,17 @@ public class PropertyDefinitionBuilder {
     public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name, Typ typ) {
 
         QName qName;
-        if (name.contains(":")) {
-            String[] n = name.split(":");
-            qName = QName.createQName(n[0], n[1], dictionaryDao);
-        } else
-            qName = QName.createQName(name);
+
+        String[] n = name.split(":");
+        qName = QName.createQName(n[0], n[1], dictionaryDao);
+
 
         Map<String, PropertyDefinition<?>> propertyDefinitionMap = new HashMap<>();
-        ClassDefinition classDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getType(qName);
+        ClassDefinition classDefinition;
+        if (typ.equals(Typ.SECONDARY))
+            classDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getAspect(qName);
+        else
+            classDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getType(qName);
         AbstractTypeDefinitionWrapper wrapper;
         switch (typ) {
             case DOCUMENT: {

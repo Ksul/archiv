@@ -82,7 +82,7 @@ public class MockUtils {
     public ItemTypeImpl getItemType() {
         if (itemType == null) {
             ItemTypeDefinitionImpl itemTypeDefinition = new ItemTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> itemDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}item", PropertyDefinitionBuilder.Typ.ITEM);
+            Map<String, PropertyDefinition<?>> itemDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:item", PropertyDefinitionBuilder.Typ.ITEM);
             propertyDefinitionCache.putAll(itemDefinitionMap);
             itemTypeDefinition.setPropertyDefinitions(itemDefinitionMap);
             itemType = new ItemTypeImpl(sessionImpl, itemTypeDefinition);
@@ -98,7 +98,7 @@ public class MockUtils {
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}folder", PropertyDefinitionBuilder.Typ.FOLDER);
+            Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:folder", PropertyDefinitionBuilder.Typ.FOLDER);
             propertyDefinitionCache.putAll(folderDefinitionMap);
             folderTypeDefinition.setPropertyDefinitions(folderDefinitionMap);
             folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
@@ -115,7 +115,7 @@ public class MockUtils {
 
         if (documentType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:document", PropertyDefinitionBuilder.Typ.DOCUMENT);
             propertyDefinitionCache.putAll(documentDefinitionMap);
             documentTypeDefinition.setPropertyDefinitions(documentDefinitionMap);
             documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
@@ -132,8 +132,8 @@ public class MockUtils {
 
         if (archivType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT);
-            Map<String, PropertyDefinition<?>> archivDefinitionMap =  propertyDefinitionBuilder.getPropertyDefinitionMap("{archiv.model}archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:document", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            Map<String, PropertyDefinition<?>> archivDefinitionMap =  propertyDefinitionBuilder.getPropertyDefinitionMap("my:archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT);
             documentDefinitionMap.putAll(archivDefinitionMap);
             propertyDefinitionCache.putAll(archivDefinitionMap);
             documentTypeDefinition.setPropertyDefinitions(documentDefinitionMap);
@@ -153,6 +153,7 @@ public class MockUtils {
         secondaryTypeDefinition.setPropertyDefinitions(secondaryDefinitionMap);
         SecondaryTypeImpl secondaryType = new SecondaryTypeImpl(sessionImpl, secondaryTypeDefinition);
         secondaryType.setId("P:" + type);
+        secondaryType.setBaseTypeId(BaseTypeId.CMIS_SECONDARY);
         return secondaryType;
     }
 
@@ -220,7 +221,7 @@ public class MockUtils {
 
             objectData.setProperties(properties);
             fileableCmisObject = new FolderImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
-        } else if (objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value()) ){
+        } else if (objectType.getBaseTypeId().value().equals(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value()) ){
             try {
                 Thread.sleep(1);
             } catch (InterruptedException ignored) {
@@ -236,6 +237,10 @@ public class MockUtils {
             properties.addProperty(fillProperty(PropertyIds.CONTENT_STREAM_ID, null));
             properties.addProperty(fillProperty(PropertyIds.CONTENT_STREAM_MIME_TYPE, mimeType));
             properties.addProperty(fillProperty(PropertyIds.CHECKIN_COMMENT, "Initial Version"));
+            if (objectType.getId().equalsIgnoreCase("D:my:archivContent")) {
+                properties.addProperty(fillProperty("my:person", "Klaus"));
+                properties.addProperty(fillProperty("my:documentDate", new Date().getTime()));
+            }
             objectData.setProperties(properties);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         } else if(objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value()) ) {
