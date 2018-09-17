@@ -13,6 +13,7 @@ import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.SecondaryTypeDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.Cardinality;
 import org.apache.chemistry.opencmis.commons.enums.PropertyType;
@@ -43,13 +44,16 @@ public class MockUtils {
     private SessionImpl sessionImpl;
     private ResourceLoader resourceLoader;
     private PropertyDefinitionBuilder propertyDefinitionBuilder = new PropertyDefinitionBuilder();
+    private  Map<String, PropertyDefinition<?>> propertyDefinitionCache = new HashMap<>();
 
     private static MockUtils mockUtils;
 
 
+
     public static MockUtils getInstance() {
-        if (mockUtils == null)
+        if (mockUtils == null) {
             mockUtils = new MockUtils();
+        }
         return mockUtils;
     }
 
@@ -63,326 +67,14 @@ public class MockUtils {
 
     public void setSession(SessionImpl sessionImpl) {
         this.sessionImpl = sessionImpl;
+        getDocumentType();
+        getFolderType();
+        getItemType();
+        getArchivType();
     }
 
-    private Map<String, PropertyDefinition<?>> propertyDefinitionMap;
-
-    Map<String, PropertyDefinition<?>> getPropertyDefinitionMap() {
-
-        if (propertyDefinitionMap == null) {
-            propertyDefinitionMap = new HashMap<>();
-            PropertyIdDefinitionImpl propertyIdDefinition = new PropertyIdDefinitionImpl();
-            propertyIdDefinition.setId("cmis:objectId");
-            propertyIdDefinition.setDisplayName("Object ID");
-            propertyIdDefinition.setQueryName("cmis:objectId");
-            propertyIdDefinition.setLocalName("objectId");
-            propertyIdDefinition.setCardinality(Cardinality.SINGLE);
-            propertyIdDefinition.setPropertyType(PropertyType.ID);
-            propertyIdDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:objectId", propertyIdDefinition);
-
-            PropertyStringDefinitionImpl propertyPathDefinition = new PropertyStringDefinitionImpl();
-            propertyPathDefinition.setId("cmis:path");
-            propertyPathDefinition.setDisplayName("Path");
-            propertyPathDefinition.setQueryName("cmis:path");
-            propertyPathDefinition.setLocalName("path");
-            propertyPathDefinition.setCardinality(Cardinality.SINGLE);
-            propertyPathDefinition.setPropertyType(PropertyType.STRING);
-            propertyPathDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:path", propertyPathDefinition);
-
-            PropertyStringDefinitionImpl propertyNameDefinition = new PropertyStringDefinitionImpl();
-            propertyNameDefinition.setId("cmis:name");
-            propertyNameDefinition.setDisplayName("Name");
-            propertyNameDefinition.setQueryName("cmis:name");
-            propertyNameDefinition.setLocalName("name");
-            propertyNameDefinition.setCardinality(Cardinality.SINGLE);
-            propertyNameDefinition.setPropertyType(PropertyType.STRING);
-            propertyNameDefinition.setUpdatability(Updatability.READWRITE);
-            propertyDefinitionMap.put("cmis:name", propertyNameDefinition);
-
-            PropertyIdDefinitionImpl propertyObjectTypeIdDefinition = new PropertyIdDefinitionImpl();
-            propertyObjectTypeIdDefinition.setId("cmis:objectTypeId");
-            propertyObjectTypeIdDefinition.setDisplayName("Object Type Id");
-            propertyObjectTypeIdDefinition.setQueryName("cmis:objectTypeId");
-            propertyObjectTypeIdDefinition.setLocalName("objectTypeId");
-            propertyObjectTypeIdDefinition.setCardinality(Cardinality.SINGLE);
-            propertyObjectTypeIdDefinition.setPropertyType(PropertyType.ID);
-            propertyObjectTypeIdDefinition.setUpdatability(Updatability.ONCREATE);
-            propertyDefinitionMap.put("cmis:objectTypeId", propertyObjectTypeIdDefinition);
-
-            PropertyIdDefinitionImpl propertyBaseTypeIdDefinition = new PropertyIdDefinitionImpl();
-            propertyBaseTypeIdDefinition.setId("cmis:baseTypeId");
-            propertyBaseTypeIdDefinition.setDisplayName("Base Type Id");
-            propertyBaseTypeIdDefinition.setQueryName("cmis:baseTypeId");
-            propertyBaseTypeIdDefinition.setLocalName("baseTypeId");
-            propertyBaseTypeIdDefinition.setCardinality(Cardinality.SINGLE);
-            propertyBaseTypeIdDefinition.setPropertyType(PropertyType.ID);
-            propertyBaseTypeIdDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:baseTypeId", propertyBaseTypeIdDefinition);
-
-            PropertyIdDefinitionImpl propertyParentIdDefinition = new PropertyIdDefinitionImpl();
-            propertyParentIdDefinition.setId("cmis:parentId");
-            propertyParentIdDefinition.setDisplayName("Parent Id");
-            propertyParentIdDefinition.setQueryName("cmis:parentId");
-            propertyParentIdDefinition.setLocalName("parentId");
-            propertyParentIdDefinition.setCardinality(Cardinality.SINGLE);
-            propertyParentIdDefinition.setPropertyType(PropertyType.ID);
-            propertyParentIdDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:parentId", propertyParentIdDefinition);
-
-            PropertyBooleanDefinitionImpl propertyIsVersionCheckedOutDefinition = new PropertyBooleanDefinitionImpl();
-            propertyIsVersionCheckedOutDefinition.setId("cmis:isVersionSeriesCheckedOut");
-            propertyIsVersionCheckedOutDefinition.setDisplayName("Is version Checked Out");
-            propertyIsVersionCheckedOutDefinition.setQueryName("cmis:isVersionSeriesCheckedOut");
-            propertyIsVersionCheckedOutDefinition.setLocalName("isVersionSeriesCheckedOut");
-            propertyIsVersionCheckedOutDefinition.setCardinality(Cardinality.SINGLE);
-            propertyIsVersionCheckedOutDefinition.setPropertyType(PropertyType.BOOLEAN);
-            propertyIsVersionCheckedOutDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:isVersionSeriesCheckedOut", propertyIsVersionCheckedOutDefinition);
-
-            PropertyBooleanDefinitionImpl propertyIsPrivateWorkingCopyDefinition = new PropertyBooleanDefinitionImpl();
-            propertyIsPrivateWorkingCopyDefinition.setId("cmis:isPrivateWorkingCopy");
-            propertyIsPrivateWorkingCopyDefinition.setDisplayName("Is private working copy");
-            propertyIsPrivateWorkingCopyDefinition.setQueryName("cmis:isPrivateWorkingCopy");
-            propertyIsPrivateWorkingCopyDefinition.setLocalName("isPrivateWorkingCopy");
-            propertyIsPrivateWorkingCopyDefinition.setCardinality(Cardinality.SINGLE);
-            propertyIsPrivateWorkingCopyDefinition.setPropertyType(PropertyType.BOOLEAN);
-            propertyIsPrivateWorkingCopyDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:isPrivateWorkingCopy", propertyIsPrivateWorkingCopyDefinition);
-
-            PropertyStringDefinitionImpl propertyVersionLabelDefinition = new PropertyStringDefinitionImpl();
-            propertyVersionLabelDefinition.setId("cmis:versionLabel");
-            propertyVersionLabelDefinition.setDisplayName("Version Label");
-            propertyVersionLabelDefinition.setQueryName("cmis:versionLabel");
-            propertyVersionLabelDefinition.setLocalName("versionLabel");
-            propertyVersionLabelDefinition.setCardinality(Cardinality.SINGLE);
-            propertyVersionLabelDefinition.setPropertyType(PropertyType.STRING);
-            propertyVersionLabelDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:versionLabel", propertyVersionLabelDefinition);
-
-            PropertyBooleanDefinitionImpl propertyIsMajorVersionDefinition = new PropertyBooleanDefinitionImpl();
-            propertyIsMajorVersionDefinition.setId("cmis:isMajorVersion");
-            propertyIsMajorVersionDefinition.setDisplayName("Is Major Version");
-            propertyIsMajorVersionDefinition.setQueryName("cmis:isMajorVersion");
-            propertyIsMajorVersionDefinition.setLocalName("isMajorVersion");
-            propertyIsMajorVersionDefinition.setCardinality(Cardinality.SINGLE);
-            propertyIsMajorVersionDefinition.setPropertyType(PropertyType.BOOLEAN);
-            propertyIsMajorVersionDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:isMajorVersion", propertyIsMajorVersionDefinition);
-
-            PropertyBooleanDefinitionImpl propertyVersionSeriesIdDefinition = new PropertyBooleanDefinitionImpl();
-            propertyVersionSeriesIdDefinition.setId("cmis:versionSeriesId");
-            propertyVersionSeriesIdDefinition.setDisplayName("Version series Id");
-            propertyVersionSeriesIdDefinition.setQueryName("cmis:versionSeriesId");
-            propertyVersionSeriesIdDefinition.setLocalName("versionSeriesId");
-            propertyVersionSeriesIdDefinition.setCardinality(Cardinality.SINGLE);
-            propertyVersionSeriesIdDefinition.setPropertyType(PropertyType.ID);
-            propertyVersionSeriesIdDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:versionSeriesId", propertyVersionSeriesIdDefinition);
-
-            PropertyStringDefinitionImpl propertyCheckinCommentDefinition = new PropertyStringDefinitionImpl();
-            propertyCheckinCommentDefinition.setId("cmis:checkinComment");
-            propertyCheckinCommentDefinition.setDisplayName("Checkin Comment");
-            propertyCheckinCommentDefinition.setQueryName("cmis:checkinComment");
-            propertyCheckinCommentDefinition.setLocalName("checkinComment");
-            propertyCheckinCommentDefinition.setCardinality(Cardinality.SINGLE);
-            propertyCheckinCommentDefinition.setPropertyType(PropertyType.STRING);
-            propertyCheckinCommentDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:checkinComment", propertyCheckinCommentDefinition);
-
-            PropertyStringDefinitionImpl propertyContentStreamMimeTypeDefinition = new PropertyStringDefinitionImpl();
-            propertyContentStreamMimeTypeDefinition.setId("cmis:contentStreamMimeType");
-            propertyContentStreamMimeTypeDefinition.setDisplayName("Content Stream MIME Type");
-            propertyContentStreamMimeTypeDefinition.setQueryName("cmis:contentStreamMimeType");
-            propertyContentStreamMimeTypeDefinition.setLocalName("contentStreamMimeType");
-            propertyContentStreamMimeTypeDefinition.setCardinality(Cardinality.SINGLE);
-            propertyContentStreamMimeTypeDefinition.setPropertyType(PropertyType.STRING);
-            propertyContentStreamMimeTypeDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:contentStreamMimeType", propertyContentStreamMimeTypeDefinition);
-
-            PropertyIdDefinitionImpl propertyContentStreamIdTypeDefinition = new PropertyIdDefinitionImpl();
-            propertyContentStreamIdTypeDefinition.setId("cmis:contentStreamId");
-            propertyContentStreamIdTypeDefinition.setDisplayName("Content Stream Id");
-            propertyContentStreamIdTypeDefinition.setQueryName("cmis:contentStreamId");
-            propertyContentStreamIdTypeDefinition.setLocalName("contentStreamId");
-            propertyContentStreamIdTypeDefinition.setCardinality(Cardinality.SINGLE);
-            propertyContentStreamIdTypeDefinition.setPropertyType(PropertyType.STRING);
-            propertyContentStreamIdTypeDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:contentStreamId", propertyContentStreamIdTypeDefinition);
-
-            PropertyIdDefinitionImpl propertySecondaryObjectTypeIdDefinition = new PropertyIdDefinitionImpl();
-            propertySecondaryObjectTypeIdDefinition.setId("cmis:secondaryObjectTypeIds");
-            propertySecondaryObjectTypeIdDefinition.setDisplayName("Secondary Object Type Id");
-            propertySecondaryObjectTypeIdDefinition.setQueryName("cmis:secondaryObjectTypeIds");
-            propertySecondaryObjectTypeIdDefinition.setLocalName("secondaryObjectTypeIds");
-            propertySecondaryObjectTypeIdDefinition.setCardinality(Cardinality.MULTI);
-            propertySecondaryObjectTypeIdDefinition.setPropertyType(PropertyType.ID);
-            propertySecondaryObjectTypeIdDefinition.setUpdatability(Updatability.READWRITE);
-            propertyDefinitionMap.put("cmis:secondaryObjectTypeIds", propertySecondaryObjectTypeIdDefinition);
-
-            PropertyStringDefinitionImpl propertyPersonDefinition = new PropertyStringDefinitionImpl();
-            propertyPersonDefinition.setId("my:person");
-            propertyPersonDefinition.setDisplayName("Person");
-            propertyPersonDefinition.setQueryName("my:person");
-            propertyPersonDefinition.setLocalName("person");
-            propertyPersonDefinition.setCardinality(Cardinality.SINGLE);
-            propertyPersonDefinition.setPropertyType(PropertyType.STRING);
-            propertyPersonDefinition.setUpdatability(Updatability.READWRITE);
-            propertyDefinitionMap.put("my:person", propertyPersonDefinition);
-
-            PropertyDateTimeDefinitionImpl propertyDocumentDateDefinition = new PropertyDateTimeDefinitionImpl();
-            propertyDocumentDateDefinition.setId("my:documentDate");
-            propertyDocumentDateDefinition.setDisplayName("Documentdate");
-            propertyDocumentDateDefinition.setQueryName("my:documentDate");
-            propertyDocumentDateDefinition.setLocalName("documentDate");
-            propertyDocumentDateDefinition.setCardinality(Cardinality.SINGLE);
-            propertyDocumentDateDefinition.setPropertyType(PropertyType.DATETIME);
-            propertyDocumentDateDefinition.setUpdatability(Updatability.READWRITE);
-            propertyDefinitionMap.put("my:documentDate", propertyDocumentDateDefinition);
-
-            PropertyDateTimeDefinitionImpl propertyCreateDateDefinition = new PropertyDateTimeDefinitionImpl();
-            propertyCreateDateDefinition.setId("cmis:creationDate");
-            propertyCreateDateDefinition.setDisplayName("Creation Date");
-            propertyCreateDateDefinition.setQueryName("cmis:creationDate");
-            propertyCreateDateDefinition.setLocalName("creationDate");
-            propertyCreateDateDefinition.setCardinality(Cardinality.SINGLE);
-            propertyCreateDateDefinition.setPropertyType(PropertyType.DATETIME);
-            propertyCreateDateDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:creationDate", propertyCreateDateDefinition);
-
-            PropertyDateTimeDefinitionImpl propertyLastModificationDateDefinition = new PropertyDateTimeDefinitionImpl();
-            propertyLastModificationDateDefinition.setId("cmis:lastModificationDate");
-            propertyLastModificationDateDefinition.setDisplayName("Last Modified Date");
-            propertyLastModificationDateDefinition.setQueryName("cmis:lastModificationDate");
-            propertyLastModificationDateDefinition.setLocalName("lastModificationDate");
-            propertyLastModificationDateDefinition.setCardinality(Cardinality.SINGLE);
-            propertyLastModificationDateDefinition.setPropertyType(PropertyType.DATETIME);
-            propertyLastModificationDateDefinition.setUpdatability(Updatability.READONLY);
-            propertyDefinitionMap.put("cmis:lastModificationDate", propertyLastModificationDateDefinition);
-        }
-        return propertyDefinitionMap;
-    }
-
-    private static Map<String, PropertyDefinition<?>> secondaryPropertyDefinitionMap;
-
-    Map<String, PropertyDefinition<?>> getSecondaryPropertyDefinitionMap() {
-
-        if (secondaryPropertyDefinitionMap == null) {
-            secondaryPropertyDefinitionMap = new HashMap<>();
-            PropertyStringDefinitionImpl propertyTitleDefinition = new PropertyStringDefinitionImpl();
-            propertyTitleDefinition.setId("cm:title");
-            propertyTitleDefinition.setDisplayName("Title");
-            propertyTitleDefinition.setQueryName("cm:title");
-            propertyTitleDefinition.setLocalName("title");
-            propertyTitleDefinition.setCardinality(Cardinality.SINGLE);
-            propertyTitleDefinition.setPropertyType(PropertyType.STRING);
-            propertyTitleDefinition.setUpdatability(Updatability.READWRITE);
-            secondaryPropertyDefinitionMap.put("cm:title", propertyTitleDefinition);
-
-            PropertyDecimalDefinitionImpl propertyAmountDefinition = new PropertyDecimalDefinitionImpl();
-            propertyAmountDefinition.setId("my:amount");
-            propertyAmountDefinition.setDisplayName("Amount");
-            propertyAmountDefinition.setQueryName("my:amount");
-            propertyAmountDefinition.setLocalName("amount");
-            propertyAmountDefinition.setCardinality(Cardinality.SINGLE);
-            propertyAmountDefinition.setPropertyType(PropertyType.DECIMAL);
-            propertyAmountDefinition.setUpdatability(Updatability.READWRITE);
-            secondaryPropertyDefinitionMap.put("my:amount", propertyAmountDefinition);
-
-            PropertyBooleanDefinitionImpl propertyTaxDefinition = new PropertyBooleanDefinitionImpl();
-            propertyTaxDefinition.setId("my:tax");
-            propertyTaxDefinition.setDisplayName("Tax");
-            propertyTaxDefinition.setQueryName("my:tax");
-            propertyTaxDefinition.setLocalName("tax");
-            propertyTaxDefinition.setCardinality(Cardinality.SINGLE);
-            propertyTaxDefinition.setPropertyType(PropertyType.BOOLEAN);
-            propertyTaxDefinition.setUpdatability(Updatability.READWRITE);
-            secondaryPropertyDefinitionMap.put("my:tax", propertyTaxDefinition);
-
-            PropertyDateTimeDefinitionImpl propertySentDateDefinition = new PropertyDateTimeDefinitionImpl();
-            propertySentDateDefinition.setId("cm:sentdate");
-            propertySentDateDefinition.setDisplayName("Sentdate");
-            propertySentDateDefinition.setQueryName("cm:sentdate");
-            propertySentDateDefinition.setLocalName("sentdate");
-            propertySentDateDefinition.setCardinality(Cardinality.SINGLE);
-            propertySentDateDefinition.setPropertyType(PropertyType.DATETIME);
-            propertySentDateDefinition.setUpdatability(Updatability.READWRITE);
-            secondaryPropertyDefinitionMap.put("cm:sentdate", propertySentDateDefinition);
-
-            PropertyStringDefinitionImpl propertyIdValueDefinition = new PropertyStringDefinitionImpl();
-            propertyIdValueDefinition.setId("my:idvalue");
-            propertyIdValueDefinition.setDisplayName("ID Value");
-            propertyIdValueDefinition.setQueryName("my:idvalue");
-            propertyIdValueDefinition.setLocalName("idvalue");
-            propertyIdValueDefinition.setCardinality(Cardinality.SINGLE);
-            propertyIdValueDefinition.setPropertyType(PropertyType.STRING);
-            propertyIdValueDefinition.setUpdatability(Updatability.READWRITE);
-            secondaryPropertyDefinitionMap.put("my:idvalue", propertyIdValueDefinition);
-
-            PropertyStringDefinitionImpl propertyDescriptionDefinition = new PropertyStringDefinitionImpl();
-            propertyDescriptionDefinition.setId("cm:description");
-            propertyDescriptionDefinition.setDisplayName("Description");
-            propertyDescriptionDefinition.setQueryName("cm:description");
-            propertyDescriptionDefinition.setLocalName("description");
-            propertyDescriptionDefinition.setCardinality(Cardinality.SINGLE);
-            propertyDescriptionDefinition.setPropertyType(PropertyType.STRING);
-            propertyDescriptionDefinition.setUpdatability(Updatability.READWRITE);
-            secondaryPropertyDefinitionMap.put("cm:description", propertyDescriptionDefinition);
-        }
-        return secondaryPropertyDefinitionMap;
-    }
-
-    Map<String, PropertyDefinition<?>> getAllPropertyDefinitionMap() {
-        Map<String, PropertyDefinition<?>> allPropertyDefinitionMap = new HashMap<>();
-        allPropertyDefinitionMap.putAll(getPropertyDefinitionMap());
-        allPropertyDefinitionMap.putAll(getSecondaryPropertyDefinitionMap());
-        return allPropertyDefinitionMap;
-
-    }
-
-    private static Map<String, SecondaryType> secondaryTypeStore;
-
-    Map<String, SecondaryType> getSecondaryTypeStore() {
-        if (secondaryTypeStore == null) {
-            secondaryTypeStore = new HashMap<>();
-            SecondaryTypeDefinitionImpl titled = new SecondaryTypeDefinitionImpl();
-            titled.setDisplayName("Titled");
-            titled.setId("P:cm:titled");
-            titled.setLocalName("titled");
-            titled.setQueryName("cm:titled");
-            titled.setParentTypeId("cmis:secondary");
-            titled.setPropertyDefinitions(getSecondaryPropertyDefinitionMap());
-            secondaryTypeStore.put("P:cm:titled", new SecondaryTypeImpl(sessionImpl, titled));
-
-            SecondaryTypeDefinitionImpl amountable = new SecondaryTypeDefinitionImpl();
-            amountable.setDisplayName("Amountable");
-            amountable.setId("P:my:amountable");
-            amountable.setLocalName("amountable");
-            amountable.setQueryName("my:amountable");
-            amountable.setParentTypeId("cmis:secondary");
-            amountable.setPropertyDefinitions(getSecondaryPropertyDefinitionMap());
-            secondaryTypeStore.put("P:my:amountable", new SecondaryTypeImpl(sessionImpl, amountable));
-
-            SecondaryTypeDefinitionImpl idable = new SecondaryTypeDefinitionImpl();
-            idable.setDisplayName("IDable");
-            idable.setId("P:my:idable");
-            idable.setLocalName("idable");
-            idable.setQueryName("my:idable");
-            idable.setParentTypeId("cmis:secondary");
-            idable.setPropertyDefinitions(getSecondaryPropertyDefinitionMap());
-            secondaryTypeStore.put("P:my:idable", new SecondaryTypeImpl(sessionImpl, idable));
-
-            SecondaryTypeDefinitionImpl emailed = new SecondaryTypeDefinitionImpl();
-            emailed.setDisplayName("Emailed");
-            emailed.setId("P:cm:emailed");
-            emailed.setLocalName("emailed");
-            emailed.setQueryName("cm:idable");
-            emailed.setParentTypeId("cmis:secondary");
-            emailed.setPropertyDefinitions(getSecondaryPropertyDefinitionMap());
-            secondaryTypeStore.put("P:cm:emailed", new SecondaryTypeImpl(sessionImpl, emailed));
-        }
-        return secondaryTypeStore;
+    public Map<String, PropertyDefinition<?>> getPropertyDefinitionCache() {
+        return propertyDefinitionCache;
     }
 
     private static ItemTypeImpl itemType;
@@ -390,7 +82,9 @@ public class MockUtils {
     public ItemTypeImpl getItemType() {
         if (itemType == null) {
             ItemTypeDefinitionImpl itemTypeDefinition = new ItemTypeDefinitionImpl();
-            itemTypeDefinition.setPropertyDefinitions(propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}item", PropertyDefinitionBuilder.Typ.ITEM));
+            Map<String, PropertyDefinition<?>> itemDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}item", PropertyDefinitionBuilder.Typ.ITEM);
+            propertyDefinitionCache.putAll(itemDefinitionMap);
+            itemTypeDefinition.setPropertyDefinitions(itemDefinitionMap);
             itemType = new ItemTypeImpl(sessionImpl, itemTypeDefinition);
             itemType.setId(EnumBaseObjectTypeIds.CMIS_ITEM.value());
             itemType.setBaseTypeId(BaseTypeId.CMIS_ITEM);
@@ -404,7 +98,9 @@ public class MockUtils {
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
-            folderTypeDefinition.setPropertyDefinitions(propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}folder", PropertyDefinitionBuilder.Typ.FOLDER));
+            Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}folder", PropertyDefinitionBuilder.Typ.FOLDER);
+            propertyDefinitionCache.putAll(folderDefinitionMap);
+            folderTypeDefinition.setPropertyDefinitions(folderDefinitionMap);
             folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
             folderType.setId(EnumBaseObjectTypeIds.CMIS_FOLDER.value());
             folderType.setBaseTypeId(BaseTypeId.CMIS_FOLDER);
@@ -419,7 +115,9 @@ public class MockUtils {
 
         if (documentType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            documentTypeDefinition.setPropertyDefinitions(propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT));
+            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            propertyDefinitionCache.putAll(documentDefinitionMap);
+            documentTypeDefinition.setPropertyDefinitions(documentDefinitionMap);
             documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             documentType.setId(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value());
             documentType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
@@ -434,9 +132,11 @@ public class MockUtils {
 
         if (archivType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> propertyDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT);
-            propertyDefinitionMap.putAll(propertyDefinitionBuilder.getPropertyDefinitionMap("{archiv.model}archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT));
-            documentTypeDefinition.setPropertyDefinitions(propertyDefinitionMap);
+            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("{http://www.alfresco.org/model/cmis/1.0/cs01}document", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            Map<String, PropertyDefinition<?>> archivDefinitionMap =  propertyDefinitionBuilder.getPropertyDefinitionMap("{archiv.model}archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            documentDefinitionMap.putAll(archivDefinitionMap);
+            propertyDefinitionCache.putAll(archivDefinitionMap);
+            documentTypeDefinition.setPropertyDefinitions(documentDefinitionMap);
             archivType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             archivType.setId("D:my:archivContent");
             archivType.setIsVersionable(true);
@@ -444,6 +144,16 @@ public class MockUtils {
             archivType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
         }
         return archivType;
+    }
+
+    SecondaryTypeImpl getSecondaryType(String type) {
+        Map<String, PropertyDefinition<?>> secondaryDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap(type, PropertyDefinitionBuilder.Typ.SECONDARY);
+        propertyDefinitionCache.putAll(secondaryDefinitionMap);
+        SecondaryTypeDefinitionImpl secondaryTypeDefinition = new SecondaryTypeDefinitionImpl();
+        secondaryTypeDefinition.setPropertyDefinitions(secondaryDefinitionMap);
+        SecondaryTypeImpl secondaryType = new SecondaryTypeImpl(sessionImpl, secondaryTypeDefinition);
+        secondaryType.setId("P:" + type);
+        return secondaryType;
     }
 
     ObjectData getObjectDataFromProperties(List<Property<?>> properties) {
@@ -559,7 +269,7 @@ public class MockUtils {
     List<Property<?>> convPropertyData(Map<String, PropertyData<?>> propertyDataMap) {
         List<Property<?>> properties = new ArrayList<>();
         for (PropertyData<?> prop : propertyDataMap.values())
-            properties.add(new PropertyImpl(, prop.getValues()));
+            properties.add(new PropertyImpl(((PropertyImpl<?>) prop).getDefinition(), prop.getValues()));
         return properties;
     }
 
@@ -570,13 +280,9 @@ public class MockUtils {
         AbstractPropertyData<?> property = null;
 
 
-        if (!getPropertyDefinitionMap().containsKey(id) && !getSecondaryPropertyDefinitionMap().containsKey(id))
+        if (!getPropertyDefinitionCache().containsKey(id))
             throw new CmisRuntimeException(("Invalid properties " + id));
-        if (getPropertyDefinitionMap().containsKey(id))
-            definition = getPropertyDefinitionMap().get(id);
-        else
-            definition = getSecondaryPropertyDefinitionMap().get(id);
-
+            definition = getPropertyDefinitionCache().get(id);
         switch (definition.getPropertyType()) {
             case STRING:
                 property = new PropertyStringImpl();
@@ -637,7 +343,7 @@ public class MockUtils {
             default:
                 throw new CmisRuntimeException("Unknown property data type!");
         }
-
+        ((AbstractPropertyData) property).setPropertyDefinition(definition);
         property.setId(id);
         property.setDisplayName(definition.getDisplayName());
         property.setQueryName(definition.getQueryName());

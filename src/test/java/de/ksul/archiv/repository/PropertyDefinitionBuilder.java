@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class PropertyDefinitionBuilder {
 
     public enum Typ{
-        DOCUMENT, FOLDER, ITEM
+        DOCUMENT, FOLDER, ITEM, SECONDARY
     }
     private DictionaryDAOImpl dictionaryDao = new DictionaryDAOImpl();
     private DictionaryComponent dictionaryComponent = new DictionaryComponent();
@@ -82,14 +82,22 @@ public class PropertyDefinitionBuilder {
     }
 
     public PropertyDefinition getPropertyDefinition(String name) {
-        return dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getProperty(QName.createQName(name, dictionaryDao));
+       // return dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getProperty(QName.createQName(name, dictionaryDao));
+        return null;
     }
 
     public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name, Typ typ) {
 
+        QName qName;
+        if (name.contains(":")) {
+            String[] n = name.split(":");
+            qName = QName.createQName(n[0], n[1], dictionaryDao);
+        } else
+            qName = QName.createQName(name);
+
         Map<String, PropertyDefinition<?>> propertyDefinitionMap = new HashMap<>();
-        ClassDefinition classDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getType(QName.createQName(name));
-        ShadowTypeDefinitionWrapper wrapper;
+        ClassDefinition classDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getType(qName);
+        AbstractTypeDefinitionWrapper wrapper;
         switch (typ) {
             case DOCUMENT: {
                 wrapper = new DocumentTypeDefinitionWrapper(cmisMapping, null, null, classDefinition.getName().toPrefixString(), dictionaryComponent, classDefinition);
@@ -101,6 +109,10 @@ public class PropertyDefinitionBuilder {
             }
             case ITEM:  {
                 wrapper = new ItemTypeDefinitionWrapper(cmisMapping, null, null, classDefinition.getName().toPrefixString(), dictionaryComponent, classDefinition);
+                break;
+            }
+            case SECONDARY:{
+                wrapper = new SecondaryTypeDefinitionWrapper(cmisMapping, null, null, classDefinition.getName().toPrefixString(), dictionaryComponent, classDefinition);
                 break;
             }
             default: {

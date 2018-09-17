@@ -170,7 +170,7 @@ public class Repository {
         Iterator<String> it = properties.keySet().iterator();
         while (it.hasNext()) {
             String key = it.next();
-            newProps.add( new PropertyImpl(MockUtils.getInstance().getAllPropertyDefinitionMap().get(key), properties.get(key).getValues()));
+            newProps.add( new PropertyImpl(MockUtils.getInstance().getPropertyDefinitionCache().get(key), properties.get(key).getValues()));
         }
         node.updateNode(newProps);
 

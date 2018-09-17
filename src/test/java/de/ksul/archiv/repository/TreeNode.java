@@ -15,6 +15,7 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
+import org.joda.time.LocalTime;
 
 import java.util.*;
 
@@ -268,7 +269,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     private void changePropertie(String id, Object value){
         Map<String, PropertyData<?>> props = MockUtils.getInstance().convProperties(obj.getProperties());
-        props.put(id, MockUtils.getInstance().fillProperty(id, value));
+        ((PropertyImpl) props.get(id)).setValue(value);
         obj.setProperties(MockUtils.getInstance().convPropertyData(props));
     }
 

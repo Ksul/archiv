@@ -1,6 +1,7 @@
 package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumBaseObjectTypeIds;
 import org.apache.chemistry.opencmis.commons.spi.RepositoryService;
 import org.mockito.invocation.InvocationOnMock;
@@ -47,7 +48,8 @@ public class RepositoryServiceMock {
                 else if (string.contains("my:archivContent"))
                     return MockUtils.getInstance().getArchivType();
                 else if (string.startsWith("P:"))
-                    return MockUtils.getInstance().getSecondaryTypeStore().get(string);
+                    throw new CmisRuntimeException("unknown Type");
+                    //return MockUtils.getInstance().getPropertyDefinitionCache().get(string);
                 else
                     return MockUtils.getInstance().getDocumentType();
             }
