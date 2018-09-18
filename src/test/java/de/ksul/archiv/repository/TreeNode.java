@@ -277,7 +277,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         if (mimeType.equals("text/plain")) {
             String newName = getName().substring(0, getName().lastIndexOf(".") + 1) + "txt";
             String newPath = path.substring(0, path.lastIndexOf("/")) ;
-            FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, MockUtils.getInstance().getDocumentType(), "text/plain");
+            FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, MockUtils.getInstance().getDocumentType("cmis:document"), "text/plain");
             TreeNode<T> transform = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this.parent, newObject, false);
 //            if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get().getValue().equals(VerteilungConstants.DOCUMENT_TYPE_PDF)){
 //                ((PropertyImpl) ((FileableCmisObject) transform.getObj()).getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get()).setValue(VerteilungConstants.DOCUMENT_TYPE_PDF);

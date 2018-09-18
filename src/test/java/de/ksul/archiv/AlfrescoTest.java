@@ -4,6 +4,7 @@ import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.hamcrest.Matchers;
@@ -147,6 +148,7 @@ public abstract class AlfrescoTest {
         props.put("my:documentDate", Long.toString(new Date().getTime()));
         props.put("cm:title", "");
         props.put(PropertyIds.OBJECT_TYPE_ID, "D:my:archivContent");
+        props.put(PropertyIds.BASE_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
         aspects.add("P:cm:titled");
         aspects.add("P:my:amountable");
         aspects.add("P:my:idable");

@@ -124,10 +124,7 @@ public class ObjectServiceMock {
 
                 ObjectType objectType;
                 PropertiesImpl props = (PropertiesImpl) invocation.getArguments()[1];
-                objectType = MockUtils.getInstance().getDocumentType();
-                if (props.getProperties().containsKey(PropertyIds.OBJECT_TYPE_ID) && ((String) props.getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue()).equalsIgnoreCase("D:my:archivContent"))
-                    objectType = MockUtils.getInstance().getArchivType();
-
+                objectType = MockUtils.getInstance().getDocumentType(((String) props.getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue()));
                 String name = (String) props.getProperties().get(PropertyIds.NAME).getFirstValue();
                 TreeNode parent = repository.findTreeNodeForId((String) invocation.getArguments()[2]);
                 String path = parent.getPath();

@@ -111,7 +111,7 @@ public class ScriptTest {
 
     @Test
     public void testScriptForUnknown() throws Exception {
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.pdf", MockUtils.getInstance().getDocumentType(), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createFileStream("classpath:Test.pdf",  VerteilungConstants.DOCUMENT_TYPE_PDF), "1.0", false);
+        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.pdf", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createFileStream("classpath:Test.pdf",  VerteilungConstants.DOCUMENT_TYPE_PDF), "1.0", false);
         RecognizeEndpoints.setDocument(node);
         engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
         invocable.invokeMethod(rec, "run");
@@ -120,7 +120,7 @@ public class ScriptTest {
 
     @Test
     public void testScript() throws Exception {
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.txt", MockUtils.getInstance().getDocumentType(), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createStream("Caffee Fausto   Rechnung Nr 12345 Bertrag 79€ 01.01.2010",  VerteilungConstants.DOCUMENT_TYPE_TEXT), "1.0", false);
+        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.txt", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createStream("Caffee Fausto   Rechnung Nr 12345 Bertrag 79€ 01.01.2010",  VerteilungConstants.DOCUMENT_TYPE_TEXT), "1.0", false);
         RecognizeEndpoints.setDocument(node);
         engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
         invocable.invokeMethod(rec, "run");

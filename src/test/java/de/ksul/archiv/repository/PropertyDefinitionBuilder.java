@@ -31,9 +31,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class PropertyDefinitionBuilder {
 
-    public enum Typ{
-        DOCUMENT, FOLDER, ITEM, SECONDARY
-    }
     private DictionaryDAOImpl dictionaryDao = new DictionaryDAOImpl();
     private DictionaryComponent dictionaryComponent = new DictionaryComponent();
     private DictionaryNamespaceComponent namespaceComponent = new DictionaryNamespaceComponent();
@@ -106,7 +103,7 @@ public class PropertyDefinitionBuilder {
         return null;
     }
 
-    public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name, Typ typ) {
+    public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name) {
 
         TypeDefinitionWrapper typeDefinitionWrapper = cmisDictionaryService.findType(name);
 

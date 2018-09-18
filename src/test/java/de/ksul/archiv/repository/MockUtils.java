@@ -67,10 +67,6 @@ public class MockUtils {
 
     public void setSession(SessionImpl sessionImpl) {
         this.sessionImpl = sessionImpl;
-        getDocumentType();
-        getFolderType();
-        getItemType();
-        getArchivType();
     }
 
     public Map<String, PropertyDefinition<?>> getPropertyDefinitionCache() {
@@ -82,7 +78,7 @@ public class MockUtils {
     public ItemTypeImpl getItemType() {
         if (itemType == null) {
             ItemTypeDefinitionImpl itemTypeDefinition = new ItemTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> itemDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:item", PropertyDefinitionBuilder.Typ.ITEM);
+            Map<String, PropertyDefinition<?>> itemDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:item");
             propertyDefinitionCache.putAll(itemDefinitionMap);
             itemTypeDefinition.setPropertyDefinitions(itemDefinitionMap);
             itemType = new ItemTypeImpl(sessionImpl, itemTypeDefinition);
@@ -98,7 +94,7 @@ public class MockUtils {
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:folder", PropertyDefinitionBuilder.Typ.FOLDER);
+            Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:folder");
             propertyDefinitionCache.putAll(folderDefinitionMap);
             folderTypeDefinition.setPropertyDefinitions(folderDefinitionMap);
             folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
@@ -109,47 +105,29 @@ public class MockUtils {
     }
 
 
-    private static DocumentTypeImpl documentType;
+    public DocumentTypeImpl getDocumentType(String id) {
 
-    public DocumentTypeImpl getDocumentType() {
-
-        if (documentType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:document", PropertyDefinitionBuilder.Typ.DOCUMENT);
+            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap(id);
             propertyDefinitionCache.putAll(documentDefinitionMap);
             documentTypeDefinition.setPropertyDefinitions(documentDefinitionMap);
-            documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
+            DocumentTypeImpl documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             documentType.setId(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value());
             documentType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
+            documentType.setId(id);
             documentType.setIsVersionable(true);
-        }
+
         return documentType;
     }
 
-    private static DocumentTypeImpl archivType;
-
-    DocumentTypeImpl getArchivType() {
-
-        if (archivType == null) {
-            DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> archivDefinitionMap =  propertyDefinitionBuilder.getPropertyDefinitionMap("D:my:archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT);
-            propertyDefinitionCache.putAll(archivDefinitionMap);
-            archivType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
-            archivType.setId("D:my:archivContent");
-            archivType.setIsVersionable(true);
-            archivType.setParentTypeId("cmis:document");
-            archivType.setBaseTypeId(BaseTypeId.CMIS_DOCUMENT);
-        }
-        return archivType;
-    }
 
     SecondaryTypeImpl getSecondaryType(String type) {
-        Map<String, PropertyDefinition<?>> secondaryDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap(type, PropertyDefinitionBuilder.Typ.SECONDARY);
+        Map<String, PropertyDefinition<?>> secondaryDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap(type);
         propertyDefinitionCache.putAll(secondaryDefinitionMap);
         SecondaryTypeDefinitionImpl secondaryTypeDefinition = new SecondaryTypeDefinitionImpl();
         secondaryTypeDefinition.setPropertyDefinitions(secondaryDefinitionMap);
         SecondaryTypeImpl secondaryType = new SecondaryTypeImpl(sessionImpl, secondaryTypeDefinition);
-        secondaryType.setId("P:" + type);
+        secondaryType.setId(type);
         secondaryType.setBaseTypeId(BaseTypeId.CMIS_SECONDARY);
         return secondaryType;
     }
@@ -194,7 +172,7 @@ public class MockUtils {
             properties = (PropertiesImpl) convertProperties(props);
 
         properties.addProperty(fillProperty(PropertyIds.OBJECT_ID, versionSeriesId));
-        properties.addProperty(fillProperty(PropertyIds.BASE_TYPE_ID, objectType.getBaseType() != null ? objectType.getBaseType().getId() : objectType.getId()));
+        properties.addProperty(fillProperty(PropertyIds.BASE_TYPE_ID, objectType.getBaseTypeId() != null ? objectType.getBaseTypeId().value() : objectType.getId()));
         if (!properties.getProperties().containsKey(PropertyIds.OBJECT_TYPE_ID)) {
             properties.addProperty(fillProperty(PropertyIds.OBJECT_TYPE_ID, objectType.getId()));
         }
@@ -549,13 +527,9 @@ public class MockUtils {
             cmisObject = new FolderImpl(sessionImpl, getFolderType(), objectData, new OperationContextImpl());
 
         } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value())) {
-            cmisObject = new ItemImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
+            cmisObject = new ItemImpl(sessionImpl, getItemType(), objectData, new OperationContextImpl());
         } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value())) {
-            if (objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value())) {
-                cmisObject = new DocumentImpl(sessionImpl, getDocumentType(), objectData, new OperationContextImpl());
-            } else {
-                cmisObject = new DocumentImpl(sessionImpl, getArchivType(), objectData, new OperationContextImpl());
-            }
+            cmisObject = new DocumentImpl(sessionImpl, getDocumentType(objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString()), objectData, new OperationContextImpl());
         }
         LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
         for (Property<?> p : obj.getProperties()) {

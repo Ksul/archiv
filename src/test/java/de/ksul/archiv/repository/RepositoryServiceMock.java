@@ -40,17 +40,15 @@ public class RepositoryServiceMock {
                 Object[] args = invocation.getArguments();
                 String string = (String) args[1];
                 if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value()))
-                    return MockUtils.getInstance().getDocumentType();
+                    return MockUtils.getInstance().getDocumentType(string);
                 else if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value()))
                     return MockUtils.getInstance().getFolderType();
                 else if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value()))
                     return MockUtils.getInstance().getItemType();
-                else if (string.contains("my:archivContent"))
-                    return MockUtils.getInstance().getArchivType();
                 else if (string.startsWith("P:"))
-                    return MockUtils.getInstance().getSecondaryType(string.substring(2));
+                    return MockUtils.getInstance().getSecondaryType(string);
                 else
-                    return MockUtils.getInstance().getDocumentType();
+                    return MockUtils.getInstance().getDocumentType(string);
             }
 
         });
