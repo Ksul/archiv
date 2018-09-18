@@ -2,7 +2,9 @@ package de.ksul.archiv.repository;
 
 import org.alfresco.opencmis.dictionary.*;
 import org.alfresco.opencmis.mapping.CMISMapping;
+import org.alfresco.repo.cache.DefaultSimpleCache;
 import org.alfresco.repo.dictionary.*;
+import org.alfresco.repo.i18n.MessageServiceImpl;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -37,6 +39,8 @@ public class PropertyDefinitionBuilder {
     private DictionaryNamespaceComponent namespaceComponent = new DictionaryNamespaceComponent();
     private CMISMapping cmisMapping  = new CMISMapping();
     private TenantService tenantService = new SingleTServiceImpl();
+    private  CMISDictionaryService cmisDictionaryService = new CMISStrictDictionaryService();
+    private  MessageServiceImpl messageService = new MessageServiceImpl();
 
 
     public PropertyDefinitionBuilder() {
@@ -77,6 +81,20 @@ public class PropertyDefinitionBuilder {
         cmisMapping.setCmisVersion(CmisVersion.CMIS_1_1);
 
 
+        ((CMISStrictDictionaryService) cmisDictionaryService).setSingletonCache(new DefaultSimpleCache<>());
+        ((CMISStrictDictionaryService) cmisDictionaryService).setCmisMapping(cmisMapping);
+        ((CMISStrictDictionaryService) cmisDictionaryService).setDictionaryDAO(dictionaryDao);
+        ((CMISStrictDictionaryService) cmisDictionaryService).setTenantService(tenantService);
+
+        messageService.setTenantService(tenantService);
+        messageService.setLoadedResourceBundlesCache(new DefaultSimpleCache<>());
+        messageService.setMessagesCache(new DefaultSimpleCache<>());
+        messageService.setResourceBundleBaseNamesCache(new DefaultSimpleCache<>());
+        dictionaryComponent.setMessageLookup(messageService);
+        ((CMISStrictDictionaryService) cmisDictionaryService).setDictionaryService(dictionaryComponent);
+        ((CMISStrictDictionaryService) cmisDictionaryService).init();
+
+
     }
 
     public DictionaryDAO getDictionaryDao() {
@@ -90,43 +108,11 @@ public class PropertyDefinitionBuilder {
 
     public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name, Typ typ) {
 
-        QName qName;
+        TypeDefinitionWrapper typeDefinitionWrapper = cmisDictionaryService.findType(name);
 
-        String[] n = name.split(":");
-        qName = QName.createQName(n[0], n[1], dictionaryDao);
-
-
+        Collection<PropertyDefinitionWrapper> propertyDefinitions = typeDefinitionWrapper.getProperties(false);
         Map<String, PropertyDefinition<?>> propertyDefinitionMap = new HashMap<>();
-        ClassDefinition classDefinition;
-        if (typ.equals(Typ.SECONDARY))
-            classDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getAspect(qName);
-        else
-            classDefinition = dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getType(qName);
-        AbstractTypeDefinitionWrapper wrapper;
-        switch (typ) {
-            case DOCUMENT: {
-                wrapper = new DocumentTypeDefinitionWrapper(cmisMapping, null, null, classDefinition.getName().toPrefixString(), dictionaryComponent, classDefinition);
-                break;
-            }
-            case FOLDER: {
-                wrapper = new FolderTypeDefintionWrapper(cmisMapping, null, null, classDefinition.getName().toPrefixString(), dictionaryComponent, classDefinition);
-                break;
-            }
-            case ITEM:  {
-                wrapper = new ItemTypeDefinitionWrapper(cmisMapping, null, null, classDefinition.getName().toPrefixString(), dictionaryComponent, classDefinition);
-                break;
-            }
-            case SECONDARY:{
-                wrapper = new SecondaryTypeDefinitionWrapper(cmisMapping, null, null, classDefinition.getName().toPrefixString(), dictionaryComponent, classDefinition);
-                break;
-            }
-            default: {
-                throw new CmisRuntimeException("kein Typ angegeben!");
-            }
-        }
-        Collection<PropertyDefinitionWrapper> propertyDefinitions = wrapper.getProperties(false);
-
-        for (PropertyDefinitionWrapper definition: propertyDefinitions){
+        for (PropertyDefinitionWrapper definition : propertyDefinitions) {
             propertyDefinitionMap.put(definition.getPropertyDefinition().getId(), definition.getPropertyDefinition());
         }
 

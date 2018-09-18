@@ -132,11 +132,8 @@ public class MockUtils {
 
         if (archivType == null) {
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:document", PropertyDefinitionBuilder.Typ.DOCUMENT);
-            Map<String, PropertyDefinition<?>> archivDefinitionMap =  propertyDefinitionBuilder.getPropertyDefinitionMap("my:archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT);
-            documentDefinitionMap.putAll(archivDefinitionMap);
+            Map<String, PropertyDefinition<?>> archivDefinitionMap =  propertyDefinitionBuilder.getPropertyDefinitionMap("D:my:archivContent", PropertyDefinitionBuilder.Typ.DOCUMENT);
             propertyDefinitionCache.putAll(archivDefinitionMap);
-            documentTypeDefinition.setPropertyDefinitions(documentDefinitionMap);
             archivType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             archivType.setId("D:my:archivContent");
             archivType.setIsVersionable(true);
