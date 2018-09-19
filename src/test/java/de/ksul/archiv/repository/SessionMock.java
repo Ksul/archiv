@@ -11,6 +11,7 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
@@ -96,7 +97,15 @@ public class SessionMock {
         when(session.getObjectByPath(any(String.class), any(OperationContext.class))).thenCallRealMethod();
         when(session.getContentStream(any(ObjectId.class), any(), any(), any())).thenCallRealMethod();
         when(session.getTypeDefinition(anyString())).thenCallRealMethod();
-        when(session.getTypeDefinition(anyString(), anyBoolean())).thenCallRealMethod();
+        when(session.getTypeDefinition(anyString(), anyBoolean())).then(new Answer<ObjectType>() {
+            @Override
+            public ObjectType answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                 TypeDefinition typeDefinition = MockUtils.getInstance().getPropertyDefinitionBuilder().getTypeDefinition((String) args[0]);
+                return objectFactory.convertTypeDefinition(typeDefinition);
+            }
+        });
+
 
         Map<String, String> parameter = new HashMap<>();
         parameter.put(SessionParameter.CACHE_SIZE_OBJECTS, "5");

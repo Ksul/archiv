@@ -15,6 +15,7 @@ import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.TraceableThreadFactory;
 import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
 import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -98,9 +99,9 @@ public class PropertyDefinitionBuilder {
         return dictionaryDao;
     }
 
-    public PropertyDefinition getPropertyDefinition(String name) {
-       // return dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getProperty(QName.createQName(name, dictionaryDao));
-        return null;
+    public TypeDefinition getTypeDefinition(String name) {
+        TypeDefinitionWrapper typeDefinitionWrapper = cmisDictionaryService.findType(name);
+        return typeDefinitionWrapper.getTypeDefinition(true);
     }
 
     public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name) {

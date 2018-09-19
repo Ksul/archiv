@@ -75,6 +75,10 @@ public class MockUtils {
         return propertyDefinitionCache;
     }
 
+    public PropertyDefinitionBuilder getPropertyDefinitionBuilder() {
+        return propertyDefinitionBuilder;
+    }
+
     private static ItemTypeImpl itemType;
 
     public ItemTypeImpl getItemType() {

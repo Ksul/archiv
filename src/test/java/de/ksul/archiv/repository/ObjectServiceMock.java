@@ -153,7 +153,6 @@ public class ObjectServiceMock {
         when(objectService.getContentStream(anyString(), anyString(), any(), any(), any(), any())).then(new Answer<ContentStream>() {
             @Override
             public ContentStream answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
                 return repository.getContent((String) invocation.getArguments()[1]);
             }
         });
