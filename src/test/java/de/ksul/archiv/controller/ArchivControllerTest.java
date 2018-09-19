@@ -1,6 +1,7 @@
 package de.ksul.archiv.controller;
 
 import de.ksul.archiv.AlfrescoConnector;
+import de.ksul.archiv.ArchivTestApplication;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import de.ksul.archiv.request.QueryRequest;
 import de.ksul.archiv.response.RestResponse;
@@ -12,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -29,8 +30,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Time: 13:15
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={ArchivTestConfiguration.class})
-@TestPropertySource(properties={"ksul.archiv.test.testData="})
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.MOCK, classes = {ArchivTestConfiguration.class, ArchivTestApplication.class})
+@TestPropertySource(properties={"ksul.archiv.testing.testData="})
 @DirtiesContext
 public class ArchivControllerTest extends  ArchivControllerAbstractTest {
 

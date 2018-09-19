@@ -9,8 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -24,8 +24,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * To change this template use File | Settings | File Templates.
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes={ArchivTestConfiguration.class})
-@TestPropertySource(properties={"ksul.archiv.test.testData="})
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.MOCK, classes = {ArchivTestConfiguration.class, ArchivTestApplication.class})
+@TestPropertySource(properties={"ksul.archiv.testing.testData="})
 @DirtiesContext
 public class AlfrescoConnectorTest extends AlfrescoConnectorAbstractTest {
 

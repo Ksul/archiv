@@ -45,6 +45,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -74,7 +75,7 @@ import java.util.concurrent.TimeUnit;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ArchivTestConfiguration.class})
-@TestPropertySource(properties = {"ksul.archiv.test.testData="})
+@TestPropertySource(properties = {"ksul.archiv.testing.testData="})
 @DirtiesContext
 public class ScriptTest {
 
@@ -128,18 +129,6 @@ public class ScriptTest {
 
     @Test
     public void testModel() throws Exception {
-//        List<String> bootstrapModels = new ArrayList<>();
-//        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
-//        bootstrapModels.add("alfresco/model/systemModel.xml");
-//        bootstrapModels.add("org/alfresco/repo/security/authentication/userModel.xml");
-//        bootstrapModels.add("alfresco/model/contentModel.xml");
-//       // bootstrapModels.add("alfresco/model/wcmModel.xml");
-//        bootstrapModels.add("alfresco/model/applicationModel.xml");
-//        bootstrapModels.add("alfresco/model/bpmModel.xml");
-//        //bootstrapModels.add("alfresco/model/wcmAppModel.xml");
-//        bootstrapModels.add("alfresco/model/cmisModel.xml");
-//        bootstrapModels.add("alfresco/workflow/workflowModel.xml");
-//        bootstrapModels.add("alfresco/model/siteModel.xml");
 
         TenantService tenantService = new SingleTServiceImpl();
         DictionaryDAOImpl dictionaryDao = new DictionaryDAOImpl();

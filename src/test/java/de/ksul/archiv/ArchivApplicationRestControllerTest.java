@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ArchivTestConfiguration.class, ArchivController.class})
-@TestPropertySource(properties={"ksul.archiv.test.testData="})
+@TestPropertySource(properties={"ksul.archiv.testing.testData="})
 @DirtiesContext
 public class ArchivApplicationRestControllerTest extends ArchivApplicationRestControllerAbstractTest {
 

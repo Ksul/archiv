@@ -46,6 +46,11 @@ public class ArchivProperties {
      */
     private String scriptDirectoryName = "Scripts";
 
+    /**
+     * Einstellungen zum Testen
+     */
+    private Testing testing = new Testing();
+
     public String getUser() {
         return user;
     }
@@ -100,5 +105,81 @@ public class ArchivProperties {
 
     public void setScriptDirectoryName(String scriptDirectoryName) {
         this.scriptDirectoryName = scriptDirectoryName;
+    }
+
+    public Testing getTesting() {
+        return testing;
+    }
+
+    public void setTesting(Testing testing) {
+        this.testing = testing;
+    }
+
+    public class Testing {
+
+        /**
+         * Pfad zur Test Pdf Datei
+         */
+        private String testpdf;
+
+        /**
+         * Pfad zum Test Zip File
+         */
+        private String testzip;
+
+        /**
+         * Pfad zum Test Text File
+         */
+        private String testtxt;
+
+        /**
+         * Pfad zum Sichern der Testumgebung
+         */
+        private String testData;
+
+        /**
+         * Alfresco Models die genutzt werden sollen
+         */
+        private String[] models;
+
+        public String getTestpdf() {
+            return testpdf;
+        }
+
+        public void setTestpdf(String testpdf) {
+            this.testpdf = testpdf;
+        }
+
+        public String getTestzip() {
+            return testzip;
+        }
+
+        public void setTestzip(String testzip) {
+            this.testzip = testzip;
+        }
+
+        public String getTesttxt() {
+            return testtxt;
+        }
+
+        public void setTesttxt(String testtxt) {
+            this.testtxt = testtxt;
+        }
+
+        public String getTestData() {
+            return testData;
+        }
+
+        public void setTestData(String testData) {
+            this.testData = testData;
+        }
+
+        public String[] getModels() {
+            return models;
+        }
+
+        public void setModels(String[] models) {
+            this.models = models;
+        }
     }
 }

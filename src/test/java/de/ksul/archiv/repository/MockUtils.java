@@ -1,7 +1,9 @@
 package de.ksul.archiv.repository;
 
-import org.apache.chemistry.opencmis.client.api.*;
-import org.apache.chemistry.opencmis.client.bindings.spi.atompub.ObjectServiceImpl;
+import de.ksul.archiv.configuration.ArchivProperties;
+import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.client.api.ObjectType;
+import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.*;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.DocumentTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
@@ -13,15 +15,11 @@ import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
-import org.apache.chemistry.opencmis.commons.definitions.SecondaryTypeDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
-import org.apache.chemistry.opencmis.commons.enums.Cardinality;
 import org.apache.chemistry.opencmis.commons.enums.PropertyType;
-import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumBaseObjectTypeIds;
-import org.apache.chemistry.opencmis.commons.spi.ObjectService;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.ByteArrayInputStream;
@@ -43,7 +41,7 @@ public class MockUtils {
 
     private SessionImpl sessionImpl;
     private ResourceLoader resourceLoader;
-    private PropertyDefinitionBuilder propertyDefinitionBuilder = new PropertyDefinitionBuilder();
+    private PropertyDefinitionBuilder propertyDefinitionBuilder ;
     private  Map<String, PropertyDefinition<?>> propertyDefinitionCache = new HashMap<>();
 
     private static MockUtils mockUtils;
@@ -63,6 +61,10 @@ public class MockUtils {
 
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
+    }
+
+    public void setArchivTestProperties(ArchivProperties archivProperties) {
+        propertyDefinitionBuilder = new PropertyDefinitionBuilder(archivProperties);
     }
 
     public void setSession(SessionImpl sessionImpl) {

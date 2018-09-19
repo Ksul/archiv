@@ -1,14 +1,16 @@
 package de.ksul.archiv;
 
 import de.ksul.archiv.configuration.ArchivConfiguration;
-import de.ksul.archiv.configuration.ArchivTestProperties;
+import de.ksul.archiv.configuration.ArchivProperties;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,19 +30,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @ExtendWith(SpringExtension.class)
 @EnableAutoConfiguration
-@EnableConfigurationProperties({ArchivTestProperties.class})
 @SpringBootTest(classes = {ArchivConfiguration.class})
 @DirtiesContext
 public class AlfrescoConnectorITest extends AlfrescoConnectorAbstractTest {
 
     @BeforeEach
-    public void setUp(@Autowired AlfrescoConnector connector, @Autowired ArchivTestProperties testProperties) throws Exception {
+    public void setUp(@Autowired AlfrescoConnector connector, @Autowired ArchivProperties archivProperties) throws Exception {
         con = connector;
         Assertions.assertNotNull(con);
-        Assertions.assertNotNull(testProperties);
-        filePdf = testProperties.getTestPDF();
-        fileTxt = testProperties.getTestTXT();
-        fileZip = testProperties.getTestZIP();
+        Assertions.assertNotNull(archivProperties);
+        filePdf = archivProperties.getTesting().getTestpdf();
+        fileTxt = archivProperties.getTesting().getTesttxt();
+        fileZip = archivProperties.getTesting().getTestzip();
         super.setUp();
     }
 

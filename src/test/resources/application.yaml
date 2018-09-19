@@ -1,0 +1,26 @@
+# Properties zum Testen
+ksul:
+  archiv:
+    server: http://localhost:9080/alfresco/
+    binding: http://localhost:9080/alfresco/api/-default-/public/cmis/versions/1.1/atom
+    user: admin
+    password: admin
+    company-home-name: Company Home
+    data-dictionary-name: Data Dictionary
+    script-directory-name: Scripts
+    testing:
+      testpdf: /src/test/resources/Test.pdf
+      testzip: /src/test/resources/Sample.zip
+      testtxt: /src/test/resources/test.txt
+      models:
+              - alfresco/model/dictionaryModel.xml
+              - alfresco/model/systemModel.xml
+              - alfresco/model/contentModel.xml
+              - org/alfresco/repo/security/authentication/userModel.xml
+              - alfresco/model/applicationModel.xml
+              - alfresco/model/bpmModel.xml
+              - alfresco/model/cmisModel.xml
+              - alfresco/workflow/workflowModel.xml
+              - alfresco/model/siteModel.xml
+              - static/model/archivModel.xml
+#ksul.archiv.test.testData=/tmp/repo.txt

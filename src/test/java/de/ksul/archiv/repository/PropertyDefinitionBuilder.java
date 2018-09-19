@@ -1,21 +1,24 @@
 package de.ksul.archiv.repository;
 
-import org.alfresco.opencmis.dictionary.*;
+import de.ksul.archiv.configuration.ArchivProperties;
+import org.alfresco.opencmis.dictionary.CMISDictionaryService;
+import org.alfresco.opencmis.dictionary.CMISStrictDictionaryService;
+import org.alfresco.opencmis.dictionary.PropertyDefinitionWrapper;
+import org.alfresco.opencmis.dictionary.TypeDefinitionWrapper;
 import org.alfresco.opencmis.mapping.CMISMapping;
 import org.alfresco.repo.cache.DefaultSimpleCache;
 import org.alfresco.repo.dictionary.*;
 import org.alfresco.repo.i18n.MessageServiceImpl;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
 import org.alfresco.repo.tenant.TenantService;
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.TraceableThreadFactory;
 import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
-import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +41,17 @@ public class PropertyDefinitionBuilder {
     private TenantService tenantService = new SingleTServiceImpl();
     private  CMISDictionaryService cmisDictionaryService = new CMISStrictDictionaryService();
     private  MessageServiceImpl messageService = new MessageServiceImpl();
+    private ArchivProperties archivProperties;
 
 
-    public PropertyDefinitionBuilder() {
+    @Autowired
+    public PropertyDefinitionBuilder(ArchivProperties archivProperties) {
+        this.archivProperties = archivProperties;
+        init();
+    }
 
+
+    public void init() {
 
         dictionaryDao.setTenantService(tenantService);
         CompiledModelsCache compiledModelsCache = new CompiledModelsCache();
@@ -56,17 +66,8 @@ public class PropertyDefinitionBuilder {
                 new ThreadPoolExecutor.CallerRunsPolicy());
         compiledModelsCache.setThreadPoolExecutor(threadPoolExecutor);
         dictionaryDao.setDictionaryRegistryCache(compiledModelsCache);
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/dictionaryModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/systemModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/contentModel.xml")));
-
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/security/authentication/userModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/applicationModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/bpmModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/cmisModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/workflow/workflowModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/siteModel.xml")));
-        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("static/model/archivModel.xml")));
+        for (String model : archivProperties.getTesting().getModels())
+            dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream(model)));
 
         cmisMapping.afterPropertiesSet();
 
@@ -90,7 +91,6 @@ public class PropertyDefinitionBuilder {
         dictionaryComponent.setMessageLookup(messageService);
         ((CMISStrictDictionaryService) cmisDictionaryService).setDictionaryService(dictionaryComponent);
         ((CMISStrictDictionaryService) cmisDictionaryService).init();
-
 
     }
 

@@ -2,15 +2,17 @@ package de.ksul.archiv;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.configuration.ArchivConfiguration;
-import de.ksul.archiv.configuration.ArchivTestProperties;
+import de.ksul.archiv.configuration.ArchivProperties;
 import de.ksul.archiv.controller.ArchivController;
 import de.ksul.archiv.request.CommentRequest;
 import de.ksul.archiv.request.ObjectByIdRequest;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -30,13 +32,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ArchivConfiguration.class, ArchivController.class})
-@EnableConfigurationProperties({ArchivTestProperties.class})
 @DirtiesContext
 public class ArchivApplicationRestControllerITest extends ArchivApplicationRestControllerAbstractTest {
 
     @BeforeEach
     public void setUp(@Autowired AlfrescoConnector connector,
-                      @Autowired ArchivTestProperties testProperties,
+                      @Autowired ArchivProperties archivProperties,
                       @Autowired MockMvc mockMvc,
                       @Autowired ObjectMapper objectMapper) throws Exception {
         con = connector;
@@ -45,10 +46,10 @@ public class ArchivApplicationRestControllerITest extends ArchivApplicationRestC
         Assertions.assertNotNull(mockMvc);
         this.objectMapper = objectMapper;
         Assertions.assertNotNull(objectMapper);
-        Assertions.assertNotNull(testProperties);
-        filePdf = testProperties.getTestPDF();
-        fileTxt = testProperties.getTestTXT();
-        fileZip = testProperties.getTestZIP();
+        Assertions.assertNotNull(archivProperties);
+        filePdf = archivProperties.getTesting().getTestpdf();
+        fileTxt = archivProperties.getTesting().getTesttxt();
+        fileZip = archivProperties.getTesting().getTestzip();
         super.setUp();
     }
 

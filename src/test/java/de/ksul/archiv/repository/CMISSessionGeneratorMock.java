@@ -7,9 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import de.ksul.archiv.VerteilungConstants;
 import de.ksul.archiv.configuration.ArchivProperties;
-import de.ksul.archiv.configuration.ArchivTestProperties;
 import de.ksul.archiv.repository.deserializer.ContentStreamDeserializer;
 import de.ksul.archiv.repository.deserializer.PropertyDeserializer;
 import de.ksul.archiv.repository.serializer.*;
@@ -23,7 +21,6 @@ import org.apache.chemistry.opencmis.commons.enums.Cardinality;
 import org.apache.chemistry.opencmis.commons.enums.DateTimeResolution;
 import org.apache.chemistry.opencmis.commons.enums.PropertyType;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +29,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,20 +47,20 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     private String file;
     private SessionImpl sessionImpl;
     private Repository repository;
-
     private ArchivProperties archivProperties;
 
 
-    @Autowired
-    public CMISSessionGeneratorMock(ResourceLoader resourceLoader, ArchivProperties archivProperties, ArchivTestProperties archivTestProperties) {
+   public CMISSessionGeneratorMock() { }
 
-        this.file = archivTestProperties.getTestData();
+    public void init(ResourceLoader resourceLoader, ArchivProperties archivProperties) {
+        this.file = archivProperties.getTesting().getTestData();
         this.archivProperties = archivProperties;
-        MockUtils.getInstance().setResourceLoader(resourceLoader);
+        MockUtils mockUtils = MockUtils.getInstance();
+        mockUtils.setResourceLoader(resourceLoader);
+        mockUtils.setArchivTestProperties(archivProperties);
 
         mockCollectionIterable();
-
-
+        setup();
     }
 
 
@@ -107,7 +98,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
 
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void setup()  {
         if (file != null && !file.isEmpty()) {
             ObjectMapper mapper = new ObjectMapper();

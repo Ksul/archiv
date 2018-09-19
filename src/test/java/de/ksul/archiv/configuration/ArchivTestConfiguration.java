@@ -19,18 +19,38 @@ import org.springframework.core.io.ResourceLoader;
  * Time: 12:40
  */
 @Configuration
-@EnableConfigurationProperties({ArchivProperties.class, ArchivTestProperties.class})
+@EnableConfigurationProperties({ArchivProperties.class})
 @ComponentScan(basePackages = "de.ksul.archiv.repository")
 public class ArchivTestConfiguration {
+
+    ArchivProperties archivProperties;
+    ResourceLoader resourceLoader;
+    CMISSessionGeneratorMock cmisSessionGeneratorMock;
 
     public ArchivTestConfiguration() {
 
     }
 
-    @Bean
+
     @Autowired
-    public Session getSession(CMISSessionGeneratorMock cmisSessionGeneratorMock) {
+    public void setArchivProperties(ArchivProperties archivProperties) {
+        this.archivProperties = archivProperties;
+    }
+
+    @Autowired
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
+    @Autowired
+    public void setCmisSessionGeneratorMock(CMISSessionGeneratorMock cmisSessionGeneratorMock) {
+        this.cmisSessionGeneratorMock = cmisSessionGeneratorMock;
+    }
+
+    @Bean
+    public Session getSession() {
         Session session;
+        cmisSessionGeneratorMock.init(resourceLoader, archivProperties);
         session = cmisSessionGeneratorMock.generateSession();
         return session;
     }
