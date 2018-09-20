@@ -58,7 +58,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
         this.path ="";
-        this.obj = new Type(obj.getProperties());
+        this.obj = new Type(obj.getProperties(), obj.getType());
         this.childs = new HashMap<>();
         copyValues();
      }
@@ -71,7 +71,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
         this.path ="";
-        this.obj = new Type(obj.getProperties());
+        this.obj = new Type(obj.getProperties(), obj.getType());
         this.childs = new HashMap<>();
         if (version != null) {
             this.versions.put(version, this.obj);

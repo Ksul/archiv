@@ -530,12 +530,12 @@ public class MockUtils {
         FileableCmisObject cmisObject = null;
         ObjectData objectData = getObjectDataFromProperties(obj.getProperties());
         if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value())) {
-            cmisObject = new FolderImpl(sessionImpl, getFolderType(), objectData, new OperationContextImpl());
+            cmisObject = new FolderImpl(sessionImpl, obj.getObjectType(), objectData, new OperationContextImpl());
 
         } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value())) {
-            cmisObject = new ItemImpl(sessionImpl, getItemType(), objectData, new OperationContextImpl());
+            cmisObject = new ItemImpl(sessionImpl, obj.getObjectType(), objectData, new OperationContextImpl());
         } else if (objectData.getProperties().getProperties().get(PropertyIds.BASE_TYPE_ID).getFirstValue().toString().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value())) {
-            cmisObject = new DocumentImpl(sessionImpl, getDocumentType(objectData.getProperties().getProperties().get(PropertyIds.OBJECT_TYPE_ID).getFirstValue().toString()), objectData, new OperationContextImpl());
+            cmisObject = new DocumentImpl(sessionImpl, obj.getObjectType(), objectData, new OperationContextImpl());
         }
         LinkedHashMap<String, Property<?>> newProps = new LinkedHashMap<>();
         for (Property<?> p : obj.getProperties()) {

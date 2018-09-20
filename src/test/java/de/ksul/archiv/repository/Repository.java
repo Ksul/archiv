@@ -172,6 +172,11 @@ public class Repository {
             String key = it.next();
             newProps.add( new PropertyImpl(MockUtils.getInstance().getPropertyDefinitionCache().get(key), properties.get(key).getValues()));
         }
+        List<Object> secondaryTypes = node.getObj().getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).getValues();
+        for (Object secondaryType: secondaryTypes) {
+            ((ObjectType node.getObj().getType().
+            MockUtils.getInstance().getPropertyDefinitionBuilder().((String) secondaryType)
+        }
         node.updateNode(newProps);
 
     }

@@ -5,6 +5,7 @@ import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.SecondaryType;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractTypeDefinition;
 
 import java.util.ArrayList;
@@ -20,13 +21,15 @@ import java.util.List;
 public class Type implements Cloneable{
 
     private List<Property<?>> properties;
+    private ObjectType objectType;
 
 
     private Type() {
     }
 
-    public Type(List<Property<?>> properties) {
+    public Type(List<Property<?>> properties, ObjectType objectType) {
         this.properties = properties;
+        this.objectType = objectType;
     }
 
     public List<Property<?>> getProperties() {
@@ -37,7 +40,13 @@ public class Type implements Cloneable{
         this.properties = properties;
     }
 
+    public ObjectType getObjectType() {
+        return objectType;
+    }
 
+    public void setObjectType(ObjectType objectType) {
+        this.objectType = objectType;
+    }
 
     @Override
     protected Type clone() throws CloneNotSupportedException {
@@ -48,6 +57,7 @@ public class Type implements Cloneable{
             newProps.add(new PropertyImpl(p));
         }
         type.setProperties(newProps);
+        type.setObjectType(objectType);
         return type;
     }
 }
