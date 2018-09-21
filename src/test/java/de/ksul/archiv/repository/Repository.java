@@ -11,10 +11,12 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.enums.Cardinality;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.apache.commons.collections4.list.SetUniqueList;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,8 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.io.*;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -45,6 +48,7 @@ public class Repository {
     private TreeMap<String, String> contentIds = new TreeMap<>();
     @JsonIgnore
     public static Repository repository;
+
 
     private Repository() {
     }
@@ -152,7 +156,7 @@ public class Repository {
         }
     }
 
-    void update(String id , Map<String, PropertyData<?>> properties) {
+    void update(String id, Map<String, PropertyData<?>> properties) {
         if (id == null)
             throw new RuntimeException("id must be set!");
         if (properties == null)
@@ -163,19 +167,25 @@ public class Repository {
         if (node == null)
             throw new RuntimeException("Node with Id " + id + " not found!");
         List<Property<?>> props = node.getObj().getProperties();
-        List<Property<?>> newProps = new ArrayList<>();
-        for (Property<?> p : props) {
-            newProps.add( new PropertyImpl(p));
+        SetUniqueList<Object> secondaryTypes = SetUniqueList.setUniqueList(node.getObj().getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).getValues());
+        if (properties.containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS))
+            secondaryTypes.addAll(properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).getValues());
+        for (Object secondaryType : secondaryTypes) {
+            node.getObj().getType().getPropertyDefinitions().putAll(MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap((String) secondaryType));
         }
+        List<Property<?>> newProps = new ArrayList<>();
+        newProps.addAll(props);
         Iterator<String> it = properties.keySet().iterator();
         while (it.hasNext()) {
             String key = it.next();
-            newProps.add( new PropertyImpl(MockUtils.getInstance().getPropertyDefinitionCache().get(key), properties.get(key).getValues()));
-        }
-        List<Object> secondaryTypes = node.getObj().getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).getValues();
-        for (Object secondaryType: secondaryTypes) {
-            ((ObjectType node.getObj().getType().
-            MockUtils.getInstance().getPropertyDefinitionBuilder().((String) secondaryType)
+            if (newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().isPresent()) {
+                if (node.getType().getObjectType().getPropertyDefinitions().get(key).getCardinality().equals(Cardinality.SINGLE))
+                    ((PropertyImpl) newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).setValue(properties.get(key).getFirstValue());
+                else
+                    ((PropertyImpl) newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues().addAll(properties.get(key).getValues());
+            } else
+                newProps.add( new PropertyImpl(MockUtils.getInstance().getPropertyDefinitionCache().get(key), properties.get(key).getValues()));
+
         }
         node.updateNode(newProps);
 
@@ -445,5 +455,8 @@ public class Repository {
             }
         }
     }
+
+
+
 
 }

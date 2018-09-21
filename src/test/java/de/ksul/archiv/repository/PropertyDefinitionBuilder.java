@@ -17,6 +17,7 @@ import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
 import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -40,8 +41,8 @@ public class PropertyDefinitionBuilder {
     private DictionaryNamespaceComponent namespaceComponent = new DictionaryNamespaceComponent();
     private CMISMapping cmisMapping  = new CMISMapping();
     private TenantService tenantService = new SingleTServiceImpl();
-    private  CMISDictionaryService cmisDictionaryService = new CMISStrictDictionaryService();
-    private  MessageServiceImpl messageService = new MessageServiceImpl();
+    private CMISDictionaryService cmisDictionaryService = new CMISStrictDictionaryService();
+    private MessageServiceImpl messageService = new MessageServiceImpl();
     private ArchivProperties archivProperties;
 
 
@@ -51,6 +52,13 @@ public class PropertyDefinitionBuilder {
         init();
     }
 
+    public CMISDictionaryService getCmisDictionaryService() {
+        return cmisDictionaryService;
+    }
+
+    public DictionaryComponent getDictionaryComponent() {
+        return dictionaryComponent;
+    }
 
     public void init() {
 
@@ -107,8 +115,10 @@ public class PropertyDefinitionBuilder {
     public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name) {
 
         TypeDefinitionWrapper typeDefinitionWrapper = cmisDictionaryService.findType(name);
-
+        if (typeDefinitionWrapper == null)
+            throw new CmisRuntimeException("type " + name + " not found!");
         Collection<PropertyDefinitionWrapper> propertyDefinitions = typeDefinitionWrapper.getProperties(false);
+
         Map<String, PropertyDefinition<?>> propertyDefinitionMap = new HashMap<>();
         for (PropertyDefinitionWrapper definition : propertyDefinitions) {
             propertyDefinitionMap.put(definition.getPropertyDefinition().getId(), definition.getPropertyDefinition());

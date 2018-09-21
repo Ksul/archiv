@@ -74,6 +74,11 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.obj = new Type(obj.getProperties(), obj.getType());
         this.childs = new HashMap<>();
         if (version != null) {
+            changePropertie(PropertyIds.LAST_MODIFICATION_DATE, MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
+            changePropertie(PropertyIds.VERSION_LABEL, version);
+            changePropertie(PropertyIds.IS_PRIVATE_WORKING_COPY, false);
+            String versionSeriesId = obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.VERSION_SERIES_ID)).findFirst().get().getValue();
+            ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).setValue(versionSeriesId + ";" + version);
             this.versions.put(version, this.obj);
         }
         copyValues();
@@ -83,6 +88,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return parent == null;
     }
 
+    public Type getType() {
+        return obj;
+    }
 
     public T getObj(){return (T) MockUtils.getInstance().createObject(obj);
     }
@@ -125,8 +133,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.childs.put(name, childNode);
         childNode.path = this.path + (this.path.equals("/") ? "" : "/") + name;
         childNode.displayPath = this.displayPath + "/" + this.getName();
-        if (version != null)
-            childNode.checkin(version, null);
+//        if (version != null) {
+//             childNode.versions.put(version, childNode.obj);
+//           // childNode.checkin(version, null);
+//        }
         this.registerChild(childNode);
         return childNode;
     }
@@ -309,17 +319,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return true;
     }
 
-    public void specializeType(String name) {
-        //TODO Implementierung
+    public void specializeType(String key) {
+        obj.getObjectType().getPropertyDefinitions().putAll(MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key));
     }
 
-    public void addAspect(String name) {
-        //TODO Implementierung
+    public void addAspect(String key) {
+        ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues().add(key);
+        obj.getObjectType().getPropertyDefinitions().putAll(MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key));
     }
 
-    public boolean hasAspect(String name) {
-        //TODO Implementierung
-        return false;
+    public boolean hasAspect(String key) {
+        return ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues().contains(key);
     }
 
     public void addTag(String name) {

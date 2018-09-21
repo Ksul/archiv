@@ -822,7 +822,7 @@ public class AlfrescoConnector {
         Map<String, PropertyDefinition<?>> definitions = new HashMap<>();
         List<String> types = new ArrayList<>();
         if (properties!= null && properties.size() > 0) {
-            // Typens suchen
+            // Typen suchen
             types.add((String) properties.get(PropertyIds.OBJECT_TYPE_ID));
             if (properties.containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS))
                 types.addAll((List<String>) properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS));
