@@ -11,6 +11,7 @@ import org.alfresco.repo.dictionary.*;
 import org.alfresco.repo.i18n.MessageServiceImpl;
 import org.alfresco.repo.tenant.SingleTServiceImpl;
 import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.TraceableThreadFactory;
 import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
@@ -126,6 +127,15 @@ public class PropertyDefinitionBuilder {
 
         return propertyDefinitionMap;
     }
+
+    public boolean isSubtypeOf(String nodeType, String typeName)
+    {
+        QName nodeTypeQName = QName.createQName(nodeType, dictionaryDao);
+        QName typeQName = QName.createQName(typeName, dictionaryDao);
+
+        return dictionaryComponent.isSubClass(nodeTypeQName, typeQName);
+    }
+
 
 
 

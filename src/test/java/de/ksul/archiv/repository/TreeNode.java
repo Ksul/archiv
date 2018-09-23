@@ -11,6 +11,7 @@ import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
@@ -287,7 +288,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         if (mimeType.equals("text/plain")) {
             String newName = getName().substring(0, getName().lastIndexOf(".") + 1) + "txt";
             String newPath = path.substring(0, path.lastIndexOf("/")) ;
-            FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, MockUtils.getInstance().getDocumentType("cmis:document"), "text/plain");
+            FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, this.obj.getObjectType(), "text/plain");
             TreeNode<T> transform = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this.parent, newObject, false);
 //            if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get().getValue().equals(VerteilungConstants.DOCUMENT_TYPE_PDF)){
 //                ((PropertyImpl) ((FileableCmisObject) transform.getObj()).getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get()).setValue(VerteilungConstants.DOCUMENT_TYPE_PDF);
@@ -315,21 +316,40 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     public boolean isSubType(String name) {
-        //TODO Implementierung
-        return true;
+        String typeName = obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue();
+        return MockUtils.getInstance().getPropertyDefinitionBuilder().isSubtypeOf(typeName, name);
     }
 
     public void specializeType(String key) {
-        obj.getObjectType().getPropertyDefinitions().putAll(MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key));
+        if (!key.startsWith("D:"))
+            key = "D:" + key;
+        Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
+        obj.getObjectType().getPropertyDefinitions().putAll(definitionMap);
+        for (PropertyDefinition propertyDefinition: definitionMap.values()) {
+            if (  ! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(propertyDefinition.getId())).findFirst().isPresent()) {
+                obj.getProperties().add(new PropertyImpl<>(propertyDefinition, new ArrayList<>()));
+                properties._put(propertyDefinition.getId(), null);
+            }
+        }
     }
 
     public void addAspect(String key) {
-        ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues().add(key);
-        obj.getObjectType().getPropertyDefinitions().putAll(MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key));
+        if (!key.startsWith("P:"))
+            key = "P:" + key;
+        ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).findFirst().get()).getValues().add(key);
+        Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
+        obj.getObjectType().getPropertyDefinitions().putAll(definitionMap);
+        for (PropertyDefinition propertyDefinition: definitionMap.values()) {
+            if (  ! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(propertyDefinition.getId())).findFirst().isPresent()) {
+                obj.getProperties().add(new PropertyImpl<>(propertyDefinition, new ArrayList<>()));
+                properties._put(propertyDefinition.getId(), null);
+            }
+        }
+
     }
 
     public boolean hasAspect(String key) {
-        return ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues().contains(key);
+        return ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).findFirst().get()).getValues().contains(key);
     }
 
     public void addTag(String name) {
@@ -362,7 +382,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
     }
 
-    public void save() {}
+    public void save() {
+        for (String key: properties.keySet())
+            MockUtils.getInstance().fillProperty(key, properties.get(key));
+    }
 
 
     @Override

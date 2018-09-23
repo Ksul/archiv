@@ -1868,9 +1868,10 @@ function ArchivZiel(srch) {
 
         if (this.type) {
             Logger.log(Level.TRACE, "ArchivZiel.resolve: Type is " + this.type);
-            if (!node.isSubType(this.type))
+            if (!node.isSubType(this.type)) {
                 node.specializeType(this.type);
-            Logger.log(Level.INFO, "specialize type " + this.type);
+                Logger.log(Level.INFO, "specialize type " + this.type);
+            }
         }
 
         Logger.setLevel(orgLevel);

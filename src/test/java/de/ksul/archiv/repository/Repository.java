@@ -184,7 +184,7 @@ public class Repository {
                 else
                     ((PropertyImpl) newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues().addAll(properties.get(key).getValues());
             } else
-                newProps.add( new PropertyImpl(MockUtils.getInstance().getPropertyDefinitionCache().get(key), properties.get(key).getValues()));
+                newProps.add( new PropertyImpl(MockUtils.getInstance().getPropertyDefinitionBuilder().getCmisDictionaryService().findProperty(key).getPropertyDefinition(), properties.get(key).getValues()));
 
         }
         node.updateNode(newProps);

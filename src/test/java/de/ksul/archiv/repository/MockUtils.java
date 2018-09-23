@@ -42,7 +42,6 @@ public class MockUtils {
     private SessionImpl sessionImpl;
     private ResourceLoader resourceLoader;
     private PropertyDefinitionBuilder propertyDefinitionBuilder ;
-    private  Map<String, PropertyDefinition<?>> propertyDefinitionCache = new HashMap<>();
 
     private static MockUtils mockUtils;
 
@@ -71,10 +70,6 @@ public class MockUtils {
         this.sessionImpl = sessionImpl;
     }
 
-    public Map<String, PropertyDefinition<?>> getPropertyDefinitionCache() {
-        return propertyDefinitionCache;
-    }
-
     public PropertyDefinitionBuilder getPropertyDefinitionBuilder() {
         return propertyDefinitionBuilder;
     }
@@ -85,7 +80,6 @@ public class MockUtils {
         if (itemType == null) {
             ItemTypeDefinitionImpl itemTypeDefinition = new ItemTypeDefinitionImpl();
             Map<String, PropertyDefinition<?>> itemDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:item");
-            propertyDefinitionCache.putAll(itemDefinitionMap);
             itemTypeDefinition.setPropertyDefinitions(itemDefinitionMap);
             itemType = new ItemTypeImpl(sessionImpl, itemTypeDefinition);
             itemType.setId(EnumBaseObjectTypeIds.CMIS_ITEM.value());
@@ -101,7 +95,6 @@ public class MockUtils {
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
             Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:folder");
-            propertyDefinitionCache.putAll(folderDefinitionMap);
             folderTypeDefinition.setPropertyDefinitions(folderDefinitionMap);
             folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
             folderType.setId(EnumBaseObjectTypeIds.CMIS_FOLDER.value());
@@ -115,7 +108,6 @@ public class MockUtils {
 
             DocumentTypeDefinitionImpl documentTypeDefinition = new DocumentTypeDefinitionImpl();
             Map<String, PropertyDefinition<?>> documentDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap(id);
-            propertyDefinitionCache.putAll(documentDefinitionMap);
             documentTypeDefinition.setPropertyDefinitions(documentDefinitionMap);
             DocumentTypeImpl documentType = new DocumentTypeImpl(sessionImpl, documentTypeDefinition);
             documentType.setId(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value());
@@ -129,7 +121,6 @@ public class MockUtils {
 
     SecondaryTypeImpl getSecondaryType(String type) {
         Map<String, PropertyDefinition<?>> secondaryDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap(type);
-        propertyDefinitionCache.putAll(secondaryDefinitionMap);
         SecondaryTypeDefinitionImpl secondaryTypeDefinition = new SecondaryTypeDefinitionImpl();
         secondaryTypeDefinition.setPropertyDefinitions(secondaryDefinitionMap);
         SecondaryTypeImpl secondaryType = new SecondaryTypeImpl(sessionImpl, secondaryTypeDefinition);
@@ -262,67 +253,68 @@ public class MockUtils {
 
     AbstractPropertyData<?> fillProperty(String id, Object value) {
 
-        PropertyDefinition<?> definition;
-        AbstractPropertyData<?> property = null;
+        PropertyDefinition<?> definition = getPropertyDefinitionBuilder().getCmisDictionaryService().findProperty(id).getPropertyDefinition();
 
+        return createProperty(value, definition);
+    }
 
-        if (!getPropertyDefinitionCache().containsKey(id))
-            throw new CmisRuntimeException(("Invalid properties " + id));
-            definition = getPropertyDefinitionCache().get(id);
+    public AbstractPropertyData<?> createProperty(Object value, PropertyDefinition<?> definition) {
+
+        AbstractPropertyData<?> property;
         switch (definition.getPropertyType()) {
             case STRING:
                 property = new PropertyStringImpl();
                 if (value instanceof List)
-                    ((PropertyStringImpl) property).setValues(copyStringValues((List) value));
+                    property.setValues(copyStringValues((List) value));
                 else
                     ((PropertyStringImpl) property).setValue(copyStringValue(value));
                 break;
             case ID:
                 property = new PropertyIdImpl();
                 if (value instanceof List)
-                    ((PropertyIdImpl) property).setValues(copyStringValues((List) value));
+                    property.setValues(copyStringValues((List) value));
                 else
                     ((PropertyIdImpl) property).setValue(copyStringValue(value));
                 break;
             case BOOLEAN:
                 property = new PropertyBooleanImpl();
                 if (value instanceof List)
-                    ((PropertyBooleanImpl) property).setValues(copyBooleanValues((List) value));
+                    property.setValues(copyBooleanValues((List) value));
                 else
                     ((PropertyBooleanImpl) property).setValue(copyBooleanValue(value));
                 break;
             case INTEGER:
                 property = new PropertyIntegerImpl();
                 if (value instanceof List)
-                    ((PropertyIntegerImpl) property).setValues(copyIntegerValues((List) value));
+                    property.setValues(copyIntegerValues((List) value));
                 else
                     ((PropertyIntegerImpl) property).setValue(copyIntegerValue(value));
                 break;
             case DECIMAL:
                 property = new PropertyDecimalImpl();
                 if (value instanceof List)
-                    ((PropertyDecimalImpl) property).setValues(copyDecimalValues((List) value));
+                    property.setValues(copyDecimalValues((List) value));
                 else
                     ((PropertyDecimalImpl) property).setValue(copyDecimalValue(value));
                 break;
             case DATETIME:
                 property = new PropertyDateTimeImpl();
                 if (value instanceof List)
-                    ((PropertyDateTimeImpl) property).setValues(copyDateTimeValues((List) value));
+                    property.setValues(copyDateTimeValues((List) value));
                 else
                     ((PropertyDateTimeImpl) property).setValue(copyDateTimeValue(value));
                 break;
             case HTML:
                 property = new PropertyHtmlImpl();
                 if (value instanceof List)
-                    ((PropertyHtmlImpl) property).setValues(copyStringValues((List) value));
+                    property.setValues(copyStringValues((List) value));
                 else
                     ((PropertyHtmlImpl) property).setValue(copyStringValue(value));
                 break;
             case URI:
                 property = new PropertyUriImpl();
                 if (value instanceof List)
-                    ((PropertyUriImpl) property).setValues(copyStringValues((List) value));
+                    property.setValues(copyStringValues((List) value));
                 else
                     ((PropertyUriImpl) property).setValue(copyStringValue(value));
                 break;
@@ -330,11 +322,10 @@ public class MockUtils {
                 throw new CmisRuntimeException("Unknown property data type!");
         }
         ((AbstractPropertyData) property).setPropertyDefinition(definition);
-        property.setId(id);
+        property.setId(definition.getId());
         property.setDisplayName(definition.getDisplayName());
         property.setQueryName(definition.getQueryName());
         property.setLocalName(definition.getLocalName());
-
 
         return property;
     }
@@ -570,7 +561,4 @@ public class MockUtils {
         }
         return contentStream;
     }
-
-
-
 }
