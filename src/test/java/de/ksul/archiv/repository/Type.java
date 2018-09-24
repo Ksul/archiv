@@ -9,6 +9,7 @@ import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractTypeDefinition;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -21,15 +22,17 @@ import java.util.List;
 public class Type implements Cloneable{
 
     private List<Property<?>> properties;
+    private List<SecondaryType> secondaryTypes;
     private ObjectType objectType;
 
 
     private Type() {
     }
 
-    public Type(List<Property<?>> properties, ObjectType objectType) {
+    public Type(List<Property<?>> properties, ObjectType objectType, List<SecondaryType> secondaryTypes) {
         this.properties = properties;
         this.objectType = objectType;
+        this.secondaryTypes = secondaryTypes;
     }
 
     public List<Property<?>> getProperties() {
@@ -46,6 +49,14 @@ public class Type implements Cloneable{
 
     public void setObjectType(ObjectType objectType) {
         this.objectType = objectType;
+    }
+
+    public List<SecondaryType> getSecondaryTypes() {
+        return secondaryTypes;
+    }
+
+    public void setSecondaryTypes(List<SecondaryType> secondaryTypes) {
+        this.secondaryTypes = secondaryTypes;
     }
 
     @Override

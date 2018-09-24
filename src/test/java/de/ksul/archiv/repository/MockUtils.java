@@ -175,9 +175,7 @@ public class MockUtils {
         }
         properties.addProperty(fillProperty(PropertyIds.CREATION_DATE, new Date().getTime()));
         properties.addProperty(fillProperty(PropertyIds.LAST_MODIFICATION_DATE, new Date().getTime()));
-        if (!properties.getProperties().containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)) {
-            properties.addProperty(fillProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Collections.emptyList()));
-        }
+
         properties.addProperty(fillProperty(PropertyIds.NAME, name));
         if (objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value())) {
             if (path == null) {
@@ -189,6 +187,14 @@ public class MockUtils {
                 properties.addProperty(fillProperty(PropertyIds.PATH, (path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/") + name));
             }
 
+            if (!properties.getProperties().containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)) {
+                ArrayList<String> liste = new ArrayList<>(3);
+                liste.add("P:cm:titled");
+                liste.add("P:sys:localized");
+                liste.add("P:app:uifacets");
+                properties.addProperty(fillProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, liste));
+                properties.addProperty(fillProperty("cm:title", null));
+            }
             properties.addProperty(fillProperty(PropertyIds.PARENT_ID, parentId));
 
             objectData.setProperties(properties);
@@ -213,9 +219,18 @@ public class MockUtils {
                 properties.addProperty(fillProperty("my:person", "Klaus"));
                 properties.addProperty(fillProperty("my:documentDate", new Date().getTime()));
             }
+            if (!properties.getProperties().containsKey(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)) {
+                ArrayList<String> liste = new ArrayList<>(4);
+                liste.add("P:cm:titled");
+                liste.add("P:app:inlineeditable");
+                liste.add("P:sys:localized");
+                liste.add("P:cm:author");
+                properties.addProperty(fillProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, liste));
+                properties.addProperty(fillProperty("cm:title", null));
+            }
             objectData.setProperties(properties);
             fileableCmisObject = new DocumentImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
-        } else if(objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value()) ) {
+           } else if(objectType.getId().equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value()) ) {
             objectData.setProperties(properties);
             fileableCmisObject = new ItemImpl(sessionImpl, objectType, objectData, new OperationContextImpl());
         }

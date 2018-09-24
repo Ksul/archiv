@@ -2,6 +2,7 @@ package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
+import java.util.Date;
 import java.util.HashMap;
 
 /**
