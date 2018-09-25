@@ -321,8 +321,14 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     public void specializeType(String key) {
-        if (!key.startsWith("D:"))
-            key = "D:" + key;
+        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_DOCUMENT.value())) {
+            if (!key.startsWith("D:"))
+                key = "D:" + key;
+        }
+        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_FOLDER.value())) {
+            if (!key.startsWith("F:"))
+                key = "F:" + key;
+        }
         Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
         obj.getObjectType().getPropertyDefinitions().putAll(definitionMap);
         for (PropertyDefinition propertyDefinition: definitionMap.values()) {

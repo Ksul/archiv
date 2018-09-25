@@ -271,6 +271,8 @@ public class Repository {
                         engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
                         engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
                         engine.eval("classification = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').categoryhome;");
+                        engine.eval("commentService = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').commentService;");
+                        engine.eval("search = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').searchService;");
                         Object result = invocable.invokeMethod(rec, "run");
                     } catch (ScriptException e2) {
                         logger.error("Script error!", e2);

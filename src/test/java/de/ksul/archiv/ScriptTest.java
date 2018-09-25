@@ -77,6 +77,8 @@ public class ScriptTest {
         engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
         engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
         engine.eval("classification = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').categoryhome;");
+        engine.eval("commentService = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').commentService;");
+        engine.eval("search = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').searchService;");
 
     }
 
@@ -93,10 +95,12 @@ public class ScriptTest {
 
     @Test
     public void testScript() throws Exception {
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.txt", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createStream("Caffee Fausto   Rechnung Nr 12345 Bertrag 79€ 01.01.2010",  VerteilungConstants.DOCUMENT_TYPE_TEXT), "1.0", false);
+        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.txt", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createStream("Caffee Fausto   Rechnung Nr 12345  01.01.2010 Betrag  79€",  VerteilungConstants.DOCUMENT_TYPE_TEXT), "1.0", false);
         RecognizeEndpoints.setDocument(node);
         engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
         invocable.invokeMethod(rec, "run");
+        node = Repository.getInstance().findTreeNodeForPath("/Archiv/Dokumente/Rechnungen/Rechnungen Caffé Fausto/Test.txt");
+        MatcherAssert.assertThat(node, Matchers.notNullValue());
     }
 
     @Test

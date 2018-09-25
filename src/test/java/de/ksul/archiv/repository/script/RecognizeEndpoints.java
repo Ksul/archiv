@@ -1,6 +1,8 @@
 package de.ksul.archiv.repository.script;
 
+import de.ksul.archiv.repository.CommentService;
 import de.ksul.archiv.repository.Repository;
+import de.ksul.archiv.repository.SearchService;
 import de.ksul.archiv.repository.TreeNode;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.slf4j.Logger;
@@ -20,11 +22,15 @@ public class RecognizeEndpoints {
     public static TreeNode<FileableCmisObject> script;
     public static TreeNode<FileableCmisObject> companyhome;
     public static TreeNode<FileableCmisObject> categoryhome;
+    public static CommentService commentService;
+    public static SearchService searchService;
 
     public static void setRepository(Repository repository) {
         RecognizeEndpoints.repository = repository;
         companyhome = repository.getRoot();
         categoryhome = repository.getCategoryroot();
+        RecognizeEndpoints.commentService = new CommentService();
+        RecognizeEndpoints.searchService = new SearchService();
     }
 
     public static void setScript(String path) {

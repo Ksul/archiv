@@ -2224,8 +2224,11 @@ function Category(srch) {
                     }
                 }
                 if (top) {
-                    Logger.log(Level.TRACE, "Add Aspect cm:generalclassifiable to document");
-                    document.addAspect("cm:generalclassifiable");
+                    if (!document.hasAspect("cm:generalclassifiable")) {
+                        Logger.log(Level.TRACE, "Add Aspect cm:generalclassifiable to document");
+                        document.addAspect("cm:generalclassifiable");
+                        Logger.log(Level.INFO, "Aspect cm:generalclassifiable added to document");
+                    }
                     var categories = [];
                     categories.push(top);
                     Logger.log(Level.INFO, "Add Category [" + this.name + "] to document");

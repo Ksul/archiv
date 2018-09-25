@@ -44,7 +44,6 @@ public class NodeProperties extends HashMap<String, Object> {
                 return list;
             } else {
                 if (scriptObjectMirror.getClassName().equalsIgnoreCase("Date")) {
-                    NativeDate nativeDate = scriptObjectMirror.to(NativeDate.class);
                     return new Date(scriptObjectMirror.to(Long.class));
                 } else {
                     return scriptObj;
@@ -52,6 +51,8 @@ public class NodeProperties extends HashMap<String, Object> {
             }
 
         }
+        if (scriptObj.getClass().equals(TreeNode.class))
+            return ((TreeNode) scriptObj).getId();
         return scriptObj;
     }
 

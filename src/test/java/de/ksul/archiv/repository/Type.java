@@ -30,7 +30,7 @@ public class Type implements Cloneable{
     }
 
     public Type(List<Property<?>> properties, ObjectType objectType, List<SecondaryType> secondaryTypes) {
-        this.properties = properties;
+        this.properties = new ArrayList<>(properties);
         this.objectType = objectType;
         this.secondaryTypes = secondaryTypes;
     }

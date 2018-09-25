@@ -22,5 +22,6 @@ ksul:
               - alfresco/model/cmisModel.xml
               - alfresco/workflow/workflowModel.xml
               - alfresco/model/siteModel.xml
+              - alfresco/model/forumModel.xml
               - static/model/archivModel.xml
 #ksul.archiv.test.testData=/tmp/repo.txt
