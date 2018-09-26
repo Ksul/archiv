@@ -104,6 +104,15 @@ public class ScriptTest {
     }
 
     @Test
+    public void testScriptForX() throws Exception {
+        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test1.pdf", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createFileStream("classpath:Test1.pdf",  VerteilungConstants.DOCUMENT_TYPE_PDF), "1.0", false);
+        RecognizeEndpoints.setDocument(node);
+        engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
+        invocable.invokeMethod(rec, "run");
+        MatcherAssert.assertThat(Repository.getInstance().findTreeNodeForPath("/Archiv/Unbekannt/2011/Mai/Test.pdf"), Matchers.notNullValue());
+    }
+
+    @Test
     public void testModel() throws Exception {
 
         TenantService tenantService = new SingleTServiceImpl();

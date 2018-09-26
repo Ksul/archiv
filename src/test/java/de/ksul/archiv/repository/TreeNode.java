@@ -151,6 +151,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     public boolean move(TreeNode<T> destination) {
         try {
             moveNode(destination);
+            if (destination.getName().equalsIgnoreCase("Inbox")) {
+                Repository.getInstance().executeScript(this);
+            }
             return true;
         } catch(Exception e) {
             return false;

@@ -19,7 +19,7 @@ public class JSRepository {
         JSRepository.repository = repository;
     }
 
-    public TreeNode<FileableCmisObject> childByNamePath(String path) {
+    public TreeNode<?> childByNamePath(String path) {
       return repository.findTreeNodeForPath(path);
     }
 

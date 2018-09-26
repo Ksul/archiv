@@ -11,9 +11,9 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
  */
 public class JSDocument {
 
-    private TreeNode<FileableCmisObject> document;
+    private TreeNode<?> document;
 
-    public void  setDocument(TreeNode<FileableCmisObject> document) {
+    public void  setDocument(TreeNode<?> document) {
         this.document = document;
     }
 }

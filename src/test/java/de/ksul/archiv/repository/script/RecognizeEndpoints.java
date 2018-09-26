@@ -18,10 +18,10 @@ public class RecognizeEndpoints {
 
     private static Repository repository;
     private static Logger logger = LoggerFactory.getLogger(RecognizeEndpoints.class.getName());
-    public static TreeNode<FileableCmisObject> document;
-    public static TreeNode<FileableCmisObject> script;
-    public static TreeNode<FileableCmisObject> companyhome;
-    public static TreeNode<FileableCmisObject> categoryhome;
+    public static TreeNode<?> document;
+    public static TreeNode<?> script;
+    public static TreeNode<?> companyhome;
+    public static TreeNode<?> categoryhome;
     public static CommentService commentService;
     public static SearchService searchService;
 
@@ -43,7 +43,7 @@ public class RecognizeEndpoints {
         }
     }
 
-    public static void setDocument(TreeNode<FileableCmisObject> document) {
+    public static void setDocument(TreeNode<?> document) {
         RecognizeEndpoints.document = document;
     }
 

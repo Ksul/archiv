@@ -258,27 +258,7 @@ public class Repository {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
                 if (parent.getName().equals("Inbox") && executeRule) {
-                    ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-                    try {
-                        RecognizeEndpoints.setDocument(newNode);
-                        RecognizeEndpoints.setRepository(this);
-                        RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
-                        Object rec = engine.eval("load(\"src/main/resources/static/js/recognition.js\");");
-
-                        Invocable invocable = (Invocable) engine;
-                        engine.eval("logger = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints.JSLogger');");
-                        engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
-                        engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
-                        engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
-                        engine.eval("classification = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').categoryhome;");
-                        engine.eval("commentService = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').commentService;");
-                        engine.eval("search = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').searchService;");
-                        Object result = invocable.invokeMethod(rec, "run");
-                    } catch (ScriptException e2) {
-                        logger.error("Script error!", e2);
-                    } catch (NoSuchMethodException e3)  {
-                        logger.error("Java Script Function not found", e3);
-                    }
+                    executeScript(newNode);
 
                 }
                 logger.info(name + " [ID: " + newNode.getId() + "] [Path: " + newNode.getObj().getPaths().get(0) + "] inserted into repository!");
@@ -287,6 +267,30 @@ public class Repository {
         }
 
         return newNode;
+    }
+
+    public void executeScript(TreeNode<?> newNode) {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+        try {
+            RecognizeEndpoints.setDocument(newNode);
+            RecognizeEndpoints.setRepository(this);
+            RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
+            Object rec = engine.eval("load(\"src/main/resources/static/js/recognition.js\");");
+
+            Invocable invocable = (Invocable) engine;
+            engine.eval("logger = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints.JSLogger');");
+            engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
+            engine.eval("script = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').script;");
+            engine.eval("companyhome = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').companyhome;");
+            engine.eval("classification = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').categoryhome;");
+            engine.eval("commentService = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').commentService;");
+            engine.eval("search = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').searchService;");
+            Object result = invocable.invokeMethod(rec, "run");
+        } catch (ScriptException e2) {
+            logger.error("Script error!", e2);
+        } catch (NoSuchMethodException e3)  {
+            logger.error("Java Script Function not found", e3);
+        }
     }
 
     TreeNode<FileableCmisObject> findTreeNodeForId(String id) {

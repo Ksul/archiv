@@ -10,7 +10,7 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
  */
 public class CommentService {
 
-    public TreeNode<FileableCmisObject> createCommentsFolder(TreeNode node) {
+    public TreeNode<?> createCommentsFolder(TreeNode<?> node) {
         return null;
     }
 }

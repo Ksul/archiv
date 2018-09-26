@@ -210,14 +210,26 @@ var Formatter = {
     }
 };
 
+function LogLevel(level, text, code){
+    this.level = level;
+    this.text = text;
+    this.code = code;
+}
+
+LogLevel.prototype.constructor = LogLevel;
+LogLevel.prototype.toString = function(){
+    return "Level: " + this.level + " -> " + this.text;
+};
+
+
 var Level = {
 
-    NONE: {level: 0, text: "NONE", code: "N"},
-    ERROR: {level: 1, text: "ERROR", code: "E"},
-    WARN: {level: 2, text: "WARN", code: "W"},
-    INFO: {level: 3, text: "INFO", code: "I"},
-    DEBUG: {level: 4, text: "DEBUG", code: "D"},
-    TRACE: {level: 5, text: "TRACE", code: "T"},
+    NONE: new LogLevel(0, "NONE",  "N"),
+    ERROR: new LogLevel(1, "ERROR", "E"),
+    WARN: new LogLevel(2, "WARN", "W"),
+    INFO: new LogLevel(3, "INFO", "I"),
+    DEBUG: new LogLevel(4, "DEBUG", "D"),
+    TRACE: new LogLevel(5, "TRACE", "T"),
 
     getLevelFor : function (level) {
         if (level) {
@@ -252,7 +264,9 @@ var Level = {
             }
         }
         return this.ERROR;
-    }
+    },
+
+
 };
 
 function LoggerDefinition(debugLevel) {
@@ -1562,7 +1576,9 @@ function ArchivTyp(srch, parentType) {
                     if (this.getTopParent() === this && !this.destinationResolved) {
                         // hier kommen wir hin, wenn die geschachtelten Archivtypen keine Destination erzeugen können und
                         // aktuelle Typ keine definiert hat
-                        REC.moveDocToUnknownBox(REC.currentDocument);
+                        // das bedeutet, das die gefundene Regel wohl doch nicht die richtige ist
+                        Logger.log(Level.INFO, "No Positions found! Rule " + this.name + " is not suitable");
+                       return false;
                     }
                 }
             }
@@ -3645,11 +3661,11 @@ REC = {
     recognize: function (doc, rules, deb) {
         if (rules.debugLevel)
             this.debugLevel = Level.getLevelFor(rules.debugLevel);
-        Logger.log(Level.INFO, "Debug Level is set to: " + this.print(this.debugLevel));
         if (rules.maxDebugLength)
             this.maxDebugLength = parseInt(rules.maxDebugLength, 10);
         else
             this.maxDebugLength = 80;
+        Logger.log(Level.INFO, "Debug Level is set to: " + this.print(this.debugLevel.toString()));
         Logger.log(Level.INFO, "Debug length is set to: " + this.maxDebugLength);
         this.currentDocument = doc;
         var docName = this.currentDocument.name;

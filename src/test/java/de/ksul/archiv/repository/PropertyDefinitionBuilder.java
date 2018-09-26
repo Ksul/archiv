@@ -130,6 +130,10 @@ public class PropertyDefinitionBuilder {
 
     public boolean isSubtypeOf(String nodeType, String typeName)
     {
+        if (nodeType.startsWith("D:"))
+            nodeType = nodeType.substring(2);
+        if (typeName.startsWith("D:"))
+            typeName = typeName.substring(2);
         QName nodeTypeQName = QName.createQName(nodeType, dictionaryDao);
         QName typeQName = QName.createQName(typeName, dictionaryDao);
 
