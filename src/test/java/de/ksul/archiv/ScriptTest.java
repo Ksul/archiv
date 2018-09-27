@@ -61,11 +61,11 @@ public class ScriptTest {
     public void setUp() throws Exception {
 
         root = Repository.getInstance().getRoot();
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/","Archiv", MockUtils.getInstance().getFolderType(), null), false);
-        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Inbox", MockUtils.getInstance().getFolderType(), null), false);
-        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Unbekannt", MockUtils.getInstance().getFolderType(), null), false);
-        TreeNode<FileableCmisObject> fehler = Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Fehler", MockUtils.getInstance().getFolderType(), null), false);
-        Repository.getInstance().insert(fehler, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv/Fehler","Doppelte", MockUtils.getInstance().getFolderType(), null), false);
+        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/","Archiv", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Inbox", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Unbekannt", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+        TreeNode<FileableCmisObject> fehler = Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Fehler", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+        Repository.getInstance().insert(fehler, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv/Fehler","Doppelte", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
         engine = new ScriptEngineManager().getEngineByName("nashorn");
         RecognizeEndpoints.setRepository(Repository.getInstance());
         RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
@@ -140,6 +140,7 @@ public class ScriptTest {
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/cmisModel.xml")));
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/workflow/workflowModel.xml")));
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/siteModel.xml")));
+        dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("alfresco/model/forumModel.xml")));
         dictionaryDao.putModel(M2Model.createModel(getClass().getClassLoader().getResourceAsStream("static/model/archivModel.xml")));
 
       //  dictionaryDao.getDictionaryRegistry(tenantService.getCurrentUserDomain()).getModel(QName.createQName("{archiv.model}archivModel"))

@@ -144,7 +144,7 @@ public class ObjectServiceMock {
                 TreeNode parent = repository.findTreeNodeForId((String) invocation.getArguments()[2]);
                 String path = parent.getPath();
                 FileableCmisObject newObject;
-                newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, MockUtils.getInstance().getFolderType(), null);
+                newObject = MockUtils.getInstance().createFileableCmisObject(repository, props.getProperties(), path, name, MockUtils.getInstance().getFolderType("cmis:folder"), null);
                 repository.insert(parent, newObject, true);
 
                 return newObject.getId();

@@ -313,9 +313,15 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     public TreeNode<T> createFolder(String name) {
-        FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType(), null);
+        FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType("cmis:folder"), null);
         return ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, true);
-        
+    }
+
+    public TreeNode<T> createNode(String name, String type, String aspect){
+        FileableCmisObject newComment = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getDocumentType(type), null);
+        TreeNode<T> node = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newComment, true);
+        node.addAspect(aspect);
+        return node;
     }
 
     public boolean isSubType(String name) {

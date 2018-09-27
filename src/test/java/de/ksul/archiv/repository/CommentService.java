@@ -1,6 +1,7 @@
 package de.ksul.archiv.repository;
 
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,6 +12,11 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 public class CommentService {
 
     public TreeNode<?> createCommentsFolder(TreeNode<?> node) {
-        return null;
+        if (!node.isSubType("cmis:document"))
+            throw new CmisRuntimeException("Discusions only for documents");
+        MockUtils mockUtils = MockUtils.getInstance();
+        Repository repository = Repository.getInstance();
+        
+        return repository.insert((TreeNode<FileableCmisObject>) node, mockUtils.createFileableCmisObject(repository, null, node.getPath(), node.getName() + " Diskussion", mockUtils.getFolderType("fm:forum"), null), false);
     }
 }

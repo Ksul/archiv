@@ -90,11 +90,11 @@ public class MockUtils {
 
     private static FolderTypeImpl folderType;
 
-    public FolderTypeImpl getFolderType() {
+    public FolderTypeImpl getFolderType(String id) {
 
         if (folderType == null) {
             FolderTypeDefinitionImpl folderTypeDefinition = new FolderTypeDefinitionImpl();
-            Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap("cmis:folder");
+            Map<String, PropertyDefinition<?>> folderDefinitionMap = propertyDefinitionBuilder.getPropertyDefinitionMap(id);
             folderTypeDefinition.setPropertyDefinitions(folderDefinitionMap);
             folderType = new FolderTypeImpl(sessionImpl, folderTypeDefinition);
             folderType.setId(EnumBaseObjectTypeIds.CMIS_FOLDER.value());

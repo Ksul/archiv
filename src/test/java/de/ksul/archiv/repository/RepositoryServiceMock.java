@@ -42,7 +42,7 @@ public class RepositoryServiceMock {
                 if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_DOCUMENT.value()))
                     return MockUtils.getInstance().getDocumentType(string);
                 else if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_FOLDER.value()))
-                    return MockUtils.getInstance().getFolderType();
+                    return MockUtils.getInstance().getFolderType(string);
                 else if (string.equalsIgnoreCase(EnumBaseObjectTypeIds.CMIS_ITEM.value()))
                     return MockUtils.getInstance().getItemType();
                 else if (string.startsWith("P:"))

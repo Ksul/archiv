@@ -132,9 +132,9 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             MockUtils mockUtils = MockUtils.getInstance();
             mockUtils.setSession(sessionImpl);
             TreeNode node;
-            node = repository.insert(null, mockUtils.createFileableCmisObject(repository, null, null, archivProperties.getCompanyHomeName(), mockUtils.getFolderType(), null), false);
-            node = repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), mockUtils.getFolderType(), null), false);
-            node = repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), mockUtils.getFolderType(), null), false);
+            node = repository.insert(null, mockUtils.createFileableCmisObject(repository, null, null, archivProperties.getCompanyHomeName(), mockUtils.getFolderType("cmis:folder"), null), false);
+            node = repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), mockUtils.getFolderType("cmis:folder"), null), false);
+            node = repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName(), mockUtils.getFolderType("cmis:folder"), null), false);
             repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "backup.js.sample", mockUtils.getDocumentType("cmis:document"), "application/x-javascript"), mockUtils.createStream("// ", "application/x-javascript"), "1.0", false);
             repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "alfresco docs.js.sample", mockUtils.getDocumentType("cmis:document"), "application/x-javascript"), mockUtils.createStream("// ", "application/x-javascript"), "1.0", false);
             repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName(), "doc.xml", mockUtils.getDocumentType("cmis:document"), "text/xml"), mockUtils.createFileStream("classpath:static/rules/doc.xml", "text/xml"), "1.0", false);
