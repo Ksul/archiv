@@ -42,8 +42,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     public String content;
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
-    public NodeProperties properties = new NodeProperties();
-    public NodeProperties childAssocs  = new NodeProperties();
+    public NodeProperties properties;
+    public NodeProperties childAssocs;
     public boolean isLeaf() {
         return childs.size() == 0;
     }
@@ -61,6 +61,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.path ="";
         this.obj = new Type(obj.getProperties(), obj.getType(), obj.getSecondaryTypes());
         this.childs = new HashMap<>();
+        this.properties = new NodeProperties(this.obj);
+        this.childAssocs = new NodeProperties(this.obj);
         copyValues();
      }
 
@@ -74,6 +76,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         this.path ="";
         this.obj = new Type(obj.getProperties(), obj.getType(), obj.getSecondaryTypes());
         this.childs = new HashMap<>();
+        this.properties = new NodeProperties(this.obj);
+        this.childAssocs = new NodeProperties(this.obj);
         if (version != null) {
             changePropertie(PropertyIds.LAST_MODIFICATION_DATE, MockUtils.getInstance().copyDateTimeValue(new Date().getTime()));
             changePropertie(PropertyIds.VERSION_LABEL, version);
@@ -318,9 +322,11 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     }
 
     public TreeNode<T> createNode(String name, String type, String aspect){
-        FileableCmisObject newComment = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getDocumentType(type), null);
+        if (!type.startsWith("F:"))
+        type = "F:" + type;
+        FileableCmisObject newComment = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType(type), null);
         TreeNode<T> node = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newComment, true);
-        node.addAspect(aspect);
+        //node.addAspect(aspect);
         return node;
     }
 

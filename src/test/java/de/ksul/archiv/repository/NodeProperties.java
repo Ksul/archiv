@@ -3,14 +3,13 @@ package de.ksul.archiv.repository;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.internal.objects.NativeDate;
 import jdk.nashorn.internal.runtime.ScriptObject;
+import org.apache.chemistry.opencmis.client.api.ObjectType;
+import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.assertj.core.util.Lists;
 import org.assertj.core.util.Maps;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,8 +19,18 @@ import java.util.Map;
  */
 public class NodeProperties extends HashMap<String, Object> {
 
+    private Type type;
+
+
+    public NodeProperties(Type type) {
+        this.type = type;
+    }
+
+
+
     @Override
     public Object put(String key, Object value) {
+        key = findNameForyKey(key);
         if (super.containsKey(key))
             return super.put(key, convertIntoJavaObject(value));
         else
@@ -33,7 +42,14 @@ public class NodeProperties extends HashMap<String, Object> {
         return super.put(key, value);
     }
 
-    private static Object convertIntoJavaObject(Object scriptObj) {
+    private String findNameForyKey(String key) {
+        Optional<Property<?>> op = this.type.getProperties().stream().filter(e -> e.getLocalName().equals(key)).findFirst();
+        if (op.isPresent())
+            return op.get().getId();
+    return key;
+    }
+
+    private Object convertIntoJavaObject(Object scriptObj) {
         if (scriptObj instanceof ScriptObjectMirror) {
             ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) scriptObj;
             if (scriptObjectMirror.isArray()) {
