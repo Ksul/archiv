@@ -462,6 +462,15 @@ public class Repository {
         }
     }
 
+    public Map getComments(String objectId){
+        Map<String, String> result = new HashMap<>();
+        TreeNode<?> node = findTreeNodeForId(objectId);
+        for(TreeNode<?> folderNode : node.childs.values()) {
+            folderNode.getName();
+        }
+        return result;
+    }
+
 
 
 

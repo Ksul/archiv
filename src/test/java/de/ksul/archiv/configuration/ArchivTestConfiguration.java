@@ -1,9 +1,7 @@
 package de.ksul.archiv.configuration;
 
-import de.ksul.archiv.AlfrescoConnector;
-import de.ksul.archiv.repository.CMISSessionGenerator;
+import de.ksul.archiv.AlfrescoTestConnector;
 import de.ksul.archiv.repository.CMISSessionGeneratorMock;
-import de.ksul.archiv.repository.Repository;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -58,8 +56,8 @@ public class ArchivTestConfiguration {
 
     @Bean
     @Autowired
-    AlfrescoConnector getConnector(Session session, ArchivProperties archivProperties) {
-        return  new AlfrescoConnector(session, null, null, null, null, archivProperties.getCompanyHomeName(), archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName());
+    AlfrescoTestConnector getConnector(Session session, ArchivProperties archivProperties) {
+        return  new AlfrescoTestConnector(session, null, null, null, null, archivProperties.getCompanyHomeName(), archivProperties.getDataDictionaryName(), archivProperties.getScriptDirectoryName());
 
     }
 
