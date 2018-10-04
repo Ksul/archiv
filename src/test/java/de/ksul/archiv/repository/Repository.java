@@ -462,11 +462,29 @@ public class Repository {
         }
     }
 
-    public Map getComments(String objectId){
-        Map<String, String> result = new HashMap<>();
+    public Map getComments(String objectId) {
+        TreeNode<?> commentFolder = null;
+        Map<String, Object> result = new LinkedHashMap<>();
         TreeNode<?> node = findTreeNodeForId(objectId);
         for(TreeNode<?> folderNode : node.childs.values()) {
-            folderNode.getName();
+            if (folderNode.getName().equals(node.getName() + " Diskussion")) {
+                commentFolder = folderNode;
+                break;
+            }
+        }
+        if (commentFolder != null) {
+            LinkedHashMap<String, Boolean> permissions = new LinkedHashMap();
+            permissions.put("create", true);
+            permissions.put("edit", true);
+            permissions.put("delete", true);
+            result.put("nodePermissions", permissions);
+            result.put("total", Integer.valueOf(commentFolder.childs.values().size()));
+            result.put("pageSize", 10);
+            result.put("startIndex", 0);
+            result.put("itemCount", Integer.valueOf(commentFolder.childs.values().size()));
+            for (TreeNode<?> folderNode : commentFolder.childs.values()) {
+
+            }
         }
         return result;
     }
