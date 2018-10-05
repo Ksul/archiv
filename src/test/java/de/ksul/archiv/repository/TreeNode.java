@@ -19,6 +19,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.joda.time.LocalTime;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,7 +31,7 @@ import java.util.*;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
+public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoScriptApi<T> {
 
     private String id;
     public String name;
@@ -187,6 +188,18 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
             return parent.getLevel() + 1;
     }
 
+    GregorianCalendar getCreationDate() {
+        if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CREATION_DATE)).findFirst().isPresent())
+            return null;
+        return obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CREATION_DATE)).findFirst().get().getValue();
+    }
+
+    GregorianCalendar getModifiedDate() {
+        if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.LAST_MODIFICATION_DATE)).findFirst().isPresent())
+            return null;
+        return obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.LAST_MODIFICATION_DATE)).findFirst().get().getValue();
+    }
+
     private void registerChild(TreeNode<T> node) {
 
         if (parent != null)
@@ -226,6 +239,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return null;
     }
 
+    @Override
     public TreeNode<T> childByNamePath(String name) {
         if (name.endsWith("/")) {
             name = name.substring(0, name.length() - 1);
@@ -291,6 +305,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         obj.setProperties(MockUtils.getInstance().convPropertyData(props));
     }
 
+    @Override
     public TreeNode<T> transformDocument(String mimeType) {
         if (mimeType.equals("text/plain")) {
             String newName = getName().substring(0, getName().lastIndexOf(".") + 1) + "txt";
@@ -316,11 +331,13 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         }
     }
 
+    @Override
     public TreeNode<T> createFolder(String name) {
         FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType("cmis:folder"), null);
         return ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, true);
     }
 
+    @Override
     public TreeNode<T> createNode(String name, String type, String aspect){
         if (!type.startsWith("F:"))
         type = "F:" + type;
@@ -330,11 +347,32 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return node;
     }
 
+    @Override
+    public TreeNode<T> createNode(String name, String type) {
+        return createNode(name, type, null);
+    }
+
+
+    @Override
+    public TreeNode<T> createFile(String name) {
+        return createFile(name, "cm:content");
+    }
+
+    @Override
+    public TreeNode<T> createFile(String name, String type) {
+        FileableCmisObject newNode = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getDocumentType(type), null);
+        TreeNode<T> node = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newNode, false);
+
+        return node;
+    }
+
+    @Override
     public boolean isSubType(String name) {
         String typeName = obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue();
         return MockUtils.getInstance().getPropertyDefinitionBuilder().isSubtypeOf(typeName, name);
     }
 
+    @Override
     public void specializeType(String key) {
         if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_DOCUMENT.value())) {
             if (!key.startsWith("D:"))
@@ -354,6 +392,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         }
     }
 
+    @Override
     public void addAspect(String key) {
         if (!key.startsWith("P:"))
             key = "P:" + key;
@@ -369,24 +408,29 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
 
     }
 
+    @Override
     public boolean hasAspect(String key) {
         return ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).findFirst().get()).getValues().contains(key);
     }
 
+    @Override
     public void addTag(String name) {
         //TODO Implementierung
     }
 
-    public void createAssociation( Object target, String name){
+    @Override
+    public void createAssociation(Object target, String name){
         childAssocs.put(name, target);
     }
 
+    @Override
     public List<TreeNode<T>> getRootCategories(String name) {
         if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
             throw new CmisRuntimeException("no category node");
         return null;
     }
 
+    @Override
     public TreeNode<T> createRootCategory(String aspect, String name) {
         if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
             throw new CmisRuntimeException("no category node");
@@ -395,6 +439,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
     }
 
+    @Override
     public TreeNode<T> createSubCategory(String name) {
         if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
             throw new CmisRuntimeException("no category node");
@@ -403,6 +448,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
     }
 
+    @Override
     public void save() {
         for (String key: properties.keySet())
             MockUtils.getInstance().fillProperty(key, properties.get(key));

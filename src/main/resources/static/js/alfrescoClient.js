@@ -471,7 +471,7 @@ function loadAlfrescoTable() {
                 url: (window.location.pathname === "/context.html" ? "http://localhost:8080/Archiv" : window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2))) + "/listFolderWithPagination",
                 type: "POST",
                 data: function (obj, meta) {
-                     obj.folderId = meta.oInit.folderId;
+                    obj.folderId = meta.oInit.folderId;
                     obj.withFolder = meta.oInit.withFolder;
                     duration = new Date().getTime();
                     return JSON.stringify(obj);
@@ -642,12 +642,17 @@ function loadAlfrescoTable() {
                     targets: [1],
                     render: function (obj, type, row, meta) {
                         try {
-                                if (obj && obj === "application/pdf" && !meta.settings.oInit.iconView) {
+                                if (obj && !meta.settings.oInit.iconView) {
                                     let span = document.createElement("span");
                                     let image = document.createElement('div');
                                     image.id = "alfrescoTableIcon" + row.objectID;
-                                    image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable far fa-file-pdf fa-15x awesomeEntity";
-                                    image.title = "PDF Dokument";
+                                    if (obj === "application/pdf" ) {
+                                        image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable far fa-file-pdf fa-15x awesomeEntity";
+                                        image.title = "PDF Dokument";
+                                    } else if (obj === "text/plain" ) {
+                                        image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable far fa-file-alt fa-15x awesomeEntity";
+                                        image.title = "Text Dokument";
+                                    }
                                     image.draggable = true;
                                     image.style.cursor = "pointer";
                                     $('#alfrescoTabelle tbody').on( 'click', '#' + image.id, function (event) {
@@ -1014,6 +1019,7 @@ function loadAlfrescoFolderTable() {
                             obj.objectID === unknownFolderId ||
                             obj.objectID === doubleFolderId ||
                             obj.objectID === documentFolderId ||
+                            obj.objectID === logboxFolderId ||
                             obj.objectID === inboxFolderId)
                             $(tableData).addClass("read_only");
                         else
@@ -1083,6 +1089,8 @@ function loadAlfrescoFolderTable() {
                     dt.data().objectID !== fehlerFolderId &&
                     // der Ordner darf nicht der Inbox Folder sein
                     dt.data().objectID !== inboxFolderId &&
+                        // der Ordner darf nicht der Log Folder sein
+                    dt.data().objectID !== logboxFolderId &&
                     // der Ordner darf nicht der Unknown Folder sein
                     dt.data().objectID !== unknownFolderId &&
                     // der Ordner darf nicht der Doppelte Folder sein
@@ -1705,6 +1713,7 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
             data.objectID !== fehlerFolderId &&
             data.objectID !== unknownFolderId &&
             data.objectID !== doubleFolderId &&
+            data.objectID !== logboxFolderId &&
             data.objectID !== inboxFolderId) {
             image = document.createElement("i");
             image.href = "#";
@@ -1731,6 +1740,7 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
             data.objectID !== unknownFolderId &&
             data.objectID !== doubleFolderId &&
             data.objectID !== inboxFolderId &&
+            data.objectID !== logboxFolderId &&
             data.objectID !== documentFolderId) {
             image = document.createElement("i");
             image.href = "#";
@@ -2210,6 +2220,12 @@ function switchAlfrescoDirectory(data) {
         else
             objectID = "-1";
         alfrescoTabelle.settings().init().folderId = objectID;
+        if (objectID === logboxFolderId) {
+            // LogFolder auch normale Dokumente (nicht nur vom Typ my:archivcontent) anzeigen
+            alfrescoTabelle.settings().init().withFolder = 2;
+        } else {
+            alfrescoTabelle.settings().init().withFolder = 1;
+        }
         alfrescoTabelle.ajax.reload();
         alfrescoFolderTabelle.settings().init().folderId = objectID;
         alfrescoFolderTabelle.ajax.reload();
@@ -2645,6 +2661,10 @@ function buildObjectForTree(data) {
             // Fehler Folder
             item["type"] = "archivDoubleFolderStandard";
         }
+        if (data.objectID === logboxFolderId) {
+            // Log Folder
+            item["type"] = "archivLogFolderStandard";
+        }
         if (data.objectID === documentFolderId) {
             // Fehler Folder
             item["type"] = "archivDocumentFolderStandard";
@@ -2785,6 +2805,8 @@ function loadAlfrescoTree() {
                     sourceData.objectID !== fehlerFolderId &&
                         // der zu verschiebene Ordner darf nicht der Inbox Folder sein
                     sourceData.objectID !== inboxFolderId &&
+                    // der zu verschiebene Ordner darf nicht der Log Folder sein
+                    sourceData.objectID !== logboxFolderId &&
                         // der zu verschiebene Ordner darf nicht der Unknown Folder sein
                     sourceData.objectID !== unknownFolderId &&
                         // der zu verschiebene Ordner darf nicht der Doppelte Folder sein
@@ -2794,8 +2816,10 @@ function loadAlfrescoTree() {
                     (sourceData.baseTypeId === "cmis:folder" || (sourceData.baseTypeId === "cmis:document" && targetData.objectID !== documentFolderId)) &&
                         // Ziel für Objekte darf nicht AlfrescoRootFolder sein
                     targetData.objectID !== alfrescoRootFolderId &&
-                        // Ziel für den Objekte darf nicht der ArchivRootFolder sein
+                        // Ziel für Objekte darf nicht der ArchivRootFolder sein
                     targetData.objectID !== archivFolderId &&
+                    // Ziel für Objekte darf nicht der Log Folder sein
+                    targetData.objectID !== logboxFolderId &&
                         // Ziel für Ordner darf nicht Fehler Folder sein
                     (sourceData.baseTypeId === "cmis:document" || (sourceData.baseTypeId === "cmis:folder" && targetData.objectID !== fehlerFolderId)) &&
                         // Ziel für den Ordner darf nicht der Folder für die Doppelten sein
@@ -2893,6 +2917,11 @@ function loadAlfrescoTree() {
             delete items.delete;
             delete items.create;
         }
+        // Im Log kein Delete und Create
+        if (tree.get_type(node) === "archivLogFolderStandard") {
+            delete items.delete;
+            delete items.create;
+        }
         // Im Ordner für die Dokumente kein Delete
         if (tree.get_type(node) === "archivDocumentFolderStandard") {
             delete items.delete;
@@ -2939,6 +2968,7 @@ function loadAlfrescoTree() {
                              node.data.objectID !== alfrescoRootFolderId &&
                              node.data.objectID !== archivFolderId &&
                              node.data.objectID !== inboxFolderId &&
+                             node.data.objectID !== logboxFolderId &&
                              node.data.objectID !== fehlerFolderId &&
                              node.data.objectID !== unknownFolderId &&
                              node.data.objectID !== doubleFolderId &&
@@ -2949,6 +2979,7 @@ function loadAlfrescoTree() {
                              par.id !== alfrescoRootFolderId &&
                              par.id !== archivFolderId &&
                              par.id !== inboxFolderId &&
+                             par.id !== logboxFolderId &&
                              par.id !== fehlerFolderId &&
                              par.id !== unknownFolderId &&
                              par.id !== doubleFolderId) {
@@ -2964,6 +2995,7 @@ function loadAlfrescoTree() {
                              par.id !== alfrescoRootFolderId &&
                              par.id !== archivFolderId &&
                              par.id !== documentFolderId &&
+                             par.id !== logboxFolderId &&
                              par.id !== node.data.parentId ) {
                             erg = true;
                         }
@@ -2993,6 +3025,10 @@ function loadAlfrescoTree() {
                     icon: "far fa-folder fa-15x awesomeEntity"
                 },
                 'archivDoubleFolderStandard' : {
+                    valid_children : [],
+                    icon: "far fa-folder fa-15x awesomeEntity"
+                },
+                'archivLogFolderStandard' : {
                     valid_children : [],
                     icon: "far fa-folder fa-15x awesomeEntity"
                 },
@@ -3464,6 +3500,13 @@ function checkAndBuidAlfrescoEnvironment() {
             erg = buildAlfrescoFolder("/Archiv/Inbox", archivFolderId, "Der Posteingangsordner");
             if (erg.success) {
                 inboxFolderId = erg.data.objectID;
+            }
+        }
+        if (erg.success) {
+            // Log prüfen
+            erg = buildAlfrescoFolder("/Archiv/Log", archivFolderId, "Der Logordner");
+            if (erg.success) {
+                logboxFolderId = erg.data.objectID;
             }
         }
         if (erg.success) {

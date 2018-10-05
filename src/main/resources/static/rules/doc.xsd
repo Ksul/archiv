@@ -434,6 +434,12 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
+            <xsd:attribute name="logBox" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>legt den Ort für die Logs fest.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
             <xsd:attribute name="debugLevel" type="debugLevelType">
                 <xsd:annotation>
                     <xsd:documentation>spezifiziert den Debuglevel</xsd:documentation>

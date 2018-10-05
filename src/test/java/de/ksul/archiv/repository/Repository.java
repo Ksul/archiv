@@ -27,6 +27,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -473,6 +474,11 @@ public class Repository {
             }
         }
         if (commentFolder != null) {
+            SimpleDateFormat simpleDateFormat =
+                    new SimpleDateFormat("MMM dd yyyy HH:mm:ss zZ' (UTC)'");
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            SimpleDateFormat dfIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+            dfIso.setTimeZone(TimeZone.getTimeZone("GMT"));
             LinkedHashMap<String, Boolean> permissions = new LinkedHashMap();
             permissions.put("create", true);
             permissions.put("edit", true);
@@ -482,9 +488,24 @@ public class Repository {
             result.put("pageSize", 10);
             result.put("startIndex", 0);
             result.put("itemCount", Integer.valueOf(commentFolder.childs.values().size()));
+            List<LinkedHashMap<String, Object>> items = new ArrayList<>();
+            LinkedHashMap<String, String> author = new LinkedHashMap<>(3);
+            author.put("username", "admin");
+            author.put("firstName", "Administrator");
+            author.put("lastName", "");
             for (TreeNode<?> folderNode : commentFolder.childs.values()) {
-
+                LinkedHashMap<String, Object> item = new LinkedHashMap<>();
+                item.put("content", folderNode.content);
+                item.put("name", folderNode.getId());
+                item.put("author", author);
+                item.put("createdOn", simpleDateFormat.format(folderNode.getCreationDate()));
+                item.put("modifiedOn", simpleDateFormat.format(folderNode.getModifiedDate()));
+                item.put("createdOnISO", dfIso.format(folderNode.getCreationDate()));
+                item.put("modifiedOnISO", dfIso.format(folderNode.getModifiedDate()));
+                item.put("isUpdated", false);
+                items.add(item);
             }
+            result.put("items", items);
         }
         return result;
     }

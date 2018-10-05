@@ -3686,6 +3686,14 @@ REC = {
             Logger.log(Level.INFO, "Inbox is located: " + this.completeNodePath(this.inBox));
         else
             throw "Inbox not found!";
+        if (rules.logBox)
+            this.logBox = this.archivRoot.childByNamePath(this.trim(rules.logBox));
+        else
+            this.logBox = this.archivRoot.childByNamePath("Log");
+        if (this.logBox)
+            Logger.log(Level.INFO, "Log is located: " + this.completeNodePath(this.logBox));
+        else
+            throw "Log not found!";
         if (rules.errorBox)
             this.errorBox = this.archivRoot.childByNamePath(this.trim(rules.errorBox));
         else
@@ -3726,6 +3734,24 @@ REC = {
         if (!ruleFound) {
             this.moveDocToUnknownBox(doc);
         }
+        // Log Eintrag erzeugen
+        var name = doc.name + ".log";
+        var logNode = this.logBox.createFile(name, "cmis:document");
+        var cont = "";
+        if (REC.errors.length > 0) {
+            // Fehlerkommentar hinzufügen
+            cont = cont + "<table border=\"1\"> <tr><td>Nummer</td><td>Fehler</td></tr> ";
+            for (var i = 0; i < REC.errors.length; i++) {
+                cont = cont + "<tr>";
+                cont = cont + "<td>" + (i + 1) + "</td>";
+                cont = cont + "<td>" + REC.errors[i] + "</td>";
+                cont = cont + "</tr>";
+            }
+            cont = cont + "</table><br>";
+        }
+        cont = cont + Logger.getMessages(true);
+        logNode.content = cont;
+        logNode.save();
         Logger.log(Level.INFO, "Processing of document " + docName + " finished!");
     },
 
@@ -3783,6 +3809,7 @@ REC = {
         this.archivRoot = companyhome.createFolder("Archiv");
         this.unknownBox = this.archivRoot.createFolder("Unbekannt");
         this.inBox = this.archivRoot.createFolder("Inbox");
+        this.logBox = this.archivRoot.createFolder("Log");
         this.errorBox  = this.archivRoot.createFolder("Fehler");
         this.duplicateBox = this.errorBox.createFolder("Doppelte");
         this.currentDocument = companyhome.createNode('WebScriptTest', "my:archivContent");
@@ -3796,6 +3823,7 @@ REC = {
     errorBox: null,
     unknownBox: null,
     fehlerBox: null,
+    logBox: null,
     maxDebugLength: 0,
     mandatoryElements: [],
     currentSearchItems: [],
