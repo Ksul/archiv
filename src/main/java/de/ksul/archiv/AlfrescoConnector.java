@@ -86,6 +86,8 @@ public class AlfrescoConnector {
     private final static String DOCUMENT_SQL_STRING = "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, d.my:documentDate, o.cm:title  from my:archivContent as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "WHERE IN_FOLDER(d, ?) ";
+    private final static String DOCUMENT_ALL_SQL_STRING = "select o.cmis:objectId, o.cmis:name, o.cmis:creationDate, o.cm:title  from cmis:document as o " +
+            "WHERE IN_FOLDER(o, ?) ";
     private final static String FOLDER_SQL_STRING = "select d.*, o.* from cmis:folder as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "WHERE IN_FOLDER(d, ?) AND d.cmis:objectTypeId<>'F:cm:systemfolder'";
@@ -285,6 +287,15 @@ public class AlfrescoConnector {
             }
             case VerteilungConstants.LIST_MODUS_DOCUMENTS:{  // nur Dokumente
                 StringBuilder query = new StringBuilder(DOCUMENT_SQL_STRING);
+
+                query.append(" ORDER BY " + buildOrder(order, columns, modus));
+                QueryStatement stmt = session.createQueryStatement(query.toString());
+                stmt.setString(1, folderId);
+                result = getCmisObjects(stmt, operationContext);
+                break;
+            }
+            case VerteilungConstants.LIST_MODUS_DOCUMENTS_ALL:{  // alle Dokumente (nicht nur die aus dem Archiv)
+                StringBuilder query = new StringBuilder(DOCUMENT_ALL_SQL_STRING);
 
                 query.append(" ORDER BY " + buildOrder(order, columns, modus));
                 QueryStatement stmt = session.createQueryStatement(query.toString());

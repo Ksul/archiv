@@ -20,10 +20,10 @@ public class DataTablesRequest  {
     private String folderId;
 
     /**
-     * mögliche Werte: -1 nur Folder  0: beides  1: nur Dokumente
+     * mögliche Werte: -1 nur Folder  0: beides  1: nur Dokumente  2: alle Dokumente ( nicht nur vom Typ my:archivcontent)
      */
     @Min(-1)
-    @Max(1)
+    @Max(2)
     private int withFolder;
 
     private String cmisQuery;
