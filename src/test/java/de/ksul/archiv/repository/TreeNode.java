@@ -155,9 +155,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
     public boolean move(TreeNode<T> destination) {
         try {
             moveNode(destination);
-            if (destination.getName().equalsIgnoreCase("Inbox")) {
-                Repository.getInstance().executeScript(this);
-            }
             return true;
         } catch(Exception e) {
             return false;
@@ -172,6 +169,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable {
         deRegisterChild(this);
         newParent.registerChild(this);
         updateProperty(PropertyIds.PARENT_ID, newParent.getId());
+        if (newParent.getName().equalsIgnoreCase("Inbox")) {
+            Repository.getInstance().executeScript(this);
+        }
         return this;
     }
 
