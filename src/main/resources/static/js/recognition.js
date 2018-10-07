@@ -328,14 +328,13 @@ function LoggerDefinition(debugLevel) {
             var ret = [];
             if (!level)
                 level = Logger.getLevel();
+            var z = 0;
             for (var i = 0; i < this.messages.length; i++) {
-                var message = this.messages[i];
-
-                if (message.isRelevant(level)) {
-                    var messParts = [];
-                    messParts.push(Formatter.dateFormat(message.datum, "G:i:s,u"));
-                    messParts.push(message.txt);
-                    ret.push(messParts);
+                if (this.messages[i].isRelevant(level)) {
+                    ret[z] = [];
+                    ret[z][0] =Formatter.dateFormat(this.messages[i].datum, "G:i:s,u");
+                    ret[z][1] = this.messages[i].text;
+                    z++;
                 }
                 if (reverse) {
                     return ret.reverse();
@@ -3776,11 +3775,11 @@ REC = {
             cont = cont + "</table><br>";
         }
         cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Meldung</td></tr> ";
-        var messages = Logger.getRawMessages(false);
-        for (var i = 0; i < messages.length; i++) {
+        var m = Logger.getRawMessages(false);
+        for (var i = 0; i < m.length; i++) {
             cont = cont + "<tr>";
-            cont = cont + "<td>" + messages[i][0] + "</td>";
-            cont = cont + "<td>" + messages[i][1] + "</td>";
+            cont = cont + "<td>" + m[i][0] + "</td>";
+            cont = cont + "<td>" + m[i][1] + "</td>";
             cont = cont + "</tr>";
         }
         cont = cont + "</table><br>";
