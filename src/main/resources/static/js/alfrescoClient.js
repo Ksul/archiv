@@ -649,7 +649,7 @@ function loadAlfrescoTable() {
                                     if (obj === "application/pdf" ) {
                                         image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable far fa-file-pdf fa-15x awesomeEntity";
                                         image.title = "PDF Dokument";
-                                    } else if (obj === "text/plain" ) {
+                                    } else if (obj === "text/html" ) {
                                         image.className = "alfrescoTableIconEvent alfrescoTableDragable treeDropable far fa-file-alt fa-15x awesomeEntity";
                                         image.title = "Text Dokument";
                                     }

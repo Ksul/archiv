@@ -3751,6 +3751,7 @@ REC = {
         }
         cont = cont + Logger.getMessages(true);
         logNode.content = cont;
+        logNode.mimetype = "text/html";
         logNode.save();
         Logger.log(Level.INFO, "Processing of document " + docName + " finished!");
     },

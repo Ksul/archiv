@@ -10,14 +10,20 @@ import org.apache.chemistry.opencmis.client.api.ItemType;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.joda.time.LocalTime;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -41,6 +47,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     private TreeMap<String, Type> versions = new TreeMap<>(Collections.reverseOrder());
     public TreeNode<T> parent;
     public String content;
+    public String mimetype;
     @JsonProperty("childs")
     Map<String, TreeNode<T>> childs;
     public NodeProperties properties;
@@ -450,8 +457,21 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     @Override
     public void save() {
+        if (mimetype != null)
+            updateProperty(PropertyIds.CONTENT_STREAM_MIME_TYPE, mimetype);
+        if (content != null){
+
+            try {
+                InputStream stream = new ByteArrayInputStream(content.getBytes("UTF-8"));
+                ContentStream contentStream = new ContentStreamImpl(null, BigInteger.valueOf(content.length()), mimetype, stream);
+                Repository.getInstance().createContent(getId(), contentStream, true);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
         for (String key: properties.keySet())
             MockUtils.getInstance().fillProperty(key, properties.get(key));
+
     }
 
 
@@ -470,7 +490,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     void updateProperty(String name, Object value) {
-        ((PropertyImpl) ((FileableCmisObject) getObj()).getProperty(PropertyIds.CONTENT_STREAM_ID)).setValue(value);
+        ((PropertyImpl) ((FileableCmisObject) getObj()).getProperty(name)).setValue(value);
         properties._put(name,value);
     }
 
