@@ -324,6 +324,26 @@ function LoggerDefinition(debugLevel) {
                 return ret.join("\n");
             }
         },
+        getRawMessages: function (reverse, level) {
+            var ret = [];
+            if (!level)
+                level = Logger.getLevel();
+            for (var i = 0; i < this.messages.length; i++) {
+                var message = this.messages[i];
+
+                if (message.isRelevant(level)) {
+                    var messParts = [];
+                    messParts.push(Formatter.dateFormat(message.datum, "G:i:s,u"));
+                    messParts.push(message.txt);
+                    ret.push(messParts);
+                }
+                if (reverse) {
+                    return ret.reverse();
+                } else {
+                    return ret;
+                }
+            }
+        },
         getLastMessage: function() {
             return this.messages[this.messages.length - 1];
         },
@@ -355,6 +375,12 @@ function LoggerDefinition(debugLevel) {
         if (!level)
             level = this.debugLevel;
         return this.Messages.getMessages(reverse, level);
+    };
+
+    this.getRawMessages = function(reverse, level) {
+        if (!level)
+            level = this.debugLevel;
+        return this.Messages.getRawMessages(reverse, level);
     };
 
     this.getLastMessage = function(level){
@@ -3749,7 +3775,15 @@ REC = {
             }
             cont = cont + "</table><br>";
         }
-        cont = cont + Logger.getMessages(true);
+        cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Meldung</td></tr> ";
+        var messages = Logger.getRawMessages(false);
+        for (var i = 0; i < messages.length; i++) {
+            cont = cont + "<tr>";
+            cont = cont + "<td>" + messages[i][0] + "</td>";
+            cont = cont + "<td>" + messages[i][1] + "</td>";
+            cont = cont + "</tr>";
+        }
+        cont = cont + "</table><br>";
         logNode.content = cont;
         logNode.mimetype = "text/html";
         logNode.save();
