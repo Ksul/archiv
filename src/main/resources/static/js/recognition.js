@@ -3742,6 +3742,7 @@ REC = {
                 break;
         }
         if (!ruleFound) {
+            Logger.log(Level.INFO, "No suitable rule found!");
             this.moveDocToUnknownBox(doc);
         }
         // Log Eintrag erzeugen

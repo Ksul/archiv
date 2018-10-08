@@ -525,10 +525,17 @@ function loadAlfrescoTable() {
                         alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlRevert');
                         alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlNone');
                     }
-                    if (obj.parent === archivFolderId || obj.parent === documentFolderId){
+                    if (obj.parent === archivFolderId ||
+                        obj.parent === documentFolderId ||
+                        obj.parent === logboxFolderId ||
+                        obj.parent === fehlerFolderId ||
+                        obj.parent === doubleFolderId){
                         alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionUpload');
                     } else {
                         alfrescoDocumentActionMenu.superfish('enableItem', 'alfrescoDocumentActionUpload');
+                    }
+                    if (obj.parent === logboxFolderId ) {
+                        alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionMove');
                     }
                     return obj.data;
                 },
@@ -724,6 +731,10 @@ function loadAlfrescoTable() {
                     visible: true
                 },
                 {
+                    targets: [5],
+                    visible: true
+                },
+                {
                     targets: [6],
                     render: function (obj, type, row) {
                         if (row.amount) {
@@ -781,7 +792,8 @@ function loadAlfrescoTable() {
             }
         }).on( 'select', function ( e, dt, type, indexes ) {
             if ( type === 'row' ) {
-                alfrescoDocumentActionMenu.superfish('enableItem','alfrescoDocumentActionMove');
+                if (alfrescoTabelle.rows({selected:  true}).data()[0].parentId !== logboxFolderId)
+                    alfrescoDocumentActionMenu.superfish('enableItem','alfrescoDocumentActionMove');
                 alfrescoDocumentActionMenu.superfish('enableItem','alfrescoDocumentActionDelete');
                 alfrescoDocumentSelectMenu.superfish('enableItem','alfrescoDocumentAuswahlRevert');
                 alfrescoDocumentSelectMenu.superfish('enableItem','alfrescoDocumentAuswahlNone');
@@ -1776,44 +1788,47 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
 function alfrescoAktionFieldFormatter(data, type, full) {
     try {
         let container = document.createElement("div");
-        let image = document.createElement("i");
-        image.href = "#";
-        image.className = "detailEdit fas fa-pencil-alt fa-15x awesomeEntity";
-        image.title = "Details bearbeiten";
-        image.style.cursor = "pointer";
-        image.style.cssFloat = "left";
-        image.style.marginRight = "5px";
-        container.appendChild(image);
-
-        image = document.createElement("i");
-        image.href = "#";
-
-        if (data.commentCount > 0) {
+        if (data.parentId !== logboxFolderId) {
+            let image = document.createElement("i");
+            image.href = "#";
+            image.className = "detailEdit fas fa-pencil-alt fa-15x awesomeEntity";
+            image.title = "Details bearbeiten";
             image.style.cursor = "pointer";
-            if (data.commentCount === 1)
-                image.className = "showComments fas fa-comment fa-15x awesomeEntity";
-            else
-                image.className = "showComments fas fa-comments fa-15x awesomeEntity";
+            image.style.cssFloat = "left";
+            image.style.marginRight = "5px";
+            container.appendChild(image);
         }
-        else {
-             image.className = "showComments far fa-comment fa-15x awesomeEntity";
-            image.style.cursor = "none";
+        if (data.parentId !== logboxFolderId) {
+            image = document.createElement("i");
+            image.href = "#";
+
+            if (data.commentCount > 0) {
+                image.style.cursor = "pointer";
+                if (data.commentCount === 1)
+                    image.className = "showComments fas fa-comment fa-15x awesomeEntity";
+                else
+                    image.className = "showComments fas fa-comments fa-15x awesomeEntity";
+            }
+            else {
+                image.className = "showComments far fa-comment fa-15x awesomeEntity";
+                image.style.cursor = "none";
+            }
+            image.title = "Kommentare";
+            image.style.cursor = "pointer";
+            image.style.cssFloat = "left";
+            image.style.marginRight = "5px";
+            container.appendChild(image);
         }
-        image.title = "Kommentare";
-        image.style.cursor = "pointer";
-        image.style.cssFloat = "left";
-        image.style.marginRight = "5px";
-        container.appendChild(image);
-
-        image = document.createElement("i");
-        image.href = "#";
-        image.className = "moveDocument far fa-copy fa-15x awesomeEntity";
-        image.title = "Dokument verschieben";
-        image.style.cursor = "pointer";
-        image.style.cssFloat = "left";
-        image.style.marginRight = "5px";
-        container.appendChild(image);
-
+        if (data.parentId !== logboxFolderId) {
+            image = document.createElement("i");
+            image.href = "#";
+            image.className = "moveDocument far fa-copy fa-15x awesomeEntity";
+            image.title = "Dokument verschieben";
+            image.style.cursor = "pointer";
+            image.style.cssFloat = "left";
+            image.style.marginRight = "5px";
+            container.appendChild(image);
+        }
         image = document.createElement("i");
         image.href = "#";
         image.className = "deleteDocument far fa-trash-alt fa-15x awesomeEntity";
@@ -1822,16 +1837,16 @@ function alfrescoAktionFieldFormatter(data, type, full) {
         image.style.cssFloat = "left";
         image.style.marginRight = "5px";
         container.appendChild(image);
-
-        image = document.createElement("i");
-        image.href = "#";
-        image.className = "rulesDocument fab fa-wpforms fa-15x awesomeEntity";
-        image.title = "Dokument Regel erstellen";
-        image.style.cursor = "pointer";
-        image.style.cssFloat = "left";
-        image.style.marginRight = "5px";
-        container.appendChild(image);
-
+        if (data.parentId !== logboxFolderId) {
+            image = document.createElement("i");
+            image.href = "#";
+            image.className = "rulesDocument fab fa-wpforms fa-15x awesomeEntity";
+            image.title = "Dokument Regel erstellen";
+            image.style.cursor = "pointer";
+            image.style.cssFloat = "left";
+            image.style.marginRight = "5px";
+            container.appendChild(image);
+        }
         return container;
     } catch (e) {
         errorHandler(e);
