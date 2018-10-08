@@ -21,10 +21,10 @@ import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -109,15 +109,13 @@ public class PropertyDefinitionBuilder {
     }
 
     public TypeDefinition getTypeDefinition(String name) {
-        TypeDefinitionWrapper typeDefinitionWrapper = cmisDictionaryService.findType(name);
+        TypeDefinitionWrapper typeDefinitionWrapper = getTypeDefinitionWrapper(name);
         return typeDefinitionWrapper.getTypeDefinition(true);
     }
 
     public Map<String, PropertyDefinition<?>> getPropertyDefinitionMap(String name) {
 
-        TypeDefinitionWrapper typeDefinitionWrapper = cmisDictionaryService.findType(name);
-        if (typeDefinitionWrapper == null)
-            throw new CmisRuntimeException("type " + name + " not found!");
+        TypeDefinitionWrapper typeDefinitionWrapper = getTypeDefinitionWrapper(name);
         Collection<PropertyDefinitionWrapper> propertyDefinitions = typeDefinitionWrapper.getProperties(false);
 
         Map<String, PropertyDefinition<?>> propertyDefinitionMap = new HashMap<>();
@@ -126,6 +124,19 @@ public class PropertyDefinitionBuilder {
         }
 
         return propertyDefinitionMap;
+    }
+
+    private TypeDefinitionWrapper getTypeDefinitionWrapper(String name) {
+        TypeDefinitionWrapper typeDefinitionWrapper;
+        if (name.substring(1, 2).equals(":"))
+            name = name.substring(2);
+        String n = name;
+        Optional<TypeDefinitionWrapper> wrapper = cmisDictionaryService.getAllTypes().stream().filter(e -> e.getTypeDefinition(true).getQueryName().equals(n)).findFirst();
+        if (wrapper.isPresent())
+            typeDefinitionWrapper = wrapper.get();
+       else
+            throw new CmisRuntimeException("type " + name + " not found!");
+        return typeDefinitionWrapper;
     }
 
     public boolean isSubtypeOf(String nodeType, String typeName)

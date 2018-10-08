@@ -1,4 +1,6 @@
-package de.ksul.archiv.repository;
+package de.ksul.archiv.repository.script;
+
+import de.ksul.archiv.repository.TreeNode;
 
 import java.util.List;
 
@@ -14,6 +16,8 @@ public interface AlfrescoScriptApi<T> {
     TreeNode<T> transformDocument(String mimeType);
 
     TreeNode<T> createFolder(String name);
+
+    TreeNode<T> createFolder(String name, String type);
 
     TreeNode<T> createNode(String name, String type, String aspect);
 

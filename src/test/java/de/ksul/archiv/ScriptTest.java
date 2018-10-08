@@ -61,12 +61,12 @@ public class ScriptTest {
     public void setUp() throws Exception {
 
         root = Repository.getInstance().getRoot();
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/","Archiv", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
-        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Inbox", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
-        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Log", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
-        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Unbekannt", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
-        TreeNode<FileableCmisObject> fehler = Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Fehler", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
-        Repository.getInstance().insert(fehler, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv/Fehler","Doppelte", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+//        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/","Archiv", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+//        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Inbox", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+//        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Log", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+//        Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Unbekannt", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+//        TreeNode<FileableCmisObject> fehler = Repository.getInstance().insert(node, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv","Fehler", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
+//        Repository.getInstance().insert(fehler, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/Archiv/Fehler","Doppelte", MockUtils.getInstance().getFolderType("cmis:folder"), null), false);
         engine = new ScriptEngineManager().getEngineByName("nashorn");
         RecognizeEndpoints.setRepository(Repository.getInstance());
         RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
@@ -96,7 +96,7 @@ public class ScriptTest {
 
     @Test
     public void testScript() throws Exception {
-        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.txt", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createStream("Caffee Fausto   Rechnung Nr 12345  01.01.2010 Betrag  79€",  VerteilungConstants.DOCUMENT_TYPE_TEXT), "1.0", false);
+        TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test.txt", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_TEXT), MockUtils.getInstance().createStream("Caffee Fausto   Rechnung Nr 12345  01.01.2010 Betrag  79€",  VerteilungConstants.DOCUMENT_TYPE_TEXT), "1.0", false);
         RecognizeEndpoints.setDocument(node);
         engine.eval("document = Java.type('de.ksul.archiv.repository.script.RecognizeEndpoints').document;");
         invocable.invokeMethod(rec, "run");

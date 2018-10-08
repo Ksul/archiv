@@ -3,8 +3,7 @@ package de.ksul.archiv.repository;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import de.ksul.archiv.VerteilungConstants;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import de.ksul.archiv.repository.script.AlfrescoScriptApi;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.ItemType;
 import org.apache.chemistry.opencmis.client.api.Property;
@@ -18,14 +17,12 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedExceptio
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
-import org.joda.time.LocalTime;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -339,9 +336,16 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     @Override
-    public TreeNode<T> createFolder(String name) {
+    public TreeNode<T> createFolder(String name, String type) {
         FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType("cmis:folder"), null);
-        return ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, true);
+        TreeNode<T> newNode = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, false);
+        newNode.specializeType(type);
+        return newNode;
+    }
+
+    @Override
+    public TreeNode<T> createFolder(String name) {
+        return createFolder(name, "cmis:folder");
     }
 
     @Override
@@ -381,14 +385,14 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     @Override
     public void specializeType(String key) {
-        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_DOCUMENT.value())) {
-            if (!key.startsWith("D:"))
-                key = "D:" + key;
-        }
-        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_FOLDER.value())) {
-            if (!key.startsWith("F:"))
-                key = "F:" + key;
-        }
+//        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_DOCUMENT.value())) {
+//            if (!key.startsWith("D:"))
+//                key = "D:" + key;
+//        }
+//        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_FOLDER.value())) {
+//            if (!key.startsWith("F:"))
+//                key = "F:" + key;
+//        }
         Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
         obj.getObjectType().getPropertyDefinitions().putAll(definitionMap);
         for (PropertyDefinition propertyDefinition: definitionMap.values()) {
@@ -490,13 +494,18 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     void updateProperty(String name, Object value) {
-        ((PropertyImpl) ((FileableCmisObject) getObj()).getProperty(name)).setValue(value);
-        properties._put(name,value);
+        Optional<Property<?>> p = ((FileableCmisObject) getObj()).getProperties().stream().filter(e -> e.getQueryName().equals(name)).findFirst();
+        if (p.isPresent()) {
+            ((PropertyImpl) p.get()).setValue(value);
+            properties._put(name, value);
+        }
     }
 
     private void copyValues() {
         for (Property property: obj.getProperties()){
             properties._put(property.getId(), property.getValue());
+            if (property.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE))
+                mimetype = property.getValueAsString();
         }
     }
 

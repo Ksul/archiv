@@ -332,15 +332,15 @@ function LoggerDefinition(debugLevel) {
             for (var i = 0; i < this.messages.length; i++) {
                 if (this.messages[i].isRelevant(level)) {
                     ret[z] = [];
-                    ret[z][0] =Formatter.dateFormat(this.messages[i].datum, "G:i:s,u");
+                    ret[z][0] = Formatter.dateFormat(this.messages[i].datum, "G:i:s,u");
                     ret[z][1] = this.messages[i].text;
                     z++;
                 }
-                if (reverse) {
-                    return ret.reverse();
-                } else {
-                    return ret;
-                }
+            }
+            if (reverse) {
+                return ret.reverse();
+            } else {
+                return ret;
             }
         },
         getLastMessage: function() {
@@ -3678,6 +3678,33 @@ REC = {
     },
 
     /**
+     * baut einen Folder auf
+     * @param name              der Name aus den regeln
+     * @param defaultName       ein Default Name, wenn keiner in den Regeln sein sollte
+     * @param parentNode        der Eltern Knoten
+     * @param desription        Beschreibung für den Folder
+     * @return {*}              der neu erstellte Knoten
+     */
+    buildFolder: function (name, defaultName, parentNode, description) {
+        var n;
+        if (!name)
+            name = defaultName;
+        n = parentNode.childByNamePath(this.trim(name));
+        if (n)
+            Logger.log(Level.INFO, name + " is located: " + this.completeNodePath(n));
+        else {
+            n = parentNode.createFolder(name, "my:archivFolder");
+            if (!n)
+                throw name + " ist not available";
+            n.addAspect("cm:titled");
+            n.title = description;
+            n.save();
+        }
+        return n;
+        
+    },
+
+    /**
      * führt die Erkennung durch
      * @param doc       das zu erkennende Dokument
      * @param rules     die Regeln
@@ -3695,54 +3722,12 @@ REC = {
         this.currentDocument = doc;
         var docName = this.currentDocument.name;
         Logger.log(Level.INFO, "Process Dokument " + docName);
-        if (rules.archivRoot)
-            this.archivRoot = companyhome.childByNamePath(this.trim(rules.archivRoot));
-        else
-            this.archivRoot = companyhome.childByNamePath("Archiv");
-        if (this.archivRoot)
-            Logger.log(Level.INFO, "ArchivRoot is located: " + this.completeNodePath(this.archivRoot));
-        else
-            throw "Archiv Root not found!";
-        if (rules.inBox)
-            this.inBox = this.archivRoot.childByNamePath(this.trim(rules.inBox));
-        else
-            this.inBox = this.archivRoot.childByNamePath("Inbox");
-        if (this.inBox)
-            Logger.log(Level.INFO, "Inbox is located: " + this.completeNodePath(this.inBox));
-        else
-            throw "Inbox not found!";
-        if (rules.logBox)
-            this.logBox = this.archivRoot.childByNamePath(this.trim(rules.logBox));
-        else
-            this.logBox = this.archivRoot.childByNamePath("Log");
-        if (this.logBox)
-            Logger.log(Level.INFO, "Log is located: " + this.completeNodePath(this.logBox));
-        else
-            throw "Log not found!";
-        if (rules.errorBox)
-            this.errorBox = this.archivRoot.childByNamePath(this.trim(rules.errorBox));
-        else
-            this.errorBox = this.archivRoot.childByNamePath("Fehler");
-        if (this.errorBox)
-            Logger.log(Level.INFO, "ErrorBox is located: " + this.completeNodePath(this.errorBox));
-        else
-            throw "ErrorBox not found!";
-        if (rules.duplicateBox)
-            this.duplicateBox = this.archivRoot.childByNamePath(this.trim(rules.duplicateBox));
-        else
-            this.duplicateBox = this.archivRoot.childByNamePath("Fehler/Doppelte");
-        if (this.duplicateBox)
-            Logger.log(Level.INFO, "DuplicateBox is located: " + this.completeNodePath(this.duplicateBox));
-        else
-            throw "DuplicateBox not found!";
-        if (rules.unknownBox)
-            this.unknownBox = this.archivRoot.childByNamePath(this.trim(rules.unknownBox));
-        else
-            this.unknownBox = this.archivRoot.childByNamePath("Unbekannt");
-        if (this.unknownBox)
-            Logger.log(Level.INFO, "UnknownBox is located: " + this.completeNodePath(this.unknownBox));
-        else
-            throw "UnknownBox not found!";
+        this.archivRoot = this.buildFolder(rules.archivRoot, "Archiv", companyhome, "Der Archiv Root Ordner");
+        this.inBox = this.buildFolder(rules.inBox, "Inbox", this.archivRoot, "Der Posteingangsordner");
+        this.logBox = this.buildFolder(rules.logBox, "Log", this.archivRoot, "Der Logordner");
+        this.unknownBox = this.buildFolder(rules.unknownBox, "Unbekannt", this.archivRoot, "Der Ordner für unbekannte Dokumente");
+        this.errorBox = this.buildFolder(rules.errorBox, "Fehler", this.archivRoot, "Der Ordner für nicht verteilbare Dokumente");
+        this.duplicateBox = this.buildFolder(rules.duplicateBox, "Doppelte", this.errorBox, "Verzeichnis für doppelte Dokumente");
         if (rules.mandatory) {
             var mnd = this.trim(rules.mandatory);
             this.mandatoryElements = mnd.split(",");

@@ -167,7 +167,8 @@ public class MockUtils {
             properties = new PropertiesImpl();
         else
             properties = (PropertiesImpl) convertProperties(props);
-
+        if (name.endsWith("/"))
+            name = name.substring(0, name.length() -1);
         properties.addProperty(fillProperty(PropertyIds.OBJECT_ID, versionSeriesId));
         properties.addProperty(fillProperty(PropertyIds.BASE_TYPE_ID, objectType.getBaseTypeId() != null ? objectType.getBaseTypeId().value() : objectType.getId()));
         if (!properties.getProperties().containsKey(PropertyIds.OBJECT_TYPE_ID)) {
@@ -183,7 +184,10 @@ public class MockUtils {
                 properties.addProperty(fillProperty(PropertyIds.PATH, "/"));
 
             } else {
-                parentId = repository.getByPath(path).getId();
+                FileableCmisObject parent = repository.getByPath(path);
+                if (parent == null)
+                    throw new CmisRuntimeException("Parent with Path " + path + " not found!");
+                parentId = parent.getId();
                 properties.addProperty(fillProperty(PropertyIds.PATH, (path != null ? path : "") + (name.equalsIgnoreCase("/") || path.endsWith("/") ? "" : "/") + name));
             }
 
