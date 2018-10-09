@@ -1698,56 +1698,6 @@ function ArchivPosition(srch) {
     };
 
     /**
-     * liefert den Alfresco Folder, bzw. erstellt die Folderstruktur, falls noch nicht vorhanden
-     * @param folderName            der Folder als String
-     * @return {*}                  der Alfresco Folder
-     */
-    this.resolveFolder = function (folderName) {
-        Logger.log(Level.TRACE, "resolveFolder: entering with " + folderName);
-        var fol = null;
-        var dir = folderName;
-        var top = companyhome.childByNamePath(folderName);
-        if (!top) {
-            Logger.log(Level.INFO, "resolveFolder: folder " + folderName + " not found");
-            var parts = folderName.split("/");
-            dir = "";
-            for (var i = 0; i < parts.length; i++) {
-                var part = parts[i];
-                if (part.length > 0) {
-                    dir = dir + (dir.length === 0 ? "" : "/") + part;
-                    Logger.log(Level.TRACE, "resolveFolder: search Folder " + dir);
-                    if (dir.length > 0)
-                        fol = companyhome.childByNamePath(dir);
-                    if (!fol) {
-                        Logger.log(Level.INFO, "create folder " + dir);
-                        if (!top) {
-                            Logger.log(Level.TRACE, "resolveFolder: create Folder[" + part + "] at companyhome ");
-                            top = companyhome.createFolder(part);
-                        } else {
-                            Logger.log(Level.TRACE, "resolveFolder: create Folder[" + part + "] at " + top.name);
-                            top = top.createFolder(part);
-                        }
-                        if (!top) {
-                            REC.errors.push("Folder " + dir + " not successfuly created");
-                            break;
-                        } else {
-                            // auf Archiv Folder spezialisieren
-                            top.specializeType("my:archivFolder");
-                            // Aspect hinzufügen, sonst wird er beim 'listFolder' nicht gefunden
-                            top.addAspect("cm:titled");
-                        }
-                    } else {
-                        Logger.log(Level.TRACE, "resolveFolder: folder " + dir + " found");
-                        top = fol;
-                    }
-                }
-            }
-        }
-        Logger.log(Level.TRACE, "resolveFolder result is " + dir);
-        return top;
-    };
-
-    /**
      * baut einen Foldernamen auf
      * @return {*}   der Alfresco Folder, bzw null wenn er nicht aufgebaut werden konnte
      */
@@ -1775,7 +1725,7 @@ function ArchivPosition(srch) {
             }
         }
         Logger.log(Level.TRACE, "ArchivPosition.resolve: result is " + tmp);
-        tmp = this.resolveFolder(tmp);
+        tmp = REC.resolveFolder(tmp);
         Logger.log(Level.TRACE, "ArchivPosition.resolve: result is " + tmp);
         return tmp;
     };
@@ -3685,23 +3635,68 @@ REC = {
      * @param desription        Beschreibung für den Folder
      * @return {*}              der neu erstellte Knoten
      */
-    buildFolder: function (name, defaultName, parentNode, description) {
+    buildFolder: function (name, defaultName,  description) {
         var n;
         if (!name)
             name = defaultName;
-        n = parentNode.childByNamePath(this.trim(name));
-        if (n)
-            Logger.log(Level.INFO, name + " is located: " + this.completeNodePath(n));
-        else {
-            n = parentNode.createFolder(name, "my:archivFolder");
-            if (!n)
-                throw name + " ist not available";
-            n.addAspect("cm:titled");
-            n.properties.title = description;
-            n.save();
-        }
+        n = this.resolveFolder(name, description);
         return n;
         
+    },
+
+    /**
+     * liefert den Alfresco Folder, bzw. erstellt die Folderstruktur, falls noch nicht vorhanden
+     * @param folderName            der Folder als String
+     * @return {*}                  der Alfresco Folder
+     */
+    resolveFolder: function (folderName, description) {
+        Logger.log(Level.TRACE, "resolveFolder: entering with " + folderName);
+        var fol = null;
+        var dir = folderName;
+        var top = companyhome.childByNamePath(folderName);
+        if (!top) {
+            Logger.log(Level.INFO, "resolveFolder: folder " + folderName + " not found");
+            var parts = folderName.split("/");
+            dir = "";
+            for (var i = 0; i < parts.length; i++) {
+                var part = parts[i];
+                if (part.length > 0) {
+                    dir = dir + (dir.length === 0 ? "" : "/") + part;
+                    Logger.log(Level.TRACE, "resolveFolder: search Folder " + dir);
+                    if (dir.length > 0)
+                        fol = companyhome.childByNamePath(dir);
+                    if (!fol) {
+                        Logger.log(Level.INFO, "create folder " + dir);
+                        if (!top) {
+                            Logger.log(Level.TRACE, "resolveFolder: create Folder[" + part + "] at companyhome ");
+                            top = companyhome.createFolder(part);
+                        } else {
+                            Logger.log(Level.TRACE, "resolveFolder: create Folder[" + part + "] at " + top.name);
+                            top = top.createFolder(part);
+                        }
+                        if (!top) {
+                            REC.errors.push("Folder " + dir + " not successfuly created");
+                            break;
+                        } else {
+                            // auf Archiv Folder spezialisieren
+                            top.specializeType("my:archivFolder");
+                            // Aspect hinzufügen, sonst wird er beim 'listFolder' nicht gefunden
+                            top.addAspect("cm:titled");
+                            if (description) {
+                                top.addAspect("cm:titled");
+                                top.properties.title = description;
+                                top.save();
+                            }
+                        }
+                    } else {
+                        Logger.log(Level.TRACE, "resolveFolder: folder " + dir + " found");
+                        top = fol;
+                    }
+                }
+            }
+        }
+        Logger.log(Level.TRACE, "resolveFolder result is " + dir);
+        return top;
     },
 
     /**
@@ -3722,12 +3717,12 @@ REC = {
         this.currentDocument = doc;
         var docName = this.currentDocument.name;
         Logger.log(Level.INFO, "Process Dokument " + docName);
-        this.archivRoot = this.buildFolder(rules.archivRoot, "Archiv", companyhome, "Der Archiv Root Ordner");
-        this.inBox = this.buildFolder(rules.inBox, "Inbox", this.archivRoot, "Der Posteingangsordner");
-        this.logBox = this.buildFolder(rules.logBox, "Log", this.archivRoot, "Der Logordner");
-        this.unknownBox = this.buildFolder(rules.unknownBox, "Unbekannt", this.archivRoot, "Der Ordner für unbekannte Dokumente");
-        this.errorBox = this.buildFolder(rules.errorBox, "Fehler", this.archivRoot, "Der Ordner für nicht verteilbare Dokumente");
-        this.duplicateBox = this.buildFolder(rules.duplicateBox, "Doppelte", this.errorBox, "Verzeichnis für doppelte Dokumente");
+        this.archivRoot = this.buildFolder(rules.archivRoot, "Archiv", "Der Archiv Root Ordner");
+        this.inBox = this.buildFolder(rules.inBox, "Archiv/Inbox", "Der Posteingangsordner");
+        this.logBox = this.buildFolder(rules.logBox, "Archiv/Log", "Der Logordner");
+        this.unknownBox = this.buildFolder(rules.unknownBox, "Archiv/Unbekannt", "Der Ordner für unbekannte Dokumente");
+        this.errorBox = this.buildFolder(rules.errorBox, "Archiv/Fehler", "Der Ordner für nicht verteilbare Dokumente");
+        this.duplicateBox = this.buildFolder(rules.duplicateBox, "Archiv/Fehler/Doppelte", "Verzeichnis für doppelte Dokumente");
         if (rules.mandatory) {
             var mnd = this.trim(rules.mandatory);
             this.mandatoryElements = mnd.split(",");
@@ -3746,34 +3741,34 @@ REC = {
             this.moveDocToUnknownBox(doc);
         }
         // Log Eintrag erzeugen
-        // var name = docName + ".log";
-        // var logNode = this.logBox.createFile(name, "cm:content");
-        // var cont = "";
-        // if (REC.errors.length > 0) {
-        //     // Fehlerkommentar hinzufügen
-        //     cont = cont + "<table border=\"1\"> <tr><td>Nummer</td><td>Fehler</td></tr> ";
-        //     for (var i = 0; i < REC.errors.length; i++) {
-        //         cont = cont + "<tr>";
-        //         cont = cont + "<td>" + (i + 1) + "</td>";
-        //         cont = cont + "<td>" + REC.errors[i] + "</td>";
-        //         cont = cont + "</tr>";
-        //     }
-        //     cont = cont + "</table><br>";
-        // }
-        // cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Meldung</td></tr> ";
-        // var m = Logger.getRawMessages(false);
-        // for (var i = 0; i < m.length; i++) {
-        //     cont = cont + "<tr>";
-        //     cont = cont + "<td>" + m[i][0] + "</td>";
-        //     cont = cont + "<td>" + m[i][1] + "</td>";
-        //     cont = cont + "</tr>";
-        // }
-        // cont = cont + "</table><br>";
-        // logNode.content = cont;
-        // logNode.mimetype = "text/html";
-        // logNode.addAspect("cm:referencesnode");
-        // logNode.properties['cm:noderef'] = doc;
-        // logNode.save();
+        var name = docName + ".log";
+        var logNode = this.logBox.createFile(name, "cm:content");
+        var cont = "";
+        if (REC.errors.length > 0) {
+            // Fehlerkommentar hinzufügen
+            cont = cont + "<table border=\"1\"> <tr><td>Nummer</td><td>Fehler</td></tr> ";
+            for (var i = 0; i < REC.errors.length; i++) {
+                cont = cont + "<tr>";
+                cont = cont + "<td>" + (i + 1) + "</td>";
+                cont = cont + "<td>" + REC.errors[i] + "</td>";
+                cont = cont + "</tr>";
+            }
+            cont = cont + "</table><br>";
+        }
+        cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Meldung</td></tr> ";
+        var m = Logger.getRawMessages(false);
+        for (var i = 0; i < m.length; i++) {
+            cont = cont + "<tr>";
+            cont = cont + "<td>" + m[i][0] + "</td>";
+            cont = cont + "<td>" + m[i][1] + "</td>";
+            cont = cont + "</tr>";
+        }
+        cont = cont + "</table><br>";
+        logNode.content = cont;
+        logNode.mimetype = "text/html";
+        logNode.addAspect("cm:referencesnode");
+        logNode.properties['cm:noderef'] = doc;
+        logNode.save();
         Logger.log(Level.INFO, "Processing of document " + docName + " finished!");
     },
 
