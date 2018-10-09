@@ -3697,7 +3697,7 @@ REC = {
             if (!n)
                 throw name + " ist not available";
             n.addAspect("cm:titled");
-            n.title = description;
+            n.properties.title = description;
             n.save();
         }
         return n;
@@ -3746,32 +3746,34 @@ REC = {
             this.moveDocToUnknownBox(doc);
         }
         // Log Eintrag erzeugen
-        var name = doc.name + ".log";
-        var logNode = this.logBox.createFile(name, "cmis:document");
-        var cont = "";
-        if (REC.errors.length > 0) {
-            // Fehlerkommentar hinzufügen
-            cont = cont + "<table border=\"1\"> <tr><td>Nummer</td><td>Fehler</td></tr> ";
-            for (var i = 0; i < REC.errors.length; i++) {
-                cont = cont + "<tr>";
-                cont = cont + "<td>" + (i + 1) + "</td>";
-                cont = cont + "<td>" + REC.errors[i] + "</td>";
-                cont = cont + "</tr>";
-            }
-            cont = cont + "</table><br>";
-        }
-        cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Meldung</td></tr> ";
-        var m = Logger.getRawMessages(false);
-        for (var i = 0; i < m.length; i++) {
-            cont = cont + "<tr>";
-            cont = cont + "<td>" + m[i][0] + "</td>";
-            cont = cont + "<td>" + m[i][1] + "</td>";
-            cont = cont + "</tr>";
-        }
-        cont = cont + "</table><br>";
-        logNode.content = cont;
-        logNode.mimetype = "text/html";
-        logNode.save();
+        // var name = docName + ".log";
+        // var logNode = this.logBox.createFile(name, "cm:content");
+        // var cont = "";
+        // if (REC.errors.length > 0) {
+        //     // Fehlerkommentar hinzufügen
+        //     cont = cont + "<table border=\"1\"> <tr><td>Nummer</td><td>Fehler</td></tr> ";
+        //     for (var i = 0; i < REC.errors.length; i++) {
+        //         cont = cont + "<tr>";
+        //         cont = cont + "<td>" + (i + 1) + "</td>";
+        //         cont = cont + "<td>" + REC.errors[i] + "</td>";
+        //         cont = cont + "</tr>";
+        //     }
+        //     cont = cont + "</table><br>";
+        // }
+        // cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Meldung</td></tr> ";
+        // var m = Logger.getRawMessages(false);
+        // for (var i = 0; i < m.length; i++) {
+        //     cont = cont + "<tr>";
+        //     cont = cont + "<td>" + m[i][0] + "</td>";
+        //     cont = cont + "<td>" + m[i][1] + "</td>";
+        //     cont = cont + "</tr>";
+        // }
+        // cont = cont + "</table><br>";
+        // logNode.content = cont;
+        // logNode.mimetype = "text/html";
+        // logNode.addAspect("cm:referencesnode");
+        // logNode.properties['cm:noderef'] = doc;
+        // logNode.save();
         Logger.log(Level.INFO, "Processing of document " + docName + " finished!");
     },
 

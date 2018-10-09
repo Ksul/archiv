@@ -86,7 +86,8 @@ public class AlfrescoConnector {
     private final static String DOCUMENT_SQL_STRING = "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, d.my:documentDate, o.cm:title  from my:archivContent as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "WHERE IN_FOLDER(d, ?) ";
-    private final static String DOCUMENT_ALL_SQL_STRING = "select o.cmis:objectId, o.cmis:name, o.cmis:creationDate, o.cm:title  from cmis:document as o " +
+    private final static String DOCUMENT_ALL_SQL_STRING = "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, o.cm:title  from cmis:document as d " +
+            "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "WHERE IN_FOLDER(o, ?) ";
     private final static String FOLDER_SQL_STRING = "select d.*, o.* from cmis:folder as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
