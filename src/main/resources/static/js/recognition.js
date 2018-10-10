@@ -333,7 +333,8 @@ function LoggerDefinition(debugLevel) {
                 if (this.messages[i].isRelevant(level)) {
                     ret[z] = [];
                     ret[z][0] = Formatter.dateFormat(this.messages[i].datum, "G:i:s,u");
-                    ret[z][1] = this.messages[i].text;
+                    ret[z][1] = this.messages[i].level.text;
+                    ret[z][2] = this.messages[i].text;
                     z++;
                 }
             }
@@ -3699,6 +3700,21 @@ REC = {
         return top;
     },
 
+    uuid: function() {
+        var chars = '0123456789abcdef'.split('');
+        var uuid = [], rnd = Math.random, r;
+        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+        uuid[14] = '4';
+        // version 4
+        for (var i = 0; i < 36; i++) {
+            if (!uuid[i]) {
+                r = 0 | rnd() * 16;
+                uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r & 0xf];
+            }
+        }
+        return uuid.join('');
+    },
+
     /**
      * führt die Erkennung durch
      * @param doc       das zu erkennende Dokument
@@ -3708,6 +3724,7 @@ REC = {
     recognize: function (doc, rules, deb) {
         if (rules.debugLevel)
             this.debugLevel = Level.getLevelFor(rules.debugLevel);
+        Logger.setLevel(this.debugLevel);
         if (rules.maxDebugLength)
             this.maxDebugLength = parseInt(rules.maxDebugLength, 10);
         else
@@ -3719,7 +3736,7 @@ REC = {
         Logger.log(Level.INFO, "Process Dokument " + docName);
         this.archivRoot = this.buildFolder(rules.archivRoot, "Archiv", "Der Archiv Root Ordner");
         this.inBox = this.buildFolder(rules.inBox, "Archiv/Inbox", "Der Posteingangsordner");
-        this.logBox = this.buildFolder(rules.logBox, "Archiv/Log", "Der Logordner");
+        this.logBox = this.buildFolder(rules.logBox, "Archiv/Report", "Der Ordner für Reporte");
         this.unknownBox = this.buildFolder(rules.unknownBox, "Archiv/Unbekannt", "Der Ordner für unbekannte Dokumente");
         this.errorBox = this.buildFolder(rules.errorBox, "Archiv/Fehler", "Der Ordner für nicht verteilbare Dokumente");
         this.duplicateBox = this.buildFolder(rules.duplicateBox, "Archiv/Fehler/Doppelte", "Verzeichnis für doppelte Dokumente");
@@ -3740,8 +3757,11 @@ REC = {
             Logger.log(Level.INFO, "No suitable rule found!");
             this.moveDocToUnknownBox(doc);
         }
+        // Dokument auf Archivtyp setzen
+        doc.specializeType("my:archivContent");
         // Log Eintrag erzeugen
-        var name = docName + ".log";
+        Logger.log(Level.INFO, "Create Recognition Report...");
+        var name = this.uuid() + ".log";
         var logNode = this.logBox.createFile(name, "cm:content");
         var cont = "";
         if (REC.errors.length > 0) {
@@ -3755,19 +3775,22 @@ REC = {
             }
             cont = cont + "</table><br>";
         }
-        cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Meldung</td></tr> ";
+        cont = cont + "<table border=\"1\"> <tr><td>Datum</td><td>Level</td><td>Meldung</td></tr> ";
         var m = Logger.getRawMessages(false);
         for (var i = 0; i < m.length; i++) {
             cont = cont + "<tr>";
             cont = cont + "<td>" + m[i][0] + "</td>";
             cont = cont + "<td>" + m[i][1] + "</td>";
+            cont = cont + "<td>" + m[i][2] + "</td>";
             cont = cont + "</tr>";
         }
         cont = cont + "</table><br>";
         logNode.content = cont;
         logNode.mimetype = "text/html";
         logNode.addAspect("cm:referencesnode");
+        logNode.addAspect("cm:titled");
         logNode.properties['cm:noderef'] = doc;
+        logNode.properties['cm:title'] = "Report von " + docName;
         logNode.save();
         Logger.log(Level.INFO, "Processing of document " + docName + " finished!");
     },

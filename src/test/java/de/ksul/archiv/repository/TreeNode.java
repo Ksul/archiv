@@ -337,7 +337,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     @Override
     public TreeNode<T> createFolder(String name, String type) {
-        FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType("cmis:folder"), null);
+        if (type.equals("cm:folder"))
+            type = "cmis:folder";
+        FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType(type), null);
         TreeNode<T> newNode = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, false);
         newNode.specializeType(type);
         return newNode;
@@ -345,7 +347,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     @Override
     public TreeNode<T> createFolder(String name) {
-        return createFolder(name, "cmis:folder");
+        return createFolder(name, "cm:folder");
     }
 
     @Override
@@ -371,6 +373,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     @Override
     public TreeNode<T> createFile(String name, String type) {
+        if (type.equals("cm:content"))
+            type = "cmis:document";
         FileableCmisObject newNode = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getDocumentType(type), null);
         TreeNode<T> node = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newNode, false);
 

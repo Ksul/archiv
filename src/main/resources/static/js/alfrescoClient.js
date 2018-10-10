@@ -420,32 +420,31 @@ function loadLayout() {
 }
 
 /**
+ * zeigt das Dokument in einem neuen Tab an
+ * @param id      die Id des Objects
+ */
+function openDocument(id) {
+    try {
+        const erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
+            {"name": "documentId", "value": id}
+        ]);
+        if (erg.success) {
+            const file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
+            const fileURL = URL.createObjectURL(file);
+            window.open(fileURL);
+        }
+
+    } catch (e) {
+        errorHandler(e);
+    }
+}
+
+/**
  * baut die Alfresco Tabelle auf.
  */
 function loadAlfrescoTable() {
 
-    /**
-     * zeigt das Dokument in einem neuen Tab an
-     * @param obj     das Objekt
-     * @param event   das Event
-     */
-    function openDocument(obj, event) {
-        try {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            const erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnten nicht geöffnet werden!"}, [
-                {"name": "documentId", "value": alfrescoTabelle.row($(obj).closest('tr')).data().objectId}
-            ]);
-            if (erg.success) {
-                const file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
-                const fileURL = URL.createObjectURL(file);
-                window.open(fileURL);
-            }
 
-         } catch (e) {
-            errorHandler(e);
-        }
-    }
 
     try {
         let duration;
@@ -663,7 +662,9 @@ function loadAlfrescoTable() {
                                     image.draggable = true;
                                     image.style.cursor = "pointer";
                                     $('#alfrescoTabelle tbody').on( 'click', '#' + image.id, function (event) {
-                                        openDocument(this, event);
+                                        event.preventDefault();
+                                        event.stopImmediatePropagation();
+                                        openDocument(alfrescoTabelle.row($(obj).closest('tr')).data().objectId);
                                     });
                                     span.appendChild(image);
                                     return span.outerHTML;
@@ -765,8 +766,8 @@ function loadAlfrescoTable() {
                 },
                 {
                     targets: [9],
-                    render: function(obj, types, row) {
-                        return alfrescoAktionFieldFormatter(obj, types, row).outerHTML;
+                    render: function(obj, types, row, meta) {
+                        return alfrescoAktionFieldFormatter(obj, types, row, meta).outerHTML;
                     },
                     orderable: false
                 }
@@ -1066,8 +1067,8 @@ function loadAlfrescoFolderTable() {
                 },
                 {
                     targets: [3],
-                    render: function(data, type, row) {
-                        return alfrescoFolderAktionFieldFormatter(data, type, row).outerHTML;
+                    render: function(data, type, row, meta) {
+                        return alfrescoFolderAktionFieldFormatter(data, type, row, meta).outerHTML;
                     },
                     orderable: false
                 }
@@ -1504,19 +1505,9 @@ function loadAlfrescoSearchTable() {
                 },
                 {
                     targets: [9],
-                    render: function(obj, type, row) {
+                    render: function(obj, type, row, meta) {
                         
-                        let container = alfrescoAktionFieldFormatter(obj, type, row);
-                        let image = document.createElement("div");
-                        image.href = "#";
-                        image.className = "detailAim fas fa-bullseye fa-15x awesomeEntity";
-                        image.title = "Dokument im Ordner anzeigen";
-                        image.style.cursor = "pointer";
-                        image.style.width = "16px";
-                        image.style.height = "16px";
-                        image.style.cssFloat = "left";
-                        image.style.marginRight = "5px";
-                        container.appendChild(image);
+                        let container = alfrescoAktionFieldFormatter(obj, type, row, meta);
                         return container.outerHTML;
                     },
                     orderable: false
@@ -1696,12 +1687,13 @@ function loadVerteilungTable() {
 
 /**
  * formatiert die Iconspalte in der AlfrescoFolderTabelle
- * @param data
- * @param type
- * @param full
+ * @param data      das Object der Tabellenzeile
+ * @param type      der Typ (display...)
+ * @param row       die aktuelle Tabellenzeile (identisch zu data)
+ * @param meta      Metainformationen
  * @return {string}
  */
-function alfrescoFolderAktionFieldFormatter(data, type, full) {
+function alfrescoFolderAktionFieldFormatter(data, type, row, meta) {
     try {
 
         let container = document.createElement("div");
@@ -1780,12 +1772,13 @@ function alfrescoFolderAktionFieldFormatter(data, type, full) {
 
 /**
  * formatiert die Iconspalte in der AlfrescoTabelle
- * @param data
- * @param type
- * @param full
+ * @param data      das Object der Tabellenzeile
+ * @param type      der Typ (display...)
+ * @param row       die aktuelle Tabellenzeile (identisch zu data)
+ * @param meta      Metainformationen
  * @returns {string}
  */
-function alfrescoAktionFieldFormatter(data, type, full) {
+function alfrescoAktionFieldFormatter(data, type, row, meta) {
     try {
         let container = document.createElement("div");
         if (data.parentId !== logboxFolderId) {
@@ -1843,6 +1836,31 @@ function alfrescoAktionFieldFormatter(data, type, full) {
             image.className = "rulesDocument fab fa-wpforms fa-15x awesomeEntity";
             image.title = "Dokument Regel erstellen";
             image.style.cursor = "pointer";
+            image.style.cssFloat = "left";
+            image.style.marginRight = "5px";
+            container.appendChild(image);
+        }
+        if (data.parentId === logboxFolderId) {
+            image = document.createElement("div");
+            image.href = "#";
+            image.className = "openDocument far fa-file-image fa-15x awesomeEntity";
+            image.title = "Dokument öffnen";
+            image.style.cursor = "pointer";
+            image.style.width = "16px";
+            image.style.height = "16px";
+            image.style.cssFloat = "left";
+            image.style.marginRight = "5px";
+            container.appendChild(image);
+        }
+        if (data.parentId === logboxFolderId ||
+            meta.settings.sTableId == "alfrescoSearchTabelle") {
+            image = document.createElement("div");
+            image.href = "#";
+            image.className = "detailAim fas fa-bullseye fa-15x awesomeEntity";
+            image.title = "Dokument im Ordner anzeigen";
+            image.style.cursor = "pointer";
+            image.style.width = "16px";
+            image.style.height = "16px";
             image.style.cssFloat = "left";
             image.style.marginRight = "5px";
             container.appendChild(image);
@@ -2317,10 +2335,11 @@ function handleAlfrescoFolderImageClicks() {
  */
 function aimNode(data) {
     const results = [];
+    let node;
     const tree = $('#tree').jstree(true);
     const id = data.objectID;
     if (data && data.parents) {
-        let node = tree.get_node(data.parents[0].objectId);
+        node = tree.get_node(data.parents[0].objectId);
         // Alle Knoten bis hinauf zum ersten geöffneten Knoten suchen
         while (!node) {
             const json = executeService({
@@ -2514,18 +2533,42 @@ function handleAlfrescoImageClicks() {
     // Ziel im Ordner suchen
     $(document).on("click", ".detailAim", function () {
         try {
-           
+
             const tr = $(this).closest('tr');
             const tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
-            const data = tabelle.row(tr).data();
-            if (aimNode(data))
+            let data = tabelle.row(tr).data();
+            if (data && data.parentId === logboxFolderId && data.noderef) {
+                const json = executeService({
+                    "name": "getNodeById",
+                    "errorMessage": "Dokument konnten nicht gelesen werden!"
+                }, [
+                    {"name": "documentId", "value": data.noderef}
+                ]);
+                if (json.success) {
+                    data = json.data;
+                } else {
+                    return;
+                }
+            }
+            if (data && aimNode(data))
             // auf den Archiv Tab umschalten
-               tabLayout.tabs("option", "active", 0);
+                tabLayout.tabs("option", "active", 0);
 
         } catch (e) {
             errorHandler(e);
         }
     });
+    // Dokument öffnen
+    $(document).on("click", ".openDocument", function () {
+        try {
+            const tr = $(this).closest('tr');
+            const tabelle = $('#' + tr[0].parentElement.parentElement.id).DataTable();
+            const data = tabelle.row(tr).data();
+            openDocument(data.noderef);
+        } catch (e) {
+            errorHandler(e);
+        }
+});
 }
 
 /**
@@ -3519,7 +3562,7 @@ function checkAndBuidAlfrescoEnvironment() {
         }
         if (erg.success) {
             // Log prüfen
-            erg = buildAlfrescoFolder("/Archiv/Log", archivFolderId, "Der Logordner");
+            erg = buildAlfrescoFolder("/Archiv/Report", archivFolderId, "Der Ordner für Reporte");
             if (erg.success) {
                 logboxFolderId = erg.data.objectID;
             }

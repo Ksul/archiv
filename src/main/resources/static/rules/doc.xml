@@ -1,7 +1,7 @@
 <documentTypes
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:cm="http://www.alfresco.org/model/content/1.0"
-        xmlns:my="http://www.schulte.local/archiv"  xsi:noNamespaceSchemaLocation="doc.xsd" archivRoot="Archiv/" inBox="Archiv/Inbox" logBox="Archiv/Log" mandatory="cm:title,my:documentDate,my:person" unknownBox="Archiv/Unbekannt" errorBox="Archiv/Fehler"  duplicateBox="Archiv/Fehler/Doppelte" debugLevel="trace" maxDebugLength="40">
+        xmlns:my="http://www.schulte.local/archiv"  xsi:noNamespaceSchemaLocation="doc.xsd" archivRoot="Archiv/" inBox="Archiv/Inbox" logBox="Archiv/Report" mandatory="cm:title,my:documentDate,my:person" unknownBox="Archiv/Unbekannt" errorBox="Archiv/Fehler"  duplicateBox="Archiv/Fehler/Doppelte" debugLevel="trace" maxDebugLength="40">
     <!-- LVM Gehaltsabrechnung -->
     <archivTyp name="LVMGehalt" searchString="81302">
         <archivZiel type="my:archivContent" />
