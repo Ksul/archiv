@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.ksul.archiv.PDFConnector;
 import de.ksul.archiv.VerteilungConstants;
+import de.ksul.archiv.configuration.ArchivProperties;
 import de.ksul.archiv.repository.script.RecognizeEndpoints;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
@@ -49,6 +50,8 @@ public class Repository {
     private TreeMap<String, String> contentIds = new TreeMap<>();
     @JsonIgnore
     public static Repository repository;
+    @JsonIgnore
+    private static ArchivProperties archivProperties;
 
 
     private Repository() {
@@ -62,6 +65,10 @@ public class Repository {
 
     static void setInstance(Repository repo) {
         repository = repo;
+    }
+
+    static void setArchivProperties(ArchivProperties archivProperties) {
+        Repository.archivProperties = archivProperties;
     }
 
     String UUId() {
@@ -275,7 +282,7 @@ public class Repository {
         try {
             RecognizeEndpoints.setDocument(newNode);
             RecognizeEndpoints.setRepository(this);
-            RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
+            RecognizeEndpoints.setScript("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName() + "/recognition.js");
             Object rec = engine.eval("load(\"src/main/resources/static/js/recognition.js\");");
 
             Invocable invocable = (Invocable) engine;

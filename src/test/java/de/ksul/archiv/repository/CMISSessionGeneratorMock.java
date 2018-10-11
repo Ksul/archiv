@@ -117,6 +117,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 try {
                     repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
                     });
+                    Repository.setArchivProperties(archivProperties);
                     Repository.setInstance(repository);
                     sessionImpl = new SessionMock().setRepository(repository).getSession();
                     MockUtils.getInstance().setSession(sessionImpl);
@@ -127,6 +128,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             }
         }
         if (repository == null) {
+            Repository.setArchivProperties(archivProperties);
             repository = Repository.getInstance();
             sessionImpl = new SessionMock().setRepository(repository).getSession();
             MockUtils mockUtils = MockUtils.getInstance();

@@ -664,7 +664,7 @@ function loadAlfrescoTable() {
                                     $('#alfrescoTabelle tbody').on( 'click', '#' + image.id, function (event) {
                                         event.preventDefault();
                                         event.stopImmediatePropagation();
-                                        openDocument(alfrescoTabelle.row($(obj).closest('tr')).data().objectId);
+                                        openDocument(alfrescoTabelle.row($(this).closest('tr')).data().objectId);
                                     });
                                     span.appendChild(image);
                                     return span.outerHTML;
@@ -694,7 +694,9 @@ function loadAlfrescoTable() {
                                 image.src = "data:image/png;base64," + executeService({"name": "getThumbnail"}, [
                                         {"name": "documentId", "value": row.objectID}]).data;
                                 $('#alfrescoTabelle tbody').on( 'click', '#' + image.id, function (event) {
-                                    openDocument(this, event);
+                                    event.preventDefault();
+                                    event.stopImmediatePropagation();
+                                    openDocument(alfrescoTabelle.row($(this).closest('tr')).data().objectId);
                                 });
                                 span.appendChild(image);
                                 return span.outerHTML;
@@ -1191,29 +1193,6 @@ function loadAlfrescoFolderTable() {
  */
 function loadAlfrescoSearchTable() {
 
-    /**
-     * öffnet ein Dokument
-     * @param obj
-     * @param event
-     */
-    function openDocument(obj, event) {
-        try {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            const erg = executeService({"name": "openDocument", "errorMessage": "Dokument konnte nicht geöffnet werden!"}, [
-                {"name": "documentId", "value": alfrescoSearchTabelle.row($(obj).closest('tr')).data().objectID}
-            ]);
-            if (erg.success) {
-                const file = new Blob([base64DecToArr(erg.data)], { type: erg.mimeType });
-                const fileURL = URL.createObjectURL(file);
-                window.open(fileURL);
-            }
-
-        } catch (e) {
-            errorHandler(e);
-        }
-    }
-
     try {
         let duration;
         $.fn.dataTable.moment('DD.MM.YY');
@@ -1407,7 +1386,9 @@ function loadAlfrescoSearchTable() {
                                 image.draggable = true;
                                 image.style.cursor = "pointer";
                                 $('#alfrescoSearchTabelle tbody').on( 'click', '#' + image.id, function (event) {
-                                    openDocument(this, event);
+                                    event.preventDefault();
+                                    event.stopImmediatePropagation();
+                                    openDocument(alfrescoSearchTabelle.row($(this).closest('tr')).data().objectId);
                                 });
                                 span.appendChild(image);
                                 return span.outerHTML;
@@ -1437,7 +1418,9 @@ function loadAlfrescoSearchTable() {
                                 image.src = "data:image/png;base64," + executeService({"name": "getThumbnail"}, [
                                         {"name": "documentId", "value": row.objectID}]).data;
                                 $('#alfrescoSearchTabelle tbody').on( 'click', '#' + image.id, function (event) {
-                                    openDocument(this, event);
+                                    event.preventDefault();
+                                    event.stopImmediatePropagation();
+                                    openDocument(alfrescoSearchTabelle.row($(this).closest('tr')).data().objectId);
                                 });
                                 span.appendChild(image);
                                 return span.outerHTML;
