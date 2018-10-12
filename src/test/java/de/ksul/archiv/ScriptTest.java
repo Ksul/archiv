@@ -1,5 +1,6 @@
 package de.ksul.archiv;
 
+import de.ksul.archiv.configuration.ArchivProperties;
 import de.ksul.archiv.configuration.ArchivTestConfiguration;
 import de.ksul.archiv.repository.MockUtils;
 import de.ksul.archiv.repository.Repository;
@@ -87,12 +88,12 @@ public class ScriptTest {
 
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(@Autowired ArchivProperties archivProperties) throws Exception {
 
         root = Repository.getInstance().getRoot();
         engine = new ScriptEngineManager().getEngineByName("nashorn");
         RecognizeEndpoints.setRepository(Repository.getInstance());
-        RecognizeEndpoints.setScript("/Data Dictionary/Scripts/recognition.js");
+        RecognizeEndpoints.setScript("/" + archivProperties.getDataDictionaryName() + "/" + archivProperties.getScriptDirectoryName() + "/recognition.js");
         rec = engine.eval("load(\"src/main/resources/static/js/recognition.js\");");
 
         invocable = (Invocable) engine;

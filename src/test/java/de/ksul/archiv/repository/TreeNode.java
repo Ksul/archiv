@@ -16,6 +16,7 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 
 import java.io.ByteArrayInputStream;
@@ -374,7 +375,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     @Override
     public TreeNode<T> createFile(String name, String type) {
         if (type.equals("cm:content"))
-            type = "cmis:document";
+                type = "cmis:document";
         FileableCmisObject newNode = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getDocumentType(type), null);
         TreeNode<T> node = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newNode, false);
 
@@ -465,6 +466,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     @Override
     public void save() {
+
         if (mimetype != null)
             updateProperty(PropertyIds.CONTENT_STREAM_MIME_TYPE, mimetype);
         if (content != null){
@@ -477,8 +479,21 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
                 e.printStackTrace();
             }
         }
+        MockUtils mockUtils = MockUtils.getInstance();
+
+        HashMap<String, PropertyData<?>> map = new HashMap<>();
         for (String key: properties.keySet())
-            MockUtils.getInstance().fillProperty(key, properties.get(key));
+            map.put(key, mockUtils.fillProperty(key, properties.get(key)));
+
+        List<Property<?>> propertyList = MockUtils.getInstance().convPropertyData(map);
+
+        for (Property<?> property : propertyList) {
+            Optional<Property<?>> p = this.getType().getProperties().stream().filter(e -> e.getQueryName().equals(property.getQueryName())).findFirst();
+            if (p.isPresent())
+                ((PropertyImpl) p.get()).setValues(property.getValues());
+            else
+                this.getType().getProperties().add(property);
+        }
 
     }
 

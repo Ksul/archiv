@@ -10,10 +10,8 @@ import org.apache.chemistry.opencmis.client.runtime.objecttype.FolderTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.ItemTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.data.ObjectData;
+import org.apache.chemistry.opencmis.commons.data.*;
 import org.apache.chemistry.opencmis.commons.data.Properties;
-import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.PropertyType;
@@ -264,8 +262,12 @@ public class MockUtils {
 
     List<Property<?>> convPropertyData(Map<String, PropertyData<?>> propertyDataMap) {
         List<Property<?>> properties = new ArrayList<>();
-        for (PropertyData<?> prop : propertyDataMap.values())
-            properties.add(new PropertyImpl(((PropertyImpl<?>) prop).getDefinition(), prop.getValues()));
+        for (PropertyData<?> prop : propertyDataMap.values()) {
+            if (prop instanceof PropertyImpl)
+                properties.add((PropertyImpl) prop);
+            else
+                properties.add(new PropertyImpl(((PropertyDataWithDefinition<?>) prop).getPropertyDefinition(), prop.getValues()));
+        }
         return properties;
     }
 

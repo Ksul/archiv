@@ -3791,6 +3791,7 @@ REC = {
         logNode.addAspect("cm:titled");
         logNode.properties['cm:noderef'] = doc;
         logNode.properties['cm:title'] = "Report von " + docName;
+        logNode.properties['cm:description'] = doc.displayPath;
         logNode.save();
         Logger.log(Level.INFO, "Processing of document " + docName + " finished!");
     },

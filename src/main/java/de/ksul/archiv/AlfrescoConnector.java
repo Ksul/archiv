@@ -83,13 +83,14 @@ public class AlfrescoConnector {
 //            "join my:amountable as c on d.cmis:objectId = c.cmis:objectId " +
 //            "join my:idable as i on d.cmis:objectId = i.cmis:objectId " +
 //            "WHERE IN_FOLDER(d, ?) ";
-    private final static String DOCUMENT_SQL_STRING = "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, d.my:documentDate, o.cm:title  from my:archivContent as d " +
+    // die SQL's müssen immer nur die Id mit liefern, weil im Fetcher aus dieser das Object aufgebaut wird  
+    private final static String DOCUMENT_SQL_STRING = "select d.cmis:objectId from my:archivContent as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "WHERE IN_FOLDER(d, ?) ";
-    private final static String DOCUMENT_ALL_SQL_STRING = "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, o.cm:title  from cmis:document as d " +
+    private final static String DOCUMENT_ALL_SQL_STRING = "select d.cmis:objectId  from cmis:document as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "WHERE IN_FOLDER(o, ?) ";
-    private final static String FOLDER_SQL_STRING = "select d.*, o.* from cmis:folder as d " +
+    private final static String FOLDER_SQL_STRING = "select d.cmis:objectId from cmis:folder as d " +
             "join cm:titled as o on d.cmis:objectId = o.cmis:objectId " +
             "WHERE IN_FOLDER(d, ?) AND d.cmis:objectTypeId<>'F:cm:systemfolder'";
 
@@ -330,7 +331,7 @@ public class AlfrescoConnector {
     private String buildOrder(List<Order> order, List<Column> columns, int modus) {
         String orderString = "";
         if (order == null || order.isEmpty())
-            orderString = modus == 1? "my:documentDate DESC, cmis:creationDate DESC" : "cmis:name" + " DESC";
+            orderString = modus == 1? "d.my:documentDate DESC, d.cmis:creationDate DESC" : "d.cmis:name" + " DESC";
         else  {
             StringBuilder sb = new StringBuilder();
             boolean first = true;

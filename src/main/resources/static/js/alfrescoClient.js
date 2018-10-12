@@ -534,7 +534,20 @@ function loadAlfrescoTable() {
                         alfrescoDocumentActionMenu.superfish('enableItem', 'alfrescoDocumentActionUpload');
                     }
                     if (obj.parent === logboxFolderId ) {
+                        alfrescoTabelle.column(9).visible(true);
+                        alfrescoTabelle.column(10).visible(true);
+                        alfrescoTabelle.column(5).visible(false);
+                        alfrescoTabelle.column(6).visible(false);
+                        alfrescoTabelle.column(7).visible(false);
+                        alfrescoTabelle.column(8).visible(false);
                         alfrescoDocumentActionMenu.superfish('disableItem', 'alfrescoDocumentActionMove');
+                    } else {
+                        alfrescoTabelle.column(9).visible(false);
+                        alfrescoTabelle.column(10).visible(false);
+                        alfrescoTabelle.column(5).visible(true);
+                        alfrescoTabelle.column(6).visible(true);
+                        alfrescoTabelle.column(7).visible(true);
+                        alfrescoTabelle.column(8).visible(true);
                     }
                     return obj.data;
                 },
@@ -574,7 +587,7 @@ function loadAlfrescoTable() {
                 {
                     data: "title",
                     title: "Titel",
-                    name: "cm:title, cmis:name",
+                    name: "d.cm:title, d.cmis:name",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft alfrescoTableDragable"
@@ -582,7 +595,7 @@ function loadAlfrescoTable() {
                 {
                     data: "documentDateDisplay",
                     title: "Datum",
-                    name: "my:documentDate, cmis:creationDate",
+                    name: "d.my:documentDate, d.cmis:creationDate",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -590,7 +603,7 @@ function loadAlfrescoTable() {
                 {
                     data: "person",
                     title: "Person",
-                    name: "my:person",
+                    name: "d.my:person",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -599,7 +612,7 @@ function loadAlfrescoTable() {
                     data: "amountDisplay",
                     orderable: false,
                     title: "Betrag",
-                    name: "my:amount",
+                    name: "d.my:amount",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -608,7 +621,7 @@ function loadAlfrescoTable() {
                     data: "idvalue",
                     orderable: false,
                     title: "Schlüssel",
-                    name: "my:idvalue",
+                    name: "d.my:idvalue",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -617,9 +630,28 @@ function loadAlfrescoTable() {
                     data: "versionLabel",
                     orderable: false,
                     title: "Version",
-                    name: "cm:versionLabel",
+                    name: "d.cm:versionLabel",
                     defaultContent: '',
                     width: "25px",
+                    type: "string",
+                    class: "alignCenter"
+                },
+                {
+                    data: "versionLabel",
+                    orderable: false,
+                    title: "Status",
+                    name: "d.cm:versionLabel",
+                    defaultContent: '',
+                    width: "25px",
+                    type: "string",
+                    class: "alignCenter"
+                },
+                {
+                    data: "description",
+                    orderable: false,
+                    title: "Position",
+                    name: "cm:description",
+                    defaultContent: '',
                     type: "string",
                     class: "alignCenter"
                 },
@@ -640,7 +672,7 @@ function loadAlfrescoTable() {
                     visible: true
                 },
 
-                {   targets: [10],
+                {   targets: [9, 10, 12],
                     visible: false
                 },
 
@@ -723,13 +755,17 @@ function loadAlfrescoTable() {
                 {
                     targets: [4],
                     render: function (obj, type, row) {
-                        if (row.documentDate) {
-                            row.documentDateDisplay = $.datepicker.formatDate("dd.mm.yy", new Date(Number(row.documentDate)));
-                        }  else if (row.creationDate)
-                            row.documentDateDisplay = $.datepicker.formatDate("dd.mm.yy", new Date(Number(row.creationDate)));
-                        else
-                            row.documentDateDisplay = "";
-                        return row.documentDateDisplay;
+                        if (row.parentId === logboxFolderId)
+                            return moment(row.creationDate).format("DD.MM.YYYY HH:mm:ss");
+                        else {
+                            if (row.documentDate) {
+                                row.documentDateDisplay = $.datepicker.formatDate("dd.mm.yy", new Date(Number(row.documentDate)));
+                            } else if (row.creationDate)
+                                row.documentDateDisplay = $.datepicker.formatDate("dd.mm.yy", new Date(Number(row.creationDate)));
+                            else
+                                row.documentDateDisplay = "";
+                            return row.documentDateDisplay;
+                        }
                     },
                     visible: true
                 },
@@ -767,7 +803,7 @@ function loadAlfrescoTable() {
                     }
                 },
                 {
-                    targets: [9],
+                    targets: [11],
                     render: function(obj, types, row, meta) {
                         return alfrescoAktionFieldFormatter(obj, types, row, meta).outerHTML;
                     },
@@ -1045,7 +1081,7 @@ function loadAlfrescoFolderTable() {
                 {
                     data: "description",
                     title: "Beschreibung",
-                    name : "cm:description",
+                    name : "d.cm:description",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft alfrescoFolderTableDragable treeDropable"
@@ -1306,7 +1342,7 @@ function loadAlfrescoSearchTable() {
                 {
                     data: "title",
                     title: "Titel",
-                    name: "cm:title, cmis:name",
+                    name: "d.cm:title, d.cmis:name",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -1314,7 +1350,7 @@ function loadAlfrescoSearchTable() {
                 {
                     data: "documentDateDisplay",
                     title: "Datum",
-                    name: "my:documentDate, cmis:creationDate",
+                    name: "d.my:documentDate, d.cmis:creationDate",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -1322,7 +1358,7 @@ function loadAlfrescoSearchTable() {
                 {
                     data: "person",
                     title: "Person",
-                    name: "my:person",
+                    name: "d.my:person",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -1330,7 +1366,7 @@ function loadAlfrescoSearchTable() {
                 {
                     data: "amountDisplay",
                     title: "Betrag",
-                    name: "my:amount",
+                    name: "d.my:amount",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -1338,7 +1374,7 @@ function loadAlfrescoSearchTable() {
                 {
                     data: "idvalue",
                     title: "Schlüssel",
-                    name: "my:idvalue",
+                    name: "d.my:idvalue",
                     defaultContent: '',
                     type: "string",
                     class: "alignLeft"
@@ -1347,7 +1383,7 @@ function loadAlfrescoSearchTable() {
                     data: "versionLabel",
                     orderable: false,
                     title: "Version",
-                    name: "cm:versionLabel",
+                    name: "d.cm:versionLabel",
                     defaultContent: '',
                     width: "25px",
                     type: "string",
