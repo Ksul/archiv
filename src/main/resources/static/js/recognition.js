@@ -3789,9 +3789,16 @@ REC = {
         logNode.mimetype = "text/html";
         logNode.addAspect("cm:referencesnode");
         logNode.addAspect("cm:titled");
+        logNode.addAspect("my:reportable");
         logNode.properties['cm:noderef'] = doc;
         logNode.properties['cm:title'] = "Report von " + docName;
-        logNode.properties['cm:description'] = doc.displayPath;
+        logNode.properties['my:position'] = doc.displayPath.split("/").slice(2).join("/");
+        if (!ruleFound)
+            logNode.properties['my:result'] = -1;
+        else if(REC.errors.length > 0)
+            logNode.properties['my:result'] = 1;
+        else
+            logNode.properties['my:result'] = 0;
         logNode.save();
         Logger.log(Level.INFO, "Processing of document " + docName + " finished!");
     },

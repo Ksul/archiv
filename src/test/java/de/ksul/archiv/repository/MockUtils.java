@@ -473,6 +473,8 @@ public class MockUtils {
                     result.add((BigInteger) obj);
                 } else if (obj instanceof String) {
                     result.add(new BigInteger(obj.toString()));
+                } else if (obj instanceof Integer) {
+                    result.add(BigInteger.valueOf(((Integer) obj).longValue()));
                 } else {
                     throw new CmisRuntimeException("Invalid property value: " + obj);
                 }
@@ -489,7 +491,10 @@ public class MockUtils {
                 result = (BigInteger) source;
             } else if (source instanceof String) {
                 result = new BigInteger((String) source);
-            } else {
+            } else if (source instanceof Integer) {
+                result = BigInteger.valueOf(((Integer) source).longValue());
+            }
+            else {
                 throw new CmisRuntimeException("Invalid property value: " + source);
             }
         }

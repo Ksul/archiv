@@ -30,6 +30,15 @@
                 </list>
             </parameter>
         </constraint>
+        <constraint name="my:result_constraint" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>-1</value>
+                    <value>0</value>
+                    <value>1</value>
+                </list>
+            </parameter>
+        </constraint>
     </constraints>
 
 
@@ -114,6 +123,24 @@
                     <index enabled="true">
                         <tokenised>false</tokenised>
                     </index>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="my:reportable">
+            <title>Reportable</title>
+            <properties>
+                <property name="my:position">
+                    <title>Position</title>
+                    <description>Position of Report</description>
+                    <type>d:text</type>
+                </property>
+                <property name="my:result">
+                    <title>Result</title>
+                    <description>Result of Recognition</description>
+                    <type>d:int</type>
+                    <constraints>
+                        <constraint ref="my:result_constraint"/>
+                    </constraints>
                 </property>
             </properties>
         </aspect>

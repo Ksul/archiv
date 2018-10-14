@@ -637,23 +637,21 @@ function loadAlfrescoTable() {
                     class: "alignCenter"
                 },
                 {
-                    data: "versionLabel",
+                    data: null,
                     orderable: false,
                     title: "Status",
-                    name: "d.cm:versionLabel",
-                    defaultContent: '',
-                    width: "25px",
+                    width: "45px",
                     type: "string",
                     class: "alignCenter"
                 },
                 {
-                    data: "description",
+                    data: "position",
                     orderable: false,
                     title: "Position",
-                    name: "cm:description",
+                    name: "my:position",
                     defaultContent: '',
                     type: "string",
-                    class: "alignCenter"
+                    class: "alignLeft"
                 },
                 {
                     data: null,
@@ -803,6 +801,28 @@ function loadAlfrescoTable() {
                     }
                 },
                 {
+                    targets: [9],
+                    render: function (obj, type, row) {
+
+                        let container = document.createElement("div");
+
+                        let image = document.createElement("i");
+                        image.href = "#";
+                        if (row.result === -1) {
+                            image.className = "fas fa-question fa-15x awesomeEntity";
+                            image.title = "Unbekanntes Dokument";
+                        } else if (row.result === 0) {
+                            image.className = "fas fa-check fa-15x awesomeEntity";
+                            image.title = "Dokument verteilt";
+                        } else if (row.result === 1) {
+                            image.className = "fas fa-exclamation fa-15x awesomeEntity";
+                            image.title = "Fehler bei der Verteilung";
+                        }
+                        container.appendChild(image);
+                        return container.outerHTML;
+                    }
+                },
+                {
                     targets: [11],
                     render: function(obj, types, row, meta) {
                         return alfrescoAktionFieldFormatter(obj, types, row, meta).outerHTML;
@@ -846,8 +866,11 @@ function loadAlfrescoTable() {
                    alfrescoDocumentSelectMenu.superfish('disableItem','alfrescoDocumentAuswahlNone');
                }
             }
-        } ).on( 'draw', function () {
-            $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineDocumentFieldDefinition());
+        } ).on( 'draw', function (element, args) {
+            if (args &&  args.oInit.folderId !== logboxFolderId)
+                $.fn.dataTable.makeEditable(alfrescoTabelle, updateInLineDocumentFieldDefinition());
+            else
+                $.fn.dataTable.makeEditable(alfrescoTabelle, { bDisableEditing: true});
         });
 
         $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterCenter").outerHeight() - ($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight() + $("#alfrescoTabelleHeader").outerHeight() +
