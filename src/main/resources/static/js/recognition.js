@@ -254,7 +254,7 @@ var Level = {
                     return this.ERROR;
                 else if (level.trim().toLowerCase() === "warn")
                     return this.WARN;
-                else if (level.trim().toLowerCase() === "informational")
+                else if (level.trim().toLowerCase() === "info")
                     return this.INFO;
                 else if (level.trim().toLowerCase() === "debug")
                     return this.DEBUG;
@@ -362,6 +362,7 @@ function LoggerDefinition(debugLevel) {
     };
 
     this.setLevel = function (level) {
+        Logger.log(Level.INFO, "Level set to " + level.toString());
         this.debugLevel = level;
     };
 
@@ -410,6 +411,17 @@ function LoggerDefinition(debugLevel) {
 
 
 var Logger = new LoggerDefinition(Level.INFO);
+
+
+function Error(){
+    Array.call(this);
+}
+Error.prototype = [];
+Error.prototype.push = function(element) {
+    Logger.log(Level.ERROR, element);
+    Array.prototype.push.call(this, element);
+};
+
 
 var Encoder = {
 
@@ -1231,7 +1243,8 @@ function XMLNode(nodeType, doc, str) {
 
 /**
  * beschreibt einen Dokument Typen
- * @param srch    die Parameter
+ * @param srch          die Parameter
+ * @param parentType    das Elternobject
  * @constructor
  */
 function ArchivTyp(srch, parentType) {
@@ -1259,76 +1272,76 @@ function ArchivTyp(srch, parentType) {
     this.completeWord = REC.stringToBoolean(srch.completeWord, false);
     this.caseSensitive = REC.stringToBoolean(srch.caseSensitive, false);
     var tmp = [];
-    Logger.log(Level.TRACE, "Search Archivposition");
+    Logger.log(Level.TRACE, this.name + ": Search Archivposition");
     if (srch.archivPosition) {
         Logger.log(Level.TRACE, "Archivposition exist");
         for (i = 0; i < srch.archivPosition.length; i++)
-            tmp.push(new ArchivPosition(srch.archivPosition[i]));
+            tmp.push(new ArchivPosition(srch.archivPosition[i]), this.name);
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Archivposition found");
+            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivposition found");
             this.archivPosition = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Archivposition found");
+            Logger.log(Level.WARN, this.name + ": No valid Archivposition found");
     }
     tmp = [];
-    Logger.log(Level.TRACE, "Search Archivziel");
+    Logger.log(Level.TRACE, this.name + ": Search Archivziel");
     if (srch.archivZiel) {
-        Logger.log(Level.TRACE, "Archivziel exist");
+        Logger.log(Level.TRACE, this.name + ": Archivziel exist");
         for (i = 0; i < srch.archivZiel.length; i++)
             tmp.push(new ArchivZiel(srch.archivZiel[i]));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Archivziel found");
+            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivziel found");
             this.archivZiel = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Archivziel found");
+            Logger.log(Level.WARN, this.name + ": No valid Archivziel found");
     }
-    Logger.log(Level.TRACE, "Search Tags");
+    Logger.log(Level.TRACE, this.name + ": Search Tags");
     tmp = [];
     if (srch.tags) {
-        Logger.log(Level.TRACE, "Tags exist");
+        Logger.log(Level.TRACE, this.name + ": Tags exist");
         for (i = 0; i < srch.tags.length; i++)
             tmp.push(new Tags(srch.tags[i]));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Tags found");
+            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Tags found");
             this.tags = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Tags found");
+            Logger.log(Level.WARN, this.name + ": No valid Tags found");
     }
     tmp = [];
-    Logger.log(Level.TRACE, "Search Category");
+    Logger.log(Level.TRACE, this.name + ": Search Category");
     if (srch.category) {
-        Logger.log(Level.TRACE, "Category exist");
+        Logger.log(Level.TRACE, this.name + ": Category exist");
         for (i = 0; i < srch.category.length; i++)
             tmp.push(new Category(srch.category[i]));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Category found");
+            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Category found");
             this.category = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Category found");
+            Logger.log(Level.WARN, this.name + ": No valid Category found");
     }
     tmp = [];
-    Logger.log(Level.TRACE, "Search SearchItems");
+    Logger.log(Level.TRACE, this.name + ": Search SearchItems");
     if (srch.searchItem) {
-        Logger.log(Level.TRACE, "SearchItems exist");
+        Logger.log(Level.TRACE, this.name + ": SearchItems exist");
         for (i = 0; i < srch.searchItem.length; i++)
-            tmp.push(new SearchItem(srch.searchItem[i]));
+            tmp.push(new SearchItem(srch.searchItem[i], this.name));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " SearchItem found");
+            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " SearchItem found");
             this.searchItem = tmp;
         } else
-            Logger.log(Level.WARN, "No valid SearchItem found");
+            Logger.log(Level.WARN, this.name + ": No valid SearchItem found");
     }
     tmp = [];
-    Logger.log(Level.TRACE, "Search Archivtyp");
+    Logger.log(Level.TRACE, this.name + ": Search Archivtyp");
     if (srch.archivTyp) {
-        Logger.log(Level.TRACE, "Archivtyp exist");
+        Logger.log(Level.TRACE, this.name + ": Archivtyp exist");
         for (i = 0; i < srch.archivTyp.length; i++)
             tmp.push(new ArchivTyp(srch.archivTyp[i], this));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Archivtyp found");
+            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivtyp found");
             this.archivTyp = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Archivtyp found");
+            Logger.log(Level.WARN, this.name + ": No valid Archivtyp found");
     }
 
     /**
@@ -1597,8 +1610,7 @@ function ArchivTyp(srch, parentType) {
                             REC.moveDocToUnknownBox(REC.currentDocument);
                         }
                     }
-                }
-                else {
+                } else {
                     if (this.getTopParent() === this && !this.destinationResolved) {
                         // hier kommen wir hin, wenn die geschachtelten Archivtypen keine Destination erzeugen können und
                         // aktuelle Typ keine definiert hat
@@ -1653,10 +1665,11 @@ function ArchivTyp(srch, parentType) {
 
 /**
  * Ermittelt die Zielposition für das Dokument
- * @param srch      die Parameter
+ * @param srch          die Parameter
+ * @param parentName    der Name
  * @constructor
  */
-function ArchivPosition(srch) {
+function ArchivPosition(srch, parentName) {
     if (srch.debugLevel)
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
     // XML merken
@@ -1665,16 +1678,16 @@ function ArchivPosition(srch) {
     if (srch.folder)
         this.folder = srch.folder;
     var tmp = [];
-    Logger.log(Level.TRACE, "Search Archivziel");
+    Logger.log(Level.TRACE, parentName + ": Search Archivziel");
     if (srch.archivZiel) {
-        Logger.log(Level.TRACE, "Archivziel exist");
+        Logger.log(Level.TRACE, parentName + ": Archivziel exist");
         for (var i = 0; i < srch.archivZiel.length; i++)
             tmp.push(new ArchivZiel(srch.archivZiel[i]));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Archivziel found");
+            Logger.log(Level.DEBUG, parentName + ": " + tmp.length + " Archivziel found");
             this.archivZiel = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Archivziel found");
+            Logger.log(Level.WARN, parentName + ": No valid Archivziel found");
     }
 
     /**
@@ -1757,10 +1770,11 @@ function ArchivPosition(srch) {
 
 /**
  * formatiert Werte
- * @param srch      die Parameter
+ * @param srch          die Parameter
+ * @param parentName    der Name des Eltenobjekts
  * @constructor
  */
-function Format(srch) {
+function Format(srch, parentName) {
     if (srch.debugLevel)
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
     // XML merken
@@ -2050,10 +2064,11 @@ function Comments() {
 
 /**
  * Ermittelt die Grenzen im Suchtext für das zu findende Element
- * @param srch      die Parameter
+ * @param srch          die Parameter
+ * @param parentName    der Name des Elternobjekts
  * @constructor
  */
-function Delimitter(srch) {
+function Delimitter(srch, parentName) {
     Encoder.EncodeType = "numerical";
     if (srch.debugLevel)
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
@@ -2294,10 +2309,11 @@ function Tags(srch) {
 
 /**
  * stellt die Funktionalität zum Suchen eines Dokumentes zur Verfügung
- * @param srch      die Parameter
+ * @param srch          die Parameter
+ * @param parentName    der Name des Elternobjekts
  * @constructor
  */
-function SearchItem(srch) {
+function SearchItem(srch, parentName) {
     var tmp;
     var i;
     this.erg = new ResultContainer();
@@ -2361,52 +2377,52 @@ function SearchItem(srch) {
     this.backwards = REC.stringToBoolean(srch.backwards, false);
     this.left = (srch.direction && REC.trim(srch.direction).toLowerCase() === "left");
     tmp = [];
-    Logger.log(Level.TRACE, "Search Check");
+    Logger.log(Level.TRACE, parentName + ": Search Check");
     if (srch.check) {
-        Logger.log(Level.TRACE, "Check exist");
+        Logger.log(Level.TRACE, parentName + ": Check exist");
         for (i = 0; i < srch.check.length; i++)
             tmp.push(new Check(srch.check[i], this));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Check found");
+            Logger.log(Level.DEBUG, parentName + ": " + tmp.length + " Check found");
             this.check = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Check found");
+            Logger.log(Level.WARN, parentName + ": No valid Check found");
     }
     tmp = [];
-    Logger.log(Level.TRACE, "Search Delimitter");
+    Logger.log(Level.TRACE, parentName + ": Search Delimitter");
     if (srch.delimitter) {
-        Logger.log(Level.TRACE, "Delimitter exist");
+        Logger.log(Level.TRACE, parentName + ": Delimitter exist");
         for (i = 0; i < srch.delimitter.length; i++)
-            tmp.push(new Delimitter(srch.delimitter[i]));
+            tmp.push(new Delimitter(srch.delimitter[i], parentName));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Delimitter found");
+            Logger.log(Level.DEBUG, parentName + ": " + tmp.length + " Delimitter found");
             this.delimitter = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Delimitter found");
+            Logger.log(Level.WARN, parentName + ": No valid Delimitter found");
     }
     tmp = [];
-    Logger.log(Level.TRACE, "Search Archivziel");
+    Logger.log(Level.TRACE, parentName + ": Search Archivziel");
     if (srch.archivZiel) {
-        Logger.log(Level.TRACE, "Archivziel exist");
+        Logger.log(Level.TRACE, parentName + ": Archivziel exist");
         for (i = 0; i < srch.archivZiel.length; i++)
             tmp.push(new ArchivZiel(srch.archivZiel[i]));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Archivziel found");
+            Logger.log(Level.DEBUG,  parentName + ": " + tmp.length + " Archivziel found");
             this.archivZiel = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Archivziel found");
+            Logger.log(Level.WARN, parentName + ": No valid Archivziel found");
     }
     tmp = [];
-    Logger.log(Level.TRACE, "Format Archivziel");
+    Logger.log(Level.TRACE, parentName + ": Format Archivziel");
     if (srch.format) {
-        Logger.log(Level.TRACE, "Format exist");
+        Logger.log(Level.TRACE, parentName + ": Format exist");
         for (i = 0; i < srch.format.length; i++)
             tmp.push(new Format(srch.format[i]));
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, tmp.length + " Format found");
+            Logger.log(Level.DEBUG, parentName + ": " + tmp.length + " Format found");
             this.format = tmp;
         } else
-            Logger.log(Level.WARN, "No valid Format found");
+            Logger.log(Level.WARN, parentName + ": No valid Format found");
     }
 
     /**
@@ -3617,7 +3633,7 @@ REC = {
             var r = {
                 folder: folderName
             };
-            var archivPosition = new ArchivPosition(r);
+            var archivPosition = new ArchivPosition(r, "System");
             var destination = archivPosition.resolve();
             if (!doc.move(destination))
                 REC.errors.push("Document not successful moved to " + REC.completeNodePath(destination));
@@ -3846,7 +3862,7 @@ REC = {
         this.currXMLName = [];
         this.showContent = false;
         this.result = [];
-        this.errors = [];
+        this.errors = new Error();
         this.results = {
             search: [],
             tag : [],
@@ -3878,7 +3894,7 @@ REC = {
     currXMLName: [],
     showContent: false,
     result: [],
-    errors: [],
+    errors: new Error(),
     results: {
         search: [],
         tag : [],

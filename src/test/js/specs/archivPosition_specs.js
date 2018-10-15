@@ -13,7 +13,7 @@ describe("Test für ArchivPosition", function() {
         var rules = ' <archivPosition folder="Dokumente/Auto/KFZ Steuern" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
+        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode), "System");
         erg = archivPosition.resolve();
         expect(erg.displayPath.split("/").slice(2).join("/") + "/" + erg.name).toBe("/Archiv/Dokumente/Auto/KFZ Steuern");
     });
@@ -22,7 +22,7 @@ describe("Test für ArchivPosition", function() {
         var rules = ' <archivPosition folder="Dokumente/Auto/KFZ :Steuern" />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
+        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode), "System");
         erg = archivPosition.resolve();
         expect(erg).not.toBeDefined();
         expect(REC.errors[0]).toBe("invalid characters for a foldername\n/Archiv/Dokumente/Auto/KFZ :Steuern\nPosition 27:\n:\n");
@@ -32,12 +32,12 @@ describe("Test für ArchivPosition", function() {
         var rules = '<searchItem name="tmp2" fix="Test"  />';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
+        var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode), "System");
         REC.currentSearchItems = REC.currentSearchItems.concat(searchItem);
         rules = ' <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp2}"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
+        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode), "System");
         erg = archivPosition.resolve();
         expect(erg.displayPath.split("/").slice(2).join("/") + "/" + erg.name).toBe("/Archiv/Dokumente/Rechnungen/Sonstige Rechnungen/Test");
     });
@@ -46,14 +46,14 @@ describe("Test für ArchivPosition", function() {
         var rules = ' <archivPosition folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp2}"/>';
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
-        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode));
+        var archivPosition = new ArchivPosition(new XMLObject(XMLDoc.docNode), "System");
         erg = archivPosition.resolve();
         expect(erg).not.toBeDefined();
         expect(REC.errors[0]).toBe("Could not replace Placeholder {tmp2}!");
     });
 
     it("testResolveFolder1", function () {
-        var archivPosition = new ArchivPosition({});
+        var archivPosition = new ArchivPosition({}, "System");
         var newFolder = archivPosition.resolveFolder("/aa/bb/cc");
         expect(newFolder).not.toBeNull();
         expect(companyhome.childByNamePath("aa")).not.toBeNull();
@@ -63,7 +63,7 @@ describe("Test für ArchivPosition", function() {
 
     it("testResolveFolder2", function () {
         companyhome.createFolder("aa");
-        var archivPosition = new ArchivPosition({});
+        var archivPosition = new ArchivPosition({}, "System");
         var newFolder = archivPosition.resolveFolder("/aa/bb/cc");
         expect(newFolder).not.toBeNull();
         expect(companyhome.childByNamePath("aa")).not.toBeNull();
