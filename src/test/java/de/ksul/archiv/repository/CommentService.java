@@ -12,7 +12,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 public class CommentService {
 
     public TreeNode<?> createCommentsFolder(TreeNode<?> node) {
-        if (!node.isSubType("cmis:document"))
+        if (!node.isSubType("cm:content"))
             throw new CmisRuntimeException("Discusions only for documents");
         MockUtils mockUtils = MockUtils.getInstance();
         Repository repository = Repository.getInstance();

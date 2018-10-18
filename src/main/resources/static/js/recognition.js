@@ -275,7 +275,7 @@ function LoggerDefinition(debugLevel) {
 
         this.level = level;
         this.datum = new Date();
-        this.text = text;
+        this.text = text ? text : "";
 
         this.isRelevant = function(level){
             return this.level.level <= level.level;

@@ -418,6 +418,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         for (PropertyDefinition propertyDefinition: definitionMap.values()) {
             if (  ! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(propertyDefinition.getId())).findFirst().isPresent()) {
                 obj.getProperties().add(new PropertyImpl<>(propertyDefinition, new ArrayList<>()));
+                if (!obj.getObjectType().getPropertyDefinitions().containsKey(propertyDefinition.getId()))
+                    obj.getObjectType().getPropertyDefinitions().put(propertyDefinition.getId(), propertyDefinition);
                 properties._put(propertyDefinition.getId(), null);
             }
         }
