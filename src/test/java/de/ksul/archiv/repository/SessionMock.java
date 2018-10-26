@@ -6,6 +6,7 @@ import org.apache.chemistry.opencmis.client.runtime.OperationContextImpl;
 import org.apache.chemistry.opencmis.client.runtime.QueryStatementImpl;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.client.runtime.cache.Cache;
+import org.apache.chemistry.opencmis.client.runtime.cache.CacheImpl;
 import org.apache.chemistry.opencmis.client.runtime.repository.ObjectFactoryImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
@@ -41,12 +42,16 @@ public class SessionMock {
     private SessionImpl session;
     private CmisBindingMock cmisBindingMock;
     private RepositoryInfoMock repositoryInfoMock;
-    private CacheMock cacheMock;
+    private CmisBinding binding;
+    private Cache cache = new CacheImpl();
+    private ObjectFactory objectFactory = new ObjectFactoryImpl();
+    private Map<String, String> parameter;
+
+
 
     public SessionMock() {
         cmisBindingMock = new CmisBindingMock();
         repositoryInfoMock = new RepositoryInfoMock();
-        cacheMock = new CacheMock();
     }
 
     public SessionImpl getSession() {
@@ -56,8 +61,11 @@ public class SessionMock {
     }
 
     public SessionMock setRepository(Repository repository) {
+        parameter = repository.getParameter();
         cmisBindingMock.setRepository(repository);
         repositoryInfoMock.setRepository(repository);
+
+
         return this;
     }
 
@@ -65,11 +73,12 @@ public class SessionMock {
 
         SessionImpl session = mock(SessionImpl.class);
 
-        ObjectFactory objectFactory = new ObjectFactoryImpl();
-        objectFactory.initialize(session, null);
+
         RepositoryInfo repositoryInfo = repositoryInfoMock.getRepositoryInfo();
-        Cache cache = cacheMock.getCache();
-        CmisBinding binding = cmisBindingMock.getBinding();
+        objectFactory.initialize(session, parameter);
+        cache.initialize(session, parameter);
+
+        binding = cmisBindingMock.getBinding();
         when(session.getBinding()).thenReturn(binding);
         when(session.getRepositoryInfo()).thenReturn(repositoryInfo);
         when(session.getRepositoryId()).thenReturn("0");
@@ -106,13 +115,6 @@ public class SessionMock {
             }
         });
 
-
-        Map<String, String> parameter = new HashMap<>();
-        parameter.put(SessionParameter.CACHE_SIZE_OBJECTS, "5");
-        parameter.put(SessionParameter.CACHE_SIZE_LINKS, "5");
-        parameter.put(SessionParameter.CACHE_SIZE_REPOSITORIES, "2");
-
-
         try {
             Field bindingField = SessionImpl.class.getDeclaredField("binding");
             bindingField.setAccessible(true);
@@ -132,6 +134,8 @@ public class SessionMock {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+
+
         return session;
     }
 

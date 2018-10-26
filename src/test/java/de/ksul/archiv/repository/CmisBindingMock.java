@@ -1,6 +1,5 @@
 package de.ksul.archiv.repository;
 
-import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.BindingsObjectFactoryImpl;
 import org.apache.chemistry.opencmis.commons.spi.*;
 
@@ -21,8 +20,7 @@ public class CmisBindingMock {
     private VersionServiceMock versionServiceMock;
     private RepositoryServiceMock repositoryServiceMock;
     private CmisBinding binding;
-    private Repository repository;
-    private SessionImpl sessionImpl;
+
 
     public CmisBindingMock() {
         objectServiceMock = new ObjectServiceMock();
@@ -33,7 +31,6 @@ public class CmisBindingMock {
     }
 
     public CmisBindingMock setRepository(Repository repository) {
-        this.repository = repository;
         discoveryServiceMock.setRepository(repository);
         objectServiceMock.setRepository(repository);
         navigationServiceMock.setRepository(repository);

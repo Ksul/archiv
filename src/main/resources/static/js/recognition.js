@@ -362,7 +362,8 @@ function LoggerDefinition(debugLevel) {
     };
 
     this.setLevel = function (level) {
-        Logger.log(Level.INFO, "Level set to " + level.toString());
+        if (level != this.debugLevel)
+            Logger.log(Level.INFO, "Level set to " + level.toString());
         this.debugLevel = level;
     };
 
@@ -1253,8 +1254,10 @@ function ArchivTyp(srch, parentType) {
     this.xml = srch.sourceXML;
     // Merker ob eine Destination ermittelt werden konnte
     this.destinationResolved = false;
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     this.name = srch.name;
     this.parent = parentType;
     this.searchString = srch.searchString;
@@ -1275,10 +1278,10 @@ function ArchivTyp(srch, parentType) {
     Logger.log(Level.TRACE, this.name + ": Search Archivposition");
     if (srch.archivPosition) {
         Logger.log(Level.TRACE, "Archivposition exist");
-        for (i = 0; i < srch.archivPosition.length; i++)
+        for (var i = 0; i < srch.archivPosition.length; i++)
             tmp.push(new ArchivPosition(srch.archivPosition[i]), this.name);
         if (tmp.length > 0) {
-            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivposition found");
+            Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivpositions found");
             this.archivPosition = tmp;
         } else
             Logger.log(Level.WARN, this.name + ": No valid Archivposition found");
@@ -1287,7 +1290,7 @@ function ArchivTyp(srch, parentType) {
     Logger.log(Level.TRACE, this.name + ": Search Archivziel");
     if (srch.archivZiel) {
         Logger.log(Level.TRACE, this.name + ": Archivziel exist");
-        for (i = 0; i < srch.archivZiel.length; i++)
+        for (var i = 0; i < srch.archivZiel.length; i++)
             tmp.push(new ArchivZiel(srch.archivZiel[i]));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivziel found");
@@ -1299,7 +1302,7 @@ function ArchivTyp(srch, parentType) {
     tmp = [];
     if (srch.tags) {
         Logger.log(Level.TRACE, this.name + ": Tags exist");
-        for (i = 0; i < srch.tags.length; i++)
+        for (var i = 0; i < srch.tags.length; i++)
             tmp.push(new Tags(srch.tags[i]));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Tags found");
@@ -1311,7 +1314,7 @@ function ArchivTyp(srch, parentType) {
     Logger.log(Level.TRACE, this.name + ": Search Category");
     if (srch.category) {
         Logger.log(Level.TRACE, this.name + ": Category exist");
-        for (i = 0; i < srch.category.length; i++)
+        for (var i = 0; i < srch.category.length; i++)
             tmp.push(new Category(srch.category[i]));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Category found");
@@ -1323,7 +1326,7 @@ function ArchivTyp(srch, parentType) {
     Logger.log(Level.TRACE, this.name + ": Search SearchItems");
     if (srch.searchItem) {
         Logger.log(Level.TRACE, this.name + ": SearchItems exist");
-        for (i = 0; i < srch.searchItem.length; i++)
+        for (var i = 0; i < srch.searchItem.length; i++)
             tmp.push(new SearchItem(srch.searchItem[i], this.name));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " SearchItem found");
@@ -1335,7 +1338,7 @@ function ArchivTyp(srch, parentType) {
     Logger.log(Level.TRACE, this.name + ": Search Archivtyp");
     if (srch.archivTyp) {
         Logger.log(Level.TRACE, this.name + ": Archivtyp exist");
-        for (i = 0; i < srch.archivTyp.length; i++)
+        for (var i = 0; i < srch.archivTyp.length; i++)
             tmp.push(new ArchivTyp(srch.archivTyp[i], this));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivtyp found");
@@ -1364,32 +1367,32 @@ function ArchivTyp(srch, parentType) {
         txt = txt + REC.getIdent(ident) + "caseSensitive: " + this.caseSensitive + "\n";
         txt = txt + REC.getIdent(ident) + "completeWord: " + this.completeWord + "\n";
         if (this.archivPosition) {
-            for (i = 0; i < this.archivPosition.length; i++) {
+            for (var i = 0; i < this.archivPosition.length; i++) {
                 txt = txt + this.archivPosition[i].toString(ident);
             }
         }
         if (this.archivZiel) {
-            for (i = 0; i < this.archivZiel.length; i++) {
+            for (var i = 0; i < this.archivZiel.length; i++) {
                 txt = txt + this.archivZiel[i].toString(ident);
             }
         }
         if (this.tags) {
-            for (i = 0; i < this.tags.length; i++) {
+            for (var i = 0; i < this.tags.length; i++) {
                 txt = txt + this.tags[i].toString(ident);
             }
         }
         if (this.category) {
-            for (i = 0; i < this.category.length; i++) {
+            for (var i = 0; i < this.category.length; i++) {
                 txt = txt + this.category[i].toString(ident);
             }
         }
         if (this.searchItem) {
-            for (i = 0; i < this.searchItem.length; i++) {
+            for (var i = 0; i < this.searchItem.length; i++) {
                 txt = txt + this.searchItem[i].toString(ident);
             }
         }
         if (this.archivTyp) {
-            for (i = 0; i < this.archivTyp.length; i++) {
+            for (var i = 0; i < this.archivTyp.length; i++) {
                 txt = txt + this.archivTyp[i].toString(ident);
             }
         }
@@ -1502,13 +1505,13 @@ function ArchivTyp(srch, parentType) {
                     REC.currentSearchItems = this.searchItem;
             }
             if (this.archivZiel) {
-                for (i = 0; i < this.archivZiel.length; i++) {
+                for (var i = 0; i < this.archivZiel.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call ArchivZiel.resolve with " + REC.currentDocument.toString());
                     this.archivZiel[i].resolve(REC.currentDocument);
                 }
             }
             if (this.archivTyp) {
-                for (i = 0; i < this.archivTyp.length; i++) {
+                for (var i = 0; i < this.archivTyp.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call ArchivTyp.resolve ");
                     if (this.archivTyp[i].resolve()) {
                         this.unique = this.archivTyp[i].unique;
@@ -1517,19 +1520,19 @@ function ArchivTyp(srch, parentType) {
                 }
             }
             if (this.searchItem) {
-                for (i = 0; i < this.searchItem.length; i++) {
+                for (var i = 0; i < this.searchItem.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call SearchItem.resolve ");
                     this.searchItem[i].resolve(i);
                 }
             }
             if (this.tags) {
-                for (i = 0; i < this.tags.length; i++) {
+                for (var i = 0; i < this.tags.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call Tags.resolve with currentDocument");
                     this.tags[i].resolve(i, REC.currentDocument);
                 }
             }
             if (this.category) {
-                for (i = 0; i < this.category.length; i++) {
+                for (var i = 0; i < this.category.length; i++) {
                     Logger.log(Level.TRACE, "ArchivTyp.resolve: call Category.resolve with currentDocument");
                     this.category[i].resolve(i, REC.currentDocument);
                 }
@@ -1560,7 +1563,7 @@ function ArchivTyp(srch, parentType) {
                 // ArchivPositionen verarbeiten
                 if (this.archivPosition) {
                     var destinationFolder = null;
-                    for (i = 0; i < this.archivPosition.length; i++) {
+                    for (var i = 0; i < this.archivPosition.length; i++) {
                         Logger.log(Level.TRACE, "ArchivTyp.resolve: call ArchivPosition.resolve");
                         destinationFolder = this.archivPosition[i].resolve();
                         if (destinationFolder) {
@@ -1607,7 +1610,7 @@ function ArchivTyp(srch, parentType) {
                             }
                         } else {
                             // hier kommen wir hin, wenn die Archivposition keinen gültigen Folder erzeugen konnte
-                            REC.moveDocToUnknownBox(REC.currentDocument);
+                            REC.moveDocToUnknownBox();
                         }
                     }
                 } else {
@@ -1670,8 +1673,10 @@ function ArchivTyp(srch, parentType) {
  * @constructor
  */
 function ArchivPosition(srch, parentName) {
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     this.link = REC.stringToBoolean(srch.link, false);
@@ -1757,7 +1762,7 @@ function ArchivPosition(srch, parentName) {
         Logger.log(Level.TRACE, "ArchivPosition.resolve: settings are: \n" + this);
         folder = this.buildFolder();
         if (this.archivZiel && folder) {
-            for (i = 0; i < this.archivZiel.length; i++) {
+            for (var i = 0; i < this.archivZiel.length; i++) {
                 Logger.log(Level.TRACE, "ArchivPosition.resolve: call ArchivZiel.resolve with " + REC.completeNodePath(folder));
                 this.archivZiel[i].resolve(folder);
             }
@@ -1775,8 +1780,10 @@ function ArchivPosition(srch, parentName) {
  * @constructor
  */
 function Format(srch, parentName) {
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     this.formatString = srch.formatString;
@@ -1825,8 +1832,10 @@ function Format(srch, parentName) {
  * @constructor
  */
 function ArchivZiel(srch) {
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     if (srch.aspect)
@@ -1893,8 +1902,10 @@ function ArchivZiel(srch) {
  */
 function Check(srch, parent) {
 
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     if (parent)
@@ -2070,8 +2081,10 @@ function Comments() {
  */
 function Delimitter(srch, parentName) {
     Encoder.EncodeType = "numerical";
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     this.typ = srch.typ;
@@ -2158,8 +2171,10 @@ function Delimitter(srch, parentName) {
  * @constructor
  */
 function Category(srch) {
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     this.name = srch.name;
@@ -2260,8 +2275,10 @@ function Category(srch) {
  * @constructor
  */
 function Tags(srch) {
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     this.name = srch.name;
@@ -2318,8 +2335,10 @@ function SearchItem(srch, parentName) {
     var i;
     this.erg = new ResultContainer();
     this.resolved = false;
-    if (srch.debugLevel)
+    if (srch.debugLevel) {
         this.debugLevel = Level.getLevelFor(srch.debugLevel);
+        Logger.setLevel(this.debugLevel);
+    }
     // XML merken
     this.xml = srch.sourceXML;
     this.name = srch.name;
@@ -2339,7 +2358,7 @@ function SearchItem(srch, parentName) {
     if (srch.word) {
         tmp = REC.trim(srch.word).split(",");
         this.word = [];
-        for (i = 0; i < tmp.length; i++) {
+        for (var i = 0; i < tmp.length; i++) {
             this.word.push(parseInt(REC.trim(tmp[i]), 10));
         }
         this.readOverReturn = true;
@@ -2380,7 +2399,7 @@ function SearchItem(srch, parentName) {
     Logger.log(Level.TRACE, parentName + ": Search Check");
     if (srch.check) {
         Logger.log(Level.TRACE, parentName + ": Check exist");
-        for (i = 0; i < srch.check.length; i++)
+        for (var i = 0; i < srch.check.length; i++)
             tmp.push(new Check(srch.check[i], this));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, parentName + ": " + tmp.length + " Check found");
@@ -2392,7 +2411,7 @@ function SearchItem(srch, parentName) {
     Logger.log(Level.TRACE, parentName + ": Search Delimitter");
     if (srch.delimitter) {
         Logger.log(Level.TRACE, parentName + ": Delimitter exist");
-        for (i = 0; i < srch.delimitter.length; i++)
+        for (var i = 0; i < srch.delimitter.length; i++)
             tmp.push(new Delimitter(srch.delimitter[i], parentName));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, parentName + ": " + tmp.length + " Delimitter found");
@@ -2404,7 +2423,7 @@ function SearchItem(srch, parentName) {
     Logger.log(Level.TRACE, parentName + ": Search Archivziel");
     if (srch.archivZiel) {
         Logger.log(Level.TRACE, parentName + ": Archivziel exist");
-        for (i = 0; i < srch.archivZiel.length; i++)
+        for (var i = 0; i < srch.archivZiel.length; i++)
             tmp.push(new ArchivZiel(srch.archivZiel[i]));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG,  parentName + ": " + tmp.length + " Archivziel found");
@@ -2416,7 +2435,7 @@ function SearchItem(srch, parentName) {
     Logger.log(Level.TRACE, parentName + ": Format Archivziel");
     if (srch.format) {
         Logger.log(Level.TRACE, parentName + ": Format exist");
-        for (i = 0; i < srch.format.length; i++)
+        for (var i = 0; i < srch.format.length; i++)
             tmp.push(new Format(srch.format[i]));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, parentName + ": " + tmp.length + " Format found");
@@ -2457,22 +2476,22 @@ function SearchItem(srch, parentName) {
         txt = txt + REC.getIdent(ident) + "completeWord: " + this.completeWord + "\n";
         txt = txt + REC.getIdent(ident) + "included: " + this.included + "\n";
         if (this.check) {
-            for (i = 0; i < this.check.length; i++) {
+            for (var i = 0; i < this.check.length; i++) {
                 txt = txt + this.check[i].toString(ident);
             }
         }
         if (this.delimitter) {
-            for (i = 0; i < this.delimitter.length; i++) {
+            for (var i = 0; i < this.delimitter.length; i++) {
                 txt = txt + this.delimitter[i].toString(ident);
             }
         }
         if (this.archivZiel) {
-            for (i = 0; i < this.archivZiel.length; i++) {
+            for (var i = 0; i < this.archivZiel.length; i++) {
                 txt = txt + this.archivZiel[i].toString(ident);
             }
         }
         if (this.format) {
-            for (i = 0; i < this.format.length; i++) {
+            for (var i = 0; i < this.format.length; i++) {
                 txt = txt + this.format[i].toString(ident);
             }
         }
@@ -2625,7 +2644,7 @@ function SearchItem(srch, parentName) {
                     }
                 }
                 marker = false;
-                for (k = start; k <= tmp.length; k++) {
+                for (var k = start; k <= tmp.length; k++) {
                     if (k === tmp.length)
                         end = k;
                     else {
@@ -2726,13 +2745,13 @@ function SearchItem(srch, parentName) {
             Logger.log(Level.TRACE, "searchItem.resolve: no matching result found");
         } else {
             if (this.delimitter) {
-                for (i = 0; i < this.delimitter.length; i++) {
+                for (var i = 0; i < this.delimitter.length; i++) {
                     Logger.log(Level.DEBUG, "SearchItem.resolve: call Delimitter.resolve with " + REC.printTrace(this.erg, this.left));
                     this.erg = this.delimitter[i].resolve(this.erg, this.left);
                 }
             }
             if (!this.readOverReturn && this.text) {
-                for (i = 0; i < this.erg.length; i++) {
+                for (var i = 0; i < this.erg.length; i++) {
                     this.erg[i].limitToReturn();
                 }
                 Logger.log(Level.DEBUG, "SearchItem.resolve: readOverReturn result is " + REC.printTrace(this.erg, this.left));
@@ -2748,13 +2767,13 @@ function SearchItem(srch, parentName) {
             }
             this.erg.convert();
             if (this.format) {
-                for (i = 0; i < this.format.length; i++) {
+                for (var i = 0; i < this.format.length; i++) {
                     Logger.log(Level.DEBUG, "SearchItem.resolve: call Format.resolve with " + this.erg.getResult().getValue());
                     this.erg.getResult().val = this.format[i].resolve(this.erg.getResult().getValue());
                 }
             }
             if (this.check) {
-                for (i = 0; i < this.check.length; i++) {
+                for (var i = 0; i < this.check.length; i++) {
                     Logger.log(Level.DEBUG, "SearchItem.resolve: call Check.resolve");
                     this.check[i].resolve();
                 }
@@ -2762,7 +2781,7 @@ function SearchItem(srch, parentName) {
 
 
             if (this.archivZiel) {
-                for (i = 0; i < this.archivZiel.length; i++) {
+                for (var i = 0; i < this.archivZiel.length; i++) {
                     Logger.log(Level.DEBUG, "SearchItem.resolve: call ArchivZiel.resolve with " + REC.completeNodePath(REC.currentDocument));
                     this.archivZiel[i].resolve(REC.currentDocument);
                 }
@@ -3097,7 +3116,7 @@ function Result(text, xml, val, startPos, endPos, typ, expected) {
         var dat;
         if (!REC.isDate(dat)) {
             txt = text.replace(/ /g, '');
-            for (i = 0; i < monate.length; i++) {
+            for (var i = 0; i < monate.length; i++) {
                 var pos = txt.indexOf(monate[i]);
                 if (pos !== -1) {
                     var form = Formatter.numberFormat(i + 1, "00") + ".";
@@ -3573,17 +3592,20 @@ REC = {
      */
     getContent: function (doc) {
         var erg;
-        var trans = doc.transformDocument("text/plain");
-        if (trans) {
-            erg = trans.content + "";
-            trans.remove();
-            if (!erg || erg.length === 0) {
-                throw "Content of document not found";
+        if (this.currentContent === null) {
+            var trans = doc.transformDocument("text/plain");
+            if (trans) {
+                erg = trans.content + "";
+                trans.remove();
+                if (!erg || erg.length === 0) {
+                    throw "Content of document not found";
+                }
+            } else {
+                throw "Content of document could not be extracted";
             }
-        } else {
-            throw "Content of document could not be extracted";
+            this.currentContent = erg.replace(/\r\n/g, '\n');
         }
-        return erg.replace(/\r\n/g,'\n');
+        return this.currentContent;
     },
 
     testRules: function (rules) {
@@ -3603,13 +3625,12 @@ REC = {
 
     /**
      * verschiebt das Dokument in die Unknown Box und baut dabei ein Unterverzeichnis mit einem im Dokument gefundenen Datum auf
-     * @param doc   das zu verschiebende Dokument
      */
-    moveDocToUnknownBox: function (doc) {
+    moveDocToUnknownBox: function () {
         var moved = false;
         // Datum suchen
         var searchItem = new SearchItem({});
-        var erg = searchItem.findSpecialType(REC.getContent(doc), ["date"], false, null);
+        var erg = searchItem.findSpecialType(REC.getContent(REC.currentDocument), ["date"], false, null);
         if (erg) {
             // Datum gefunden. Jetzt prüfen, welches Datum am nächsten am aktuellen Tagesdatum liegt weil das wahrscheinlich das gesuchte Datum ist
             var compareDate = new Date();
@@ -3623,24 +3644,24 @@ REC = {
             var folderName;
             if (!foundDate) {
                 // kein plausibles Datum gefunden, also so in den Folder legen
-                Logger.log(Level.INFO, "No suitable date found in document " + doc.name + "! Document will be moved direct to folder " + REC.unknownBox.name);
+                Logger.log(Level.INFO, "No suitable date found in document " + REC.currentDocument.name + "! Document will be moved direct to folder " + REC.unknownBox.name);
                 folderName = REC.unknownBox.name;
             }
             else
             // Datum gefunden und daraus den Foldernamen bilden
                 folderName = REC.unknownBox.name + '/' + foundDate.getFullYear() + '/' + Formatter.dateFormat(foundDate, "F");
-            Logger.log(Level.INFO, "Move Document " + doc.name + " to folder " + folderName);
+            Logger.log(Level.INFO, "Move Document " + REC.currentDocument.name + " to folder " + folderName);
             var r = {
                 folder: folderName
             };
             var archivPosition = new ArchivPosition(r, "System");
             var destination = archivPosition.resolve();
-            if (!doc.move(destination))
+            if (!REC.currentDocument.move(destination))
                 REC.errors.push("Document not successful moved to " + REC.completeNodePath(destination));
             else
                 moved = true;
         }
-        if (!moved && !doc.move(REC.unknownBox))
+        if (!moved && !REC.currentDocument.move(REC.unknownBox))
             REC.errors.push("Document not successfuly moved to aim " + REC.completeNodePath(REC.unknownBox));
     },
 
@@ -3735,9 +3756,9 @@ REC = {
      * führt die Erkennung durch
      * @param doc       das zu erkennende Dokument
      * @param rules     die Regeln
-     * @param deb       wird nicht benutzt
+
      */
-    recognize: function (doc, rules, deb) {
+    recognize: function (doc, rules) {
         if (rules.debugLevel)
             this.debugLevel = Level.getLevelFor(rules.debugLevel);
         Logger.setLevel(this.debugLevel);
@@ -3771,7 +3792,7 @@ REC = {
         }
         if (!ruleFound) {
             Logger.log(Level.INFO, "No suitable rule found!");
-            this.moveDocToUnknownBox(doc);
+            this.moveDocToUnknownBox();
         }
         // Dokument auf Archivtyp setzen
         doc.specializeType("my:archivContent");
@@ -3852,6 +3873,7 @@ REC = {
     },
 
     currentDocument: null,
+    currentContent: null,
 
     init: function(){
         this.id = Math.random() * 100;

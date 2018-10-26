@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import de.ksul.archiv.repository.script.AlfrescoScriptApi;
-import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
-import org.apache.chemistry.opencmis.client.api.ItemType;
-import org.apache.chemistry.opencmis.client.api.Property;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -16,7 +14,6 @@ import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 
 import java.io.ByteArrayInputStream;
@@ -317,10 +314,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
             String newPath = path.substring(0, path.lastIndexOf("/")) ;
             FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, this.obj.getObjectType(), "text/plain");
             TreeNode<T> transform = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this.parent, newObject, false);
-//            if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get().getValue().equals(VerteilungConstants.DOCUMENT_TYPE_PDF)){
-//                ((PropertyImpl) ((FileableCmisObject) transform.getObj()).getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE)).findFirst().get()).setValue(VerteilungConstants.DOCUMENT_TYPE_PDF);
-//                Repository.getInstance().createContent(transform.getId(), , true);
-//            }
             transform.setContent(this.content);
             return transform;
         }
@@ -390,14 +383,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     @Override
     public void specializeType(String key) {
-//        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_DOCUMENT.value())) {
-//            if (!key.startsWith("D:"))
-//                key = "D:" + key;
-//        }
-//        if (obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_TYPE_ID)).findFirst().get().getValue().equals(BaseTypeId.CMIS_FOLDER.value())) {
-//            if (!key.startsWith("F:"))
-//                key = "F:" + key;
-//        }
+
         Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
         obj.getObjectType().getPropertyDefinitions().putAll(definitionMap);
         for (PropertyDefinition propertyDefinition: definitionMap.values()) {
@@ -409,21 +395,20 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     @Override
-    public void addAspect(String key) {
-        if (!key.startsWith("P:"))
-            key = "P:" + key;
-        ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).findFirst().get()).getValues().add(key);
+    public void addAspect( String k) {
+        final String  key = k.startsWith("P:") ? k : "P:" + k;
+        if (!((List) properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(key))
+            ((List) properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).add(key);
         Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
         obj.getObjectType().getPropertyDefinitions().putAll(definitionMap);
-        for (PropertyDefinition propertyDefinition: definitionMap.values()) {
-            if (  ! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(propertyDefinition.getId())).findFirst().isPresent()) {
+        for (PropertyDefinition propertyDefinition : definitionMap.values()) {
+            if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(propertyDefinition.getId())).findFirst().isPresent()) {
                 obj.getProperties().add(new PropertyImpl<>(propertyDefinition, new ArrayList<>()));
                 if (!obj.getObjectType().getPropertyDefinitions().containsKey(propertyDefinition.getId()))
                     obj.getObjectType().getPropertyDefinitions().put(propertyDefinition.getId(), propertyDefinition);
                 properties._put(propertyDefinition.getId(), null);
             }
         }
-
     }
 
     @Override
@@ -497,6 +482,14 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
                 this.getType().getProperties().add(property);
         }
 
+        for (String key : (Iterable<String>) ((ArrayList) properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS))) {
+            Optional<SecondaryType> opt1 = obj.getSecondaryTypes().stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst();
+            if (!opt1.isPresent()) {
+                ObjectType type = Repository.getSession().getTypeDefinition(key);
+                if (type instanceof SecondaryType)
+                    obj.getSecondaryTypes().add((SecondaryType) type);
+            }
+        }
     }
 
 
@@ -512,6 +505,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     void updateProperty(String name, Object value) {

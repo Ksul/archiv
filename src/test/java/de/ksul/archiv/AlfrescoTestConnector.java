@@ -21,7 +21,7 @@ public class AlfrescoTestConnector extends AlfrescoConnector{
     }
 
     @Override
-    public Map getComments(CmisObject obj) throws IOException, AuthenticationException {
+    public Map getComments(CmisObject obj) {
         Repository repository = Repository.getInstance();
         return repository.getComments(obj.getId());
     }

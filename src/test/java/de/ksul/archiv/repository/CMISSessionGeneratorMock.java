@@ -16,21 +16,20 @@ import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.client.runtime.util.CollectionIterable;
+import org.apache.chemistry.opencmis.commons.SessionParameter;
+import org.apache.chemistry.opencmis.commons.SessionParameterDefaults;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
-import org.apache.chemistry.opencmis.commons.enums.Cardinality;
-import org.apache.chemistry.opencmis.commons.enums.DateTimeResolution;
-import org.apache.chemistry.opencmis.commons.enums.PropertyType;
-import org.apache.chemistry.opencmis.commons.enums.Updatability;
+import org.apache.chemistry.opencmis.commons.enums.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 
@@ -130,9 +129,18 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         if (repository == null) {
             Repository.setArchivProperties(archivProperties);
             repository = Repository.getInstance();
+            Map<String, String> parameter = new HashMap<>();
+            parameter.put(SessionParameter.ATOMPUB_URL, archivProperties.getBinding());
+            parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+            parameter.put(SessionParameter.CACHE_SIZE_OBJECTS, Integer.toString(SessionParameterDefaults.CACHE_SIZE_OBJECTS));
+            parameter.put(SessionParameter.CACHE_SIZE_LINKS, Integer.toString(SessionParameterDefaults.CACHE_SIZE_LINKS));
+            parameter.put(SessionParameter.CACHE_SIZE_REPOSITORIES, Integer.toString(SessionParameterDefaults.CACHE_SIZE_REPOSITORIES));
+            parameter.put(SessionParameter.CACHE_SIZE_TYPES, Integer.toString(SessionParameterDefaults.CACHE_SIZE_TYPES));
+            repository.setParameter(parameter);
             sessionImpl = new SessionMock().setRepository(repository).getSession();
             MockUtils mockUtils = MockUtils.getInstance();
             mockUtils.setSession(sessionImpl);
+            Repository.setSession(sessionImpl);
             TreeNode node;
             node = repository.insert(null, mockUtils.createFileableCmisObject(repository, null, null, archivProperties.getCompanyHomeName(), mockUtils.getFolderType("cmis:folder"), null), false);
             node = repository.insert(node, mockUtils.createFileableCmisObject(repository, null, "/", archivProperties.getDataDictionaryName(), mockUtils.getFolderType("cmis:folder"), null), false);

@@ -100,7 +100,7 @@
         <searchItem name="title" fix="Caffé Fausto Rechnung {id}" target="cm:title" />
         <searchItem name="datum" kind="date" target="my:documentDate" />
         <searchItem name="betrag" text="Betrag"  readOverReturn="true" objectTyp="float" target="my:amount">
-            <check lowerValue="30" upperValue="250" debugLevel="trace" />
+            <check lowerValue="30" upperValue="250" />
             <delimitter typ="start" text="&#0032;" count="2" />
             <archivZiel aspect="my:amountable" />
         </searchItem>
@@ -934,7 +934,7 @@
         </archivTyp>
     </archivTyp>
     <!-- Allianz -->
-    <archivTyp name="Allianz" searchString="Allianz">
+    <archivTyp name="Allianz" searchString="Allianz" debugLevel="debug">
         <archivZiel type="my:archivContent" />
         <archivPosition folder="Dokumente/Versicherungen/Allianz/{id}" />
         <searchItem name="datum" kind="date" target="my:documentDate" />

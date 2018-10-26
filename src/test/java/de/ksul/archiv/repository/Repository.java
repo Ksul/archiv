@@ -40,6 +40,7 @@ import java.util.*;
 public class Repository {
 
     private static Logger logger = LoggerFactory.getLogger(Repository.class.getName());
+    private Map<String, String> parameter;
     private TreeNode<FileableCmisObject> root;
     private TreeNode<FileableCmisObject> categoryroot;
     @JsonProperty("nodes")
@@ -52,6 +53,10 @@ public class Repository {
     public static Repository repository;
     @JsonIgnore
     private static ArchivProperties archivProperties;
+    @JsonIgnore
+    private static Session session;
+    @JsonIgnore
+    private static PDFConnector pdfConnector = new PDFConnector();
 
 
     private Repository() {
@@ -63,12 +68,28 @@ public class Repository {
         return repository;
     }
 
+    static void setSession(Session session) {
+        Repository.session = session;
+    }
+
+    static Session getSession() {
+        return session;
+    }
+
     static void setInstance(Repository repo) {
         repository = repo;
     }
 
     static void setArchivProperties(ArchivProperties archivProperties) {
         Repository.archivProperties = archivProperties;
+    }
+
+    public void setParameter(Map<String, String> parameter) {
+        this.parameter = parameter;
+    }
+
+    public Map<String, String> getParameter() {
+        return parameter;
     }
 
     String UUId() {
@@ -455,11 +476,11 @@ public class Repository {
 
     private void setTreeNodeContent(TreeNode<FileableCmisObject> node, ContentStream stream) {
 
-        if (stream != null) {
+        if (node.getContent() == null && stream != null) {
             try {
                 if (stream.getMimeType().equals(VerteilungConstants.DOCUMENT_TYPE_PDF)) {
-                    PDFConnector con = new PDFConnector();
-                    node.setContent(con.pdftoText(stream.getStream()));
+
+                    node.setContent(pdfConnector.pdftoText(stream.getStream()));
                     stream.getStream().reset();
                 } else {
                     node.setContent(IOUtils.toString(stream.getStream(), "UTF-8"));
