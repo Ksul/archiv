@@ -1279,7 +1279,7 @@ function ArchivTyp(srch, parentType) {
     if (srch.archivPosition) {
         Logger.log(Level.TRACE, "Archivposition exist");
         for (var i = 0; i < srch.archivPosition.length; i++)
-            tmp.push(new ArchivPosition(srch.archivPosition[i]), this.name);
+            tmp.push(new ArchivPosition(srch.archivPosition[i], this.name));
         if (tmp.length > 0) {
             Logger.log(Level.DEBUG, this.name + ": " + tmp.length + " Archivpositions found");
             this.archivPosition = tmp;

@@ -185,6 +185,16 @@ ScriptNode.prototype.createFolder = function (name) {
     return newFolder;
 };
 
+ScriptNode.prototype.createFile = function (name) {
+    if (this.type !== "cm:folder")
+        throw "no folder!";
+    var newFile = new ScriptNode(name, "cm:document");
+    this.children.add(newFile);
+    newFile.parent.push(this);
+    newFile.displayPath = newFile._getDisplayPath();
+    return newFile;
+};
+
 ScriptNode.prototype.isSubType = function (type) {
     return this.subType === type;
 };
