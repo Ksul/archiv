@@ -934,7 +934,7 @@
         </archivTyp>
     </archivTyp>
     <!-- Allianz -->
-    <archivTyp name="Allianz" searchString="Allianz" debugLevel="debug">
+    <archivTyp name="Allianz" searchString="Allianz">
         <archivZiel type="my:archivContent" />
         <archivPosition folder="Dokumente/Versicherungen/Allianz/{id}" />
         <searchItem name="datum" kind="date" target="my:documentDate" />

@@ -260,6 +260,9 @@ function loadLayout() {
                             try {
                                 $("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollBody").height($("#alfrescoCenterCenter").outerHeight() - ($("#alfrescoTabelle_wrapper>div.dataTables_scroll>div.dataTables_scrollHead").outerHeight() + $("#alfrescoTableFooter").outerHeight() + $("#alfrescoTabelleHeader").outerHeight() +
                                     $("div ul li, .current").outerHeight() - 4));
+                                const zone = document.getElementById("alfrescoCenterCenter");
+                                zone.addEventListener('dragover', handleDragOver, false);
+                                zone.addEventListener('drop', handleDropInbox, false);
                             } catch (e) {
                                 errorHandler(e);
                             }
@@ -2294,6 +2297,8 @@ function switchAlfrescoDirectory(data) {
             objectID = data.objectID;
         else
             objectID = "-1";
+        // aktuellen Folder speichern
+        currentFolder = objectID;
         alfrescoTabelle.settings().init().folderId = objectID;
         if (objectID === logboxFolderId) {
             // LogFolder auch normale Dokumente (nicht nur vom Typ my:archivcontent) anzeigen
@@ -3751,7 +3756,12 @@ function createAlfrescoMenus() {
                                 "file": files[0],
                                 "documentDate": files[0].lastModifiedDate
                             };
-                            startDocumentDialog(data, "web-create", true);
+                            // In der Inbox keinen Dialog, sondern direkt hocladen. Für den rest sorgt die Verteilung
+                            if (currentFolder === inboxFolderId) {
+                                createDocument(data, files[0]);
+                            } else {
+                                startDocumentDialog(data, "web-create", true);
+                            }
                         } catch (e) {
                             errorHandler(e);
                         }

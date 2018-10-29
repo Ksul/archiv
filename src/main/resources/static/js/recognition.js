@@ -2450,7 +2450,6 @@ function SearchItem(srch, parentName) {
      * @return {string}     das Objekt als String
      */
     this.toString = function (ident) {
-        var i;
         if (!ident)
             ident = 0;
         ident++;
