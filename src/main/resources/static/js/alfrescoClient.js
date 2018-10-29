@@ -5,31 +5,49 @@
 function handleDropInbox(evt) {
     evt.stopPropagation();
     evt.preventDefault();
-    const files = evt.dataTransfer.files;
-    for ( let i = 0; i < files.length; i++) {
-        let f = files[i];
-        if (f) {
-            const reader = new FileReader();
-            reader.onloadend = (function (f) {
-                return function (evt) {
-                    if (evt.target.readyState === FileReader.DONE) {
-                        const content = evt.target.result;
-                        let json = executeService({"name": "createDocument", "errorMessage": "Dokument konnten nicht im Alfresco angelegt werden!"},[
-                            {"name": "documentId", "value":inboxFolderId},
-                            {"name": "fileName", "value": f.name},
-                            {"name": "content", "value": base64EncArr(strToUTF8Arr(content))},
-                            {"name": "mimeType", "value": "application/pdf"},
-                            {"name": "extraProperties", "value": {}},
-                            {"name": "versionState", "value": "major"}
+    if (currentFolder === archivFolderId ||
+        currentFolder === documentFolderId ||
+        currentFolder === fehlerFolderId ||
+        currentFolder === doubleFolderId ||
+        currentFolder === logboxFolderId) {
+        alertify.alert("Fehler", "No upload to this folder!");
+    } else {
+        const files = evt.dataTransfer.files;
+        for (let i = 0; i < files.length; i++) {
+            let f = files[i];
+            if (f) {
+                const reader = new FileReader();
+                reader.onloadend = (function (f) {
+                    return function (evt) {
+                        if (evt.target.readyState === FileReader.DONE) {
+                            const content = evt.target.result;
+                            const extraProperties = {
+                                'D:my:archivContent': {
+                                    'my:documentDate': files[0].lastModifiedDate,
+                                    'my:person': ""
+                                }
+                            };
+                            let json = executeService({
+                                "name": "createDocument",
+                                "errorMessage": "Dokument konnten nicht im Alfresco angelegt werden!"
+                            }, [
+                                {"name": "documentId", "value": inboxFolderId},
+                                {"name": "fileName", "value": f.name},
+                                {"name": "content", "value": btoa(strToUTF8Arr(content))},
+                                {"name": "mimeType", "value": "application/pdf"},
+                                {"name": "extraProperties", "value": extraProperties},
+                                {"name": "versionState", "value": "major"}
 
-                        ]);
+                            ]);
+                        }
+
                     }
-
-                }  })(f);
-            blob = f.slice(0, f.size + 1);
-            reader.readAsBinaryString(blob);
-        } else {
-            alertify.alert("Fehler", "Failed to load file!");
+                })(f);
+                blob = f.slice(0, f.size + 1);
+                reader.readAsBinaryString(blob);
+            } else {
+                alertify.alert("Fehler", "Failed to load file!");
+            }
         }
     }
 }
@@ -2819,6 +2837,8 @@ function loadAndConvertDataForTree(aNode, callBack) {
                 const done = function (json) {
                     if (json.success) {
                         obj = [];
+                        // aktuellen Folder merken
+                        currentFolder = json.parent;
                         for (let index = 0; index < json.data.length; index++) {
                             obj.push(buildObjectForTree(json.data[index]));
                         }
