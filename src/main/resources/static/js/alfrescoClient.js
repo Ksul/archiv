@@ -3,52 +3,37 @@
  * @param evt  das Event
  */
 function handleDropInbox(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    if (currentFolder === archivFolderId ||
-        currentFolder === documentFolderId ||
-        currentFolder === fehlerFolderId ||
-        currentFolder === doubleFolderId ||
-        currentFolder === logboxFolderId) {
-        alertify.alert("Fehler", "No upload to this folder!");
-    } else {
-        const files = evt.dataTransfer.files;
-        for (let i = 0; i < files.length; i++) {
-            let f = files[i];
-            if (f) {
-                const reader = new FileReader();
-                reader.onloadend = (function (f) {
-                    return function (evt) {
-                        if (evt.target.readyState === FileReader.DONE) {
-                            const content = evt.target.result;
-                            const extraProperties = {
-                                'D:my:archivContent': {
-                                    'my:documentDate': files[0].lastModifiedDate,
-                                    'my:person': ""
-                                }
-                            };
-                            let json = executeService({
-                                "name": "createDocument",
-                                "errorMessage": "Dokument konnten nicht im Alfresco angelegt werden!"
-                            }, [
-                                {"name": "documentId", "value": inboxFolderId},
-                                {"name": "fileName", "value": f.name},
-                                {"name": "content", "value": btoa(strToUTF8Arr(content))},
-                                {"name": "mimeType", "value": "application/pdf"},
-                                {"name": "extraProperties", "value": extraProperties},
-                                {"name": "versionState", "value": "major"}
+    try {
+        evt.stopPropagation();
+        evt.preventDefault();
+        if (currentFolder === archivFolderId ||
+            currentFolder === documentFolderId ||
+            currentFolder === fehlerFolderId ||
+            currentFolder === doubleFolderId ||
+            currentFolder === logboxFolderId) {
+            alertify.alert("Fehler", "No upload to this folder!");
+        } else {
+            const files = evt.dataTransfer.files;
+            for (let i = 0; i < files.length; i++) {
 
-                            ]);
-                        }
-
-                    }
-                })(f);
-                blob = f.slice(0, f.size + 1);
-                reader.readAsBinaryString(blob);
-            } else {
-                alertify.alert("Fehler", "Failed to load file!");
+                const data = {
+                    "name": files[i].name,
+                    "title": files[i].name,
+                    "file": files[i],
+                    "documentDate": files[i].lastModifiedDate
+                };
+                // In der Inbox keinen Dialog, sondern direkt hochladen. Für den Rest sorgt die Verteilung
+                if (currentFolder === inboxFolderId) {
+                    createDocument(data, files[i]);
+                } else {
+                    startDocumentDialog(data, "web-create", true);
+                    break;
+                }
             }
         }
+
+    } catch (e) {
+        errorHandler(e);
     }
 }
 
@@ -3776,7 +3761,7 @@ function createAlfrescoMenus() {
                                 "file": files[0],
                                 "documentDate": files[0].lastModifiedDate
                             };
-                            // In der Inbox keinen Dialog, sondern direkt hocladen. Für den rest sorgt die Verteilung
+                            // In der Inbox keinen Dialog, sondern direkt hocladen. Für den Rest sorgt die Verteilung
                             if (currentFolder === inboxFolderId) {
                                 createDocument(data, files[0]);
                             } else {

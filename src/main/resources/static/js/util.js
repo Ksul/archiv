@@ -475,7 +475,7 @@ function createDocument(input, file) {
                         "errorMessage": "Dokument konnte nicht erstellt werden!",
                         "ignoreError": false
                     }, [
-                        {"name": "documentId", "value": tree.jstree("get_selected")[0]},
+                        {"name": "documentId", "value": currentFolder},
                         {"name": "fileName", "value": theFile.name},
                         // Hier muss btoa verwendet werden, denn sonst wird der Inhalt der Datei nicht korrekt übertragen
                         {"name": "content", "value": content},
