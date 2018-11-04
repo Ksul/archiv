@@ -291,6 +291,53 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
     }
 
     @Test
+    public void testHasChildFolder() throws Exception {
+        ObjectByIdRequest request = new ObjectByIdRequest();
+        request.setDocumentId(con.getNode("/" + con.getDataDictionaryName()).getId());
+        this.mockMvc.perform(post("/hasChildFolder")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data", isA(Boolean.class)))
+                .andExpect(jsonPath("$.data", is(true)));
+        request.setDocumentId(con.getNode("/" + con.getDataDictionaryName() +  "/" + con.getScriptFolderName()).getId());
+        this.mockMvc.perform(post("/hasChildFolder")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data", isA(Boolean.class)))
+                .andExpect(jsonPath("$.data", is(false)));
+        request.setDocumentId(con.getNode("/" + con.getDataDictionaryName() +  "/" + con.getScriptFolderName() + "/backup.js.sample").getId());
+        this.mockMvc.perform(post("/hasChildFolder")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().is5xxServerError())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", notNullValue()))
+                .andExpect(jsonPath("$.data", nullValue()));
+        request.setDocumentId("9999");
+        this.mockMvc.perform(post("/hasChildFolder")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsBytes(request))
+                .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.error", nullValue()))
+                .andExpect(jsonPath("$.data", nullValue()));
+    }
+
+    @Test
     public void testFindDocument() throws Exception {
         DataTablesRequest dataTablesRequest = new DataTablesRequest();
         dataTablesRequest.setCmisQuery("SELECT * from cmis:document where cmis:name='backup.js.sample'");

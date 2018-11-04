@@ -25,3 +25,8 @@ ksul:
               - alfresco/model/forumModel.xml
               - static/model/archivModel.xml
 #ksul.archiv.test.testData=/tmp/repo.txt
+
+management:
+  health:
+    defaults:
+      enabled: false

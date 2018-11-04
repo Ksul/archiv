@@ -3045,9 +3045,10 @@ function loadAlfrescoTree() {
     } catch (e) {
     }
 
-    /*
-    Aufbau des Tree's
-     */
+    /**
+     Aufbau des Tree's
+     TODO Drag and Drop von ausserhalb des Browsers
+     **/
     try {
         tree = $("#tree").jstree({
             core: {
@@ -3182,17 +3183,6 @@ function loadAlfrescoTree() {
                             }
                         }
                     }
-                }
-            } catch (e) {
-                errorHandler(e);
-            }
-        }).on("load_node.jstree", function (event, data) {
-            try {
-                if (data.node.id === inboxFolderId ) {
-                    // Eventlistner für Drop in Inbox
-                    const zone = document.getElementById(inboxFolderId);
-                    zone.addEventListener('dragover', handleDragOver, false);
-                    zone.addEventListener('drop', handleDropInbox, false);
                 }
             } catch (e) {
                 errorHandler(e);

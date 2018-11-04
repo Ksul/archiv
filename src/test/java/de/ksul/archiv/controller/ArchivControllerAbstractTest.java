@@ -184,6 +184,26 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
         assertThat(obj.getData(), nullValue());
     }
 
+    @Test
+    public void testHasChildren() throws Exception {
+        RestResponse obj = services.getNodeId(new ObjectByPathRequest("/"));
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
+        assertThat(obj.getData(), notNullValue());
+        obj = services.hasChildFolder(new ObjectByIdRequest((String) ((Map <String, Object>) obj.getData()).get("objectID")));
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
+        assertThat(obj.getData(), Matchers.is(true));
+        obj = services.getNodeId(new ObjectByPathRequest("/" + ((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.DATA_DICTIONARY) + "/" +((Map<String, String>) services.getServerPaths().getData()).get(ArchivController.SCRIPT_FOLDER)));
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
+        assertThat(obj.getData(), notNullValue());
+        obj = services.hasChildFolder(new ObjectByIdRequest((String) ((Map <String, Object>) obj.getData()).get("objectID")));
+        assertThat(obj, notNullValue());
+        assertThat(obj.getData() + (obj.hasError() ? obj.getError().getMessage() : ""), obj.isSuccess(), Matchers.is(true));
+        assertThat(obj.getData(), Matchers.is(false));
+    }
+
 
     @Test
     public void testFindDocument() throws Exception {

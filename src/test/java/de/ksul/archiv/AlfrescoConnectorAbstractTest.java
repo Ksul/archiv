@@ -210,11 +210,14 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
 
     @Test
     public void testHasChildFolder() throws Exception {
-        CmisObject folder = buildTestFolder("TestFolder", null);
-        assertThat(con.hasChildFolder(folder), Matchers.is(false));
-        buildTestFolder("TestFolder", folder);
-        assertThat(con.hasChildFolder(folder), Matchers.is(true));
-        ((Folder) folder).deleteTree(true, UnfileObject.DELETE, true);
+        CmisObject cmisObject = con.getNode("/" + con.getDataDictionaryName());
+        assertThat(cmisObject, Matchers.notNullValue());
+        boolean hasChildFolder = con.hasChildFolder(cmisObject);
+        assertThat(hasChildFolder, Matchers.is(true));
+        cmisObject = con.getNode("/" + con.getDataDictionaryName() + "/" + con.getScriptFolderName());
+        assertThat(cmisObject, Matchers.notNullValue());
+        hasChildFolder = con.hasChildFolder(cmisObject);
+        assertThat(hasChildFolder, Matchers.is(false));
     }
 
 

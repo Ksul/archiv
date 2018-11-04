@@ -442,7 +442,7 @@ public class ArchivController {
      * @param model das Requestmodel
      * @return obj          ein Object mit den Feldern     success: true    die Operation war erfolgreich
      * false   ein Fehler ist aufgetreten
-     * data     der Knoten als Map
+     * data    der Knoten als Map
      */
     @RequestMapping(value = "/getNodeById", consumes = "application/json", produces = "application/json")
     public @ResponseBody
@@ -454,6 +454,34 @@ public class ArchivController {
 
         if (cmisObject != null) {
             obj.setData(convertCmisObjectToJSON(cmisObject, true));
+            obj.setSuccess(true);
+        }
+        else {
+            obj.setData(null);
+            obj.setSuccess(false);
+        }
+
+        return obj;
+    }
+
+    /**
+     * prüft, ob ein Knoten Childknoten hat
+     *
+     * @param model das Requestmodel
+     * @return obj          ein Object mit den Feldern     success: true    die Operation war erfolgreich
+     * false   ein Fehler ist aufgetreten
+     * data    true oder false
+     */
+    @RequestMapping(value = "/hasChildFolder", consumes = "application/json", produces = "application/json")
+    public @ResponseBody
+    RestResponse hasChildFolder(@RequestBody @Valid final ObjectByIdRequest model) throws Exception {
+
+        RestResponse obj = new RestResponse();
+
+        CmisObject cmisObject = con.getNodeById(model.getDocumentId());
+
+        if (cmisObject != null) {
+            obj.setData(con.hasChildFolder(cmisObject));
             obj.setSuccess(true);
         }
         else {
