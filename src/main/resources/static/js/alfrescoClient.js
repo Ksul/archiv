@@ -2837,7 +2837,7 @@ function loadAndConvertDataForTree(aNode, callBack) {
                                 }
                             ];
                             // Daten für den ArchivRoot Ordner eintragen
-                            if (json.data[0].parents[0])
+                            if (json.data[0] && json.data[0].parents[0])
                                 obj[0].data = json.data[0].parents[0];
                         }
                         // CallBack ausführen

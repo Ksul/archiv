@@ -172,6 +172,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         this.registerChild(node);
     }
 
+    @Override
     public boolean move(TreeNode<T> destination) {
         try {
             moveNode(destination);
@@ -182,12 +183,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     TreeNode<T> moveNode(TreeNode<T> newParent) {
-        this.parent = newParent;
-        newParent.childs.put(getName(), this);
-        this.path = newParent.path + (newParent.path.equals("/") ? "" : "/") + name;
-        this.displayPath = newParent.displayPath + "/" + newParent.getName();
         deRegisterChild(this);
         newParent.registerChild(this);
+        this.path = newParent.path + (newParent.path.equals("/") ? "" : "/") + name;
+        this.displayPath = newParent.displayPath + "/" + newParent.getName();
         updateProperty(PropertyIds.PARENT_ID, newParent.getId());
         if (newParent.getName().equalsIgnoreCase("Inbox")) {
             Repository.getInstance().executeScript(this);

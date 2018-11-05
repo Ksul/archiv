@@ -151,7 +151,7 @@ public class DiscoveryServiceMock {
                             int ret = 0;
                             for (int j = 0; j < sortColumns.length; j++) {
                                 String[] column = sortColumns[j].trim().split(" ");
-                                order[0] = column[0];
+                                order[0] = column[0].substring(1, 2).equals(".") ? column[0].substring(2) : column[0];
                                 order[1] = column.length > 1 ? !column[1].isEmpty() ? column[1] : "ASC" : "ASC";
                                 Comparable valA = null, valB = null;
                                 for (int i = 0; i < o1.getProperties().getPropertyList().size(); i++) {
