@@ -25,21 +25,6 @@ function handleDropInbox(evt) {
                 // In der Inbox keinen Dialog, sondern direkt hochladen. Für den Rest sorgt die Verteilung
                 if (currentFolder === inboxFolderId) {
                     createDocument(data, files[i]);
-                    const tree = $("#tree");
-                    let nodes = []
-                    $(tree.jstree().get_json(tree, {
-                        flat: true
-                    })).each(function (index, value) {
-                            if (this.id !== archivFolderId &&
-                                this.id !== logboxFolderId &&
-                                this.id !== fehlerFolderId &&
-                                this.id !== doubleFolderId) {
-                                nodes.push(this.id);
-                            }
-                        });
-                    for ( let index = 0; index < nodes.length; ++index) {
-                        tree.jstree().refresh_node(nodes[index]);
-                    }
                 } else {
                     startDocumentDialog(data, "web-create", true);
                     break;
@@ -441,7 +426,7 @@ function loadLayout() {
 }
 
 /**
- * zeigt das Dokument in einem neuen Tab an
+ * zeigt den Inhalt des Dokumentes in einem neuen Tab an
  * @param id      die Id des Objects
  */
 function openDocument(id) {
@@ -464,9 +449,7 @@ function openDocument(id) {
  * baut die Alfresco Tabelle auf.
  */
 function loadAlfrescoTable() {
-
-
-
+    
     try {
         let duration;
         $.fn.dataTable.moment('DD.MM.YY');
@@ -2623,7 +2606,7 @@ function handleAlfrescoImageClicks() {
             errorHandler(e);
         }
     });
-    // Dokument öffnen
+    // Dokument aus Report öffnen
     $(document).on("click", ".openDocument", function () {
         try {
             const tr = $(this).closest('tr');
@@ -2633,7 +2616,7 @@ function handleAlfrescoImageClicks() {
         } catch (e) {
             errorHandler(e);
         }
-});
+    });
 }
 
 /**

@@ -461,6 +461,24 @@ function createDocument(input, file) {
                     };
                     const done = function (json) {
                         if (json.success) {
+                            // Tree updaten
+                            const tree = $("#tree");
+                            let nodes = []
+                            $(tree.jstree().get_json(tree, {
+                                flat: true
+                            })).each(function (index, value) {
+                                //unpasende Folder ausschliessen
+                                if (this.id !== archivFolderId &&
+                                    this.id !== logboxFolderId &&
+                                    this.id !== fehlerFolderId &&
+                                    this.id !== doubleFolderId &&
+                                    !this.data.children) {
+                                    nodes.push(this.id);
+                                }
+                            });
+                            for ( let index = 0; index < nodes.length; index++) {
+                                tree.jstree().refresh_node(nodes[index]);
+                            }
                             // Tabelle updaten
                             alfrescoTabelle.row.add(json.data).draw();
                         }
@@ -636,6 +654,10 @@ function deleteFolder(data) {
     try {
 
         const done = function (json) {
+
+            const lastElement = $("#breadcrumblist").children().last();
+            const tree = $.jstree.reference('#tree');
+
             function manage(data) {
                 tree.delete_node(data.objectID);
                 // Tabelle updaten
@@ -652,9 +674,8 @@ function deleteFolder(data) {
             }
 
             if (json.success) {
-                const lastElement = $("#breadcrumblist").children().last();
+
                 // Tree updaten
-                const tree = $.jstree.reference('#tree');
                 if (data instanceof Array) {
                     for ( let i = 0; i < data.length; i++)
                         manage(data[i]);

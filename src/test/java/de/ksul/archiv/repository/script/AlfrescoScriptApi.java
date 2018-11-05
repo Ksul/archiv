@@ -37,6 +37,8 @@ public interface AlfrescoScriptApi<T> {
 
     void addTag(String name);
 
+    void addNode(TreeNode<T> node);
+
     void createAssociation(Object target, String name);
 
     List<TreeNode<T>> getRootCategories(String name);

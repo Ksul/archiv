@@ -47,6 +47,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     Map<String, TreeNode<T>> childs;
     public NodeProperties properties;
     public NodeProperties childAssocs;
+
     public boolean isLeaf() {
         return childs.size() == 0;
     }
@@ -54,29 +55,29 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     public TreeNode() {
     }
 
-    TreeNode( FileableCmisObject obj) {
-        if (! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().isPresent())
+    TreeNode(FileableCmisObject obj) {
+        if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().isPresent())
             throw new CmisRuntimeException("objectId not found");
         this.id = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).getValueAsString();
-        if (! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().isPresent())
+        if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().isPresent())
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
-        this.path ="";
+        this.path = "";
         this.obj = new Type(obj.getProperties(), obj.getType(), obj.getSecondaryTypes());
         this.childs = new HashMap<>();
         this.properties = new NodeProperties(this.obj);
         this.childAssocs = new NodeProperties(this.obj);
         copyValues();
-     }
+    }
 
-    TreeNode( FileableCmisObject obj, String version) {
-        if (! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().isPresent())
+    TreeNode(FileableCmisObject obj, String version) {
+        if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().isPresent())
             throw new CmisRuntimeException("objectId not found");
         this.id = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.OBJECT_ID)).findFirst().get()).getValueAsString();
-        if (! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().isPresent())
+        if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().isPresent())
             throw new CmisRuntimeException("object name not found");
         this.name = ((PropertyImpl) obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.NAME)).findFirst().get()).getValueAsString();
-        this.path ="";
+        this.path = "";
         this.obj = new Type(obj.getProperties(), obj.getType(), obj.getSecondaryTypes());
         this.childs = new HashMap<>();
         this.properties = new NodeProperties(this.obj);
@@ -100,7 +101,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         return obj;
     }
 
-    public T getObj(){return (T) MockUtils.getInstance().createObject(obj);
+    public T getObj() {
+        return (T) MockUtils.getInstance().createObject(obj);
     }
 
     public T getObj(String version) {
@@ -111,9 +113,11 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         LinkedHashMap<String, Property<?>> props = new LinkedHashMap<>();
         return (T) MockUtils.getInstance().createObject(versions.get(version));
     }
-    
 
-    public boolean containsData (String version){ return versions.containsKey(version);}
+
+    public boolean containsData(String version) {
+        return versions.containsKey(version);
+    }
 
     public String getName() {
         return name;
@@ -127,24 +131,32 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         this.path = path;
     }
 
-    public String getId() { return id;}
+    public String getId() {
+        return id;
+    }
 
     TreeNode<T> getParent() {
         return parent;
     }
-    
 
+    private void registerChild(TreeNode<T> node) {
+        node.parent = this;
+        this.childs.put(node.getName(), node);
+    }
+
+    private void deRegisterChild(TreeNode<T> node) {
+
+        if (this.parent != null) {
+            this.parent.childs.remove(this.getName());
+            this.parent.deRegisterChild(node);
+        }
+    }
+    
     TreeNode<T> addNode(FileableCmisObject child, String version) {
-        TreeNode<T> childNode = new TreeNode<T>( child, version);
-        childNode.parent = this;
+        TreeNode<T> childNode = new TreeNode<T>(child, version);
         String name = child.getName();
-        this.childs.put(name, childNode);
         childNode.path = this.path + (this.path.equals("/") ? "" : "/") + name;
         childNode.displayPath = this.displayPath + "/" + this.getName();
-//        if (version != null) {
-//             childNode.versions.put(version, childNode.obj);
-//           // childNode.checkin(version, null);
-//        }
         this.registerChild(childNode);
         return childNode;
     }
@@ -155,11 +167,16 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         deRegisterChild(this);
     }
 
+    @Override
+    public void addNode(TreeNode<T> node) {
+        this.registerChild(node);
+    }
+
     public boolean move(TreeNode<T> destination) {
         try {
             moveNode(destination);
             return true;
-        } catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -178,7 +195,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         return this;
     }
 
-    void updateNode(List<Property<?>>  properties) {
+    void updateNode(List<Property<?>> properties) {
         obj.setProperties(properties);
         copyValues();
     }
@@ -202,17 +219,6 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         return obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(PropertyIds.LAST_MODIFICATION_DATE)).findFirst().get().getValue();
     }
 
-    private void registerChild(TreeNode<T> node) {
-
-        if (parent != null)
-            parent.registerChild(node);
-    }
-
-    private void deRegisterChild(TreeNode<T> node) {
-
-        if (parent != null)
-            parent.deRegisterChild(node);
-    }
 
     public TreeNode<T> getByPath(String path) {
         String[] parts;
@@ -228,7 +234,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
             if (part.isEmpty())
                 part = part + "/";
             if (this.childs.containsKey(part)) {
-               TreeNode<T> node = this.childs.get(part);
+                TreeNode<T> node = this.childs.get(part);
                 if (parentNode != null && !node.parent.equals(parentNode))
                     return null;
                 parentNode = node;
@@ -265,15 +271,14 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
                     break;
                 }
             }
-            if ( !found)
+            if (!found)
                 return null;
         }
         return n;
     }
 
 
-
-    TreeMap<String,  Type> getAllVersions() {
+    TreeMap<String, Type> getAllVersions() {
         return versions;
     }
 
@@ -301,7 +306,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         return this;
     }
 
-    private void changePropertie(String id, Object value){
+    private void changePropertie(String id, Object value) {
         Map<String, PropertyData<?>> props = MockUtils.getInstance().convProperties(obj.getProperties());
         ((PropertyImpl) props.get(id)).setValue(value);
         obj.setProperties(MockUtils.getInstance().convPropertyData(props));
@@ -311,7 +316,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     public TreeNode<T> transformDocument(String mimeType) {
         if (mimeType.equals("text/plain")) {
             String newName = getName().substring(0, getName().lastIndexOf(".") + 1) + "txt";
-            String newPath = path.substring(0, path.lastIndexOf("/")) ;
+            String newPath = path.substring(0, path.lastIndexOf("/"));
             FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, this.obj.getObjectType(), "text/plain");
             TreeNode<T> transform = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this.parent, newObject, false);
             transform.setContent(this.content);
@@ -320,7 +325,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         return null;
     }
 
-    public boolean remove(){
+    public boolean remove() {
         try {
             Repository.getInstance().delete(getId());
             return true;
@@ -334,7 +339,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         if (type.equals("cm:folder"))
             type = "cmis:folder";
         FileableCmisObject newFolder = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType(type), null);
-        TreeNode<T> newNode = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, false);
+        TreeNode<T> newNode = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newFolder, false);
         newNode.specializeType(type);
         return newNode;
     }
@@ -345,11 +350,11 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     @Override
-    public TreeNode<T> createNode(String name, String type, String aspect){
+    public TreeNode<T> createNode(String name, String type, String aspect) {
         if (!type.startsWith("F:"))
-        type = "F:" + type;
+            type = "F:" + type;
         FileableCmisObject newComment = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getFolderType(type), null);
-        TreeNode<T> node = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newComment, true);
+        TreeNode<T> node = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newComment, true);
         //node.addAspect(aspect);
         return node;
     }
@@ -368,9 +373,9 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     @Override
     public TreeNode<T> createFile(String name, String type) {
         if (type.equals("cm:content"))
-                type = "cmis:document";
+            type = "cmis:document";
         FileableCmisObject newNode = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, this.getPath(), name, MockUtils.getInstance().getDocumentType(type), null);
-        TreeNode<T> node = ( TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newNode, false);
+        TreeNode<T> node = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this, newNode, false);
 
         return node;
     }
@@ -386,8 +391,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
         Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
         obj.getObjectType().getPropertyDefinitions().putAll(definitionMap);
-        for (PropertyDefinition propertyDefinition: definitionMap.values()) {
-            if (  ! obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(propertyDefinition.getId())).findFirst().isPresent()) {
+        for (PropertyDefinition propertyDefinition : definitionMap.values()) {
+            if (!obj.getProperties().stream().filter(e -> e.getId().equalsIgnoreCase(propertyDefinition.getId())).findFirst().isPresent()) {
                 obj.getProperties().add(new PropertyImpl<>(propertyDefinition, new ArrayList<>()));
                 properties._put(propertyDefinition.getId(), null);
             }
@@ -395,8 +400,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     @Override
-    public void addAspect( String k) {
-        final String  key = k.startsWith("P:") ? k : "P:" + k;
+    public void addAspect(String k) {
+        final String key = k.startsWith("P:") ? k : "P:" + k;
         if (!((List) properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).contains(key))
             ((List) properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS)).add(key);
         Map<String, PropertyDefinition<?>> definitionMap = MockUtils.getInstance().getPropertyDefinitionBuilder().getPropertyDefinitionMap(key);
@@ -422,7 +427,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     @Override
-    public void createAssociation(Object target, String name){
+    public void createAssociation(Object target, String name) {
         childAssocs.put(name, target);
     }
 
@@ -437,7 +442,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     public TreeNode<T> createRootCategory(String aspect, String name) {
         if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
             throw new CmisRuntimeException("no category node");
-        Repository repository =  Repository.getInstance();
+        Repository repository = Repository.getInstance();
         MockUtils mockUtils = MockUtils.getInstance();
         return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
     }
@@ -446,7 +451,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     public TreeNode<T> createSubCategory(String name) {
         if (!(((FileableCmisObject) getObj()).getBaseType() instanceof ItemType))
             throw new CmisRuntimeException("no category node");
-        Repository repository =  Repository.getInstance();
+        Repository repository = Repository.getInstance();
         MockUtils mockUtils = MockUtils.getInstance();
         return (TreeNode<T>) repository.insert(null, mockUtils.createFileableCmisObject(repository, null, repository.getCategoryroot().getPath(), name, mockUtils.getItemType(), null), false);
     }
@@ -456,7 +461,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
         if (mimetype != null)
             updateProperty(PropertyIds.CONTENT_STREAM_MIME_TYPE, mimetype);
-        if (content != null){
+        if (content != null) {
 
             try {
                 InputStream stream = new ByteArrayInputStream(content.getBytes("UTF-8"));
@@ -469,7 +474,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         MockUtils mockUtils = MockUtils.getInstance();
 
         HashMap<String, PropertyData<?>> map = new HashMap<>();
-        for (String key: properties.keySet())
+        for (String key : properties.keySet())
             map.put(key, mockUtils.fillProperty(key, properties.get(key)));
 
         List<Property<?>> propertyList = MockUtils.getInstance().convPropertyData(map);
@@ -520,7 +525,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     private void copyValues() {
-        for (Property property: obj.getProperties()){
+        for (Property property : obj.getProperties()) {
             properties._put(property.getId(), property.getValue());
             if (property.getId().equalsIgnoreCase(PropertyIds.CONTENT_STREAM_MIME_TYPE))
                 mimetype = property.getValueAsString();

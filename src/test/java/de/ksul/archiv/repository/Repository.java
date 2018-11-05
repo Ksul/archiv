@@ -210,8 +210,13 @@ public class Repository {
             if (newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().isPresent()) {
                 if (node.getType().getObjectType().getPropertyDefinitions().get(key).getCardinality().equals(Cardinality.SINGLE))
                     ((PropertyImpl) newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).setValue(properties.get(key).getFirstValue());
-                else
-                    ((PropertyImpl) newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues().addAll(properties.get(key).getValues());
+                else {
+                    for (Object val : properties.get(key).getValues()) {
+                        List values = ((PropertyImpl) newProps.stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst().get()).getValues();
+                        if (!values.contains(val))
+                            values.add(val);
+                    }
+                }
             } else
                 newProps.add( new PropertyImpl(MockUtils.getInstance().getPropertyDefinitionBuilder().getCmisDictionaryService().findProperty(key).getPropertyDefinition(), properties.get(key).getValues()));
 

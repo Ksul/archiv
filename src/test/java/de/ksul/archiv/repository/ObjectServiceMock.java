@@ -77,8 +77,9 @@ public class ObjectServiceMock {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
                 String objectId = (String) ((Holder) invocation.getArguments()[1]).getValue();
-
                 repository.update(objectId, ((Properties) invocation.getArguments()[3]).getProperties());
+                // Holder auf die aktuelle Version stellen, damit die geänderten Properties auch zurückgeleifert werden
+                ((Holder) invocation.getArguments()[1]).setValue(objectId.substring(0, objectId.contains(";") ? objectId.lastIndexOf(";") : objectId.length()));
                 return null;
             }
         }).when(objectService).updateProperties(anyString(), any(Holder.class), any(Holder.class), any(Properties.class), any());
