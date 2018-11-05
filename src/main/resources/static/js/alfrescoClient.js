@@ -25,6 +25,21 @@ function handleDropInbox(evt) {
                 // In der Inbox keinen Dialog, sondern direkt hochladen. Für den Rest sorgt die Verteilung
                 if (currentFolder === inboxFolderId) {
                     createDocument(data, files[i]);
+                    const tree = $("#tree");
+                    let nodes = []
+                    $(tree.jstree().get_json(tree, {
+                        flat: true
+                    })).each(function (index, value) {
+                            if (this.id !== archivFolderId &&
+                                this.id !== logboxFolderId &&
+                                this.id !== fehlerFolderId &&
+                                this.id !== doubleFolderId) {
+                                nodes.push(this.id);
+                            }
+                        });
+                    for ( let index = 0; index < nodes.length; ++index) {
+                        tree.jstree().refresh_node(nodes[index]);
+                    }
                 } else {
                     startDocumentDialog(data, "web-create", true);
                     break;
