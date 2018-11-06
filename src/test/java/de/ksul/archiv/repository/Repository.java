@@ -108,6 +108,10 @@ public class Repository {
         return categoryroot;
     }
 
+    public TreeMap<String, TreeNode<FileableCmisObject>> getNodes() {
+        return nodes;
+    }
+
     List<FileableCmisObject> query(String query) {
         if (query == null)
             throw new RuntimeException("query must be set!");
@@ -225,24 +229,6 @@ public class Repository {
 
     }
 
-    void deleteTree(String id) {
-        if (id == null)
-            throw new RuntimeException("Id must be set!");
-        delete(id);
-        return;
-    }
-
-    void delete(String id) {
-        if (id == null)
-            throw new RuntimeException("Id must be set!");
-        if (root == null)
-            throw new RuntimeException("delete:no Root Node!");
-        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
-        logger.info(node.getName() + " [ID: " + node.getId() + "] [Path: " + node.getPath() + "] deleted from repository!");
-        node.removeNode();
-        nodes.remove(node.getId());
-    }
-
     FileableCmisObject move(String parentId, FileableCmisObject cmisObject){
         if (cmisObject == null)
             throw new RuntimeException("cmisObject not set!");
@@ -257,9 +243,9 @@ public class Repository {
         if (parent == null)
             throw new RuntimeException("Node with Id " + parentId + " not found!");
         TreeNode<FileableCmisObject> sourceFolder = node.getParent();
-        TreeNode<FileableCmisObject> movedNode = node.moveNode(parent);
+        node.move(parent);
         logger.info(node.getName() + " [ID: " + cmisObject.getId() + "] from Path: " + sourceFolder.getName() + " [ID: " + sourceFolder.getId() + "] to Path: " + parent.getName() + " [ID: " + parent.getId() + "] moved!");
-        return movedNode.getObj();
+        return node.getObj();
     }
 
     public TreeNode<FileableCmisObject> insert( TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, boolean executeRule) {
@@ -286,14 +272,14 @@ public class Repository {
             if (root == null)
                 throw new RuntimeException("insert:no Root Node!");
             if (parent != null) {
-                newNode = parent.addNode(cmisObject, version);
+                newNode = new TreeNode<FileableCmisObject>(cmisObject, version);
+                parent.addNode(newNode);
                 nodes.put(newNode.getId().split(";")[0], newNode);
                 if (contentStream != null) {
                     ((Document) cmisObject).setContentStream(contentStream, true);
                 }
                 if (parent.getName().equals("Inbox") && executeRule) {
                     executeScript(newNode);
-
                 }
                 logger.info(name + " [ID: " + newNode.getId() + "] [Path: " + newNode.getObj().getPaths().get(0) + "] inserted into repository!");
             } else

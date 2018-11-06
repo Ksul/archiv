@@ -1,6 +1,7 @@
 package de.ksul.archiv.repository;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import de.ksul.archiv.repository.script.AlfrescoScriptApi;
@@ -15,6 +16,8 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisNotSupportedExceptio
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -34,13 +37,15 @@ import java.util.*;
         property = "id")
 public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoScriptApi<T> {
 
+    @JsonIgnore
+    private static Logger logger = LoggerFactory.getLogger(TreeNode.class);
     private String id;
     public String name;
     private String path;
     public String displayPath = "";
     private Type obj;
     private TreeMap<String, Type> versions = new TreeMap<>(Collections.reverseOrder());
-    public TreeNode<T> parent;
+    public List<TreeNode<T>> parents = new ArrayList<>();
     public String content;
     public String mimetype;
     @JsonProperty("childs")
@@ -94,7 +99,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     private boolean isRoot() {
-        return parent == null;
+        return this.parents.isEmpty();
     }
 
     public Type getType() {
@@ -136,35 +141,21 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     TreeNode<T> getParent() {
-        return parent;
+        return parents.isEmpty() ? null :parents.get(0);
     }
 
     private void registerChild(TreeNode<T> node) {
-        node.parent = this;
+        node.parents.add(this);
+        node.path = this.path + (this.path.equals("/") ? "" : "/") + node.getName();
+        node.displayPath = this.displayPath + "/" + this.getName();
         this.childs.put(node.getName(), node);
     }
 
     private void deRegisterChild(TreeNode<T> node) {
 
-        if (this.parent != null) {
-            this.parent.childs.remove(this.getName());
-            this.parent.deRegisterChild(node);
+        if (this.childs.containsKey(node.name)) {
+            this.childs.remove(node.name);
         }
-    }
-    
-    TreeNode<T> addNode(FileableCmisObject child, String version) {
-        TreeNode<T> childNode = new TreeNode<T>(child, version);
-        String name = child.getName();
-        childNode.path = this.path + (this.path.equals("/") ? "" : "/") + name;
-        childNode.displayPath = this.displayPath + "/" + this.getName();
-        this.registerChild(childNode);
-        return childNode;
-    }
-
-    void removeNode() {
-        if (this.parent!= null)
-            this.getParent().childs.remove(this.getName());
-        deRegisterChild(this);
     }
 
     @Override
@@ -173,25 +164,19 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     }
 
     @Override
-    public boolean move(TreeNode<T> destination) {
+    public boolean move(TreeNode<T> newParent) {
         try {
-            moveNode(destination);
+            if (!this.parents.isEmpty())
+                this.parents.get(0).deRegisterChild(this);
+            newParent.registerChild(this);
+            updateProperty(PropertyIds.PARENT_ID, newParent.getId());
+            if (newParent.getName().equalsIgnoreCase("Inbox")) {
+                Repository.getInstance().executeScript(this);
+            }
             return true;
         } catch (Exception e) {
             return false;
         }
-    }
-
-    TreeNode<T> moveNode(TreeNode<T> newParent) {
-        deRegisterChild(this);
-        newParent.registerChild(this);
-        this.path = newParent.path + (newParent.path.equals("/") ? "" : "/") + name;
-        this.displayPath = newParent.displayPath + "/" + newParent.getName();
-        updateProperty(PropertyIds.PARENT_ID, newParent.getId());
-        if (newParent.getName().equalsIgnoreCase("Inbox")) {
-            Repository.getInstance().executeScript(this);
-        }
-        return this;
     }
 
     void updateNode(List<Property<?>> properties) {
@@ -203,7 +188,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         if (this.isRoot())
             return 0;
         else
-            return parent.getLevel() + 1;
+            return getParent().getLevel() + 1;
     }
 
     GregorianCalendar getCreationDate() {
@@ -234,7 +219,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
                 part = part + "/";
             if (this.childs.containsKey(part)) {
                 TreeNode<T> node = this.childs.get(part);
-                if (parentNode != null && !node.parent.equals(parentNode))
+                if (parentNode != null && !node.getParent().equals(parentNode))
                     return null;
                 parentNode = node;
                 if (i == parts.length)
@@ -317,16 +302,20 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
             String newName = getName().substring(0, getName().lastIndexOf(".") + 1) + "txt";
             String newPath = path.substring(0, path.lastIndexOf("/"));
             FileableCmisObject newObject = MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), MockUtils.getInstance().convProperties(obj.getProperties()), newPath, newName, this.obj.getObjectType(), "text/plain");
-            TreeNode<T> transform = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this.parent, newObject, false);
+            TreeNode<T> transform = (TreeNode<T>) Repository.getInstance().insert((TreeNode<FileableCmisObject>) this.getParent(), newObject, false);
             transform.setContent(this.content);
             return transform;
         }
         return null;
     }
 
+    @Override
     public boolean remove() {
         try {
-            Repository.getInstance().delete(getId());
+            for (TreeNode<T> parent : this.parents)
+                parent.deRegisterChild(this);
+            logger.info(this.name + " [ID: " + this.id + "] [Path: " + this.path + "] deleted from repository!");
+            Repository.getInstance().getNodes().remove(this.id);
             return true;
         } catch (Exception e) {
             return false;

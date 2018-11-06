@@ -28,6 +28,8 @@ public interface AlfrescoScriptApi<T> {
     TreeNode<T> createFile(String name, String type);
 
     boolean move(TreeNode<T> destination);
+
+    boolean remove();
     
     boolean isSubType(String name);
 

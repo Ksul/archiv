@@ -98,8 +98,8 @@ public class ObjectServiceMock {
         doAnswer(new Answer() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-
-                repository.delete((String) invocation.getArguments()[1]);
+                TreeNode<FileableCmisObject> node = repository.findTreeNodeForId((String) invocation.getArguments()[1]);
+                node.remove();
                 return null;
             }
         }).when(objectService).deleteObject(anyString(), anyString(), anyBoolean(), any());
@@ -115,7 +115,8 @@ public class ObjectServiceMock {
         when(objectService.deleteTree(anyString(), anyString(), anyBoolean(), any(UnfileObject.class), anyBoolean(), any())).then(new Answer<FailedToDeleteData>() {
             @Override
             public FailedToDeleteData answer(InvocationOnMock invocation) throws Throwable {
-                repository.deleteTree((String) invocation.getArguments()[1]);
+                TreeNode<FileableCmisObject> node = repository.findTreeNodeForId((String) invocation.getArguments()[1]);
+                node.remove();
                 return new FailedToDeleteDataImpl();
             }
         });
