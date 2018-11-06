@@ -8,6 +8,7 @@ import org.apache.chemistry.opencmis.commons.data.ObjectInFolderData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderList;
 import org.apache.chemistry.opencmis.commons.data.ObjectParentData;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderListImpl;
@@ -60,10 +61,13 @@ public class NavigationServiceMock {
             public ObjectData answer(InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
                 String id = (String) args[1];
-                FileableCmisObject result = null;
-                FileableCmisObject cmisObject = repository.getParent(id);
-                if (cmisObject != null)
-                    return MockUtils.getInstance().getObjectDataFromProperties(cmisObject.getProperties());
+                TreeNode<FileableCmisObject> node = repository.findTreeNodeForId(((String) invocation.getArguments()[1]));
+                if (node == null)
+                    throw new CmisRuntimeException("Node with Id " + id + "not found");
+                if (!(node.getType().getObjectType() instanceof FolderType))
+                    throw new CmisRuntimeException("Node with Id " + id + "is not a folder");
+                if (!node.getParents().isEmpty())
+                    return MockUtils.getInstance().getObjectDataFromProperties(node.getParents().get(0).getType().getProperties());
                 else
                     return null;
             }
@@ -71,16 +75,21 @@ public class NavigationServiceMock {
         when(navigationService.getObjectParents(anyString(), anyString(), anyString(), anyBoolean(), any(IncludeRelationships.class), any(), anyBoolean(), any())).then(new Answer<List<ObjectParentData>>() {
             public List<ObjectParentData> answer(InvocationOnMock invocation) throws Throwable {
                 List<ObjectParentData> result = new ArrayList<>();
-                FileableCmisObject cmisObject = repository.getById((String) invocation.getArguments()[1]);
-                FileableCmisObject parentObject = repository.getParent((String) invocation.getArguments()[1]);
-                ObjectParentDataImpl objectData = new ObjectParentDataImpl();
-                objectData.setObject(MockUtils.getInstance().getObjectDataFromProperties(parentObject.getProperties()));
-                if (cmisObject.getType() instanceof FolderType)
-                    objectData.setRelativePathSegment(parentObject.getPropertyValue(PropertyIds.PATH));
-                else
-                    objectData.setRelativePathSegment(cmisObject.getName());
+                TreeNode<FileableCmisObject> node = repository.findTreeNodeForId(((String) invocation.getArguments()[1]));
+                if (node == null)
+                    throw new CmisRuntimeException("Node with Id " + invocation.getArguments()[1] + "not found");
 
-                result.add(objectData);
+                for (TreeNode<FileableCmisObject> parent : node.getParents()) {
+                    ObjectParentDataImpl objectData = new ObjectParentDataImpl();
+                    objectData.setObject(MockUtils.getInstance().getObjectDataFromProperties(parent.getType().getProperties()));
+                    if (node.getType().getObjectType() instanceof FolderType)
+                        objectData.setRelativePathSegment((String) parent.getPropertyValue(PropertyIds.PATH));
+                    else
+                        objectData.setRelativePathSegment(parent.getName());
+                    result.add(objectData);
+                }
+
+
                 return result;
             }
         });

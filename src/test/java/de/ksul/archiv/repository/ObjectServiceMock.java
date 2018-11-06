@@ -89,9 +89,13 @@ public class ObjectServiceMock {
                 String objectId = (String) ((Holder) invocation.getArguments()[1]).getValue();
                 String targetFolderId = (String) invocation.getArguments()[2];
                 String sourceFolderId = (String) invocation.getArguments()[3];
-                FileableCmisObject cmisObject = repository.getById(objectId);
-                repository.move(targetFolderId, cmisObject);
-
+                TreeNode<FileableCmisObject> node = repository.findTreeNodeForId(objectId);
+                if (node == null)
+                    throw new RuntimeException("Node with Id " + objectId + " not found!");
+                TreeNode<FileableCmisObject> newParent = repository.findTreeNodeForId(targetFolderId);
+                if (newParent == null)
+                    throw new RuntimeException("Node with Id " + targetFolderId + " not found!");
+                node.move(newParent);
                 return null;
             }
         }).when(objectService).moveObject(anyString(), any(Holder.class), anyString(), anyString(), any());

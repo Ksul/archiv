@@ -46,6 +46,7 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     private Type obj;
     private TreeMap<String, Type> versions = new TreeMap<>(Collections.reverseOrder());
     public List<TreeNode<T>> parents = new ArrayList<>();
+    public TreeNode<T> parent;
     public String content;
     public String mimetype;
     @JsonProperty("childs")
@@ -146,9 +147,10 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
 
     private void registerChild(TreeNode<T> node) {
         node.parents.add(this);
-        node.path = this.path + (this.path.equals("/") ? "" : "/") + node.getName();
-        node.displayPath = this.displayPath + "/" + this.getName();
-        this.childs.put(node.getName(), node);
+        node.parent = node.parents.get(0);
+        node.path = this.path + (this.path.equals("/") ? "" : "/") + node.name;
+        node.displayPath = this.displayPath + "/" + this.name;
+        this.childs.put(node.name, node);
     }
 
     private void deRegisterChild(TreeNode<T> node) {
@@ -156,6 +158,8 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         if (this.childs.containsKey(node.name)) {
             this.childs.remove(node.name);
         }
+        if (node.parents.contains(this))
+            node.parents.remove(this);
     }
 
     @Override
@@ -166,13 +170,17 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
     @Override
     public boolean move(TreeNode<T> newParent) {
         try {
-            if (!this.parents.isEmpty())
+            String from = "";
+            if (!this.parents.isEmpty()) {
+                from = " from Path: " + this.parents.get(0).name + " [ID: " + this.parents.get(0).id + "]";
                 this.parents.get(0).deRegisterChild(this);
+            }
             newParent.registerChild(this);
-            updateProperty(PropertyIds.PARENT_ID, newParent.getId());
+            updateProperty(PropertyIds.PARENT_ID, newParent.id);
             if (newParent.getName().equalsIgnoreCase("Inbox")) {
                 Repository.getInstance().executeScript(this);
             }
+            logger.info(this.name + " [ID: " + this.id + "]" + from + " to Path: " + newParent.name + " [ID: " + newParent.id + "] moved!");
             return true;
         } catch (Exception e) {
             return false;
@@ -504,8 +512,20 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
         return content;
     }
 
+    public List<TreeNode<T>> getParents() {
+        return parents;
+    }
+
+    public Object getPropertyValue(String name) {
+        Optional<Property<?>> p = this.getType().getProperties().stream().filter(e -> e.getQueryName().equals(name)).findFirst();
+        if (p.isPresent()) {
+            return p.get().getValue();
+        }
+        return null;
+    }
+
     void updateProperty(String name, Object value) {
-        Optional<Property<?>> p = ((FileableCmisObject) getObj()).getProperties().stream().filter(e -> e.getQueryName().equals(name)).findFirst();
+        Optional<Property<?>> p = this.getType().getProperties().stream().filter(e -> e.getQueryName().equals(name)).findFirst();
         if (p.isPresent()) {
             ((PropertyImpl) p.get()).setValue(value);
             properties._put(name, value);

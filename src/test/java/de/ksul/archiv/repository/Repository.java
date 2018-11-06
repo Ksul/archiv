@@ -173,22 +173,6 @@ public class Repository {
         return ret;
     }
 
-    FileableCmisObject getParent(String id){
-        if (id == null)
-            throw new RuntimeException("id must be set!");
-        if (root == null)
-            throw new RuntimeException("getParent:no Root Node!");
-        TreeNode<FileableCmisObject> node = findTreeNodeForId(id);
-        if (node == null)
-            return null;
-        else {
-            if (node.getParent() == null)
-                return null;
-            else
-                return node.getParent().getObj();
-        }
-    }
-
     void update(String id, Map<String, PropertyData<?>> properties) {
         if (id == null)
             throw new RuntimeException("id must be set!");
@@ -229,24 +213,6 @@ public class Repository {
 
     }
 
-    FileableCmisObject move(String parentId, FileableCmisObject cmisObject){
-        if (cmisObject == null)
-            throw new RuntimeException("cmisObject not set!");
-        if (parentId == null)
-            throw new RuntimeException("parentId must be set!");
-        if (root == null)
-            throw new RuntimeException("move:no Root Node!");
-        TreeNode<FileableCmisObject> node = findTreeNodeForId(cmisObject.getId());
-        TreeNode<FileableCmisObject> parent = findTreeNodeForId(parentId);
-        if (node == null)
-            throw new RuntimeException("Node with Id " + cmisObject.getId() + " not found!");
-        if (parent == null)
-            throw new RuntimeException("Node with Id " + parentId + " not found!");
-        TreeNode<FileableCmisObject> sourceFolder = node.getParent();
-        node.move(parent);
-        logger.info(node.getName() + " [ID: " + cmisObject.getId() + "] from Path: " + sourceFolder.getName() + " [ID: " + sourceFolder.getId() + "] to Path: " + parent.getName() + " [ID: " + parent.getId() + "] moved!");
-        return node.getObj();
-    }
 
     public TreeNode<FileableCmisObject> insert( TreeNode<FileableCmisObject> parent, FileableCmisObject cmisObject, boolean executeRule) {
         return insert(parent, cmisObject, null, null, executeRule);
