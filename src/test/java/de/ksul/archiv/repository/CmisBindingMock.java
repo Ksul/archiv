@@ -1,5 +1,6 @@
 package de.ksul.archiv.repository;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.BindingsObjectFactoryImpl;
 import org.apache.chemistry.opencmis.commons.spi.*;
 

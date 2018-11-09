@@ -24,9 +24,40 @@ ksul:
               - alfresco/model/siteModel.xml
               - alfresco/model/forumModel.xml
               - static/model/archivModel.xml
-#ksul.archiv.test.testData=/tmp/repo.txt
+      testData: /tmp/repo.txt
+
+server:
+  servlet:
+    context-path: /Archiv
+  port: 8080
 
 management:
+  endpoint:
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  security:
+    info:
+      git:
+        mode: full
   health:
     defaults:
       enabled: false
+
+logging:
+  path: ./
+  level:
+    root: info
+
+spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  main:
+    banner-mode: log
+
