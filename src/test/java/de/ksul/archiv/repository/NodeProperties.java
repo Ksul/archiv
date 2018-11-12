@@ -1,13 +1,10 @@
 package de.ksul.archiv.repository;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import jdk.nashorn.internal.objects.NativeDate;
-import jdk.nashorn.internal.runtime.ScriptObject;
-import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.assertj.core.util.Lists;
-import org.assertj.core.util.Maps;
 
 import java.util.*;
 
@@ -26,7 +23,10 @@ public class NodeProperties extends HashMap<String, Object> {
         this.type = type;
     }
 
-
+    @JsonCreator
+    public NodeProperties(Map<? extends String, ?> m) {
+        super(m);
+    }
 
     @Override
     public Object put(String key, Object value) {
@@ -37,15 +37,16 @@ public class NodeProperties extends HashMap<String, Object> {
             throw new CmisRuntimeException("Property " + key + " not set!");
     }
 
-
     public Object _put(String key, Object value) {
         return super.put(key, value);
     }
 
     private String findNameForyKey(String key) {
-        Optional<Property<?>> op = this.type.getProperties().stream().filter(e -> e.getLocalName().equals(key)).findFirst();
-        if (op.isPresent())
-            return op.get().getId();
+        if (this.type != null) {
+            Optional<Property<?>> op = this.type.getProperties().stream().filter(e -> e.getLocalName().equals(key)).findFirst();
+            if (op.isPresent())
+                return op.get().getId();
+        }
     return key;
     }
 

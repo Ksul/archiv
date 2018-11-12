@@ -483,6 +483,14 @@ public class TreeNode<T> implements Iterable<TreeNode<T>>, Comparable, AlfrescoS
                 this.getType().getProperties().add(property);
         }
 
+        for (String key : (Iterable<String>) ((ArrayList) properties.get(PropertyIds.SECONDARY_OBJECT_TYPE_IDS))) {
+            Optional<SecondaryType> opt1 = obj.getSecondaryTypes().stream().filter(e -> e.getId().equalsIgnoreCase(key)).findFirst();
+            if (!opt1.isPresent()) {
+                ObjectType type = Repository.getSession().getTypeDefinition(key);
+                if (type instanceof SecondaryType)
+                    obj.getSecondaryTypes().add((SecondaryType) type);
+            }
+        }
     }
 
 

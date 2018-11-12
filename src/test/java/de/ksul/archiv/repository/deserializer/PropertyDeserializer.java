@@ -86,11 +86,14 @@ public class PropertyDeserializer<T> extends JsonDeserializer<Property<T>> {
             default:
                 throw new CmisRuntimeException("Unknown property data type!");
         }
-
-        property.setDisplayName(node.get("displayName").asText());
-        property.setLocalName(node.get("localName").asText());
-        property.setQueryName(node.get("queryName").asText());
-        property.setId(node.get("id").asText());
+        if (node.has("displayName"))
+            property.setDisplayName(node.get("displayName").asText());
+        if (node.has("localName"))
+            property.setLocalName(node.get("localName").asText());
+        if (node.has("queryName"))
+            property.setQueryName(node.get("queryName").asText());
+        if (node.has("id"))
+            property.setId(node.get("id").asText());
 
         return property;
     }
@@ -188,16 +191,31 @@ public class PropertyDeserializer<T> extends JsonDeserializer<Property<T>> {
         result.setId(id);
         result.setPropertyType(propertyType);
         result.setCardinality(cardinality);
-        result.setLocalName(json.get(JSON_PROPERTY_TYPE_LOCALNAME).asText());
-        result.setQueryName(json.get(JSON_PROPERTY_TYPE_QUERYNAME).asText());
+        if (json.has(JSON_PROPERTY_TYPE_LOCALNAME))
+            result.setLocalName(json.get(JSON_PROPERTY_TYPE_LOCALNAME).asText());
+        if (json.has(JSON_PROPERTY_TYPE_LOCALNAMESPACE))
+            result.setLocalNamespace(json.get(JSON_PROPERTY_TYPE_LOCALNAMESPACE).asText());
+        if (json.has(JSON_PROPERTY_TYPE_QUERYNAME))
+            result.setQueryName(json.get(JSON_PROPERTY_TYPE_QUERYNAME).asText());
+        if (json.has(JSON_PROPERTY_TYPE_CARDINALITY))
+            result.setCardinality(Cardinality.fromValue(json.get(JSON_PROPERTY_TYPE_CARDINALITY).asText()));
+        if (json.has(JSON_PROPERTY_TYPE_UPDATABILITY))
+            result.setUpdatability(Updatability.fromValue(json.get(JSON_PROPERTY_TYPE_UPDATABILITY).asText()));
+        if (json.has("isInherited" ))
+            result.setIsInherited(json.get("isInherited").asBoolean());
+        if (json.has("isQueryable" ))
+            result.setIsQueryable(json.get("isQueryable").asBoolean());
+        if (json.has("isOrderable" ))
+            result.setIsOrderable(json.get("isOrderable").asBoolean());
+        if (json.has("isRequired" ))
+            result.setIsRequired(json.get("isRequired").asBoolean());
 //        result.setDescription(json.get(JSON_PROPERTY_TYPE_DESCRIPTION).asText());
-        result.setDisplayName(json.get(JSON_PROPERTY_TYPE_DISPLAYNAME).asText());
+//        result.setDisplayName(json.get(JSON_PROPERTY_TYPE_DISPLAYNAME).asText());
 //        result.setIsInherited(json.get(JSON_PROPERTY_TYPE_INHERITED).asBoolean());
 //        result.setIsOpenChoice(json.get(JSON_PROPERTY_TYPE_OPENCHOICE).asBoolean());
 //        result.setIsOrderable(json.get(JSON_PROPERTY_TYPE_ORDERABLE).asBoolean());
 //        result.setIsQueryable(json.get(JSON_PROPERTY_TYPE_QUERYABLE).asBoolean());
 //        result.setIsRequired(json.get(JSON_PROPERTY_TYPE_REQUIRED).asBoolean());
-        result.setUpdatability(CmisEnumHelper.fromValue(json.get(JSON_PROPERTY_TYPE_UPDATABILITY).asText(), Updatability.class));
 
         // handle extensions
         //convertExtension(json, result, PROPERTY_TYPE_KEYS);

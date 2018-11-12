@@ -39,7 +39,8 @@ import java.util.*;
  */
 public class Repository {
 
-    private static Logger logger = LoggerFactory.getLogger(Repository.class.getName());
+    @JsonIgnore
+    private static Logger logger = LoggerFactory.getLogger(Repository.class);
     private Map<String, String> parameter;
     private TreeNode<FileableCmisObject> root;
     private TreeNode<FileableCmisObject> categoryroot;

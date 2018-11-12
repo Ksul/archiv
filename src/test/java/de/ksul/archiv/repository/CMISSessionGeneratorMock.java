@@ -90,7 +90,6 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             module.addSerializer(DateTimeResolution.class, new DateTimeResolutionSerializer());
             module.addSerializer(Updatability.class, new UpdatabilitySerializer());
             module.addSerializer(ContentStream.class, new ContentStreamSerializer());
-            module.addSerializer(Session.class, new SessionSerializer());
             mapper.registerModule(module);
             mapper.writeValue(new File(file), repository);
             logger.info("Data saved!");

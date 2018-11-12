@@ -23,6 +23,9 @@ import java.util.List;
 public class Type implements Cloneable{
 
     private List<Property<?>> properties;
+    @JsonIgnore
+    private List<SecondaryType> secondaryTypes;
+    @JsonIgnore
     private ObjectType objectType;
 
 
@@ -32,6 +35,7 @@ public class Type implements Cloneable{
     public Type(List<Property<?>> properties, ObjectType objectType, List<SecondaryType> secondaryTypes) {
         this.properties = new ArrayList<>(properties);
         this.objectType = objectType;
+        this.secondaryTypes = secondaryTypes;
     }
 
     public List<Property<?>> getProperties() {
@@ -48,6 +52,14 @@ public class Type implements Cloneable{
 
     public void setObjectType(ObjectType objectType) {
         this.objectType = objectType;
+    }
+
+    public List<SecondaryType> getSecondaryTypes() {
+        return secondaryTypes;
+    }
+
+    public void setSecondaryTypes(List<SecondaryType> secondaryTypes) {
+        this.secondaryTypes = secondaryTypes;
     }
 
     @Override
