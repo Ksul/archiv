@@ -23,9 +23,9 @@ import java.util.List;
 public class Type implements Cloneable{
 
     private List<Property<?>> properties;
-    @JsonIgnore
+
     private List<SecondaryType> secondaryTypes;
-    @JsonIgnore
+
     private ObjectType objectType;
 
 

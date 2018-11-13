@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.objecttype.ObjectTypeHelper;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -19,18 +20,18 @@ import java.math.BigInteger;
  * Date: 13.07.18
  * Time: 16:11
  */
-public class ObjectTypeHelperDeserializer extends JsonDeserializer<ObjectTypeHelper> {
+public class ObjectTypeDeserializer extends JsonDeserializer<ObjectType> {
 
     private Session session;
-    public ObjectTypeHelperDeserializer(Session session) {
+    public ObjectTypeDeserializer(Session session) {
         super();
         this.session = session;
     }
 
     @Override
-    public ObjectTypeHelper deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public ObjectType deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
         ObjectTypeHelper objectTypeHelper = new ObjectTypeHelper(this.session, null);
 
-        return objectTypeHelper;
+        return null;
     }
 }
