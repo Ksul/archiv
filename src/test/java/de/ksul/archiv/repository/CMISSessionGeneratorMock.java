@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import de.ksul.archiv.configuration.ArchivProperties;
 import de.ksul.archiv.repository.deserializer.ContentStreamDeserializer;
 import de.ksul.archiv.repository.deserializer.PropertyDeserializer;
+import de.ksul.archiv.repository.deserializer.SecondaryTypeDeserializer;
 import de.ksul.archiv.repository.mixin.ObjectTypeMixin;
 import de.ksul.archiv.repository.mixin.SecondaryTypeMixin;
 import de.ksul.archiv.repository.serializer.*;
@@ -118,12 +119,13 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            mapper.addMixIn(SecondaryTypeImpl.class, SecondaryTypeMixin.class);
+            //mapper.addMixIn(SecondaryType.class, SecondaryTypeMixin.class);
             InjectableValues injectedValue = new InjectableValues.Std().addValue(Session.class, sessionImpl);
             mapper.setInjectableValues(injectedValue);
             SimpleModule module = new SimpleModule();
             module.addDeserializer(Property.class, new PropertyDeserializer<FileableCmisObject>());
             module.addDeserializer(ContentStream.class, new ContentStreamDeserializer());
+            module.addDeserializer(SecondaryType.class, new SecondaryTypeDeserializer(sessionImpl));
             mapper.registerModule(module);
             File jsonFile = new File(file);
             if (jsonFile.exists()) {
