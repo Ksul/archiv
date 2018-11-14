@@ -2972,6 +2972,19 @@ function loadAlfrescoTree() {
     function customMenu(node) {
         const tree = $("#tree").jstree(true);
         const items = {
+            refresh: {
+                separator_before: false,
+                separator_after: false,
+                label: "Aktualisieren",
+                icon : "fas fa-redo fa-1x",
+                action: function (obj) {
+                    try {
+                        $.jstree.reference('#tree').refresh_node(obj.reference[0]);
+                    } catch (e) {
+                        errorHandler(e);
+                    }
+                }
+            },
             create: {
                 separator_before: false,
                 separator_after: false,

@@ -42,7 +42,7 @@ public class SecondaryTypeDeserializer extends JsonDeserializer<SecondaryType> {
             TypeReference<HashMap<String, PropertyDefinition<?>>> typeRef
                     = new TypeReference<HashMap<String, PropertyDefinition<?>>>() {};
 
-            secondaryTypeDefinition.setPropertyDefinitions(mapper.readValue(node.get("propertyDefinitions").traverse(), typeRef));
+            secondaryTypeDefinition.setPropertyDefinitions(mapper.readValue(node.get("propertyDefinitions").traverse(mapper), typeRef));
         }
         SecondaryTypeImpl secondaryType = new SecondaryTypeImpl(this.session, secondaryTypeDefinition);
         if (node.has("id"))

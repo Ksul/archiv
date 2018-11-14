@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -12,19 +11,16 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import de.ksul.archiv.configuration.ArchivProperties;
-import de.ksul.archiv.repository.deserializer.ContentStreamDeserializer;
-import de.ksul.archiv.repository.deserializer.PropertyDeserializer;
-import de.ksul.archiv.repository.deserializer.SecondaryTypeDeserializer;
+import de.ksul.archiv.repository.deserializer.*;
 import de.ksul.archiv.repository.mixin.ObjectTypeMixin;
-import de.ksul.archiv.repository.mixin.SecondaryTypeMixin;
 import de.ksul.archiv.repository.serializer.*;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
-import org.apache.chemistry.opencmis.client.runtime.objecttype.SecondaryTypeImpl;
 import org.apache.chemistry.opencmis.client.runtime.util.CollectionIterable;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.SessionParameterDefaults;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,8 +95,9 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             module.addSerializer(Cardinality.class, new CardinalitySerializer());
             module.addSerializer(DateTimeResolution.class, new DateTimeResolutionSerializer());
             module.addSerializer(Updatability.class, new UpdatabilitySerializer());
+            module.addSerializer(BaseTypeId.class, new BaseTypeIdSerializer());
             module.addSerializer(ContentStream.class, new ContentStreamSerializer());
-            //module.addSerializer(ObjectType.class, new ObjectTypeSerializer());
+            module.addSerializer(ContentStreamAllowed.class, new ContentStreamAllowedSerializer());
             mapper.registerModule(module);
             mapper.writeValue(new File(file), repository);
             logger.info("Data saved!");
@@ -111,21 +108,18 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
     //@PostConstruct
     public void setup()  {
         if (file != null && !file.isEmpty()) {
-            SessionMock sessionMock =  new SessionMock();
-            sessionImpl = sessionMock.getSession();
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
             mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-            //mapper.addMixIn(SecondaryType.class, SecondaryTypeMixin.class);
-            InjectableValues injectedValue = new InjectableValues.Std().addValue(Session.class, sessionImpl);
-            mapper.setInjectableValues(injectedValue);
             SimpleModule module = new SimpleModule();
             module.addDeserializer(Property.class, new PropertyDeserializer<FileableCmisObject>());
             module.addDeserializer(ContentStream.class, new ContentStreamDeserializer());
+            module.addDeserializer(ObjectType.class, new ObjectTypeDeserializer(sessionImpl));
             module.addDeserializer(SecondaryType.class, new SecondaryTypeDeserializer(sessionImpl));
+            module.addDeserializer(PropertyDefinition.class, new PropertyDefinitionDeserializer());
             mapper.registerModule(module);
             File jsonFile = new File(file);
             if (jsonFile.exists()) {
@@ -133,10 +127,12 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
                 try {
                     repository = mapper.readValue(jsonFile, new TypeReference<Repository>() {
                     });
+                    repository.setParameter(getSessionParameter());
                     Repository.setArchivProperties(archivProperties);
                     Repository.setInstance(repository);
-                    sessionMock.setRepository(repository);
+                    sessionImpl = new SessionMock().setRepository(repository).getSession();
                     MockUtils.getInstance().setSession(sessionImpl);
+                    Repository.setSession(sessionImpl);
                     logger.info("Data loaded!");
                 } catch (Exception e) {
                     logger.error("Data not loaded!", e);
@@ -146,14 +142,7 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
         if (repository == null) {
             Repository.setArchivProperties(archivProperties);
             repository = Repository.getInstance();
-            Map<String, String> parameter = new HashMap<>();
-            parameter.put(SessionParameter.ATOMPUB_URL, archivProperties.getBinding());
-            parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-            parameter.put(SessionParameter.CACHE_SIZE_OBJECTS, Integer.toString(SessionParameterDefaults.CACHE_SIZE_OBJECTS));
-            parameter.put(SessionParameter.CACHE_SIZE_LINKS, Integer.toString(SessionParameterDefaults.CACHE_SIZE_LINKS));
-            parameter.put(SessionParameter.CACHE_SIZE_REPOSITORIES, Integer.toString(SessionParameterDefaults.CACHE_SIZE_REPOSITORIES));
-            parameter.put(SessionParameter.CACHE_SIZE_TYPES, Integer.toString(SessionParameterDefaults.CACHE_SIZE_TYPES));
-            repository.setParameter(parameter);
+            repository.setParameter(getSessionParameter());
             sessionImpl = new SessionMock().setRepository(repository).getSession();
             MockUtils mockUtils = MockUtils.getInstance();
             mockUtils.setSession(sessionImpl);
@@ -171,6 +160,17 @@ public class CMISSessionGeneratorMock implements CMISSessionGenerator {
             repository.insert(null, mockUtils.createFileableCmisObject(repository, null, null, "categories", mockUtils.getItemType(), null), false);
 
         }
+    }
+
+    private Map<String, String> getSessionParameter() {
+        Map<String, String> parameter = new HashMap<>();
+        parameter.put(SessionParameter.ATOMPUB_URL, archivProperties.getBinding());
+        parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+        parameter.put(SessionParameter.CACHE_SIZE_OBJECTS, Integer.toString(SessionParameterDefaults.CACHE_SIZE_OBJECTS));
+        parameter.put(SessionParameter.CACHE_SIZE_LINKS, Integer.toString(SessionParameterDefaults.CACHE_SIZE_LINKS));
+        parameter.put(SessionParameter.CACHE_SIZE_REPOSITORIES, Integer.toString(SessionParameterDefaults.CACHE_SIZE_REPOSITORIES));
+        parameter.put(SessionParameter.CACHE_SIZE_TYPES, Integer.toString(SessionParameterDefaults.CACHE_SIZE_TYPES));
+        return parameter;
     }
 
 }

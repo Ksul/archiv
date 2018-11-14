@@ -64,8 +64,7 @@ public class SessionMock {
         parameter = repository.getParameter();
         cmisBindingMock.setRepository(repository);
         repositoryInfoMock.setRepository(repository);
-
-
+        
         return this;
     }
 
