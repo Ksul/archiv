@@ -41,6 +41,7 @@ public class Repository {
 
     @JsonIgnore
     private static Logger logger = LoggerFactory.getLogger(Repository.class);
+    @JsonIgnore
     private Map<String, String> parameter;
     private TreeNode<FileableCmisObject> root;
     private TreeNode<FileableCmisObject> categoryroot;

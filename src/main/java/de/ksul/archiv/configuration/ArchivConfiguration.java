@@ -37,10 +37,10 @@ public class ArchivConfiguration {
         try {
             CMISSessionGenerator gen = new CMISSessionGeneratorImpl(archivProperties.getUser(), archivProperties.getPassword(), archivProperties.getBinding(), "Session");
             session = gen.generateSession();
-            logger.trace(" Mit den Parametern Server: " + archivProperties.getServer() + " Binding: " + archivProperties.getBinding() + " User: " + archivProperties.getUser() + " Password: " + archivProperties.getPassword() + " konnte eine Cmis Session erfolgreich etabliert werden!");
+            logger.trace("Mit den Parametern [Server: " + archivProperties.getServer() + "], [Binding: " + archivProperties.getBinding() + "], [User: " + archivProperties.getUser() + "] konnte eine Cmis Session erfolgreich etabliert werden!");
             return session;
         } catch (Exception e) {
-            logger.error(" Mit den Parametern Server: " + archivProperties.getServer() + " Binding: " + archivProperties.getBinding() + " User: " + archivProperties.getUser() + " Password: " + archivProperties.getPassword() + " konnte keine Cmis Session etabliert werden!");
+            logger.error("Mit den Parametern [Server: " + archivProperties.getServer() + "], [Binding: " + archivProperties.getBinding() + "], [User: " + archivProperties.getUser() + "] konnte keine Cmis Session etabliert werden!");
             return null;
         }
     }
