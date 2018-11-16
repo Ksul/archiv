@@ -52,24 +52,5 @@ describe("Test für ArchivPosition", function() {
         expect(REC.errors[0]).toBe("Could not replace Placeholder {tmp2}!");
     });
 
-    it("testResolveFolder1", function () {
-        var archivPosition = new ArchivPosition({}, "System");
-        var newFolder = archivPosition.resolveFolder("/aa/bb/cc");
-        expect(newFolder).not.toBeNull();
-        expect(companyhome.childByNamePath("aa")).not.toBeNull();
-        expect(companyhome.childByNamePath("aa/bb")).not.toBeNull();
-        expect(companyhome.childByNamePath("aa/bb/cc")).not.toBeNull();
-    });
-
-    it("testResolveFolder2", function () {
-        companyhome.createFolder("aa");
-        var archivPosition = new ArchivPosition({}, "System");
-        var newFolder = archivPosition.resolveFolder("/aa/bb/cc");
-        expect(newFolder).not.toBeNull();
-        expect(companyhome.childByNamePath("aa")).not.toBeNull();
-        expect(companyhome.childByNamePath("aa/bb")).not.toBeNull();
-        expect(companyhome.childByNamePath("aa/bb/cc")).not.toBeNull();
-    });
-
 });
 

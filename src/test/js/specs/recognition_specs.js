@@ -216,6 +216,24 @@ describe("Test für Recognition", function() {
         expect(xml.archivTyp[0].tags[0].name).toBe("Gehalt");
         expect(xml.archivTyp[0].tags[1].name).toBe("LVM");
     });
+
+
+    it("testResolveFolder1", function () {
+        var newFolder = REC.resolveFolder("/aa/bb/cc");
+        expect(newFolder).not.toBeNull();
+        expect(companyhome.childByNamePath("aa")).not.toBeNull();
+        expect(companyhome.childByNamePath("aa/bb")).not.toBeNull();
+        expect(companyhome.childByNamePath("aa/bb/cc")).not.toBeNull();
+    });
+
+    it("testResolveFolder2", function () {
+        companyhome.createFolder("aa");
+        var newFolder = REC.resolveFolder("/aa/bb/cc");
+        expect(newFolder).not.toBeNull();
+        expect(companyhome.childByNamePath("aa")).not.toBeNull();
+        expect(companyhome.childByNamePath("aa/bb")).not.toBeNull();
+        expect(companyhome.childByNamePath("aa/bb/cc")).not.toBeNull();
+    });
 });
 
 
