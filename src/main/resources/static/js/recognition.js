@@ -3884,6 +3884,7 @@ REC = {
         this.showContent = false;
         this.result = [];
         this.errors = new Error();
+        this.currentContent = null;
         this.results = {
             search: [],
             tag : [],
@@ -3894,7 +3895,7 @@ REC = {
         this.archivRoot = companyhome.createFolder("Archiv");
         this.unknownBox = this.archivRoot.createFolder("Unbekannt");
         this.inBox = this.archivRoot.createFolder("Inbox");
-        this.logBox = this.archivRoot.createFolder("Log");
+        this.logBox = this.archivRoot.createFolder("Report");
         this.errorBox  = this.archivRoot.createFolder("Fehler");
         this.duplicateBox = this.errorBox.createFolder("Doppelte");
         this.currentDocument = companyhome.createNode('WebScriptTest', "my:archivContent");

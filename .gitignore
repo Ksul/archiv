@@ -111,3 +111,7 @@ hs_err_pid*
 
 derby.log
 mqjms.log.*
+
+# docker
+docker/volumnes/logs
+docker/volumnes/data
