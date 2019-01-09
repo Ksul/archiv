@@ -3884,6 +3884,7 @@ REC = {
         this.showContent = false;
         this.result = [];
         this.errors = new Error();
+        this.currentContent = null;
         this.results = {
             search: [],
             tag : [],

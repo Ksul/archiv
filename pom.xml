@@ -26,7 +26,7 @@
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <jasmine.version>3.3.0</jasmine.version>
         <opencmis.version>1.1.0</opencmis.version>
         <junit.version>5.3.0</junit.version>
@@ -270,6 +270,20 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <release>11</release>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.ow2.asm</groupId>
+                            <artifactId>asm</artifactId>
+                            <version>6.2</version> <!-- Use newer version of ASM -->
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.0</version>
                     <dependencies>
@@ -293,6 +307,9 @@
                         </dependency>
                     </dependencies>
                     <configuration>
+                        <argLine>
+                            --illegal-access=permit
+                        </argLine>
                         <skip>${surefire.skip}</skip>
                         <excludes>
                             <exclude>**/*MTest.java</exclude>
@@ -306,7 +323,9 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-failsafe-plugin.version}</version>
                     <configuration>
-
+                        <argLine>
+                            --illegal-access=permit
+                        </argLine>
                         <includes>
                             <include>**/*ITest.java</include>
                             <include>**/*DBTest.java</include>

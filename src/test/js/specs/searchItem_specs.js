@@ -356,7 +356,7 @@ describe("Test für SearchItem", function() {
         XMLDoc.loadXML(rules);
         XMLDoc.parse();
         var searchItem = new SearchItem(new XMLObject(XMLDoc.docNode));
-        expect(searchItem.resolve().getTime()).toBe(new Date(2009, 02, 21).getTime());
+        expect(searchItem.resolve().getTime()).toBe(new Date(2009, 2, 21).getTime());
         expect(Verteilung.positions).not.toBe(null);
         var p = Verteilung.positions.get("Test 18");
          p.convertPosition(REC.getContent(REC.currentDocument));

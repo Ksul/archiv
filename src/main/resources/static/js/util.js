@@ -198,7 +198,7 @@ function executeService(service, params) {
  */
 function getSettings(key) {
 
-    if (settings != "undefined" || !settings || settings.settings.filter(function (o) {
+    if (typeof settings == "undefined" || !settings || settings.settings.filter(function (o) {
             return o.key.indexOf(key) >= 0;
         }).length === 0) {
         const urlPar = getUrlParam(key);
