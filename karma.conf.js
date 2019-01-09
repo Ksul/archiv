@@ -63,7 +63,7 @@ module.exports = function(config) {
               rules: [{
                   loader: 'babel-loader',
                     query :{
-                        presets:['es2015']
+                        presets:["@babel/preset-env"]
         // ,'es2017'
                 },
                 test: /\.js?$/,

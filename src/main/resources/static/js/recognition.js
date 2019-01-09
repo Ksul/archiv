@@ -3894,11 +3894,13 @@ REC = {
         this.archivRoot = companyhome.createFolder("Archiv");
         this.unknownBox = this.archivRoot.createFolder("Unbekannt");
         this.inBox = this.archivRoot.createFolder("Inbox");
-        this.logBox = this.archivRoot.createFolder("Log");
+        this.logBox = this.archivRoot.createFolder("Report");
         this.errorBox  = this.archivRoot.createFolder("Fehler");
         this.duplicateBox = this.errorBox.createFolder("Doppelte");
-        this.currentDocument = companyhome.createNode('WebScriptTest', "my:archivContent");
+        //this.currentDocument = companyhome.createNode('WebScriptTest', "my:archivContent");
         this.cssCounter = 0;
+        this.currentContent = null;
+        this.currentDocument = null;
     },
     
     id: Math.random() * 100,
