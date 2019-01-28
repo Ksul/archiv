@@ -19,7 +19,7 @@ describe("Test für ArchivTyp", function() {
 
     it("testWithNestedArchivZielWithLink", function() {
         REC.currentDocument.removeProperty("my:person");
-        REC.currentDocument.properties.content = new Content("ZAUBERFRAU Rechnung Test");
+        REC.currentDocument.properties.content = "ZAUBERFRAU Rechnung Test";
         var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU">'+
             ' <archivPosition folder="Dokumente/Rechnungen/{fol}/{tmp}"/> ' +
             ' <archivPosition link="true" folder="Dokumente/Rechnungen/Sonstige Rechnungen/{tmp}">' +
@@ -52,7 +52,7 @@ describe("Test für ArchivTyp", function() {
 
     it("testWithSearchInDifferentLevel", function() {
         REC.currentDocument.properties.content = "Bezügemitteilung Personal ab: 05.05.2005";
-        var rules = '<archivTyp name="Bezügemitteilung" searchString="Bezügemitteilung" debugLevel="info">\n' +
+        var rules = '<archivTyp name="Bezügemitteilung" searchString="Bezügemitteilung">\n' +
             '        <archivZiel type="my:archivContent" />\n' +
             '        <archivPosition folder="Dokumente/Gehalt/Landesamt für Besoldung/Bezügemitteilungen/{tmp}">\n' +
             '            <archivZiel type="my:archivFolder" />\n' +
@@ -176,9 +176,10 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
         var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
         archivTyp.resolve();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/WebScriptTest")).toBeNull();
         expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
-        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Unbekannt/WebScriptTest")).not.toBeNull();
     });
 
     it("testWithMissingMandatoryField", function() {
@@ -283,7 +284,7 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
     });
 
-     it("testDuplicateWithError2", function () {
+    it("testDuplicateWithError2", function () {
         var folder = REC.archivRoot.createFolder("Dokumente");
         folder = folder.createFolder("Rechnungen");
         folder = folder.createFolder("Rechnungen Zauberfrau");
@@ -436,199 +437,199 @@ describe("Test für ArchivTyp", function() {
         expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
     });
 
-    // it("testDuplicateWithNewVersion2", function () {
-    //     var folder = REC.archivRoot.createFolder("Dokumente");
-    //     folder = folder.createFolder("Rechnungen");
-    //     folder = folder.createFolder("Rechnungen Zauberfrau");
-    //     folder = folder.createFolder("2015");
-    //     var node = folder.createNode("Test", "my:archivContent");
-    //     node.properties.content = "Hallo";
-    //     node.setProperty("cm:title", "Rechnung 1");
-    //     search.setFind(true, node);
-    //     REC.currentDocument.properties.content = "ZAUBERFRAU";
-    //     var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU" unique="newVersion">' +
-    //         ' <archivZiel type="my:archivContent" /> ' +
-    //         ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
-    //         ' <archivZiel type="my:archivFolder" /> ' +
-    //         ' </archivPosition>' +
-    //         ' <searchItem name="tmp" fix="2015" />' +
-    //         ' <searchItem name="title" fix="Rechnung 1" />' +
-    //         ' </archivTyp>';
-    //     XMLDoc.loadXML(rules);
-    //     XMLDoc.parse();
-    //     expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
-    //     var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
-    //     archivTyp.resolve();
-    //     expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
-    //     var doc = companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/Test");
-    //     expect(doc).not.toBeNull();
-    //     expect(doc.isVersioned()).toBeTruthy();
-    //     expect(doc.hasAspect(new BasicObject("cm:workingcopy"))).not.toBeTruthy();
-    //     expect(doc.properties.content.content).toBe("ZAUBERFRAU");
-    //     var version = doc.getVersion(1);
-    //     expect(version).not.toBeNull();
-    //     expect(version.properties.content.content).toBe("Hallo");
-    //     version = doc.getVersion(2);
-    //     expect(version).not.toBeNull();
-    //     expect(version.properties.content.content).toBe("ZAUBERFRAU");
-    //     expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
-    //     expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
-    // });
-    //
-    // it("testComplete1", function () {
-    //     REC.currentDocument.properties.content = "Verdienstabrechnung     0000123456  3000 Abrechnungsmonat Mai 2015";
-    //     var rules = '<archivTyp name="LVMGehalt" searchString="Verdienstabrechnung" debugLevel="debug">                              ' +
-    //         ' <archivZiel type="my:archivContent" />                                                      ' +
-    //         '<archivPosition folder="Dokumente/Gehalt/Gehalt Hansel/{tmp}">                                              ' +
-    //         '<archivZiel type="my:archivFolder" />                                                                    ' +
-    //         '</archivPosition>                                                                                        ' +
-    //         '<archivPosition link="true" folder="Dokumente/Hansel/Gehalt Hansel">                                           ' +
-    //         '<archivZiel type="my:archivFolder" />                                                                    ' +
-    //         '</archivPosition>                                                                                        ' +
-    //         '<tags name="Gehalt" />                                                                                   ' +
-    //         '<tags name="Hansel" />                                                                                      ' +
-    //         '<category name="Gehalt/Gehalt Hansel" />                                                                  ' +
-    //         '<searchItem name="person" fix="Hansel" target="my:person" />                                              ' +
-    //         '<searchItem name="tmp" objectTyp="date" value="datum">                                                   ' +
-    //         '<format formatString="YYYY" />                                                                           ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '<archivTyp name="Rückrechnung" searchString="Rückrechnungsdifferenz">                                    ' +
-    //         '<tags name="Rückrechnung" />                                                                             ' +
-    //         '<searchItem name="titel" text="Abrechnungsmonat" word="2,2"  />  ' +
-    //         '<searchItem name="title" fix="Rückrechnung {titel}" target="cm:title"/>  ' +
-    //         '<searchItem name="datum" text="Abrechnungsmonat" word="2,2" objectTyp="date" target="my:documentDate">   ' +
-    //         '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '<searchItem name="betrag" text="Rückrechnungsdifferenz" objectTyp="float" target="my:amount">            ' +
-    //         '<check lowerValue="-200" upperValue="200" />                                                             ' +
-    //         '<delimitter typ="start" text="&#0032;" count="1" removeBlanks="after" />                                 ' +
-    //         '<archivZiel aspect="my:amountable" />                                                                    ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '</archivTyp>                                                                                             ' +
-    //         '<archivTyp name="Verdienstabrechnung" searchString="" unique="error">                                    ' +
-    //         '<searchItem name="title" text="Abrechnungsmonat" word="1,2" target="cm:title" />                         ' +
-    //         '<searchItem name="datum" value="title" objectTyp="date" target="my:documentDate">                        ' +
-    //         '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '<searchItem name="betrag" text="0000123456" objectTyp="float" target="my:amount">                        ' +
-    //         '<check lowerValue="3000" upperValue="15000" />                                                           ' +
-    //         '<archivZiel aspect="my:amountable" />                                                                    ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '</archivTyp>                                                                                             ' +
-    //         '</archivTyp>';
-    //     XMLDoc.loadXML(rules);
-    //     XMLDoc.parse();
-    //     expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
-    //     var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
-    //     archivTyp.resolve();
-    //     expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
-    //     var doc = companyhome.childByNamePath("/Archiv/Dokumente/Gehalt/Gehalt Hansel/2015/WebScriptTest");
-    //     expect(doc).not.toBeNull();
-    //     expect(doc.isSubType("my:archivContent")).toBeTruthy();
-    //     expect(doc.properties["my:amount"]).toBe(3000);
-    //     expect(doc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
-    //     expect(doc.properties["cm:title"]).toBe("Mai 2015");
-    //     expect(doc.properties["my:person"]).toBe("Hansel");
-    //     expect(doc.hasTag("Gehalt")).toBeTruthy();
-    //     expect(doc.hasTag("Hansel")).toBeTruthy();
-    //     expect(doc.hasAspect("my:amountable")).toBeTruthy();
-    //     expect(doc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
-    //     //assertTrue(doc.isCategory());
-    //     //assertTrue(doc.category.contains(new BasicObject("")));
-    //     var linkDoc = companyhome.childByNamePath("/Archiv/Dokumente/Hansel/Gehalt Hansel/WebScriptTest");
-    //     expect(linkDoc).not.toBeNull();
-    //     expect(linkDoc.isSubType("my:archivContent")).toBeTruthy();
-    //     expect(linkDoc.properties["my:amount"]).toBe(3000);
-    //     expect(linkDoc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
-    //     expect(linkDoc.properties["cm:title"]).toBe("Mai 2015");
-    //     expect(linkDoc.properties["my:person"]).toBe("Hansel");
-    //     expect(linkDoc.hasTag("Gehalt")).toBeTruthy();
-    //     expect(linkDoc.hasTag("Hansel")).toBeTruthy();
-    //     expect(linkDoc.hasAspect("my:amountable")).toBeTruthy();
-    //     expect(linkDoc.parent[0].isSubType("my:archivFolder")).toBeTruthy();
-    //     expect(linkDoc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
-    //     expect(doc.id).toBe(linkDoc.id);
-    //     expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
-    //     expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
-    // });
-    //
-    //
-    // it("testComplete2", function () {
-    //     REC.currentDocument.properties.content = "Verdienstabrechnung     0000123456 Rückrechnungsdifferenz 200 Abrechnungsmonat R Mai 2015";
-    //     var rules = '<archivTyp name="LVMGehalt" searchString="Verdienstabrechnung" debugLevel="debug">                              ' +
-    //         ' <archivZiel type="my:archivContent" />                                                      ' +
-    //         '<archivPosition folder="Dokumente/Gehalt/Gehalt Hansel/{tmp}">                                              ' +
-    //         '<archivZiel type="my:archivFolder" />                                                                    ' +
-    //         '</archivPosition>                                                                                        ' +
-    //         '<archivPosition link="true" folder="Dokumente/Hansel/Gehalt Hansel">                                           ' +
-    //         '<archivZiel type="my:archivFolder" />                                                                    ' +
-    //         '</archivPosition>                                                                                        ' +
-    //         '<tags name="Gehalt" />                                                                                   ' +
-    //         '<tags name="Hansel" />                                                                                      ' +
-    //         '<category name="Gehalt/Gehalt Hansel" />                                                                  ' +
-    //         '<searchItem name="person" fix="Hansel" target="my:person" />                                              ' +
-    //         '<searchItem name="tmp" objectTyp="date" value="datum">                                                   ' +
-    //         '<format formatString="YYYY" />                                                                           ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '<archivTyp name="Rückrechnung" searchString="Rückrechnungsdifferenz">                                    ' +
-    //         '<tags name="Rückrechnung" />                                                                             ' +
-    //         '<searchItem name="titel" text="Abrechnungsmonat" word="2,2"  />  ' +
-    //         '<searchItem name="title" fix="Rückrechnung {titel}" target="cm:title"/>  ' +
-    //         '<searchItem name="datum" text="Abrechnungsmonat" word="2,2" objectTyp="date" target="my:documentDate">   ' +
-    //         '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '<searchItem name="betrag" text="Rückrechnungsdifferenz" objectTyp="float" target="my:amount">            ' +
-    //         '<check lowerValue="-200" upperValue="200" />                                                             ' +
-    //         '<delimitter typ="start" text="&#0032;" count="1" removeBlanks="after" />                                 ' +
-    //         '<archivZiel aspect="my:amountable" />                                                                    ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '</archivTyp>                                                                                             ' +
-    //         '<archivTyp name="Verdienstabrechnung" searchString="" unique="error">                                    ' +
-    //         '<searchItem name="title" text="Abrechnungsmonat" word="1,2" target="cm:title" />                         ' +
-    //         '<searchItem name="datum" value="title" objectTyp="date" target="my:documentDate">                        ' +
-    //         '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '<searchItem name="betrag" text="0000123456" objectTyp="float" target="my:amount">                        ' +
-    //         '<check lowerValue="3000" upperValue="15000" />                                                           ' +
-    //         '<archivZiel aspect="my:amountable" />                                                                    ' +
-    //         '</searchItem>                                                                                            ' +
-    //         '</archivTyp>                                                                                             ' +
-    //         '</archivTyp>';
-    //     XMLDoc.loadXML(rules);
-    //     XMLDoc.parse();
-    //     expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
-    //     var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
-    //     archivTyp.resolve();
-    //     expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
-    //     var doc = companyhome.childByNamePath("/Archiv/Dokumente/Gehalt/Gehalt Hansel/2015/WebScriptTest");
-    //     expect(doc).not.toBeNull();
-    //     expect(doc.isSubType("my:archivContent")).toBeTruthy();
-    //     expect(doc.properties["my:amount"]).toBe(200);
-    //     expect(doc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
-    //     expect(doc.properties["cm:title"]).toBe("Rückrechnung Mai 2015");
-    //     expect(doc.properties["my:person"]).toBe("Hansel");
-    //     expect(doc.hasTag("Gehalt")).toBeTruthy();
-    //     expect(doc.hasTag("Hansel")).toBeTruthy();
-    //     expect(doc.hasAspect("my:amountable")).toBeTruthy();
-    //     expect(doc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
-    //     //assertTrue(doc.isCategory());
-    //     //assertTrue(doc.category.contains(new BasicObject("")));
-    //     var linkDoc = companyhome.childByNamePath("/Archiv/Dokumente/Hansel/Gehalt Hansel/WebScriptTest");
-    //     expect(linkDoc).not.toBeNull();
-    //     expect(linkDoc.isSubType("my:archivContent")).toBeTruthy();
-    //     expect(linkDoc.properties["my:amount"]).toBe(200);
-    //     expect(linkDoc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
-    //     expect(linkDoc.properties["cm:title"]).toBe("Rückrechnung Mai 2015");
-    //     expect(linkDoc.properties["my:person"]).toBe("Hansel");
-    //     expect(linkDoc.hasTag("Gehalt")).toBeTruthy();
-    //     expect(linkDoc.hasTag("Hansel")).toBeTruthy();
-    //     expect(linkDoc.hasAspect("my:amountable")).toBeTruthy();
-    //     expect(linkDoc.parent[0].isSubType("my:archivFolder")).toBeTruthy();
-    //     expect(linkDoc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
-    //     expect(doc.id).toBe(linkDoc.id);
-    //     expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
-    //     expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
-    // });
+    it("testDuplicateWithNewVersion2", function () {
+        var folder = REC.archivRoot.createFolder("Dokumente");
+        folder = folder.createFolder("Rechnungen");
+        folder = folder.createFolder("Rechnungen Zauberfrau");
+        folder = folder.createFolder("2015");
+        var node = folder.createNode("Test", "my:archivContent");
+        node.properties.content = "Hallo";
+        node.setProperty("cm:title", "Rechnung 1");
+        search.setFind(true, node);
+        REC.currentDocument.properties.content = "ZAUBERFRAU";
+        var rules = ' <archivTyp name="Zauberfrau" searchString="ZAUBERFRAU" unique="newVersion">' +
+            ' <archivZiel type="my:archivContent" /> ' +
+            ' <archivPosition folder="Dokumente/Rechnungen/Rechnungen Zauberfrau/{tmp}"> ' +
+            ' <archivZiel type="my:archivFolder" /> ' +
+            ' </archivPosition>' +
+            ' <searchItem name="tmp" fix="2015" />' +
+            ' <searchItem name="title" fix="Rechnung 1" />' +
+            ' </archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
+        var doc = companyhome.childByNamePath("/Archiv/Dokumente/Rechnungen/Rechnungen Zauberfrau/2015/Test");
+        expect(doc).not.toBeNull();
+        expect(doc.isVersioned()).toBeTruthy();
+        expect(doc.hasAspect(new BasicObject("cm:workingcopy"))).not.toBeTruthy();
+        expect(doc.properties.content.content).toBe("ZAUBERFRAU");
+        var version = doc.getVersion(1);
+        expect(version).not.toBeNull();
+        expect(version.properties.content.content).toBe("Hallo");
+        version = doc.getVersion(2);
+        expect(version).not.toBeNull();
+        expect(version.properties.content.content).toBe("ZAUBERFRAU");
+        expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
+    });
+
+    it("testComplete1", function () {
+        REC.currentDocument.properties.content = "Verdienstabrechnung     0000123456  3000 Abrechnungsmonat Mai 2015";
+        var rules = '<archivTyp name="LVMGehalt" searchString="Verdienstabrechnung" debugLevel="debug">                              ' +
+            ' <archivZiel type="my:archivContent" />                                                      ' +
+            '<archivPosition folder="Dokumente/Gehalt/Gehalt Hansel/{tmp}">                                              ' +
+            '<archivZiel type="my:archivFolder" />                                                                    ' +
+            '</archivPosition>                                                                                        ' +
+            '<archivPosition link="true" folder="Dokumente/Hansel/Gehalt Hansel">                                           ' +
+            '<archivZiel type="my:archivFolder" />                                                                    ' +
+            '</archivPosition>                                                                                        ' +
+            '<tags name="Gehalt" />                                                                                   ' +
+            '<tags name="Hansel" />                                                                                      ' +
+            '<category name="Gehalt/Gehalt Hansel" />                                                                  ' +
+            '<searchItem name="person" fix="Hansel" target="my:person" />                                              ' +
+            '<searchItem name="tmp" objectTyp="date" value="datum">                                                   ' +
+            '<format formatString="YYYY" />                                                                           ' +
+            '</searchItem>                                                                                            ' +
+            '<archivTyp name="Rückrechnung" searchString="Rückrechnungsdifferenz">                                    ' +
+            '<tags name="Rückrechnung" />                                                                             ' +
+            '<searchItem name="titel" text="Abrechnungsmonat" word="2,2"  />  ' +
+            '<searchItem name="title" fix="Rückrechnung {titel}" target="cm:title"/>  ' +
+            '<searchItem name="datum" text="Abrechnungsmonat" word="2,2" objectTyp="date" target="my:documentDate">   ' +
+            '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
+            '</searchItem>                                                                                            ' +
+            '<searchItem name="betrag" text="Rückrechnungsdifferenz" objectTyp="float" target="my:amount">            ' +
+            '<check lowerValue="-200" upperValue="200" />                                                             ' +
+            '<delimitter typ="start" text="&#0032;" count="1" removeBlanks="after" />                                 ' +
+            '<archivZiel aspect="my:amountable" />                                                                    ' +
+            '</searchItem>                                                                                            ' +
+            '</archivTyp>                                                                                             ' +
+            '<archivTyp name="Verdienstabrechnung" searchString="" unique="error">                                    ' +
+            '<searchItem name="title" text="Abrechnungsmonat" word="1,2" target="cm:title" />                         ' +
+            '<searchItem name="datum" value="title" objectTyp="date" target="my:documentDate">                        ' +
+            '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
+            '</searchItem>                                                                                            ' +
+            '<searchItem name="betrag" text="0000123456" objectTyp="float" target="my:amount">                        ' +
+            '<check lowerValue="3000" upperValue="15000" />                                                           ' +
+            '<archivZiel aspect="my:amountable" />                                                                    ' +
+            '</searchItem>                                                                                            ' +
+            '</archivTyp>                                                                                             ' +
+            '</archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
+        var doc = companyhome.childByNamePath("/Archiv/Dokumente/Gehalt/Gehalt Hansel/2015/WebScriptTest");
+        expect(doc).not.toBeNull();
+        expect(doc.isSubType("my:archivContent")).toBeTruthy();
+        expect(doc.properties["my:amount"]).toBe(3000);
+        expect(doc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
+        expect(doc.properties["cm:title"]).toBe("Mai 2015");
+        expect(doc.properties["my:person"]).toBe("Hansel");
+        expect(doc.hasTag("Gehalt")).toBeTruthy();
+        expect(doc.hasTag("Hansel")).toBeTruthy();
+        expect(doc.hasAspect("my:amountable")).toBeTruthy();
+        expect(doc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
+        //assertTrue(doc.isCategory());
+        //assertTrue(doc.category.contains(new BasicObject("")));
+        var linkDoc = companyhome.childByNamePath("/Archiv/Dokumente/Hansel/Gehalt Hansel/WebScriptTest");
+        expect(linkDoc).not.toBeNull();
+        expect(linkDoc.isSubType("my:archivContent")).toBeTruthy();
+        expect(linkDoc.properties["my:amount"]).toBe(3000);
+        expect(linkDoc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
+        expect(linkDoc.properties["cm:title"]).toBe("Mai 2015");
+        expect(linkDoc.properties["my:person"]).toBe("Hansel");
+        expect(linkDoc.hasTag("Gehalt")).toBeTruthy();
+        expect(linkDoc.hasTag("Hansel")).toBeTruthy();
+        expect(linkDoc.hasAspect("my:amountable")).toBeTruthy();
+        expect(linkDoc.parent[0].isSubType("my:archivFolder")).toBeTruthy();
+        expect(linkDoc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
+        expect(doc.id).toBe(linkDoc.id);
+        expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
+    });
+
+
+    it("testComplete2", function () {
+        REC.currentDocument.properties.content = "Verdienstabrechnung     0000123456 Rückrechnungsdifferenz 200 Abrechnungsmonat R Mai 2015";
+        var rules = '<archivTyp name="LVMGehalt" searchString="Verdienstabrechnung" debugLevel="debug">                              ' +
+            ' <archivZiel type="my:archivContent" />                                                      ' +
+            '<archivPosition folder="Dokumente/Gehalt/Gehalt Hansel/{tmp}">                                              ' +
+            '<archivZiel type="my:archivFolder" />                                                                    ' +
+            '</archivPosition>                                                                                        ' +
+            '<archivPosition link="true" folder="Dokumente/Hansel/Gehalt Hansel">                                           ' +
+            '<archivZiel type="my:archivFolder" />                                                                    ' +
+            '</archivPosition>                                                                                        ' +
+            '<tags name="Gehalt" />                                                                                   ' +
+            '<tags name="Hansel" />                                                                                      ' +
+            '<category name="Gehalt/Gehalt Hansel" />                                                                  ' +
+            '<searchItem name="person" fix="Hansel" target="my:person" />                                              ' +
+            '<searchItem name="tmp" objectTyp="date" value="datum">                                                   ' +
+            '<format formatString="YYYY" />                                                                           ' +
+            '</searchItem>                                                                                            ' +
+            '<archivTyp name="Rückrechnung" searchString="Rückrechnungsdifferenz">                                    ' +
+            '<tags name="Rückrechnung" />                                                                             ' +
+            '<searchItem name="titel" text="Abrechnungsmonat" word="2,2"  />  ' +
+            '<searchItem name="title" fix="Rückrechnung {titel}" target="cm:title"/>  ' +
+            '<searchItem name="datum" text="Abrechnungsmonat" word="2,2" objectTyp="date" target="my:documentDate">   ' +
+            '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
+            '</searchItem>                                                                                            ' +
+            '<searchItem name="betrag" text="Rückrechnungsdifferenz" objectTyp="float" target="my:amount">            ' +
+            '<check lowerValue="-200" upperValue="200" />                                                             ' +
+            '<delimitter typ="start" text="&#0032;" count="1" removeBlanks="after" />                                 ' +
+            '<archivZiel aspect="my:amountable" />                                                                    ' +
+            '</searchItem>                                                                                            ' +
+            '</archivTyp>                                                                                             ' +
+            '<archivTyp name="Verdienstabrechnung" searchString="" unique="error">                                    ' +
+            '<searchItem name="title" text="Abrechnungsmonat" word="1,2" target="cm:title" />                         ' +
+            '<searchItem name="datum" value="title" objectTyp="date" target="my:documentDate">                        ' +
+            '<check lowerValue="01/01/2005" upperValue="01/01/2020" />                                                ' +
+            '</searchItem>                                                                                            ' +
+            '<searchItem name="betrag" text="0000123456" objectTyp="float" target="my:amount">                        ' +
+            '<check lowerValue="3000" upperValue="15000" />                                                           ' +
+            '<archivZiel aspect="my:amountable" />                                                                    ' +
+            '</searchItem>                                                                                            ' +
+            '</archivTyp>                                                                                             ' +
+            '</archivTyp>';
+        XMLDoc.loadXML(rules);
+        XMLDoc.parse();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).not.toBeNull();
+        var archivTyp = new ArchivTyp(new XMLObject(XMLDoc.docNode));
+        archivTyp.resolve();
+        expect(companyhome.childByNamePath("/Archiv/Inbox/WebScriptTest")).toBeNull();
+        var doc = companyhome.childByNamePath("/Archiv/Dokumente/Gehalt/Gehalt Hansel/2015/WebScriptTest");
+        expect(doc).not.toBeNull();
+        expect(doc.isSubType("my:archivContent")).toBeTruthy();
+        expect(doc.properties["my:amount"]).toBe(200);
+        expect(doc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
+        expect(doc.properties["cm:title"]).toBe("Rückrechnung Mai 2015");
+        expect(doc.properties["my:person"]).toBe("Hansel");
+        expect(doc.hasTag("Gehalt")).toBeTruthy();
+        expect(doc.hasTag("Hansel")).toBeTruthy();
+        expect(doc.hasAspect("my:amountable")).toBeTruthy();
+        expect(doc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
+        //assertTrue(doc.isCategory());
+        //assertTrue(doc.category.contains(new BasicObject("")));
+        var linkDoc = companyhome.childByNamePath("/Archiv/Dokumente/Hansel/Gehalt Hansel/WebScriptTest");
+        expect(linkDoc).not.toBeNull();
+        expect(linkDoc.isSubType("my:archivContent")).toBeTruthy();
+        expect(linkDoc.properties["my:amount"]).toBe(200);
+        expect(linkDoc.properties["my:documentDate"].getTime()).toBe(new Date(2015, 4, 1).getTime());
+        expect(linkDoc.properties["cm:title"]).toBe("Rückrechnung Mai 2015");
+        expect(linkDoc.properties["my:person"]).toBe("Hansel");
+        expect(linkDoc.hasTag("Gehalt")).toBeTruthy();
+        expect(linkDoc.hasTag("Hansel")).toBeTruthy();
+        expect(linkDoc.hasAspect("my:amountable")).toBeTruthy();
+        expect(linkDoc.parent[0].isSubType("my:archivFolder")).toBeTruthy();
+        expect(linkDoc.properties["cm:categories"][0].name).toBe("Gehalt Hansel");
+        expect(doc.id).toBe(linkDoc.id);
+        expect(companyhome.childByNamePath("/Archiv/Fehler/Doppelte/WebScriptTest")).toBeNull();
+        expect(companyhome.childByNamePath("/Archiv/Fehler/WebScriptTest")).toBeNull();
+    });
 
 
 });
