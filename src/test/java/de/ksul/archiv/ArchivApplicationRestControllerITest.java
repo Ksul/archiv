@@ -66,8 +66,8 @@ public class ArchivApplicationRestControllerITest extends ArchivApplicationRestC
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
-                .andExpect(jsonPath("$.data.server", is("http://localhost:9080/alfresco/")))
-                .andExpect(jsonPath("$.data.binding", is("http://localhost:9080/alfresco/api/-default-/public/cmis/versions/1.1/atom")))
+                .andExpect(jsonPath("$.data.server", is("http://localhost:80/alfresco/")))
+                .andExpect(jsonPath("$.data.binding", is("http://localhost:80/alfresco/api/-default-/public/cmis/versions/1.1/atom")))
                 .andExpect(jsonPath("$.data.user", is("admin")))
                 .andExpect(jsonPath("$.data.password", is("admin")));
 

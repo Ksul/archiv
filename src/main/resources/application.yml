@@ -13,8 +13,8 @@ info:
 
 ksul:
   archiv:
-    server: http://localhost:9080/alfresco/
-    binding: http://localhost:9080/alfresco/api/-default-/public/cmis/versions/1.1/atom
+    server: http://localhost:80/alfresco/
+    binding: http://localhost:80/alfresco/api/-default-/public/cmis/versions/1.1/atom
     user: admin
     password: admin
     company-home-name: Firmen-Home

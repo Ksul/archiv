@@ -39,6 +39,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.IntStream;
 
 
 /**
@@ -279,7 +280,9 @@ public class AlfrescoConnector {
         OperationContext operationContext = getOperationContext();
         switch (modus) {
             case VerteilungConstants.LIST_MODUS_ALL: {  // Dokumente und Folder
-                operationContext.setOrderBy(buildOrder(order, columns, modus));
+                StringBuilder query = new StringBuilder();
+                buildOrder(order, columns, query, modus);
+                operationContext.setOrderBy(query.toString());
                 CmisObject object = this.session.getObject(this.session.createObjectId(folderId));
                 Folder folder = (Folder) object;
                 time = System.currentTimeMillis();
@@ -290,7 +293,8 @@ public class AlfrescoConnector {
             case VerteilungConstants.LIST_MODUS_DOCUMENTS:{  // nur Dokumente
                 StringBuilder query = new StringBuilder(DOCUMENT_SQL_STRING);
 
-                query.append(" ORDER BY " + buildOrder(order, columns, modus));
+                query.append(" ORDER BY ");
+                buildOrder(order, columns, query, modus);
                 QueryStatement stmt = session.createQueryStatement(query.toString());
                 stmt.setString(1, folderId);
                 result = getCmisObjects(stmt, operationContext);
@@ -299,7 +303,8 @@ public class AlfrescoConnector {
             case VerteilungConstants.LIST_MODUS_DOCUMENTS_ALL:{  // alle Dokumente (nicht nur die aus dem Archiv)
                 StringBuilder query = new StringBuilder(DOCUMENT_ALL_SQL_STRING);
 
-                query.append(" ORDER BY " + buildOrder(order, columns, modus));
+                query.append(" ORDER BY ");
+                buildOrder(order, columns, query, modus);
                 QueryStatement stmt = session.createQueryStatement(query.toString());
                 stmt.setString(1, folderId);
                 result = getCmisObjects(stmt, operationContext);
@@ -308,7 +313,8 @@ public class AlfrescoConnector {
             case VerteilungConstants.LIST_MODUS_FOLDER: { // nur Folder
                 StringBuilder query = new StringBuilder(FOLDER_SQL_STRING);
 
-                query.append(" ORDER BY " + buildOrder(order, columns, modus));
+                query.append(" ORDER BY ");
+                buildOrder(order, columns, query, modus);
                 QueryStatement stmt = session.createQueryStatement(query.toString());
                 stmt.setString(1, folderId);
                 result = getCmisObjects(stmt, operationContext);
@@ -325,27 +331,68 @@ public class AlfrescoConnector {
      * baut die Orderbedingung auf
      * @param order         die einzelnen Spalten nach denen sortiert werden soll
      * @param columns       die zu den Spalten gehörenden Feldnamen
+     * @param select        der Select als String
      * @param modus         der Modus (1 == Dokumente 2 == Folder)
-     * @return              die Sortierung als String
+     * @return
      */
-    private String buildOrder(List<Order> order, List<Column> columns, int modus) {
-        String orderString = "";
-        if (order == null || order.isEmpty())
-            orderString = modus == 1? "d.my:documentDate DESC, d.cmis:creationDate DESC" : "d.cmis:name" + " DESC";
-        else  {
-            StringBuilder sb = new StringBuilder();
-            boolean first = true;
-            for (Order o : order) {
-                if (!first)
-                    sb.append(", ");
-                sb.append(columns.get(o.getColumn()).getName());
-                sb.append(" ");
-                sb.append(o.getDir());
-                first = false;
-            }
-            orderString = sb.toString();
+    private void buildOrder(List<Order> order, List<Column> columns, StringBuilder select, int modus) {
+
+        String alias = null;
+        String[] parts = select.toString().split(" ");
+        if (Arrays.stream(parts).anyMatch("AS"::equalsIgnoreCase) && Arrays.stream(parts).anyMatch("JOIN"::equalsIgnoreCase)) {
+            OptionalInt indexOpt = IntStream.range(0, parts.length)
+                    .filter(i -> parts[i].equalsIgnoreCase("AS"))
+                    .findFirst();
+            alias = parts[indexOpt.getAsInt() + 1];
         }
-        return orderString;
+        if (order == null) {
+            order = new ArrayList<>();
+        }
+        if (columns == null) {
+            columns = new ArrayList<>();
+        }
+        if (order.isEmpty()) {
+            if (modus == 1) {
+                addOrder("my:documentDate", order, columns, modus, alias);
+                addOrder("cmis:creationDate", order, columns, modus, alias);
+            } else {
+                addOrder("cmis:name", order, columns, modus, alias);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (Order o : order) {
+            if (!first)
+                sb.append(", ");
+            String columnName = columns.get(o.getColumn()).getName();
+            if (alias != null && !columnName.substring(1, 2).equalsIgnoreCase("."))
+                columnName = alias + "." + columnName;
+            sb.append(columnName);
+            sb.append(" ");
+            sb.append(o.getDir());
+            first = false;
+        }
+
+        select.append(sb.toString());
+        return;
+    }
+
+    private void addOrder(String field, List<Order> order, List<Column> columns, int modus, String alias) {
+
+        if (columns.stream().anyMatch(column -> column.getName().contains(field))) {
+
+            if (alias != null && !columns.stream().filter(column -> column.getName().contains(field)).findFirst().get().getName().substring(1, 2).equalsIgnoreCase(".")) {
+                columns.stream().filter(column -> column.getName().contains(field)).findFirst().get().setName(alias + "." + field);
+            }
+
+        } else {
+            columns.add(new Column(null, (alias != null ? alias + "." : "") + field, false, false, null, false));
+        }
+        OptionalInt indexOpt = IntStream.range(0, columns.size())
+                .filter(i -> columns.get(i).getName().contains(field))
+                .findFirst();
+        order.add(new Order(indexOpt.getAsInt(), "DESC"));
+        return;
     }
 
     /**
@@ -469,7 +516,8 @@ public class AlfrescoConnector {
         OperationContext operationContext = getOperationContext();
 
         StringBuilder query = new StringBuilder(queryString);
-        query.append(" ORDER BY " + buildOrder(order, columns, 0));
+        query.append(" ORDER BY ");
+        buildOrder(order, columns, query,0);
         QueryStatement stmt = session.createQueryStatement(query.toString());
 
         return getCmisObjects(stmt, operationContext);

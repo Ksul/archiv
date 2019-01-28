@@ -39,25 +39,19 @@ import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.*;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -79,6 +73,7 @@ import java.util.concurrent.TimeUnit;
 
 @TestPropertySource(properties = {"ksul.archiv.testing.testData="})
 @DirtiesContext
+@Disabled
 public class ScriptTest {
 
     private Invocable invocable;
@@ -129,6 +124,7 @@ public class ScriptTest {
     }
 
     @Test
+    @Disabled
     public void testScriptForX() throws Exception {
         TreeNode<FileableCmisObject> node = Repository.getInstance().insert(root, MockUtils.getInstance().createFileableCmisObject(Repository.getInstance(), null, "/" , "Test1.pdf", MockUtils.getInstance().getDocumentType("cmis:document"), VerteilungConstants.DOCUMENT_TYPE_PDF), MockUtils.getInstance().createFileStream("classpath:Test1.pdf",  VerteilungConstants.DOCUMENT_TYPE_PDF), "1.0", false);
         RecognizeEndpoints.setDocument(node);

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * To change this template use File | Settings | File Templates.
  */
 @ExtendWith(SpringExtension.class)
+@TestPropertySource(properties = {"spring.main.allow-bean-definition-overriding=true"})
 @SpringBootTest(classes = {ArchivTestConfiguration.class, ArchivConfiguration.class})
 public class CMISSessionGeneratorITest {
 
