@@ -68,12 +68,12 @@ import java.util.concurrent.TimeUnit;
  * Date: 28.08.18
  * Time: 10:18
  */
+@Disabled
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.MOCK, classes = {ArchivTestConfiguration.class, ArchivTestApplication.class})
 
 @TestPropertySource(properties = {"ksul.archiv.testing.testData="})
 @DirtiesContext
-@Disabled
 public class ScriptTest {
 
     private Invocable invocable;
