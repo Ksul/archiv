@@ -5,14 +5,14 @@ services:
     build: ./alfresco
     container_name: alfresco
     depends_on:
-      - db
+      - alfresco-db
     hostname: alfresco
     environment:
       JAVA_OPTS : '
                 -Ddb.driver=org.postgresql.Driver
                 -Ddb.username=alfresco
                 -Ddb.password=alfresco
-                -Ddb.url=jdbc:postgresql://db:5432/alfresco
+                -Ddb.url=jdbc:postgresql://alfresco-db:5432/alfresco
                 -Dsolr.host=solr6
                 -Dsolr.port=8983
                 -Dsolr.secureComms=none
@@ -74,9 +74,9 @@ services:
     networks:
       - internal
 
-  db:
+  alfresco-db:
     image: postgres:latest
-    container_name: alfresco-db
+    container_name: postgres
     environment:
       - POSTGRES_USER=alfresco
       - POSTGRES_PASSWORD=alfresco

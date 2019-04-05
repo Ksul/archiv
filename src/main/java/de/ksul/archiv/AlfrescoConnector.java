@@ -1,8 +1,10 @@
 package de.ksul.archiv;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.ksul.archiv.model.Column;
-import de.ksul.archiv.model.Order;
+import de.ksul.archiv.model.*;
+import de.ksul.archiv.request.RuleCreateRequest;
+import de.ksul.archiv.request.TicketRequest;
+import de.ksul.archiv.response.RuleResponse;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.util.AbstractPageFetcher;
 import org.apache.chemistry.opencmis.client.runtime.util.CollectionIterable;
@@ -19,7 +21,6 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumBaseObjectTypeIds;
 import org.apache.chemistry.opencmis.commons.spi.DiscoveryService;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -33,11 +34,21 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -51,9 +62,11 @@ import java.util.stream.IntStream;
  */
 public class AlfrescoConnector {
 
+    @Autowired
+    RestTemplate restTemplate;
 
     private static final String NODES_URL = "service/api/node/workspace/SpacesStore/";
-    private static final String LOGIN_URL = "service/api/login";
+    private static final String LOGIN_URL = "tickets";
     private static Logger logger = LoggerFactory.getLogger(AlfrescoConnector.class.getName());
     private String user;
     private String password;
@@ -176,7 +189,7 @@ public class AlfrescoConnector {
      * @return             das Ticket als String
      * @throws IOException
      */
-    public String  getTicket() throws IOException, AuthenticationException {
+    public String  getTicket() throws IOException, AuthenticationException, URISyntaxException {
 
         return getTicket(this.user, this.password, this.server);
     }
@@ -189,7 +202,7 @@ public class AlfrescoConnector {
      * @return             das Ticket als String
      * @throws IOException
      */
-    public String getTicket(String user, String password, String server) throws IOException, AuthenticationException {
+    public String getTicket(String user, String password, String server) throws IOException, AuthenticationException, URISyntaxException {
 
         URL url = new URL(server + (server.endsWith("/") ? "" : "/") + LOGIN_URL);
         String urlParameters = "{ \"username\" : \"" + user + "\", \"password\" : \"" + password + "\" }";
@@ -923,6 +936,59 @@ public class AlfrescoConnector {
         return props;
     }
 
+    public boolean hasRule(String name, String folderId) throws IOException, AuthenticationException, URISyntaxException {
+
+        URL url = new URL(this.server + (this.server.endsWith("/") ? "" : "/") + NODES_URL + folderId + "/ruleset/rules");
+        HttpEntity<String> request = new HttpEntity<>(getHttpHeaders());
+        ResponseEntity<RuleResponse> result = restTemplate.exchange(url.toURI(), HttpMethod.GET, request, RuleResponse.class) ;
+        return result.getBody().hasRule(name);
+    }
+
+    public void createRule(String folderId, String scriptId, String name) throws MalformedURLException, URISyntaxException {
+
+        Rule rule = new Rule();
+        rule.setTitle(name);
+        rule.setDisabled(false);
+        rule.setRuleType(Arrays.asList("inbound"));
+        rule.setApplyToChildren(false);
+        rule.setExecuteAsynchronously(false);
+        RuleAction ruleAction = new RuleAction();
+        ruleAction.setActionDefinitionName("composite-action");
+        ruleAction.setExecuteAsync(false);
+        RuleAction ruleAction1 = new RuleAction();
+        ruleAction1.setActionDefinitionName( "script");
+        HashMap<String, String> parameterValues = new HashMap<>();
+        parameterValues.put("script-ref", "workspace://SpacesStore/" + VerteilungHelper.normalizeObjectId(scriptId));
+        ruleAction1.setParameterValues(parameterValues);
+        ruleAction1.setExecuteAsync(false);
+        RuleCondition ruleCondition = new RuleCondition();
+        ruleCondition.setConditionDefinitionName("no-condition");
+        ruleCondition.setInvertCondition(false);
+        List<RuleAction> ruleActions = new ArrayList<>();
+        ruleActions.add(ruleAction1);
+        ruleAction.setActions(ruleActions);
+        List<RuleCondition> ruleConditions = new ArrayList<>();
+        ruleConditions.add(ruleCondition);
+        ruleAction.setConditions(ruleConditions);
+        List<RuleAction> ruleActions1 = new ArrayList<>();
+        ruleActions1.add(ruleAction);
+        rule.setAction(ruleActions1);
+        RuleCreateRequest ruleCreateRequest = new RuleCreateRequest();
+        ruleCreateRequest.setData(rule);
+        URL url = new URL("http://localhost:80/alfresco/service/api/node/workspace/SpacesStore/" + VerteilungHelper.normalizeObjectId(folderId) + "/ruleset/rules");
+        HttpEntity<String> request = new HttpEntity(ruleCreateRequest, getHttpHeaders());
+        ResponseEntity<String> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, String.class);
+    }
+
+    private HttpHeaders getHttpHeaders() {
+        return new HttpHeaders() {{
+            String auth = user + ":" + password;
+            byte[] encodedAuth = Base64.getEncoder().encode(
+                    auth.getBytes(Charset.forName("US-ASCII")) );
+            String authHeader = "Basic " + new String( encodedAuth );
+            set( "Authorization", authHeader );
+        }};
+    }
 
     /**
      * startet einen Http Request
@@ -955,7 +1021,7 @@ public class AlfrescoConnector {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         CloseableHttpResponse response = httpClient.execute(request);
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            HttpEntity entity = response.getEntity();
+            org.apache.http.HttpEntity entity = response.getEntity();
             if (entity != null) {
                 StringBuilder stringBuilder = new StringBuilder();
                 InputStream inputStream = entity.getContent();

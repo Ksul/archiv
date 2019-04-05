@@ -882,6 +882,32 @@ public class ArchivController {
         return obj;
     }
 
+    @RequestMapping(value = "/hasRule", consumes = "application/json", produces = "application/json")
+    public @ResponseBody
+    RestResponse hasRule(@RequestBody @Valid final RuleAvailableRequest model) throws Exception {
+
+        RestResponse obj = new RestResponse();
+        boolean result = con.hasRule(model.getRuleName(), model.getFolderId());
+
+        obj.setSuccess(true);
+        obj.setData(result);
+
+        return obj;
+    }
+
+    @RequestMapping(value = "/createRule", consumes = "application/json", produces = "application/json")
+    public @ResponseBody
+    RestResponse createRule(@RequestBody @Valid final RuleAvailableRequest model) throws Exception {
+
+        RestResponse obj = new RestResponse();
+        boolean result = con.hasRule(model.getRuleName(), model.getFolderId());
+
+        obj.setSuccess(true);
+        obj.setData(result);
+
+        return obj;
+    }
+
     /**
      * extrahiert eine PDF Datei und trägt den Inhalt in den internen Speicher ein.
      *
