@@ -1,6 +1,6 @@
 package de.ksul.archiv.response;
 
-import de.ksul.archiv.model.Rule;
+import de.ksul.archiv.model.rules.Rule;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class RuleResponse {
 
     public boolean hasRule(String name) {
         boolean ret = false;
-        if (data.isEmpty()) {
+        if (!data.isEmpty()) {
             for (int i = 0; i < data.size(); i++) {
                 if (data.get(i).getTitle().equalsIgnoreCase(name)) {
                     ret = true;

@@ -2,8 +2,10 @@ package de.ksul.archiv;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.model.*;
+import de.ksul.archiv.model.rules.Rule;
+import de.ksul.archiv.model.rules.Action;
+import de.ksul.archiv.model.rules.Condition;
 import de.ksul.archiv.request.RuleCreateRequest;
-import de.ksul.archiv.request.TicketRequest;
 import de.ksul.archiv.response.RuleResponse;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.util.AbstractPageFetcher;
@@ -45,7 +47,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -944,39 +945,38 @@ public class AlfrescoConnector {
         return result.getBody().hasRule(name);
     }
 
-    public void createRule(String folderId, String scriptId, String name) throws MalformedURLException, URISyntaxException {
+    public void createRule(String folderId, String scriptId, String name, String description) throws MalformedURLException, URISyntaxException {
 
         Rule rule = new Rule();
         rule.setTitle(name);
+        rule.setDescription(description);
         rule.setDisabled(false);
         rule.setRuleType(Arrays.asList("inbound"));
         rule.setApplyToChildren(false);
         rule.setExecuteAsynchronously(false);
-        RuleAction ruleAction = new RuleAction();
-        ruleAction.setActionDefinitionName("composite-action");
-        ruleAction.setExecuteAsync(false);
-        RuleAction ruleAction1 = new RuleAction();
-        ruleAction1.setActionDefinitionName( "script");
+        Action action = new Action();
+        action.setActionDefinitionName("composite-action");
+        action.setExecuteAsync(false);
+        Action ruleAction = new Action();
+        ruleAction.setActionDefinitionName( "script");
         HashMap<String, String> parameterValues = new HashMap<>();
         parameterValues.put("script-ref", "workspace://SpacesStore/" + VerteilungHelper.normalizeObjectId(scriptId));
-        ruleAction1.setParameterValues(parameterValues);
-        ruleAction1.setExecuteAsync(false);
-        RuleCondition ruleCondition = new RuleCondition();
+        ruleAction.setParameterValues(parameterValues);
+        ruleAction.setExecuteAsync(false);
+        Condition ruleCondition = new Condition();
         ruleCondition.setConditionDefinitionName("no-condition");
         ruleCondition.setInvertCondition(false);
-        List<RuleAction> ruleActions = new ArrayList<>();
-        ruleActions.add(ruleAction1);
-        ruleAction.setActions(ruleActions);
-        List<RuleCondition> ruleConditions = new ArrayList<>();
+        List<Action> ruleActions = new ArrayList<>();
+        ruleActions.add(ruleAction);
+        action.setActions(ruleActions);
+        List<Condition> ruleConditions = new ArrayList<>();
         ruleConditions.add(ruleCondition);
-        ruleAction.setConditions(ruleConditions);
-        List<RuleAction> ruleActions1 = new ArrayList<>();
-        ruleActions1.add(ruleAction);
-        rule.setAction(ruleActions1);
-        RuleCreateRequest ruleCreateRequest = new RuleCreateRequest();
-        ruleCreateRequest.setData(rule);
+        action.setConditions(ruleConditions);
+        List<Action> ruleActions1 = new ArrayList<>();
+        ruleActions1.add(action);
+        rule.setAction(action);
         URL url = new URL("http://localhost:80/alfresco/service/api/node/workspace/SpacesStore/" + VerteilungHelper.normalizeObjectId(folderId) + "/ruleset/rules");
-        HttpEntity<String> request = new HttpEntity(ruleCreateRequest, getHttpHeaders());
+        HttpEntity<String> request = new HttpEntity(rule, getHttpHeaders());
         ResponseEntity<String> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, String.class);
     }
 

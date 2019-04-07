@@ -15,11 +15,11 @@ public class RuleAvailableRequest {
     @NotNull
     private String folderId;
     @NotEmpty
-    private String ruleName;
+    private String title;
 
-    public RuleAvailableRequest(@NotNull String folderId, @NotEmpty String ruleName) {
+    public RuleAvailableRequest(@NotNull String folderId, @NotEmpty String title) {
         this.folderId = folderId;
-        this.ruleName = ruleName;
+        this.title = title;
     }
 
     public RuleAvailableRequest() {
@@ -33,11 +33,11 @@ public class RuleAvailableRequest {
         this.folderId = folderId;
     }
 
-    public String getRuleName() {
-        return ruleName;
+    public String getTitle() {
+        return title;
     }
 
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

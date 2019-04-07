@@ -3407,6 +3407,24 @@ function checkAndBuidAlfrescoEnvironment() {
         return erg;
     }
 
+    function buildRule(folderId, scriptId, title, description) {
+        let erg = executeService({"name": "hasRule", "ignoreError": true}, [
+            {"name": "folderId", "value": folderId},
+            {"name": "title", "value": title}
+        ]);
+        if (erg.success && !erg.data) {
+            let erg = executeService({"name": "createRule", "ignoreError": true}, [
+                {"name": "folderId", "value": folderId},
+                {"name": "scriptId", "value": scriptId},
+                {"name": "title", "value": title},
+                {"name": "description", "value": description}
+            ]);
+            if (!erg.success)
+                Logger.log(Level.WARN,  "Verteilungsregel konnte auf dem Alfresco Server nicht angelegt werden!");
+        }
+        return erg;
+    }
+
     
     let ret, erg;
     // ist schon ein Alfresco Server verbunden?
@@ -3640,6 +3658,11 @@ function checkAndBuidAlfrescoEnvironment() {
             if (erg.success) {
                 doubleFolderId = erg.data.objectID;
             }
+        }
+
+        // Rules aufbauen
+        if (erg.success) {
+            erg = buildRule(inboxFolderId, scriptID, "Verteilung", "Regel verteilt die eingehenden Dokumente");
         }
 
         ret = erg.success;

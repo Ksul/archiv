@@ -1,9 +1,11 @@
-package de.ksul.archiv.model;
+package de.ksul.archiv.model.rules;
 
-import de.ksul.archiv.model.RuleAction;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,15 +15,21 @@ import java.util.List;
  */
 public class Rule {
 
-    String id;
+    String id = UUID.randomUUID().toString();
     @NotNull
     String title;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     String description;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     List<String> ruleType;
     boolean applyToChildren;
     boolean executeAsynchronously;
     boolean disabled;
-    List<RuleAction> action;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    Action action ;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    OwningNode owningNode;
+    String url;
 
     public String getId() {
         return id;
@@ -79,11 +87,27 @@ public class Rule {
         this.disabled = disabled;
     }
 
-    public List<RuleAction> getAction() {
+    public Action getAction() {
         return action;
     }
 
-    public void setAction(List<RuleAction> action) {
+    public void setAction(Action action) {
         this.action = action;
+    }
+
+    public OwningNode getOwningNode() {
+        return owningNode;
+    }
+
+    public void setOwningNode(OwningNode owningNode) {
+        this.owningNode = owningNode;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

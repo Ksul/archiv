@@ -2,10 +2,6 @@ package de.ksul.archiv;
 
 import de.ksul.archiv.configuration.ArchivConfiguration;
 import de.ksul.archiv.configuration.ArchivProperties;
-import de.ksul.archiv.model.RuleAction;
-import de.ksul.archiv.model.RuleCondition;
-import de.ksul.archiv.model.Rule;
-import de.ksul.archiv.request.RuleCreateRequest;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -16,16 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -97,18 +86,11 @@ public class AlfrescoConnectorITest extends AlfrescoConnectorAbstractTest {
     }
 
     @Test
-    public void testHasRule() throws Exception {
-        CmisObject cmisObject;
-        cmisObject = con.getNode("/Archiv/Inbox");
-        assertThat(con.hasRule("Verteilung", cmisObject.getId()), Matchers.is(true));
-
-    }
-
-    @Test
     public void testCreateRule() throws Exception {
-        CmisObject folder = buildTestFolder("TestFolder", null);
-        CmisObject document = buildDocument("TestDocument", folder);
-        con.createRule(folder.getId(), document.getId(), "Test");
-
+       CmisObject folder = buildTestFolder("TestFolder", null);
+       CmisObject document = buildDocument("TestDocument", folder);
+        assertThat(con.hasRule("Test", folder.getId()), Matchers.is(false));
+       con.createRule(folder.getId(), document.getId(), "Test", "");
+       assertThat(con.hasRule("Test", folder.getId()), Matchers.is(true));
     }
 }

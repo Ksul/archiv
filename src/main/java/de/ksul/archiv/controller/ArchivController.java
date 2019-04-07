@@ -887,7 +887,7 @@ public class ArchivController {
     RestResponse hasRule(@RequestBody @Valid final RuleAvailableRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
-        boolean result = con.hasRule(model.getRuleName(), model.getFolderId());
+        boolean result = con.hasRule(model.getTitle(), model.getFolderId());
 
         obj.setSuccess(true);
         obj.setData(result);
@@ -897,13 +897,13 @@ public class ArchivController {
 
     @RequestMapping(value = "/createRule", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    RestResponse createRule(@RequestBody @Valid final RuleAvailableRequest model) throws Exception {
+    RestResponse createRule(@RequestBody @Valid final RuleCreateRequest model) throws Exception {
 
         RestResponse obj = new RestResponse();
-        boolean result = con.hasRule(model.getRuleName(), model.getFolderId());
+        con.createRule(model.getFolderId(), model.getScriptId(), model.getTitle(), model.getDescription());
 
         obj.setSuccess(true);
-        obj.setData(result);
+        obj.setData("");
 
         return obj;
     }

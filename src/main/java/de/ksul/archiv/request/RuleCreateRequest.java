@@ -1,6 +1,6 @@
 package de.ksul.archiv.request;
 
-import de.ksul.archiv.model.Rule;
+import de.ksul.archiv.model.rules.Rule;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,14 +10,40 @@ import de.ksul.archiv.model.Rule;
  */
 public class RuleCreateRequest {
 
-    Rule data;
+    String folderId;
+    String scriptId;
+    String title;
+    String description;
 
-    public Rule getData() {
-        return data;
+    public String getFolderId() {
+        return folderId;
     }
 
-    public void setData(Rule data) {
-        this.data = data;
+    public void setFolderId(String folderId) {
+        this.folderId = folderId;
     }
 
+    public String getScriptId() {
+        return scriptId;
+    }
+
+    public void setScriptId(String scriptId) {
+        this.scriptId = scriptId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
