@@ -2,6 +2,7 @@ package de.ksul.archiv;
 
 import de.ksul.archiv.configuration.ArchivConfiguration;
 import de.ksul.archiv.configuration.ArchivProperties;
+import de.ksul.archiv.model.comments.CommentPaging;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -50,21 +51,13 @@ public class AlfrescoConnectorITest extends AlfrescoConnectorAbstractTest {
     }
 
     @Test
-    public void testGetTicket() throws Exception {
-        String ticket = con.getTicket();
-        assertThat(ticket, Matchers.notNullValue());
-        assertThat(ticket, Matchers.startsWith("TICKET_"));
-    }
-
-
-    @Test
     public void testGetComments() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
         CmisObject document = buildDocument("TestDocument", folder);
         Map<String, Object> abd = con.addComment(document,"Testkommentar");
         assertThat(abd, Matchers.notNullValue());
-        Map<String, Object>  result =  con.getComments(document);
-        assertThat(((Map) ((ArrayList) result.get("items")).get(0)).get("content"), Matchers.equalTo("Testkommentar"));
+        CommentPaging result =  con.getComments(document);
+        assertThat(result.getList().getEntries().get(0).getEntry().getContent(), Matchers.equalTo("Testkommentar"));
         document.delete(true);
     }
 

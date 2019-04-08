@@ -3,6 +3,7 @@ package de.ksul.archiv;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.model.*;
 import de.ksul.archiv.model.comments.Comment;
+import de.ksul.archiv.model.comments.CommentPaging;
 import de.ksul.archiv.model.rules.Rule;
 import de.ksul.archiv.model.rules.Action;
 import de.ksul.archiv.model.rules.Condition;
@@ -68,7 +69,7 @@ public class AlfrescoConnector {
     RestTemplate restTemplate;
 
     private static final String NODES_URL = "service/api/node/workspace/SpacesStore/";
-    private static final String NEW_API_NODES_URL = "/alfresco/api/-default-/public/alfresco/versions/1/nodes/";
+    private static final String NEW_API_NODES_URL = "api/-default-/public/alfresco/versions/1/nodes/";
     private static final String LOGIN_URL = "tickets";
     private static Logger logger = LoggerFactory.getLogger(AlfrescoConnector.class.getName());
     private String user;
@@ -187,32 +188,6 @@ public class AlfrescoConnector {
         return scriptFolderName;
     }
 
-    /**
-     * liefert ein Ticket zur Authenfizierung
-     * @return             das Ticket als String
-     * @throws IOException
-     */
-    public String  getTicket() throws IOException, AuthenticationException, URISyntaxException {
-
-        return getTicket(this.user, this.password, this.server);
-    }
-
-    /**
-     * liefert ein Ticket zur Authentifizierung
-     * @param user         der Name des Users
-     * @param password     das Password
-     * @param server       der Alfresco Server
-     * @return             das Ticket als String
-     * @throws IOException
-     */
-    public String getTicket(String user, String password, String server) throws IOException, AuthenticationException, URISyntaxException {
-
-        URL url = new URL(server + (server.endsWith("/") ? "" : "/") + LOGIN_URL);
-        String urlParameters = "{ \"username\" : \"" + user + "\", \"password\" : \"" + password + "\" }";
-        Object obj = mapper.readValue(startRequest(url, RequestType.POST, urlParameters), Map.class);
-        logger.trace("Ticket für User " + user + " und Password " + password + " ausgestellt.");
-        return (String) ((HashMap) ((HashMap) obj).get("data")).get("ticket");
-    }
 
     /**
      * liefert die CMIS Session
@@ -864,11 +839,13 @@ public class AlfrescoConnector {
      * @return              ein Map mit den Kommentaren
      * @throws IOException
      */
-    public Map getComments(CmisObject obj) throws IOException, AuthenticationException {
+    public CommentPaging getComments(CmisObject obj) throws IOException, AuthenticationException, URISyntaxException {
 
         String id = VerteilungHelper.normalizeObjectId(obj.getId());
-        URL url = new URL(this.server + (this.server.endsWith("/") ? "" : "/") + NODES_URL + id + "/comments");
-        return mapper.readValue(startRequest(url, RequestType.GET, null), Map.class);
+        URL url = new URL(this.server + (this.server.endsWith("/") ? "" : "/") + NEW_API_NODES_URL + id + "/comments");
+        HttpEntity<String> request = new HttpEntity(getHttpHeaders());
+        ResponseEntity<CommentPaging> response = restTemplate.exchange(url.toURI(), HttpMethod.GET, request, CommentPaging.class);
+        return response.getBody();
     }
 
     /**
@@ -881,12 +858,11 @@ public class AlfrescoConnector {
     public Map addComment(CmisObject obj, String commentContent) throws IOException, AuthenticationException, URISyntaxException {
         String id = VerteilungHelper.normalizeObjectId(obj.getId());
         URL url = new URL(this.server + (this.server.endsWith("/") ? "" : "/") + NEW_API_NODES_URL + id + "/comments");
-        Comment comment = new Comment(commentContent);
+        Comment comment = new Comment();
+        comment.setContent(commentContent);
         HttpEntity<String> request = new HttpEntity(comment, getHttpHeaders());
-        ResponseEntity<String> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, String.class);
-
-        String urlParameters = "{\"content\": \"" + comment + "\"}";
-        return mapper.readValue(startRequest(url, RequestType.POST, urlParameters), Map.class);
+        ResponseEntity<Map> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, Map.class);
+        return response.getBody();
     }
 
     /**
@@ -965,10 +941,11 @@ public class AlfrescoConnector {
      * @param scriptId      die Id des Scriprdarei
      * @param name          der Name der Regel
      * @param description   die Beschreibung der Regel
+     * @return Map          eine Map mit der Rule
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    public void createRule(String folderId, String scriptId, String name, String description) throws MalformedURLException, URISyntaxException {
+    public Map createRule(String folderId, String scriptId, String name, String description) throws MalformedURLException, URISyntaxException {
 
         Rule rule = new Rule();
         rule.setTitle(name);
@@ -1000,7 +977,8 @@ public class AlfrescoConnector {
         rule.setAction(action);
         URL url = new URL("http://localhost:80/alfresco/service/api/node/workspace/SpacesStore/" + VerteilungHelper.normalizeObjectId(folderId) + "/ruleset/rules");
         HttpEntity<String> request = new HttpEntity(rule, getHttpHeaders());
-        ResponseEntity<String> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, String.class);
+        ResponseEntity<Map> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, Map.class);
+        return response.getBody();
     }
 
     /**
@@ -1017,62 +995,6 @@ public class AlfrescoConnector {
             set( "Authorization", authHeader );
         }};
     }
-
-    /**
-     * startet einen Http Request
-     * @param url               die aufzurufende URL
-     * @param type              der Typ des Aufrufs, entweder POST oder GET
-     * @param urlParameters     die Parameter für den Aufruf
-     * @return                  den Response als String
-     * @throws IOException
-     */
-    private String startRequest(URL url, RequestType type, String urlParameters) throws IOException, AuthenticationException {
-        HttpRequestBase request = null;
-
-        if (RequestType.GET.equals(type)) {
-            request = new HttpGet(url.toString());
-        } else if (RequestType.POST.equals(type)) {
-            request = new HttpPost(url.toString());
-            if (urlParameters != null ) {
-                ((HttpPost) request).setEntity(new StringEntity(urlParameters));
-            }
-        } else {
-            throw new CmisRuntimeException("Invalid HTTP method!");
-        }
-
-        request.setHeader("Content-type", "application/json");
-        request.setHeader("Accept", "application/json");
-        UsernamePasswordCredentials creds
-                = new UsernamePasswordCredentials(getUser(), getPassword());
-        request.addHeader(new BasicScheme().authenticate(creds, request, null));
-
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        CloseableHttpResponse response = httpClient.execute(request);
-        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            org.apache.http.HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                StringBuilder stringBuilder = new StringBuilder();
-                InputStream inputStream = entity.getContent();
-                byte[] buffer = new byte[1024];
-                try {
-                    int bytesRead = 0;
-                    BufferedInputStream bis = new BufferedInputStream(inputStream);
-                    while ((bytesRead = bis.read(buffer)) != -1) {
-                        stringBuilder.append(new String(buffer, 0, bytesRead));
-                    }
-                    return stringBuilder.toString();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try { inputStream.close(); } catch (Exception ignore) {}
-                }
-            }
-        }
-        httpClient.close();
-        return null;
-
-    }
-
 
     /**
      * baut einen OperationContext auf

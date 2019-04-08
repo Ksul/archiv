@@ -1,5 +1,6 @@
 package de.ksul.archiv;
 
+import de.ksul.archiv.model.comments.CommentPaging;
 import de.ksul.archiv.repository.Repository;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Session;
@@ -22,7 +23,7 @@ public class AlfrescoTestConnector extends AlfrescoConnector{
     }
 
     @Override
-    public Map getComments(CmisObject obj) {
+    public CommentPaging getComments(CmisObject obj) {
         Repository repository = Repository.getInstance();
         return repository.getComments(obj.getId());
     }

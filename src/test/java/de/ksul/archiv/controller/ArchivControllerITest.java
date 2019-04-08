@@ -3,6 +3,7 @@ package de.ksul.archiv.controller;
 import de.ksul.archiv.AlfrescoConnector;
 import de.ksul.archiv.configuration.ArchivConfiguration;
 import de.ksul.archiv.configuration.ArchivProperties;
+import de.ksul.archiv.model.comments.CommentPaging;
 import de.ksul.archiv.request.CommentRequest;
 import de.ksul.archiv.request.ObjectByIdRequest;
 import de.ksul.archiv.request.QueryRequest;
@@ -88,8 +89,8 @@ public class ArchivControllerITest extends  ArchivControllerAbstractTest  {
         assertThat(obj.getData(), notNullValue());
 
         obj = services.getComments(new ObjectByIdRequest(document.getId()));
-        Map<String, Object> comment = (Map) obj.getData();
-        assertThat(((Map) ((ArrayList) comment.get("items")).get(0)).get("content"), is("Testkommentar"));
+        CommentPaging comment = (CommentPaging) obj.getData();
+        assertThat((comment.getList().getEntries().get(0).getEntry().getContent()), is("Testkommentar"));
 
         document.delete();
         folder.delete(true);

@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.ksul.archiv.PDFConnector;
 import de.ksul.archiv.VerteilungConstants;
 import de.ksul.archiv.configuration.ArchivProperties;
+import de.ksul.archiv.model.comments.*;
 import de.ksul.archiv.repository.script.RecognizeEndpoints;
+import org.alfresco.repo.jscript.People;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.PropertyImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
@@ -450,9 +452,9 @@ public class Repository {
         }
     }
 
-    public Map getComments(String objectId) {
+    public CommentPaging getComments(String objectId) {
         TreeNode<?> commentFolder = null;
-        Map<String, Object> result = new LinkedHashMap<>();
+        CommentPaging result = new CommentPaging();
         TreeNode<?> node = findTreeNodeForId(objectId);
         for(TreeNode<?> folderNode : node.childs.values()) {
             if (folderNode.getName().equals(node.getName() + " Diskussion")) {
@@ -466,33 +468,29 @@ public class Repository {
             simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             SimpleDateFormat dfIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
             dfIso.setTimeZone(TimeZone.getTimeZone("GMT"));
-            LinkedHashMap<String, Boolean> permissions = new LinkedHashMap();
-            permissions.put("create", true);
-            permissions.put("edit", true);
-            permissions.put("delete", true);
-            result.put("nodePermissions", permissions);
-            result.put("total", Integer.valueOf(commentFolder.childs.values().size()));
-            result.put("pageSize", 10);
-            result.put("startIndex", 0);
-            result.put("itemCount", Integer.valueOf(commentFolder.childs.values().size()));
-            List<LinkedHashMap<String, Object>> items = new ArrayList<>();
-            LinkedHashMap<String, String> author = new LinkedHashMap<>(3);
-            author.put("username", "admin");
-            author.put("firstName", "Administrator");
-            author.put("lastName", "");
+            Pagination pagination = new Pagination();
+            pagination.setCount(Integer.valueOf(commentFolder.childs.values().size()));
+            pagination.setMaxItems(10);
+            pagination.setSkipCount(0);
+            pagination.setHasMoreItems(false);
+            pagination.setTotalItems(Integer.valueOf(commentFolder.childs.values().size()));
+
+            PaginationList items = new PaginationList();
+            Person author = new Person();
+            author.setJobTitle("admin");
+            author.setFirstName( "Administrator");
+            author.setLastName("");
             for (TreeNode<?> folderNode : commentFolder.childs.values()) {
-                LinkedHashMap<String, Object> item = new LinkedHashMap<>();
-                item.put("content", folderNode.content);
-                item.put("name", folderNode.getId());
-                item.put("author", author);
-                item.put("createdOn", simpleDateFormat.format(folderNode.getCreationDate()));
-                item.put("modifiedOn", simpleDateFormat.format(folderNode.getModifiedDate()));
-                item.put("createdOnISO", dfIso.format(folderNode.getCreationDate()));
-                item.put("modifiedOnISO", dfIso.format(folderNode.getModifiedDate()));
-                item.put("isUpdated", false);
-                items.add(item);
+                Comment item = new Comment();
+                item.setContent( folderNode.content);
+                item.setCreatedBy(author);
+                item.setCreatedAt(simpleDateFormat.format(folderNode.getCreationDate()));
+                item.setModifiedAt(simpleDateFormat.format(folderNode.getModifiedDate()));
+                CommentEntry commentEntry = new CommentEntry(item);
+                items.addEntry(commentEntry);
             }
-            result.put("items", items);
+            items.setPagination(pagination);
+            result.setList(items);
         }
         return result;
     }

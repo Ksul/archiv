@@ -64,8 +64,6 @@ public abstract class ArchivApplicationRestControllerAbstractTest extends Alfres
 
     }
 
-
-
     @Test
     public void testOpenDocument() throws Exception {
         ObjectByIdRequest request = new ObjectByIdRequest();

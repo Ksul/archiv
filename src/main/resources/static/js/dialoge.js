@@ -600,7 +600,7 @@ function startFolderDialog(data, modus, modal) {
  */
 function startCommentsDialog(comments) {
     try {
-        const data = comments.items;
+        const data = comments.list.entries;
 
         $dialog = $('<div> <table cellpadding="0" cellspacing="0" border="0" class="display" id="custTabelle"></table> </div>').dialog({
             autoOpen: false,
@@ -628,7 +628,7 @@ function startCommentsDialog(comments) {
             searching: false,
             columns: [
                 {
-                    data: "author.username",
+                    data: "entry.createdBy.firstName",
                     title: "User",
                     defaultContent: '',
                     type: "string",
@@ -636,7 +636,7 @@ function startCommentsDialog(comments) {
                     class: "alignLeft"
                 },
                 {
-                    data: "modifiedOn",
+                    data: "entry.modifiedAt",
                     title: "Datum",
                     defaultContent: '',
                     type: "string",
@@ -645,7 +645,7 @@ function startCommentsDialog(comments) {
                 },
                 {
                     title: "Kommentar",
-                    data: "content",
+                    data: "entry.content",
                     class: "alignLeft"
                 }
             ],
@@ -658,7 +658,7 @@ function startCommentsDialog(comments) {
                     targets: [1],
                     visible: true,
                     render: function (data, type, row) {
-                        return  $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Date.parse(row.modifiedOnISO)));
+                        return  $.formatDateTime('dd.mm.yy hh:ii:ss', new Date(Date.parse(row.entry.modifiedAt)));
                     }
                 }
             ],
