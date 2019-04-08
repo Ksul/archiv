@@ -6,6 +6,7 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.http.auth.AuthenticationException;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ public class AlfrescoTestConnector extends AlfrescoConnector{
     }
 
     @Override
-    public Map addComment(CmisObject obj, String comment) throws IOException, AuthenticationException {
+    public Map addComment(CmisObject obj, String comment) throws IOException, AuthenticationException, URISyntaxException {
         return super.addComment(obj, comment);
     }
 }

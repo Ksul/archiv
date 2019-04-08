@@ -845,7 +845,7 @@ public class ArchivController {
      *
      * @param model das Requestmodel
      * @return ein Object mit den Feldern     success: true     die Operation war erfolgreich
-     * false    ein Fehler ist aufgetreten
+     *                   false    ein Fehler ist aufgetreten
      * data              true, wenn die URL verfügbar ist
      */
     @RequestMapping(value = "/isURLAvailable", consumes = "application/json", produces = "application/json")
@@ -882,6 +882,15 @@ public class ArchivController {
         return obj;
     }
 
+    /**
+     * prüft, ob eine Regel für einen Knoten vorhanden ist
+     *
+     * @param model     das RequestModel
+     * @return ein Object mit den Feldern     success: true     die Operation war erfolgreich
+     * false             ein Fehler ist aufgetreten
+     * data              true, wenn die Regel verfügbar ist
+     * @throws Exception
+     */
     @RequestMapping(value = "/hasRule", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse hasRule(@RequestBody @Valid final RuleAvailableRequest model) throws Exception {
@@ -895,6 +904,14 @@ public class ArchivController {
         return obj;
     }
 
+    /**
+     * legt eine neue Regel für einen Folder an.
+     *
+     * @param model     das RequestModel
+     * @return obj          ein Object mit den Feldern     success: true    die Operation war erfolgreich
+     *                      false   ein Fehler ist aufgetreten
+     * @throws Exception
+     */
     @RequestMapping(value = "/createRule", consumes = "application/json", produces = "application/json")
     public @ResponseBody
     RestResponse createRule(@RequestBody @Valid final RuleCreateRequest model) throws Exception {

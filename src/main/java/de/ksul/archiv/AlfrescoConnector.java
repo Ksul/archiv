@@ -2,6 +2,7 @@ package de.ksul.archiv;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.ksul.archiv.model.*;
+import de.ksul.archiv.model.comments.Comment;
 import de.ksul.archiv.model.rules.Rule;
 import de.ksul.archiv.model.rules.Action;
 import de.ksul.archiv.model.rules.Condition;
@@ -67,6 +68,7 @@ public class AlfrescoConnector {
     RestTemplate restTemplate;
 
     private static final String NODES_URL = "service/api/node/workspace/SpacesStore/";
+    private static final String NEW_API_NODES_URL = "/alfresco/api/-default-/public/alfresco/versions/1/nodes/";
     private static final String LOGIN_URL = "tickets";
     private static Logger logger = LoggerFactory.getLogger(AlfrescoConnector.class.getName());
     private String user;
@@ -871,19 +873,21 @@ public class AlfrescoConnector {
 
     /**
      * fügt einen Kommentar hinzu
-     * @param obj           der Knoten/Folder als Cmis Objekt
-     * @param comment       der neue Kommentar
-     * @return              ein Map mit dem neuen Kommentar
+     * @param obj                   der Knoten/Folder als Cmis Objekt
+     * @param commentContent        der neue Kommentar
+     * @return                      eine Map mit dem neuen Kommentar
      * @throws IOException
      */
-    public Map addComment(CmisObject obj, String comment) throws IOException, AuthenticationException {
+    public Map addComment(CmisObject obj, String commentContent) throws IOException, AuthenticationException, URISyntaxException {
         String id = VerteilungHelper.normalizeObjectId(obj.getId());
-        URL url = new URL(this.server + (this.server.endsWith("/") ? "" : "/") + NODES_URL + id + "/comments");
+        URL url = new URL(this.server + (this.server.endsWith("/") ? "" : "/") + NEW_API_NODES_URL + id + "/comments");
+        Comment comment = new Comment(commentContent);
+        HttpEntity<String> request = new HttpEntity(comment, getHttpHeaders());
+        ResponseEntity<String> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, String.class);
+
         String urlParameters = "{\"content\": \"" + comment + "\"}";
         return mapper.readValue(startRequest(url, RequestType.POST, urlParameters), Map.class);
     }
-
-
 
     /**
      * bereitet die Typen der Properties auf
@@ -891,7 +895,6 @@ public class AlfrescoConnector {
      * @return            die Properties mit den richtigen Typen
      */
     private Map<String, Object> convertProperties(Map<String, Object> properties) {
-
 
         HashMap<String, Object> props = new HashMap<>();
         Map<String, PropertyDefinition<?>> definitions = new HashMap<>();
@@ -937,6 +940,16 @@ public class AlfrescoConnector {
         return props;
     }
 
+    /**
+     * prüft, ob eine Regel für einen Knoten existiert
+     *
+     * @param name          der Name der Regel
+     * @param folderId      die Id des Folders
+     * @return              true, wenn eine Regel mit dem Namen vorhanden ist
+     * @throws IOException
+     * @throws AuthenticationException
+     * @throws URISyntaxException
+     */
     public boolean hasRule(String name, String folderId) throws IOException, AuthenticationException, URISyntaxException {
 
         URL url = new URL(this.server + (this.server.endsWith("/") ? "" : "/") + NODES_URL + folderId + "/ruleset/rules");
@@ -945,6 +958,16 @@ public class AlfrescoConnector {
         return result.getBody().hasRule(name);
     }
 
+    /**
+     * legt eine neue Regel für einen Folder an
+     *
+     * @param folderId      die Id des Folders
+     * @param scriptId      die Id des Scriprdarei
+     * @param name          der Name der Regel
+     * @param description   die Beschreibung der Regel
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
     public void createRule(String folderId, String scriptId, String name, String description) throws MalformedURLException, URISyntaxException {
 
         Rule rule = new Rule();
@@ -980,6 +1003,11 @@ public class AlfrescoConnector {
         ResponseEntity<String> response = restTemplate.exchange(url.toURI(), HttpMethod.POST, request, String.class);
     }
 
+    /**
+     * liefert den Http header für die Restcalls und sorgt für die Authentifizierung am Server
+     *
+     * @return      der HttpHeader
+     */
     private HttpHeaders getHttpHeaders() {
         return new HttpHeaders() {{
             String auth = user + ":" + password;
