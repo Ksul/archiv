@@ -361,6 +361,7 @@ public abstract class AlfrescoConnectorAbstractTest extends AlfrescoTest {
     public void testUpdateDocument() throws Exception {
         CmisObject folder = buildTestFolder("TestFolder", null);
         Document document = (Document) buildDocument("TestDocument", folder);
+        Thread.sleep(5000);
         Date date = new Date();
         String content = "";
         Map<String, Object> properties = new HashMap<>();

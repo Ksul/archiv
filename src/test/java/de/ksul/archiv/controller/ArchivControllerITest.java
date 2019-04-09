@@ -101,7 +101,7 @@ public class ArchivControllerITest extends  ArchivControllerAbstractTest  {
         CmisObject folder = buildTestFolder("TestFolder", null);
         CmisObject document = buildDocument("Test", folder);
         // der Server braucht einige Zeit um das neu angelegte Dokument zu indexieren.
-        Thread.sleep(18000);
+        Thread.sleep(20000);
         String searchText ="Test";
         QueryRequest request = new QueryRequest();
         request.setCmisQuery( "select d.cmis:objectId, d.cmis:name, d.cmis:creationDate, d.my:documentDate, o.cm:title  from my:archivContent as d " +

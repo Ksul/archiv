@@ -96,9 +96,8 @@ public class ArchivApplicationRestControllerITest extends ArchivApplicationRestC
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.error", nullValue()))
-                .andExpect(jsonPath("$.data.length()", greaterThan(0)))
-                .andExpect(jsonPath("$.data.items.length()", greaterThan(0)))
-                .andExpect(jsonPath("$.data.items[0].content", is("Testkommentar")));
+                .andExpect(jsonPath("$.data.list.entries.length()", greaterThan(0)))
+                .andExpect(jsonPath("$.data.list.entries[0].entry.content", is("Testkommentar")));
         document.delete();
         folder.delete();
     }

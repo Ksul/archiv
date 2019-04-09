@@ -811,7 +811,7 @@ public abstract class ArchivControllerAbstractTest extends AlfrescoTest {
     public void testIsURLAvailable() throws Exception {
 
         ConnectionRequest request = new ConnectionRequest();
-        request.setServer("http://www.spiegel.de");
+        request.setServer("http://www.google.de");
         request.setTimeout(5000);
         RestResponse obj = services.isURLAvailable(request);
         assertThat(obj, notNullValue());

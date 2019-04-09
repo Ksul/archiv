@@ -29,7 +29,7 @@
         <java.version>11</java.version>
         <jasmine.version>3.3.0</jasmine.version>
         <opencmis.version>1.1.0</opencmis.version>
-        <junit.version>5.3.2</junit.version>
+        <junit.version>5.4.2</junit.version>
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>

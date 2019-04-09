@@ -17,6 +17,7 @@ import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.enums.Cardinality;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.collections4.list.SetUniqueList;
@@ -138,7 +139,7 @@ public class Repository {
 
     List<FileableCmisObject> getChildren(String id, int skip, int maxItems) {
         if (id == null)
-            throw new RuntimeException("id must be set!");
+            throw new CmisRuntimeException("id must be set!");
         int i = 0;
         List<FileableCmisObject> ret = new ArrayList<>();
         if (root == null)

@@ -150,7 +150,7 @@ public abstract class AlfrescoTest {
         aspects.add("P:my:amountable");
         aspects.add("P:my:idable");
         props.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, aspects);
-        document = con.createDocument((Folder) folder, name, "Dies ist ein Testdokument".getBytes(), VerteilungConstants.DOCUMENT_TYPE_TEXT, props, VersioningState.MINOR);
+        document = con.createDocument((Folder) folder, name, new byte[]{}, VerteilungConstants.DOCUMENT_TYPE_TEXT, props, VersioningState.MINOR);
         assertThat(document, Matchers.notNullValue());
         assertThat(document, Matchers.instanceOf( Document.class));
         assertThat(document.getName(), Matchers.is(name));
