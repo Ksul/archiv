@@ -1615,7 +1615,7 @@ function ArchivTyp(srch, parentType) {
                     }
                 } else {
                     if (this.getTopParent() === this && !this.destinationResolved) {
-                        // hier kommen wir hin, wenn die geschachtelten Archivtypen keine Destination erzeugen können und
+                        // hier kommen wir hin, wenn die geschachtelten Archivtypen keine Destination erzeugen können und der
                         // aktuelle Typ keine definiert hat
                         // das bedeutet, das die gefundene Regel wohl doch nicht die richtige ist
                         Logger.log(Level.INFO, "No Positions found! Rule " + this.name + " is not suitable");

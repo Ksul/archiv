@@ -25,7 +25,7 @@ module.exports = function(config) {
     files: [ { pattern: 'test-context.js', watched: false },
              'src/main/resources/static/js/jquery/jquery-3.3.1.js',
              'src/main/resources/static/js/jquery-ui/jquery-ui.js',
-             'src/main/resources/static/js/alfrescoMock.js',
+             'src/test/js/alfrescoMock.js',
              'src/main/resources/static/js/recognition.js',
              'src/main/resources/static/js/util.js',
              'src/main/resources/static/js/verteilung.js',

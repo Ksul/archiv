@@ -6,6 +6,8 @@ describe("Test für Tags", function() {
 
     beforeEach(function () {
         REC.init();
+        var iBox = companyhome.childByNamePath("/Archiv/Inbox");
+        REC.currentDocument = iBox.createNode("WebScriptTest", "my:archivContent");
     });
 
     it("tagTest", function() {

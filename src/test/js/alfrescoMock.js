@@ -94,21 +94,27 @@ Liste.prototype.clone = function() {
 };
 
 
-function Content(cont) {
+function Content(parent) {
     BasicObject.call(this);
-    if (typeof cont === "string")
-        this.content = cont;
-    else
-        this.content = "";
+    this.content = null;
+    this.parent = parent;
 }
 
 
 Content.prototype.write = function(cont) {
-    this.content = cont.content;
+    if (typeof cont === "string") {
+        this.content = cont;
+        this.parent.content = cont;
+    } else {
+        this.content = cont.content;
+        this.parent.content = cont.content;
+    }
 };
+
 Content.prototype.clone = function() {
     var newContent = new Content();
     newContent.content = this.content;
+    newContent.parent = this.parent;
     return newContent;
 };
 
@@ -116,8 +122,9 @@ function ScriptNode(name, type) {
     BasicNode.call(this, name);
     this.subType = "";
     this.tags = new Liste();
+    this.content;
     this.properties = new Liste();
-    this.properties["content"] = new Content();
+    this.properties["content"] = new Content(this);
     this.children = new Liste();
     this.childAssocs = new Liste();
     // Parents können keine Liste sein, denn für die contains Methode wird nur der Name herangezogen was hier nicht passt.
@@ -229,10 +236,11 @@ ScriptNode.prototype.checkin = function () {
     var i = 1;
     while(this.workingParent.versions.contains(new BasicObject(i)))
         i++;
-    this.workingParent.properties = this.properties;
     var version = new BasicObject(i);
-    version.value = this.workingParent;
+    version.value = this.workingParent.clone();
     this.workingParent.versions.add(version);
+    this.workingParent.properties = this.properties;
+    this.workingParent.content = this.properties.content.content;
     return this.workingParent;
 };
 
@@ -332,7 +340,8 @@ ScriptNode.prototype.clone = function(){
     newNode.aspect = this.aspect.clone();
     newNode.tags = this.tags.clone();
     newNode.properties = this.properties.clone();
-    newNode.content = newNode.properties["content"];
+    newNode.properties.content.parent = newNode;
+    newNode.content = this.content;
     newNode.children = this.children;
     newNode.versions = this.versions;
     newNode.parent = this.parent;
@@ -345,8 +354,8 @@ ScriptNode.prototype.init = function() {
     this.aspect.clear();
     this.tags.clear();
     this.properties.clear();
-    this.properties["content"] = new Content();
-    this.content = this.properties["content"].content;
+    this.properties["content"] = new Content(this);
+    //this.content = this.properties["content"].content;
     this.children.clear();
     this.childAssocs.clear();
     this.versions.clear();

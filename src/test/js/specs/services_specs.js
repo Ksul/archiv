@@ -6,26 +6,32 @@ describe("Test für die Rest Services", function () {
 
     beforeEach(function () {
 
-        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
+        var json = executeService({
+            "name": "getNodeId",
+            "ignoreError": true}, [
             {"name": "filePath", "value": "/TestFolder"}
         ]);
 
         if (json.success) {
 
+            var ids = [];
+            ids.push(json.data.objectID);
             json = executeService({
                 "name": "deleteFolder",
                 "ignoreError": true,
                 "errorMessage": "Ordner konnte nicht gelöscht werden!"
             }, [
-                {"name": "documentId", "value": json.data.objectId}
+                {"name": "documentId", "value": ids}
             ]);
         }
 
     });
 
     it("getNodeId", function () {
-        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
-            {"name": "filePath", "value": "/Datenverzeichnis/Skripte"}
+        var json = executeService({
+            "name": "getNodeId",
+            "ignoreError": true}, [
+            {"name": "filePath", "value": "/"}
         ]);
 
         expect(json.success).toBe(true);
@@ -37,7 +43,9 @@ describe("Test für die Rest Services", function () {
 
     it("createFolder", function () {
 
-        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
+        var json = executeService({
+            "name": "getNodeId",
+            "ignoreError": true}, [
             {"name": "filePath", "value": "/"}
         ]);
 
@@ -59,12 +67,14 @@ describe("Test für die Rest Services", function () {
             expect(json.data).not.toBe(null);
             expect(json.data.objectId).not.toBe(null);
 
+            var ids = [];
+            ids.push(json.data.objectId);
             json = executeService({
                 "name": "deleteFolder",
                 "ignoreError": true,
                 "errorMessage": "Ordner konnte nicht gelöscht werden!"
             }, [
-                {"name": "documentId", "value": json.data.objectId}
+                {"name": "documentId", "value": ids}
             ]);
 
             expect(json.success).toBe(true);
@@ -74,7 +84,9 @@ describe("Test für die Rest Services", function () {
 
     it("createDocument", function () {
 
-        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
+        var json = executeService({
+            "name": "getNodeId",
+            "ignoreError": true}, [
             {"name": "filePath", "value": "/"}
         ]);
 
@@ -96,7 +108,7 @@ describe("Test für die Rest Services", function () {
         expect(json.data).not.toBe(null);
         expect(json.data.objectId).not.toBe(null);
 
-        var folderId = json.data.objectId;
+        var folderId = json.data.objectID;
 
         extraProperties = {
             'P:cm:titled': {
@@ -120,19 +132,21 @@ describe("Test für die Rest Services", function () {
             {"name": "fileName", "value": "Test.txt"},
             {"name": "content", "value": "abcde"},
             {"name": "extraProperties", "value": extraProperties},
-            {"name": "mimeType", "value": "application/pdf"},
+            {"name": "mimeType", "value": "text/plain"},
             {"name": "versionState", "value": "major"}
         ]);
         expect(json.success).toBe(true);
         expect(json.data.name).toBe("Test.txt");
         expect(json.data.versionLabel).toBe("1.0");
 
+        var ids = [];
+        ids.push(folderId);
         json = executeService({
             "name": "deleteFolder",
             "ignoreError": true,
             "errorMessage": "Ordner konnte nicht gelöscht werden!"
         }, [
-            {"name": "documentId", "value": folderId}
+            {"name": "documentId", "value": ids}
         ]);
 
         expect(json.success).toBe(true);
@@ -142,7 +156,9 @@ describe("Test für die Rest Services", function () {
     it("listFolderWithPagination", function () {
 
 
-        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
+        var json = executeService({
+            "name": "getNodeId",
+            "ignoreError": true}, [
             {"name": "filePath", "value": "/"}
         ]);
 
@@ -155,7 +171,8 @@ describe("Test für die Rest Services", function () {
             "cmis:folder": {"cmis:name": "TestFolder"},
             "P:cm:titled": {"cm:title": "TestFolder", "cm:description": "Ordner für Tests"}
         };
-        json = executeService({"name": "createFolder"}, [
+        json = executeService({
+            "name": "createFolder"}, [
             {"name": "documentId", "value": json.data.objectID},
             {"name": "extraProperties", "value": extraProperties}
         ]);
@@ -178,7 +195,7 @@ describe("Test für die Rest Services", function () {
         };
 
 
-        var folderId = json.data.objectId;
+        var folderId = json.data.objectID;
 
         json = executeService({
             "name": "createDocument",
@@ -189,14 +206,13 @@ describe("Test für die Rest Services", function () {
             {"name": "fileName", "value": "Test.txt"},
             {"name": "content", "value": "abcde"},
             {"name": "extraProperties", "value": extraProperties},
-            {"name": "mimeType", "value": "application/pdf"},
+            {"name": "mimeType", "value": "text/plain"},
             {"name": "versionState", "value": "major"}
         ]);
         expect(json.success).toBe(true);
 
         json = executeService({
             "name": "listFolderWithPagination",
-            "url": "http://localhost:8080/Archiv",
             "ignoreError": true
         }, [
             {"name": "folderId", "value": folderId},
@@ -210,7 +226,6 @@ describe("Test für die Rest Services", function () {
 
         json = executeService({
             "name": "listFolderWithPagination",
-            "url": "http://localhost:8080/Archiv",
             "ignoreError": true
         }, [
             {"name": "folderId", "value": folderId},
@@ -224,7 +239,6 @@ describe("Test für die Rest Services", function () {
 
         json = executeService({
             "name": "listFolderWithPagination",
-            "url": "http://localhost:8080/Archiv",
             "ignoreError": true
         }, [
             {"name": "folderId", "value": folderId},
@@ -236,21 +250,73 @@ describe("Test für die Rest Services", function () {
         expect(json.success).toBe(true);
         expect(json.data.length === 0).toBeTruthy();
 
+        var ids = [];
+        ids.push(folderId);
         json = executeService({
             "name": "deleteFolder",
             "ignoreError": true,
             "errorMessage": "Ordner konnte nicht gelöscht werden!"
         }, [
-            {"name": "documentId", "value": folderId}
+            {"name": "documentId", "value": ids}
         ]);
 
         expect(json.success).toBe(true);
     });
 
-    it("getDocumentContent", function () {
+    fit("getDocumentContent", function () {
 
-        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
-            {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
+        var json = executeService({
+            "name": "getNodeId",
+            "ignoreError": true}, [
+            {"name": "filePath", "value": "/"}
+        ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data).not.toBe(null);
+        expect(json.data.objectId).not.toBe(null);
+        expect(json.data.objectID).not.toBe(null);
+
+        var extraProperties = {
+            "cmis:folder": {"cmis:name": "TestFolder"},
+            "P:cm:titled": {"cm:title": "TestFolder", "cm:description": "Ordner für Tests"}
+        };
+        json = executeService({
+            "name": "createFolder"}, [
+            {"name": "documentId", "value": json.data.objectID},
+            {"name": "extraProperties", "value": extraProperties}
+        ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data).not.toBe(null);
+        expect(json.data.objectId).not.toBe(null);
+
+        extraProperties = {
+            'P:cm:titled': {
+                'cm:title': "Test",
+                'cm:description': ""
+            },
+            'D:my:archivContent': {
+                'my:documentDate': "",
+                'my:person': "Klaus"
+            },
+            'P:my:amountable': {'my:amount': "", "my:tax": ""},
+            'P:my:idable': {'my:idvalue': ""}
+        };
+
+
+        var folderId = json.data.objectID;
+
+        json = executeService({
+            "name": "createDocument",
+            "errorMessage": "Dokument konnte nicht erstellt werden!",
+            "ignoreError": true
+        }, [
+            {"name": "documentId", "value": folderId},
+            {"name": "fileName", "value": "Test.txt"},
+            {"name": "content", "value": "abcde"},
+            {"name": "extraProperties", "value": extraProperties},
+            {"name": "mimeType", "value": "text/plain"},
+            {"name": "versionState", "value": "major"}
         ]);
 
         expect(json.success).toBe(true);
@@ -260,7 +326,6 @@ describe("Test für die Rest Services", function () {
 
         json = executeService({
             "name": "getDocumentContent",
-            "url": "http://localhost:8080/Archiv",
             "ignoreError": true
         }, [
             {"name": "documentId", "value": json.data.objectId}
@@ -268,13 +333,65 @@ describe("Test für die Rest Services", function () {
 
         expect(json.success).toBe(true);
         expect(json.data.length > 0).toBeTruthy();
+        expect(json.data).toBe("abcde");
     });
 
     it("updateDocument", function () {
 
-        var json = executeService({"name": "getNodeId", "url": "http://localhost:8080/Archiv", "ignoreError": true}, [
-            {"name": "filePath", "value": "/Datenverzeichnis/Skripte/doc.xml"}
+        var json = executeService({
+            "name": "getNodeId",
+            "ignoreError": true}, [
+            {"name": "filePath", "value": "/"}
         ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data).not.toBe(null);
+        expect(json.data.objectId).not.toBe(null);
+        expect(json.data.objectID).not.toBe(null);
+
+        var extraProperties = {
+            "cmis:folder": {"cmis:name": "TestFolder"},
+            "P:cm:titled": {"cm:title": "TestFolder", "cm:description": "Ordner für Tests"}
+        };
+        json = executeService({
+            "name": "createFolder"}, [
+            {"name": "documentId", "value": json.data.objectID},
+            {"name": "extraProperties", "value": extraProperties}
+        ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data).not.toBe(null);
+        expect(json.data.objectId).not.toBe(null);
+
+        extraProperties = {
+            'P:cm:titled': {
+                'cm:title': "Test",
+                'cm:description': ""
+            },
+            'D:my:archivContent': {
+                'my:documentDate': "",
+                'my:person': "Klaus"
+            },
+            'P:my:amountable': {'my:amount': "", "my:tax": ""},
+            'P:my:idable': {'my:idvalue': ""}
+        };
+
+
+        var folderId = json.data.objectID;
+
+        json = executeService({
+            "name": "createDocument",
+            "errorMessage": "Dokument konnte nicht erstellt werden!",
+            "ignoreError": true
+        }, [
+            {"name": "documentId", "value": folderId},
+            {"name": "fileName", "value": "Test.txt"},
+            {"name": "content", "value": "abcde"},
+            {"name": "extraProperties", "value": extraProperties},
+            {"name": "mimeType", "value": "text/plain"},
+            {"name": "versionState", "value": "major"}
+        ]);
+
 
         expect(json.success).toBe(true);
         expect(json.data).not.toBe(null);
@@ -284,7 +401,6 @@ describe("Test für die Rest Services", function () {
         var rulesID = json.data.objectID;
         json = executeService({
             "name": "getDocumentContent",
-            "url": "http://localhost:8080/Archiv",
             "ignoreError": true
         }, [
             {"name": "documentId", "value": rulesID}
@@ -293,7 +409,8 @@ describe("Test für die Rest Services", function () {
         expect(json.success).toBe(true);
         expect(json.data.length > 0).toBeTruthy();
 
-        json = executeService({"name": "updateDocument",   "url": "http://localhost:8080/Archiv",
+        json = executeService({
+            "name": "updateDocument",
             "ignoreError": true}, [
             {"name": "documentId", "value": rulesID},
             {"name": "content", "value": json.data, "type": "byte"},

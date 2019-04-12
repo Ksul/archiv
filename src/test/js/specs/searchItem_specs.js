@@ -3,6 +3,8 @@ describe("Test für SearchItem", function() {
 
     beforeEach(function () {
         REC.init();
+        var iBox = companyhome.childByNamePath("/Archiv/Inbox");
+        REC.currentDocument = iBox.createNode("WebScriptTest", "my:archivContent");
         var txt = " Dies ist ein Test!Datum: 01.05.1965\r\n" +
             "Wert:\r\n" +
             " \r\n" +
@@ -40,7 +42,7 @@ describe("Test für SearchItem", function() {
             "Unsere Lieferungen\r\n" +
             "Zahlbetrag \r\n" +
             "	 25,65 € ";
-        REC.currentDocument.properties.content = txt;
+        REC.currentDocument.properties.content.write(txt);
         Verteilung.positions.clear();
     });
 

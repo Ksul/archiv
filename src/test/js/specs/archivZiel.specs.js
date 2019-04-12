@@ -5,6 +5,8 @@ describe("Test für ArchivZiel", function() {
 
     beforeEach(function () {
         REC.init();
+        var iBox = companyhome.childByNamePath("/Archiv/Inbox");
+        REC.currentDocument = iBox.createNode("WebScriptTest", "my:archivContent");
     });
 
     it("test1", function() {

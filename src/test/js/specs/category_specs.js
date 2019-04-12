@@ -6,6 +6,8 @@ describe("Test für Kategorie", function() {
 
     beforeEach(function () {
         REC.init();
+        var iBox = companyhome.childByNamePath("/Archiv/Inbox");
+        REC.currentDocument = iBox.createNode("WebScriptTest", "my:archivContent");
         companyhome.init();
         classification.init();
     });
