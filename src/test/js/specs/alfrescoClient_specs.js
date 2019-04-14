@@ -131,7 +131,7 @@ describe("Tests für alfrescoClient.js", function() {
 
     });
 
-    it("testAimNode", function() {
+    xit("testAimNode", function() {
 
         alfrescoViewModeMenu = null;
         alfrescoDocumentSelectMenu=null;

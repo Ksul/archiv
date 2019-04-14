@@ -188,6 +188,26 @@ function executeService(service, params) {
     }
 }
 
+/**
+ * liefert den Inhalt eines Dokumentes
+ * @param   objectId        die ObjectId des Dokumentes
+ * @param   ignoreError     legt fest ob ein Fehler ignoriert werden soll
+ * @returns der Inhalt als bytes
+ */
+function getDocumentContent(objectId, ignoreError) {
+
+    var json = executeService({
+        "name": "getDocumentContent",
+        "ignoreError": ignoreError
+    }, [
+        {"name": "documentId", "value": objectId}
+    ]);
+    if (json.success) {
+        return base64DecToArr(json.data);
+    }
+    return null;
+}
+
 
 /**
  * liefert die Einstellungen
@@ -756,6 +776,43 @@ function editFolder(input, id) {
         errorHandler(e);
     }
     return erg;
+}
+
+/**
+ * konvertiert ein byte Array in einen UTF-8 Stringb
+ * @param data      das byte Array
+ * @returns {*}     der UTF-8 String
+ */
+function stringFromUTF8Array(data)
+{
+    const extraByteMap = [ 1, 1, 1, 1, 2, 2, 3, 0 ];
+    var count = data.length;
+    var str = "";
+
+    for (var index = 0;index < count;)
+    {
+        var ch = data[index++];
+        if (ch & 0x80)
+        {
+            var extra = extraByteMap[(ch >> 3) & 0x07];
+            if (!(ch & 0x40) || !extra || ((index + extra) > count))
+                return null;
+
+            ch = ch & (0x3F >> extra);
+            for (;extra > 0;extra -= 1)
+            {
+                var chx = data[index++];
+                if ((chx & 0xC0) != 0x80)
+                    return null;
+
+                ch = (ch << 6) | (chx & 0x3F);
+            }
+        }
+
+        str += String.fromCharCode(ch);
+    }
+
+    return str;
 }
 
 

@@ -34,7 +34,7 @@ function decodeBase64(str) {
 }
 
 
-function    base64DecToArr (sBase64, nBlocksSize) {
+function base64DecToArr (sBase64, nBlocksSize) {
 
     var
         sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, ""), nInLen = sB64Enc.length,
