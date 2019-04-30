@@ -39,7 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @EnableAutoConfiguration
 @SpringBootTest(classes = {ArchivConfiguration.class})
 @DirtiesContext
-public class ArchivControllerITest extends  ArchivControllerAbstractTest  {
+public class ArchivControllerATest extends  ArchivControllerAbstractTest  {
 
     ArchivProperties properties;
 

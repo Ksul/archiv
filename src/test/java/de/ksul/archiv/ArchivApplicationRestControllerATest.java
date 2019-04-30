@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ArchivConfiguration.class, ArchivController.class})
 @DirtiesContext
-public class ArchivApplicationRestControllerITest extends ArchivApplicationRestControllerAbstractTest {
+public class ArchivApplicationRestControllerATest extends ArchivApplicationRestControllerAbstractTest {
 
     @BeforeEach
     public void setUp(@Autowired AlfrescoConnector connector,

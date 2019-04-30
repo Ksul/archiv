@@ -32,7 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @EnableAutoConfiguration
 @SpringBootTest(classes = {ArchivConfiguration.class})
 @DirtiesContext
-public class AlfrescoConnectorITest extends AlfrescoConnectorAbstractTest {
+public class AlfrescoConnectorATest extends AlfrescoConnectorAbstractTest {
 
     @BeforeEach
     public void setUp(@Autowired AlfrescoConnector connector, @Autowired ArchivProperties archivProperties) throws Exception {

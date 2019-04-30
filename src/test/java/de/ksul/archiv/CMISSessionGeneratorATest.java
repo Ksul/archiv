@@ -25,7 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = {"spring.main.allow-bean-definition-overriding=true"})
 @SpringBootTest(classes = {ArchivTestConfiguration.class, ArchivConfiguration.class})
-public class CMISSessionGeneratorITest {
+public class CMISSessionGeneratorATest {
 
     @Autowired
     ArchivProperties properties;

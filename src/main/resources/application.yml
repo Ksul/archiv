@@ -55,5 +55,6 @@ spring:
     banner-mode: log
   autoconfigure:
     exclude:
-             - org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration
-             - org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration
+      - org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration
