@@ -771,7 +771,7 @@ public class AlfrescoConnector {
         if (!properties.containsKey(PropertyIds.OBJECT_TYPE_ID))
             properties.put(PropertyIds.OBJECT_TYPE_ID, obj.getPropertyValue(PropertyIds.OBJECT_TYPE_ID));
 
-        obj = session.getObject(obj.updateProperties(convertProperties(properties), true));
+        obj = session.getObject(obj.updateProperties(convertProperties(properties), true), getOperationContext());
         logger.trace("updateProperties for node " + obj.getId());
         return obj;
     }
@@ -816,7 +816,7 @@ public class AlfrescoConnector {
                                       String checkinComment) {
 
         if (isDocumentVersionable(document)) {
-            CmisObject cmisObject = session.getObject(document.checkIn(major, convertProperties(properties), contentStream, checkinComment));
+            CmisObject cmisObject = session.getObject(document.checkIn(major, convertProperties(properties), contentStream, checkinComment), getOperationContext());
             logger.trace("Object " + cmisObject.getId() + " checked in with Version " + cmisObject.getPropertyValue("versionLabel"));
             return cmisObject;
         }

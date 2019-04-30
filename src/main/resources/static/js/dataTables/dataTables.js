@@ -4,24 +4,24 @@
  *
  * To rebuild or modify this file with the latest versions of the included
  * software please visit:
- *   https://datatables.net/download/#dt/dt-1.10.16
+ *   https://datatables.net/download/#dt/dt-1.10.18/sc-2.0.0/sl-1.3.0
  *
  * Included libraries:
- *   DataTables 1.10.16
+ *   DataTables 1.10.18, Scroller 2.0.0, Select 1.3.0
  */
 
-/*! DataTables 1.10.16
- * ©2008-2017 SpryMedia Ltd - datatables.net/license
+/*! DataTables 1.10.18
+ * ©2008-2018 SpryMedia Ltd - datatables.net/license
  */
 
 /**
  * @summary     DataTables
  * @description Paginate, search and order HTML tables
- * @version     1.10.16
+ * @version     1.10.18
  * @file        jquery.dataTables.js
  * @author      SpryMedia Ltd
  * @contact     www.datatables.net
- * @copyright   Copyright 2008-2017 SpryMedia Ltd.
+ * @copyright   Copyright 2008-2018 SpryMedia Ltd.
  *
  * This source file is free software, available under the following license:
  *   MIT license - http://datatables.net/license
@@ -90,18 +90,18 @@
      *  @example
      *    // Basic initialisation
      *    $(document).ready( function {
-	 *      $('#example').dataTable();
-	 *    } );
+     *      $('#example').dataTable();
+     *    } );
      *
      *  @example
      *    // Initialisation with configuration options - in this case, disable
      *    // pagination and sorting.
      *    $(document).ready( function {
-	 *      $('#example').dataTable( {
-	 *        "paginate": false,
-	 *        "sort": false
-	 *      } );
-	 *    } );
+     *      $('#example').dataTable( {
+     *        "paginate": false,
+     *        "sort": false
+     *      } );
+     *    } );
      */
     var DataTable = function ( options )
     {
@@ -124,22 +124,22 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Highlight every second row
-		 *      oTable.$('tr:odd').css('backgroundColor', 'blue');
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Highlight every second row
+         *      oTable.$('tr:odd').css('backgroundColor', 'blue');
+         *    } );
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Filter to rows with 'Webkit' in them, add a background colour and then
-		 *      // remove the filter, thus highlighting the 'Webkit' rows only.
-		 *      oTable.fnFilter('Webkit');
-		 *      oTable.$('tr', {"search": "applied"}).css('backgroundColor', 'blue');
-		 *      oTable.fnFilter('');
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Filter to rows with 'Webkit' in them, add a background colour and then
+         *      // remove the filter, thus highlighting the 'Webkit' rows only.
+         *      oTable.fnFilter('Webkit');
+         *      oTable.$('tr', {"search": "applied"}).css('backgroundColor', 'blue');
+         *      oTable.fnFilter('');
+         *    } );
          */
         this.$ = function ( sSelector, oOpts )
         {
@@ -174,26 +174,26 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Get the data from the first row in the table
-		 *      var data = oTable._('tr:first');
-		 *
-		 *      // Do something useful with the data
-		 *      alert( "First cell is: "+data[0] );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Get the data from the first row in the table
+         *      var data = oTable._('tr:first');
+         *
+         *      // Do something useful with the data
+         *      alert( "First cell is: "+data[0] );
+         *    } );
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Filter to 'Webkit' and get all data for
-		 *      oTable.fnFilter('Webkit');
-		 *      var data = oTable._('tr', {"search": "applied"});
-		 *
-		 *      // Do something with the data
-		 *      alert( data.length+" rows matched the search" );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Filter to 'Webkit' and get all data for
+         *      oTable.fnFilter('Webkit');
+         *      var data = oTable._('tr', {"search": "applied"});
+         *
+         *      // Do something with the data
+         *      alert( data.length+" rows matched the search" );
+         *    } );
          */
         this._ = function ( sSelector, oOpts )
         {
@@ -244,19 +244,19 @@
          *    var giCount = 2;
          *
          *    $(document).ready(function() {
-		 *      $('#example').dataTable();
-		 *    } );
+         *      $('#example').dataTable();
+         *    } );
          *
          *    function fnClickAddRow() {
-		 *      $('#example').dataTable().fnAddData( [
-		 *        giCount+".1",
-		 *        giCount+".2",
-		 *        giCount+".3",
-		 *        giCount+".4" ]
-		 *      );
-		 *
-		 *      giCount++;
-		 *    }
+         *      $('#example').dataTable().fnAddData( [
+         *        giCount+".1",
+         *        giCount+".2",
+         *        giCount+".3",
+         *        giCount+".4" ]
+         *      );
+         *
+         *      giCount++;
+         *    }
          */
         this.fnAddData = function( data, redraw )
         {
@@ -286,15 +286,15 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable( {
-		 *        "sScrollY": "200px",
-		 *        "bPaginate": false
-		 *      } );
-		 *
-		 *      $(window).on('resize', function () {
-		 *        oTable.fnAdjustColumnSizing();
-		 *      } );
-		 *    } );
+         *      var oTable = $('#example').dataTable( {
+         *        "sScrollY": "200px",
+         *        "bPaginate": false
+         *      } );
+         *
+         *      $(window).on('resize', function () {
+         *        oTable.fnAdjustColumnSizing();
+         *      } );
+         *    } );
          */
         this.fnAdjustColumnSizing = function ( bRedraw )
         {
@@ -320,11 +320,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Immediately 'nuke' the current rows (perhaps waiting for an Ajax callback...)
-		 *      oTable.fnClearTable();
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Immediately 'nuke' the current rows (perhaps waiting for an Ajax callback...)
+         *      oTable.fnClearTable();
+         *    } );
          */
         this.fnClearTable = function( bRedraw )
         {
@@ -346,19 +346,19 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable;
-		 *
-		 *      // 'open' an information row when a row is clicked on
-		 *      $('#example tbody tr').click( function () {
-		 *        if ( oTable.fnIsOpen(this) ) {
-		 *          oTable.fnClose( this );
-		 *        } else {
-		 *          oTable.fnOpen( this, "Temporary row opened", "info_row" );
-		 *        }
-		 *      } );
-		 *
-		 *      oTable = $('#example').dataTable();
-		 *    } );
+         *      var oTable;
+         *
+         *      // 'open' an information row when a row is clicked on
+         *      $('#example tbody tr').click( function () {
+         *        if ( oTable.fnIsOpen(this) ) {
+         *          oTable.fnClose( this );
+         *        } else {
+         *          oTable.fnOpen( this, "Temporary row opened", "info_row" );
+         *        }
+         *      } );
+         *
+         *      oTable = $('#example').dataTable();
+         *    } );
          */
         this.fnClose = function( nTr )
         {
@@ -378,11 +378,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Immediately remove the first row
-		 *      oTable.fnDeleteRow( 0 );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Immediately remove the first row
+         *      oTable.fnDeleteRow( 0 );
+         *    } );
          */
         this.fnDeleteRow = function( target, callback, redraw )
         {
@@ -414,10 +414,10 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      // This example is fairly pointless in reality, but shows how fnDestroy can be used
-		 *      var oTable = $('#example').dataTable();
-		 *      oTable.fnDestroy();
-		 *    } );
+         *      // This example is fairly pointless in reality, but shows how fnDestroy can be used
+         *      var oTable = $('#example').dataTable();
+         *      oTable.fnDestroy();
+         *    } );
          */
         this.fnDestroy = function ( remove )
         {
@@ -433,11 +433,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Re-draw the table - you wouldn't want to do it here, but it's an example :-)
-		 *      oTable.fnDraw();
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Re-draw the table - you wouldn't want to do it here, but it's an example :-)
+         *      oTable.fnDraw();
+         *    } );
          */
         this.fnDraw = function( complete )
         {
@@ -460,11 +460,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Sometime later - filter...
-		 *      oTable.fnFilter( 'test string' );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Sometime later - filter...
+         *      oTable.fnFilter( 'test string' );
+         *    } );
          */
         this.fnFilter = function( sInput, iColumn, bRegex, bSmart, bShowGlobal, bCaseInsensitive )
         {
@@ -499,24 +499,24 @@
          *  @example
          *    // Row data
          *    $(document).ready(function() {
-		 *      oTable = $('#example').dataTable();
-		 *
-		 *      oTable.$('tr').click( function () {
-		 *        var data = oTable.fnGetData( this );
-		 *        // ... do something with the array / object of data for the row
-		 *      } );
-		 *    } );
+         *      oTable = $('#example').dataTable();
+         *
+         *      oTable.$('tr').click( function () {
+         *        var data = oTable.fnGetData( this );
+         *        // ... do something with the array / object of data for the row
+         *      } );
+         *    } );
          *
          *  @example
          *    // Individual cell data
          *    $(document).ready(function() {
-		 *      oTable = $('#example').dataTable();
-		 *
-		 *      oTable.$('td').click( function () {
-		 *        var sData = oTable.fnGetData( this );
-		 *        alert( 'The cell clicked on had the value of '+sData );
-		 *      } );
-		 *    } );
+         *      oTable = $('#example').dataTable();
+         *
+         *      oTable.$('td').click( function () {
+         *        var sData = oTable.fnGetData( this );
+         *        alert( 'The cell clicked on had the value of '+sData );
+         *      } );
+         *    } );
          */
         this.fnGetData = function( src, col )
         {
@@ -546,11 +546,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Get the nodes from the table
-		 *      var nNodes = oTable.fnGetNodes( );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Get the nodes from the table
+         *      var nNodes = oTable.fnGetNodes( );
+         *    } );
          */
         this.fnGetNodes = function( iRow )
         {
@@ -574,21 +574,21 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      $('#example tbody td').click( function () {
-		 *        // Get the position of the current data from the node
-		 *        var aPos = oTable.fnGetPosition( this );
-		 *
-		 *        // Get the data array for this row
-		 *        var aData = oTable.fnGetData( aPos[0] );
-		 *
-		 *        // Update the data array and return the value
-		 *        aData[ aPos[1] ] = 'clicked';
-		 *        this.innerHTML = 'clicked';
-		 *      } );
-		 *
-		 *      // Init DataTables
-		 *      oTable = $('#example').dataTable();
-		 *    } );
+         *      $('#example tbody td').click( function () {
+         *        // Get the position of the current data from the node
+         *        var aPos = oTable.fnGetPosition( this );
+         *
+         *        // Get the data array for this row
+         *        var aData = oTable.fnGetData( aPos[0] );
+         *
+         *        // Update the data array and return the value
+         *        aData[ aPos[1] ] = 'clicked';
+         *        this.innerHTML = 'clicked';
+         *      } );
+         *
+         *      // Init DataTables
+         *      oTable = $('#example').dataTable();
+         *    } );
          */
         this.fnGetPosition = function( node )
         {
@@ -620,19 +620,19 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable;
-		 *
-		 *      // 'open' an information row when a row is clicked on
-		 *      $('#example tbody tr').click( function () {
-		 *        if ( oTable.fnIsOpen(this) ) {
-		 *          oTable.fnClose( this );
-		 *        } else {
-		 *          oTable.fnOpen( this, "Temporary row opened", "info_row" );
-		 *        }
-		 *      } );
-		 *
-		 *      oTable = $('#example').dataTable();
-		 *    } );
+         *      var oTable;
+         *
+         *      // 'open' an information row when a row is clicked on
+         *      $('#example tbody tr').click( function () {
+         *        if ( oTable.fnIsOpen(this) ) {
+         *          oTable.fnClose( this );
+         *        } else {
+         *          oTable.fnOpen( this, "Temporary row opened", "info_row" );
+         *        }
+         *      } );
+         *
+         *      oTable = $('#example').dataTable();
+         *    } );
          */
         this.fnIsOpen = function( nTr )
         {
@@ -656,19 +656,19 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable;
-		 *
-		 *      // 'open' an information row when a row is clicked on
-		 *      $('#example tbody tr').click( function () {
-		 *        if ( oTable.fnIsOpen(this) ) {
-		 *          oTable.fnClose( this );
-		 *        } else {
-		 *          oTable.fnOpen( this, "Temporary row opened", "info_row" );
-		 *        }
-		 *      } );
-		 *
-		 *      oTable = $('#example').dataTable();
-		 *    } );
+         *      var oTable;
+         *
+         *      // 'open' an information row when a row is clicked on
+         *      $('#example tbody tr').click( function () {
+         *        if ( oTable.fnIsOpen(this) ) {
+         *          oTable.fnClose( this );
+         *        } else {
+         *          oTable.fnOpen( this, "Temporary row opened", "info_row" );
+         *        }
+         *      } );
+         *
+         *      oTable = $('#example').dataTable();
+         *    } );
          */
         this.fnOpen = function( nTr, mHtml, sClass )
         {
@@ -692,9 +692,9 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *      oTable.fnPageChange( 'next' );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *      oTable.fnPageChange( 'next' );
+         *    } );
          */
         this.fnPageChange = function ( mAction, bRedraw )
         {
@@ -716,11 +716,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Hide the second column after initialisation
-		 *      oTable.fnSetColumnVis( 1, false );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Hide the second column after initialisation
+         *      oTable.fnSetColumnVis( 1, false );
+         *    } );
          */
         this.fnSetColumnVis = function ( iCol, bShow, bRedraw )
         {
@@ -741,12 +741,12 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *      var oSettings = oTable.fnSettings();
-		 *
-		 *      // Show an example parameter from the settings
-		 *      alert( oSettings._iDisplayStart );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *      var oSettings = oTable.fnSettings();
+         *
+         *      // Show an example parameter from the settings
+         *      alert( oSettings._iDisplayStart );
+         *    } );
          */
         this.fnSettings = function()
         {
@@ -763,11 +763,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Sort immediately with columns 0 and 1
-		 *      oTable.fnSort( [ [0,'asc'], [1,'asc'] ] );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Sort immediately with columns 0 and 1
+         *      oTable.fnSort( [ [0,'asc'], [1,'asc'] ] );
+         *    } );
          */
         this.fnSort = function( aaSort )
         {
@@ -785,11 +785,11 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *
-		 *      // Sort on column 1, when 'sorter' is clicked on
-		 *      oTable.fnSortListener( document.getElementById('sorter'), 1 );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *
+         *      // Sort on column 1, when 'sorter' is clicked on
+         *      oTable.fnSortListener( document.getElementById('sorter'), 1 );
+         *    } );
          */
         this.fnSortListener = function( nNode, iColumn, fnCallback )
         {
@@ -814,10 +814,10 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *      oTable.fnUpdate( 'Example update', 0, 0 ); // Single cell
-		 *      oTable.fnUpdate( ['a', 'b', 'c', 'd', 'e'], $('tbody tr')[0] ); // Row
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *      oTable.fnUpdate( 'Example update', 0, 0 ); // Single cell
+         *      oTable.fnUpdate( ['a', 'b', 'c', 'd', 'e'], $('tbody tr')[0] ); // Row
+         *    } );
          */
         this.fnUpdate = function( mData, mRow, iColumn, bRedraw, bAction )
         {
@@ -854,9 +854,9 @@
          *
          *  @example
          *    $(document).ready(function() {
-		 *      var oTable = $('#example').dataTable();
-		 *      alert( oTable.fnVersionCheck( '1.9.0' ) );
-		 *    } );
+         *      var oTable = $('#example').dataTable();
+         *      alert( oTable.fnVersionCheck( '1.9.0' ) );
+         *    } );
          */
         this.fnVersionCheck = _ext.fnVersionCheck;
 
@@ -921,8 +921,11 @@
                 var s = allSettings[i];
 
                 /* Base check on table node */
-                if ( s.nTable == this || s.nTHead.parentNode == this || (s.nTFoot && s.nTFoot.parentNode == this) )
-                {
+                if (
+                    s.nTable == this ||
+                    (s.nTHead && s.nTHead.parentNode == this) ||
+                    (s.nTFoot && s.nTFoot.parentNode == this)
+                ) {
                     var bRetrieve = oInit.bRetrieve !== undefined ? oInit.bRetrieve : defaults.bRetrieve;
                     var bDestroy = oInit.bDestroy !== undefined ? oInit.bDestroy : defaults.bDestroy;
 
@@ -979,11 +982,7 @@
 
             // Backwards compatibility, before we apply all the defaults
             _fnCompatOpts( oInit );
-
-            if ( oInit.oLanguage )
-            {
-                _fnLanguageCompat( oInit.oLanguage );
-            }
+            _fnLanguageCompat( oInit.oLanguage );
 
             // If the length menu is given, but the init display length is not, use the length menu
             if ( oInit.aLengthMenu && ! oInit.iDisplayLength )
@@ -1126,8 +1125,8 @@
             var stripeClasses = oSettings.asStripeClasses;
             var rowOne = $this.children('tbody').find('tr').eq(0);
             if ( $.inArray( true, $.map( stripeClasses, function(el, i) {
-                    return rowOne.hasClass(el);
-                } ) ) !== -1 ) {
+                return rowOne.hasClass(el);
+            } ) ) !== -1 ) {
                 $('tbody tr', this).removeClass( stripeClasses.join(' ') );
                 oSettings.asDestroyStripes = stripeClasses.slice();
             }
@@ -1366,8 +1365,10 @@
     // - fr - Swiss Franc
     // - kr - Swedish krona, Norwegian krone and Danish krone
     // - \u2009 is thin space and \u202F is narrow no-break space, both used in many
+    // - Ƀ - Bitcoin
+    // - Ξ - Ethereum
     //   standards as thousands separators.
-    var _re_formatted_numeric = /[',$£€¥%\u2009\u202F\u20BD\u20a9\u20BArfk]/gi;
+    var _re_formatted_numeric = /[',$£€¥%\u2009\u202F\u20BD\u20a9\u20BArfkɃΞ]/gi;
 
 
     var _empty = function ( d ) {
@@ -1742,33 +1743,43 @@
      */
     function _fnLanguageCompat( lang )
     {
+        // Note the use of the Hungarian notation for the parameters in this method as
+        // this is called after the mapping of camelCase to Hungarian
         var defaults = DataTable.defaults.oLanguage;
-        var zeroRecords = lang.sZeroRecords;
 
-        /* Backwards compatibility - if there is no sEmptyTable given, then use the same as
-		 * sZeroRecords - assuming that is given.
-		 */
-        if ( ! lang.sEmptyTable && zeroRecords &&
-            defaults.sEmptyTable === "No data available in table" )
-        {
-            _fnMap( lang, lang, 'sZeroRecords', 'sEmptyTable' );
+        // Default mapping
+        var defaultDecimal = defaults.sDecimal;
+        if ( defaultDecimal ) {
+            _addNumericSort( defaultDecimal );
         }
 
-        /* Likewise with loading records */
-        if ( ! lang.sLoadingRecords && zeroRecords &&
-            defaults.sLoadingRecords === "Loading..." )
-        {
-            _fnMap( lang, lang, 'sZeroRecords', 'sLoadingRecords' );
-        }
+        if ( lang ) {
+            var zeroRecords = lang.sZeroRecords;
 
-        // Old parameter name of the thousands separator mapped onto the new
-        if ( lang.sInfoThousands ) {
-            lang.sThousands = lang.sInfoThousands;
-        }
+            // Backwards compatibility - if there is no sEmptyTable given, then use the same as
+            // sZeroRecords - assuming that is given.
+            if ( ! lang.sEmptyTable && zeroRecords &&
+                defaults.sEmptyTable === "No data available in table" )
+            {
+                _fnMap( lang, lang, 'sZeroRecords', 'sEmptyTable' );
+            }
 
-        var decimal = lang.sDecimal;
-        if ( decimal ) {
-            _addNumericSort( decimal );
+            // Likewise with loading records
+            if ( ! lang.sLoadingRecords && zeroRecords &&
+                defaults.sLoadingRecords === "Loading..." )
+            {
+                _fnMap( lang, lang, 'sZeroRecords', 'sLoadingRecords' );
+            }
+
+            // Old parameter name of the thousands separator mapped onto the new
+            if ( lang.sInfoThousands ) {
+                lang.sThousands = lang.sInfoThousands;
+            }
+
+            var decimal = lang.sDecimal;
+            if ( decimal && defaultDecimal !== decimal ) {
+                _addNumericSort( decimal );
+            }
         }
     }
 
@@ -2608,7 +2619,7 @@
             };
         }
         else if ( typeof mSource === 'string' && (mSource.indexOf('.') !== -1 ||
-                mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
+            mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
         {
             /* If there is a . in the source string then the data source is in a
 			 * nested object so we loop over the data for each level to get the next
@@ -2723,7 +2734,7 @@
             };
         }
         else if ( typeof mSource === 'string' && (mSource.indexOf('.') !== -1 ||
-                mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
+            mSource.indexOf('[') !== -1 || mSource.indexOf('(') !== -1) )
         {
             /* Like the get, we need to get data from a nested object */
             var setData = function (data, val, src) {
@@ -3140,7 +3151,7 @@
                 }
             }
 
-            _fnCallbackFire( oSettings, 'aoRowCreatedCallback', null, [nTr, rowData, iRow] );
+            _fnCallbackFire( oSettings, 'aoRowCreatedCallback', null, [nTr, rowData, iRow, cells] );
         }
 
         // Remove once webkit bug 131819 and Chromium bug 365619 have been resolved
@@ -3465,7 +3476,7 @@
                 // iRowCount and j are not currently documented. Are they at all
                 // useful?
                 _fnCallbackFire( oSettings, 'aoRowCallback', null,
-                    [nRow, aoData._aData, iRowCount, j] );
+                    [nRow, aoData._aData, iRowCount, j, iDataIndex] );
 
                 anRows.push( nRow );
                 iRowCount++;
@@ -3869,12 +3880,12 @@
         {
             ajaxData = ajax.data;
 
-            var newData = $.isFunction( ajaxData ) ?
+            var newData = typeof ajaxData === 'function' ?
                 ajaxData( data, oSettings ) :  // fn can manipulate data or return
                 ajaxData;                      // an object object or array to merge
 
             // If the function returned something, use that alone
-            data = $.isFunction( ajaxData ) && newData ?
+            data = typeof ajaxData === 'function' && newData ?
                 newData :
                 $.extend( true, data, newData );
 
@@ -3938,7 +3949,7 @@
                 url: ajax || oSettings.sAjaxSource
             } ) );
         }
-        else if ( $.isFunction( ajax ) )
+        else if ( typeof ajax === 'function' )
         {
             // Is a function - let the caller define what needs to be done
             oSettings.jqXHR = ajax.call( instance, data, callback, oSettings );
@@ -5306,7 +5317,7 @@
             // - which is shouldn't. When there is a scrollbar we need to take this
             // into account.
             if ( ie67 && (table.find('tbody').height() > divBodyEl.offsetHeight ||
-                    divBody.css('overflow-y') == "scroll")
+                divBody.css('overflow-y') == "scroll")
             ) {
                 tableStyle.width = _fnStringToCss( table.outerWidth() - barWidth);
             }
@@ -5372,14 +5383,18 @@
         // both match, but we want to hide it completely. We want to also fix their
         // width to what they currently are
         _fnApplyToChildren( function(nSizer, i) {
-            nSizer.innerHTML = '<div class="dataTables_sizing" style="height:0;overflow:hidden;">'+headerContent[i]+'</div>';
+            nSizer.innerHTML = '<div class="dataTables_sizing">'+headerContent[i]+'</div>';
+            nSizer.childNodes[0].style.height = "0";
+            nSizer.childNodes[0].style.overflow = "hidden";
             nSizer.style.width = headerWidths[i];
         }, headerSrcEls );
 
         if ( footer )
         {
             _fnApplyToChildren( function(nSizer, i) {
-                nSizer.innerHTML = '<div class="dataTables_sizing" style="height:0;overflow:hidden;">'+footerContent[i]+'</div>';
+                nSizer.innerHTML = '<div class="dataTables_sizing">'+footerContent[i]+'</div>';
+                nSizer.childNodes[0].style.height = "0";
+                nSizer.childNodes[0].style.overflow = "hidden";
                 nSizer.style.width = footerWidths[i];
             }, footerSrcEls );
         }
@@ -5396,7 +5411,7 @@
 
             // IE6/7 are a law unto themselves...
             if ( ie67 && (divBodyEl.scrollHeight >
-                    divBodyEl.offsetHeight || divBody.css('overflow-y') == "scroll")
+                divBodyEl.offsetHeight || divBody.css('overflow-y') == "scroll")
             ) {
                 tableStyle.width = _fnStringToCss( correction-barWidth );
             }
@@ -6573,7 +6588,7 @@
     {
         $(n)
             .on( 'click.DT', oData, function (e) {
-                n.blur(); // Remove focus outline for mouse users
+                $(n).blur(); // Remove focus outline for mouse users
                 fn(e);
             } )
             .on( 'keypress.DT', oData, function (e){
@@ -6726,25 +6741,25 @@
      *
      *     [
      *       {
-	 *         name:      'data'                -- string   - Property name
-	 *         val:       function () {},       -- function - Api method (or undefined if just an object
-	 *         methodExt: [ ... ],              -- array    - Array of Api object definitions to extend the method result
-	 *         propExt:   [ ... ]               -- array    - Array of Api object definitions to extend the property
-	 *       },
+     *         name:      'data'                -- string   - Property name
+     *         val:       function () {},       -- function - Api method (or undefined if just an object
+     *         methodExt: [ ... ],              -- array    - Array of Api object definitions to extend the method result
+     *         propExt:   [ ... ]               -- array    - Array of Api object definitions to extend the property
+     *       },
      *       {
-	 *         name:     'row'
-	 *         val:       {},
-	 *         methodExt: [ ... ],
-	 *         propExt:   [
-	 *           {
-	 *             name:      'data'
-	 *             val:       function () {},
-	 *             methodExt: [ ... ],
-	 *             propExt:   [ ... ]
-	 *           },
-	 *           ...
-	 *         ]
-	 *       }
+     *         name:     'row'
+     *         val:       {},
+     *         methodExt: [ ... ],
+     *         propExt:   [
+     *           {
+     *             name:      'data'
+     *             val:       function () {},
+     *             methodExt: [ ... ],
+     *             propExt:   [ ... ]
+     *           },
+     *           ...
+     *         ]
+     *       }
      *     ]
      *
      * @type {Array}
@@ -7813,13 +7828,26 @@
             }
         }
         else if ( order == 'current' || order == 'applied' ) {
-            a = search == 'none' ?
-                displayMaster.slice() :                      // no search
-                search == 'applied' ?
-                    displayFiltered.slice() :                // applied search
-                    $.map( displayMaster, function (el, i) { // removed search
-                        return $.inArray( el, displayFiltered ) === -1 ? el : null;
-                    } );
+            if ( search == 'none') {
+                a = displayMaster.slice();
+            }
+            else if ( search == 'applied' ) {
+                a = displayFiltered.slice();
+            }
+            else if ( search == 'removed' ) {
+                // O(n+m) solution by creating a hash map
+                var displayFilteredMap = {};
+
+                for ( var i=0, ien=displayFiltered.length ; i<ien ; i++ ) {
+                    displayFilteredMap[displayFiltered[i]] = null;
+                }
+
+                a = $.map( displayMaster, function (el) {
+                    return ! displayFilteredMap.hasOwnProperty(el) ?
+                        el :
+                        null;
+                } );
+            }
         }
         else if ( order == 'index' || order == 'original' ) {
             for ( i=0, ien=settings.aoData.length ; i<ien ; i++ ) {
@@ -7852,14 +7880,13 @@
 	 * {array}     - jQuery array of nodes, or simply an array of TR nodes
 	 *
 	 */
-
-
     var __row_selector = function ( settings, selector, opts )
     {
         var rows;
         var run = function ( sel ) {
             var selInt = _intVal( sel );
             var i, ien;
+            var aoData = settings.aoData;
 
             // Short cut - selector is a number and no options provided (default is
             // all records, so no need to check if the index is in there, since it
@@ -7884,23 +7911,26 @@
             // Selector - function
             if ( typeof sel === 'function' ) {
                 return $.map( rows, function (idx) {
-                    var row = settings.aoData[ idx ];
+                    var row = aoData[ idx ];
                     return sel( idx, row._aData, row.nTr ) ? idx : null;
                 } );
             }
 
-            // Get nodes in the order from the `rows` array with null values removed
-            var nodes = _removeEmpty(
-                _pluck_order( settings.aoData, rows, 'nTr' )
-            );
-
             // Selector - node
             if ( sel.nodeName ) {
-                if ( sel._DT_RowIndex !== undefined ) {
-                    return [ sel._DT_RowIndex ]; // Property added by DT for fast lookup
+                var rowIdx = sel._DT_RowIndex;  // Property added by DT for fast lookup
+                var cellIdx = sel._DT_CellIndex;
+
+                if ( rowIdx !== undefined ) {
+                    // Make sure that the row is actually still present in the table
+                    return aoData[ rowIdx ] && aoData[ rowIdx ].nTr === sel ?
+                        [ rowIdx ] :
+                        [];
                 }
-                else if ( sel._DT_CellIndex ) {
-                    return [ sel._DT_CellIndex.row ];
+                else if ( cellIdx ) {
+                    return aoData[ cellIdx.row ] && aoData[ cellIdx.row ].nTr === sel ?
+                        [ cellIdx.row ] :
+                        [];
                 }
                 else {
                     var host = $(sel).closest('*[data-dt-row]');
@@ -7929,6 +7959,11 @@
                 // need to fall through to jQuery in case there is DOM id that
                 // matches
             }
+
+            // Get nodes in the order from the `rows` array with null values removed
+            var nodes = _removeEmpty(
+                _pluck_order( settings.aoData, rows, 'nTr' )
+            );
 
             // Selector - jQuery selector string, array of nodes or jQuery object/
             // As jQuery's .filter() allows jQuery objects to be passed in filter,
@@ -8123,7 +8158,13 @@
         }
 
         // Set
-        ctx[0].aoData[ this[0] ]._aData = data;
+        var row = ctx[0].aoData[ this[0] ];
+        row._aData = data;
+
+        // If the DOM has an id, and the data source is an array
+        if ( $.isArray( data ) && row.nTr.id ) {
+            _fnSetObjectDataFn( ctx[0].rowId )( data, row.nTr.id );
+        }
 
         // Automatically invalidate
         _fnInvalidate( ctx[0], this[0], 'data' );
@@ -8549,6 +8590,12 @@
         _fnDrawHead( settings, settings.aoHeader );
         _fnDrawHead( settings, settings.aoFooter );
 
+        // Update colspan for no records display. Child rows and extensions will use their own
+        // listeners to do this - only need to update the empty table item here
+        if ( ! settings.aiDisplay.length ) {
+            $(settings.nTBody).find('td[colspan]').attr('colspan', _fnVisbleColumns(settings));
+        }
+
         _fnSaveState( settings );
     };
 
@@ -8714,7 +8761,10 @@
 
             // Selector - index
             if ( $.isPlainObject( s ) ) {
-                return [s];
+                // Valid cell index and its in the array of selectable rows
+                return s.column !== undefined && s.row !== undefined && $.inArray( s.row, rows ) !== -1 ?
+                    [s] :
+                    [];
             }
 
             // Selector - jQuery filtered cells
@@ -8778,11 +8828,11 @@
         }
 
         // Row + column selector
-        var columns = this.columns( columnSelector, opts );
-        var rows = this.rows( rowSelector, opts );
+        var columns = this.columns( columnSelector );
+        var rows = this.rows( rowSelector );
         var a, i, ien, j, jen;
 
-        var cells = this.iterator( 'table', function ( settings, idx ) {
+        this.iterator( 'table', function ( settings, idx ) {
             a = [];
 
             for ( i=0, ien=rows[idx].length ; i<ien ; i++ ) {
@@ -8793,9 +8843,10 @@
                     } );
                 }
             }
-
-            return a;
         }, 1 );
+
+        // Now pass through the cell selector for options
+        var cells = this.cells( a, opts );
 
         $.extend( cells.selector, {
             cols: columnSelector,
@@ -9134,8 +9185,8 @@
      *
      *  @example
      *    if ( ! $.fn.DataTable.isDataTable( '#example' ) ) {
-	 *      $('#example').dataTable();
-	 *    }
+     *      $('#example').dataTable();
+     *    }
      */
     DataTable.isDataTable = DataTable.fnIsDataTable = function ( table )
     {
@@ -9172,8 +9223,8 @@
      *
      *  @example
      *    $.each( $.fn.dataTable.tables(true), function () {
-	 *      $(table).DataTable().columns.adjust();
-	 *    } );
+     *      $(table).DataTable().columns.adjust();
+     *    } );
      */
     DataTable.tables = DataTable.fnTables = function ( visible )
     {
@@ -9425,7 +9476,7 @@
      *  @type string
      *  @default Version number
      */
-    DataTable.version = "1.10.16";
+    DataTable.version = "1.10.18";
 
     /**
      * Private data store, containing all of the settings objects that are
@@ -9871,50 +9922,50 @@
          *  @example
          *    // Using a 2D array data source
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "data": [
-		 *          ['Trident', 'Internet Explorer 4.0', 'Win 95+', 4, 'X'],
-		 *          ['Trident', 'Internet Explorer 5.0', 'Win 95+', 5, 'C'],
-		 *        ],
-		 *        "columns": [
-		 *          { "title": "Engine" },
-		 *          { "title": "Browser" },
-		 *          { "title": "Platform" },
-		 *          { "title": "Version" },
-		 *          { "title": "Grade" }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "data": [
+         *          ['Trident', 'Internet Explorer 4.0', 'Win 95+', 4, 'X'],
+         *          ['Trident', 'Internet Explorer 5.0', 'Win 95+', 5, 'C'],
+         *        ],
+         *        "columns": [
+         *          { "title": "Engine" },
+         *          { "title": "Browser" },
+         *          { "title": "Platform" },
+         *          { "title": "Version" },
+         *          { "title": "Grade" }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using an array of objects as a data source (`data`)
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "data": [
-		 *          {
-		 *            "engine":   "Trident",
-		 *            "browser":  "Internet Explorer 4.0",
-		 *            "platform": "Win 95+",
-		 *            "version":  4,
-		 *            "grade":    "X"
-		 *          },
-		 *          {
-		 *            "engine":   "Trident",
-		 *            "browser":  "Internet Explorer 5.0",
-		 *            "platform": "Win 95+",
-		 *            "version":  5,
-		 *            "grade":    "C"
-		 *          }
-		 *        ],
-		 *        "columns": [
-		 *          { "title": "Engine",   "data": "engine" },
-		 *          { "title": "Browser",  "data": "browser" },
-		 *          { "title": "Platform", "data": "platform" },
-		 *          { "title": "Version",  "data": "version" },
-		 *          { "title": "Grade",    "data": "grade" }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "data": [
+         *          {
+         *            "engine":   "Trident",
+         *            "browser":  "Internet Explorer 4.0",
+         *            "platform": "Win 95+",
+         *            "version":  4,
+         *            "grade":    "X"
+         *          },
+         *          {
+         *            "engine":   "Trident",
+         *            "browser":  "Internet Explorer 5.0",
+         *            "platform": "Win 95+",
+         *            "version":  5,
+         *            "grade":    "C"
+         *          }
+         *        ],
+         *        "columns": [
+         *          { "title": "Engine",   "data": "engine" },
+         *          { "title": "Browser",  "data": "browser" },
+         *          { "title": "Platform", "data": "platform" },
+         *          { "title": "Version",  "data": "version" },
+         *          { "title": "Grade",    "data": "grade" }
+         *        ]
+         *      } );
+         *    } );
          */
         "aaData": null,
 
@@ -9934,17 +9985,17 @@
          *  @example
          *    // Sort by 3rd column first, and then 4th column
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "order": [[2,'asc'], [3,'desc']]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "order": [[2,'asc'], [3,'desc']]
+         *      } );
+         *    } );
          *
          *    // No initial sorting
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "order": []
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "order": []
+         *      } );
+         *    } );
          */
         "aaSorting": [[0,'asc']],
 
@@ -9964,10 +10015,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "orderFixed": [[0,'asc']]
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "orderFixed": [[0,'asc']]
+         *      } );
+         *    } )
          */
         "aaSortingFixed": [],
 
@@ -10054,77 +10105,77 @@
          *   // Get JSON data from a file via Ajax.
          *   // Note DataTables expects data in the form `{ data: [ ...data... ] }` by default).
          *   $('#example').dataTable( {
-		 *     "ajax": "data.json"
-		 *   } );
+         *     "ajax": "data.json"
+         *   } );
          *
          * @example
          *   // Get JSON data from a file via Ajax, using `dataSrc` to change
          *   // `data` to `tableData` (i.e. `{ tableData: [ ...data... ] }`)
          *   $('#example').dataTable( {
-		 *     "ajax": {
-		 *       "url": "data.json",
-		 *       "dataSrc": "tableData"
-		 *     }
-		 *   } );
+         *     "ajax": {
+         *       "url": "data.json",
+         *       "dataSrc": "tableData"
+         *     }
+         *   } );
          *
          * @example
          *   // Get JSON data from a file via Ajax, using `dataSrc` to read data
          *   // from a plain array rather than an array in an object
          *   $('#example').dataTable( {
-		 *     "ajax": {
-		 *       "url": "data.json",
-		 *       "dataSrc": ""
-		 *     }
-		 *   } );
+         *     "ajax": {
+         *       "url": "data.json",
+         *       "dataSrc": ""
+         *     }
+         *   } );
          *
          * @example
          *   // Manipulate the data returned from the server - add a link to data
          *   // (note this can, should, be done using `render` for the column - this
          *   // is just a simple example of how the data can be manipulated).
          *   $('#example').dataTable( {
-		 *     "ajax": {
-		 *       "url": "data.json",
-		 *       "dataSrc": function ( json ) {
-		 *         for ( var i=0, ien=json.length ; i<ien ; i++ ) {
-		 *           json[i][0] = '<a href="/message/'+json[i][0]+'>View message</a>';
-		 *         }
-		 *         return json;
-		 *       }
-		 *     }
-		 *   } );
+         *     "ajax": {
+         *       "url": "data.json",
+         *       "dataSrc": function ( json ) {
+         *         for ( var i=0, ien=json.length ; i<ien ; i++ ) {
+         *           json[i][0] = '<a href="/message/'+json[i][0]+'>View message</a>';
+         *         }
+         *         return json;
+         *       }
+         *     }
+         *   } );
          *
          * @example
          *   // Add data to the request
          *   $('#example').dataTable( {
-		 *     "ajax": {
-		 *       "url": "data.json",
-		 *       "data": function ( d ) {
-		 *         return {
-		 *           "extra_search": $('#extra').val()
-		 *         };
-		 *       }
-		 *     }
-		 *   } );
+         *     "ajax": {
+         *       "url": "data.json",
+         *       "data": function ( d ) {
+         *         return {
+         *           "extra_search": $('#extra').val()
+         *         };
+         *       }
+         *     }
+         *   } );
          *
          * @example
          *   // Send request as POST
          *   $('#example').dataTable( {
-		 *     "ajax": {
-		 *       "url": "data.json",
-		 *       "type": "POST"
-		 *     }
-		 *   } );
+         *     "ajax": {
+         *       "url": "data.json",
+         *       "type": "POST"
+         *     }
+         *   } );
          *
          * @example
          *   // Get the data from localStorage (could interface with a form for
          *   // adding, editing and removing rows).
          *   $('#example').dataTable( {
-		 *     "ajax": function (data, callback, settings) {
-		 *       callback(
-		 *         JSON.parse( localStorage.getItem('dataTablesData') )
-		 *       );
-		 *     }
-		 *   } );
+         *     "ajax": function (data, callback, settings) {
+         *       callback(
+         *         JSON.parse( localStorage.getItem('dataTablesData') )
+         *       );
+         *     }
+         *   } );
          */
         "ajax": null,
 
@@ -10147,10 +10198,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+         *      } );
+         *    } );
          */
         "aLengthMenu": [ 10, 25, 50, 100 ],
 
@@ -10205,15 +10256,15 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "searchCols": [
-		 *          null,
-		 *          { "search": "My filter" },
-		 *          null,
-		 *          { "search": "^[0-9]", "escapeRegex": false }
-		 *        ]
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "searchCols": [
+         *          null,
+         *          { "search": "My filter" },
+         *          null,
+         *          { "search": "^[0-9]", "escapeRegex": false }
+         *        ]
+         *      } );
+         *    } )
          */
         "aoSearchCols": [],
 
@@ -10231,10 +10282,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stripeClasses": [ 'strip1', 'strip2', 'strip3' ]
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "stripeClasses": [ 'strip1', 'strip2', 'strip3' ]
+         *      } );
+         *    } )
          */
         "asStripeClasses": null,
 
@@ -10251,10 +10302,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "autoWidth": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "autoWidth": false
+         *      } );
+         *    } );
          */
         "bAutoWidth": true,
 
@@ -10273,11 +10324,11 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "ajax": "sources/arrays.txt",
-		 *        "deferRender": true
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "ajax": "sources/arrays.txt",
+         *        "deferRender": true
+         *      } );
+         *    } );
          */
         "bDeferRender": false,
 
@@ -10295,17 +10346,17 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "srollY": "200px",
-		 *        "paginate": false
-		 *      } );
-		 *
-		 *      // Some time later....
-		 *      $('#example').dataTable( {
-		 *        "filter": false,
-		 *        "destroy": true
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "srollY": "200px",
+         *        "paginate": false
+         *      } );
+         *
+         *      // Some time later....
+         *      $('#example').dataTable( {
+         *        "filter": false,
+         *        "destroy": true
+         *      } );
+         *    } );
          */
         "bDestroy": false,
 
@@ -10326,10 +10377,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "searching": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "searching": false
+         *      } );
+         *    } );
          */
         "bFilter": true,
 
@@ -10346,10 +10397,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "info": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "info": false
+         *      } );
+         *    } );
          */
         "bInfo": true,
 
@@ -10365,10 +10416,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "lengthChange": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "lengthChange": false
+         *      } );
+         *    } );
          */
         "bLengthChange": true,
 
@@ -10383,10 +10434,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "paging": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "paging": false
+         *      } );
+         *    } );
          */
         "bPaginate": true,
 
@@ -10404,10 +10455,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "processing": true
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "processing": true
+         *      } );
+         *    } );
          */
         "bProcessing": false,
 
@@ -10428,24 +10479,24 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      initTable();
-		 *      tableActions();
-		 *    } );
+         *      initTable();
+         *      tableActions();
+         *    } );
          *
          *    function initTable ()
          *    {
-		 *      return $('#example').dataTable( {
-		 *        "scrollY": "200px",
-		 *        "paginate": false,
-		 *        "retrieve": true
-		 *      } );
-		 *    }
+         *      return $('#example').dataTable( {
+         *        "scrollY": "200px",
+         *        "paginate": false,
+         *        "retrieve": true
+         *      } );
+         *    }
          *
          *    function tableActions ()
          *    {
-		 *      var table = initTable();
-		 *      // perform API operations with oTable
-		 *    }
+         *      var table = initTable();
+         *      // perform API operations with oTable
+         *    }
          */
         "bRetrieve": false,
 
@@ -10465,11 +10516,11 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "scrollY": "200",
-		 *        "scrollCollapse": true
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "scrollY": "200",
+         *        "scrollCollapse": true
+         *      } );
+         *    } );
          */
         "bScrollCollapse": false,
 
@@ -10487,11 +10538,11 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "serverSide": true,
-		 *        "ajax": "xhr.php"
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "serverSide": true,
+         *        "ajax": "xhr.php"
+         *      } );
+         *    } );
          */
         "bServerSide": false,
 
@@ -10507,10 +10558,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "ordering": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "ordering": false
+         *      } );
+         *    } );
          */
         "bSort": true,
 
@@ -10527,10 +10578,10 @@
          *  @example
          *    // Disable multiple column sorting ability
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "orderMulti": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "orderMulti": false
+         *      } );
+         *    } );
          */
         "bSortMulti": true,
 
@@ -10547,10 +10598,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "orderCellsTop": true
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "orderCellsTop": true
+         *      } );
+         *    } );
          */
         "bSortCellsTop": false,
 
@@ -10569,10 +10620,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "orderClasses": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "orderClasses": false
+         *      } );
+         *    } );
          */
         "bSortClasses": true,
 
@@ -10594,10 +10645,10 @@
          *
          *  @example
          *    $(document).ready( function () {
-		 *      $('#example').dataTable( {
-		 *        "stateSave": true
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "stateSave": true
+         *      } );
+         *    } );
          */
         "bStateSave": false,
 
@@ -10616,16 +10667,16 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "createdRow": function( row, data, dataIndex ) {
-		 *          // Bold the grade for all 'A' grade browsers
-		 *          if ( data[4] == "A" )
-		 *          {
-		 *            $('td:eq(4)', row).html( '<b>A</b>' );
-		 *          }
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "createdRow": function( row, data, dataIndex ) {
+         *          // Bold the grade for all 'A' grade browsers
+         *          if ( data[4] == "A" )
+         *          {
+         *            $('td:eq(4)', row).html( '<b>A</b>' );
+         *          }
+         *        }
+         *      } );
+         *    } );
          */
         "fnCreatedRow": null,
 
@@ -10641,12 +10692,12 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "drawCallback": function( settings ) {
-		 *          alert( 'DataTables has redrawn the table' );
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "drawCallback": function( settings ) {
+         *          alert( 'DataTables has redrawn the table' );
+         *        }
+         *      } );
+         *    } );
          */
         "fnDrawCallback": null,
 
@@ -10669,12 +10720,12 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "footerCallback": function( tfoot, data, start, end, display ) {
-		 *          tfoot.getElementsByTagName('th')[0].innerHTML = "Starting index is "+start;
-		 *        }
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "footerCallback": function( tfoot, data, start, end, display ) {
+         *          tfoot.getElementsByTagName('th')[0].innerHTML = "Starting index is "+start;
+         *        }
+         *      } );
+         *    } )
          */
         "fnFooterCallback": null,
 
@@ -10697,14 +10748,14 @@
          *    // Format a number using a single quote for the separator (note that
          *    // this can also be done with the language.thousands option)
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "formatNumber": function ( toFormat ) {
-		 *          return toFormat.toString().replace(
-		 *            /\B(?=(\d{3})+(?!\d))/g, "'"
-		 *          );
-		 *        };
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "formatNumber": function ( toFormat ) {
+         *          return toFormat.toString().replace(
+         *            /\B(?=(\d{3})+(?!\d))/g, "'"
+         *          );
+         *        };
+         *      } );
+         *    } );
          */
         "fnFormatNumber": function ( toFormat ) {
             return toFormat.toString().replace(
@@ -10733,12 +10784,12 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "fheaderCallback": function( head, data, start, end, display ) {
-		 *          head.getElementsByTagName('th')[0].innerHTML = "Displaying "+(end-start)+" records";
-		 *        }
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "fheaderCallback": function( head, data, start, end, display ) {
+         *          head.getElementsByTagName('th')[0].innerHTML = "Displaying "+(end-start)+" records";
+         *        }
+         *      } );
+         *    } )
          */
         "fnHeaderCallback": null,
 
@@ -10765,10 +10816,10 @@
          *
          *  @example
          *    $('#example').dataTable( {
-		 *      "infoCallback": function( settings, start, end, max, total, pre ) {
-		 *        return start +" to "+ end;
-		 *      }
-		 *    } );
+         *      "infoCallback": function( settings, start, end, max, total, pre ) {
+         *        return start +" to "+ end;
+         *      }
+         *    } );
          */
         "fnInfoCallback": null,
 
@@ -10788,12 +10839,12 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "initComplete": function(settings, json) {
-		 *          alert( 'DataTables has finished its initialisation.' );
-		 *        }
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "initComplete": function(settings, json) {
+         *          alert( 'DataTables has finished its initialisation.' );
+         *        }
+         *      } );
+         *    } )
          */
         "fnInitComplete": null,
 
@@ -10812,14 +10863,14 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "preDrawCallback": function( settings ) {
-		 *          if ( $('#test').val() == 1 ) {
-		 *            return false;
-		 *          }
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "preDrawCallback": function( settings ) {
+         *          if ( $('#test').val() == 1 ) {
+         *            return false;
+         *          }
+         *        }
+         *      } );
+         *    } );
          */
         "fnPreDrawCallback": null,
 
@@ -10840,15 +10891,15 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "rowCallback": function( row, data, displayIndex, displayIndexFull ) {
-		 *          // Bold the grade for all 'A' grade browsers
-		 *          if ( data[4] == "A" ) {
-		 *            $('td:eq(4)', row).html( '<b>A</b>' );
-		 *          }
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "rowCallback": function( row, data, displayIndex, displayIndexFull ) {
+         *          // Bold the grade for all 'A' grade browsers
+         *          if ( data[4] == "A" ) {
+         *            $('td:eq(4)', row).html( '<b>A</b>' );
+         *          }
+         *        }
+         *      } );
+         *    } );
          */
         "fnRowCallback": null,
 
@@ -10922,19 +10973,19 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stateSave": true,
-		 *        "stateLoadCallback": function (settings, callback) {
-		 *          $.ajax( {
-		 *            "url": "/state_load",
-		 *            "dataType": "json",
-		 *            "success": function (json) {
-		 *              callback( json );
-		 *            }
-		 *          } );
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "stateSave": true,
+         *        "stateLoadCallback": function (settings, callback) {
+         *          $.ajax( {
+         *            "url": "/state_load",
+         *            "dataType": "json",
+         *            "success": function (json) {
+         *              callback( json );
+         *            }
+         *          } );
+         *        }
+         *      } );
+         *    } );
          */
         "fnStateLoadCallback": function ( settings ) {
             try {
@@ -10963,24 +11014,24 @@
          *  @example
          *    // Remove a saved filter, so filtering is never loaded
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stateSave": true,
-		 *        "stateLoadParams": function (settings, data) {
-		 *          data.oSearch.sSearch = "";
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "stateSave": true,
+         *        "stateLoadParams": function (settings, data) {
+         *          data.oSearch.sSearch = "";
+         *        }
+         *      } );
+         *    } );
          *
          *  @example
          *    // Disallow state loading by returning false
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stateSave": true,
-		 *        "stateLoadParams": function (settings, data) {
-		 *          return false;
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "stateSave": true,
+         *        "stateLoadParams": function (settings, data) {
+         *          return false;
+         *        }
+         *      } );
+         *    } );
          */
         "fnStateLoadParams": null,
 
@@ -10998,13 +11049,13 @@
          *  @example
          *    // Show an alert with the filtering value that was saved
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stateSave": true,
-		 *        "stateLoaded": function (settings, data) {
-		 *          alert( 'Saved filter was: '+data.oSearch.sSearch );
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "stateSave": true,
+         *        "stateLoaded": function (settings, data) {
+         *          alert( 'Saved filter was: '+data.oSearch.sSearch );
+         *        }
+         *      } );
+         *    } );
          */
         "fnStateLoaded": null,
 
@@ -11023,20 +11074,20 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stateSave": true,
-		 *        "stateSaveCallback": function (settings, data) {
-		 *          // Send an Ajax request to the server with the state object
-		 *          $.ajax( {
-		 *            "url": "/state_save",
-		 *            "data": data,
-		 *            "dataType": "json",
-		 *            "method": "POST"
-		 *            "success": function () {}
-		 *          } );
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "stateSave": true,
+         *        "stateSaveCallback": function (settings, data) {
+         *          // Send an Ajax request to the server with the state object
+         *          $.ajax( {
+         *            "url": "/state_save",
+         *            "data": data,
+         *            "dataType": "json",
+         *            "method": "POST"
+         *            "success": function () {}
+         *          } );
+         *        }
+         *      } );
+         *    } );
          */
         "fnStateSaveCallback": function ( settings, data ) {
             try {
@@ -11064,13 +11115,13 @@
          *  @example
          *    // Remove a saved filter, so filtering is never saved
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stateSave": true,
-		 *        "stateSaveParams": function (settings, data) {
-		 *          data.oSearch.sSearch = "";
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "stateSave": true,
+         *        "stateSaveParams": function (settings, data) {
+         *          data.oSearch.sSearch = "";
+         *        }
+         *      } );
+         *    } );
          */
         "fnStateSaveParams": null,
 
@@ -11087,10 +11138,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "stateDuration": 60*60*24; // 1 day
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "stateDuration": 60*60*24; // 1 day
+         *      } );
+         *    } )
          */
         "iStateDuration": 7200,
 
@@ -11116,25 +11167,25 @@
          *  @example
          *    // 57 records available in the table, no filtering applied
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "serverSide": true,
-		 *        "ajax": "scripts/server_processing.php",
-		 *        "deferLoading": 57
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "serverSide": true,
+         *        "ajax": "scripts/server_processing.php",
+         *        "deferLoading": 57
+         *      } );
+         *    } );
          *
          *  @example
          *    // 57 records after filtering, 100 without filtering (an initial filter applied)
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "serverSide": true,
-		 *        "ajax": "scripts/server_processing.php",
-		 *        "deferLoading": [ 57, 100 ],
-		 *        "search": {
-		 *          "search": "my_filter"
-		 *        }
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "serverSide": true,
+         *        "ajax": "scripts/server_processing.php",
+         *        "deferLoading": [ 57, 100 ],
+         *        "search": {
+         *          "search": "my_filter"
+         *        }
+         *      } );
+         *    } );
          */
         "iDeferLoading": null,
 
@@ -11151,10 +11202,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "pageLength": 50
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "pageLength": 50
+         *      } );
+         *    } )
          */
         "iDisplayLength": 10,
 
@@ -11172,10 +11223,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "displayStart": 20
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "displayStart": 20
+         *      } );
+         *    } )
          */
         "iDisplayStart": 0,
 
@@ -11195,10 +11246,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "tabIndex": 1
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "tabIndex": 1
+         *      } );
+         *    } );
          */
         "iTabIndex": 0,
 
@@ -11242,14 +11293,14 @@
                  *
                  *  @example
                  *    $(document).ready( function() {
-				 *      $('#example').dataTable( {
-				 *        "language": {
-				 *          "aria": {
-				 *            "sortAscending": " - click/return to sort ascending"
-				 *          }
-				 *        }
-				 *      } );
-				 *    } );
+                 *      $('#example').dataTable( {
+                 *        "language": {
+                 *          "aria": {
+                 *            "sortAscending": " - click/return to sort ascending"
+                 *          }
+                 *        }
+                 *      } );
+                 *    } );
                  */
                 "sSortAscending": ": activate to sort column ascending",
 
@@ -11265,14 +11316,14 @@
                  *
                  *  @example
                  *    $(document).ready( function() {
-				 *      $('#example').dataTable( {
-				 *        "language": {
-				 *          "aria": {
-				 *            "sortDescending": " - click/return to sort descending"
-				 *          }
-				 *        }
-				 *      } );
-				 *    } );
+                 *      $('#example').dataTable( {
+                 *        "language": {
+                 *          "aria": {
+                 *            "sortDescending": " - click/return to sort descending"
+                 *          }
+                 *        }
+                 *      } );
+                 *    } );
                  */
                 "sSortDescending": ": activate to sort column descending"
             },
@@ -11295,14 +11346,14 @@
                  *
                  *  @example
                  *    $(document).ready( function() {
-				 *      $('#example').dataTable( {
-				 *        "language": {
-				 *          "paginate": {
-				 *            "first": "First page"
-				 *          }
-				 *        }
-				 *      } );
-				 *    } );
+                 *      $('#example').dataTable( {
+                 *        "language": {
+                 *          "paginate": {
+                 *            "first": "First page"
+                 *          }
+                 *        }
+                 *      } );
+                 *    } );
                  */
                 "sFirst": "First",
 
@@ -11318,14 +11369,14 @@
                  *
                  *  @example
                  *    $(document).ready( function() {
-				 *      $('#example').dataTable( {
-				 *        "language": {
-				 *          "paginate": {
-				 *            "last": "Last page"
-				 *          }
-				 *        }
-				 *      } );
-				 *    } );
+                 *      $('#example').dataTable( {
+                 *        "language": {
+                 *          "paginate": {
+                 *            "last": "Last page"
+                 *          }
+                 *        }
+                 *      } );
+                 *    } );
                  */
                 "sLast": "Last",
 
@@ -11341,14 +11392,14 @@
                  *
                  *  @example
                  *    $(document).ready( function() {
-				 *      $('#example').dataTable( {
-				 *        "language": {
-				 *          "paginate": {
-				 *            "next": "Next page"
-				 *          }
-				 *        }
-				 *      } );
-				 *    } );
+                 *      $('#example').dataTable( {
+                 *        "language": {
+                 *          "paginate": {
+                 *            "next": "Next page"
+                 *          }
+                 *        }
+                 *      } );
+                 *    } );
                  */
                 "sNext": "Next",
 
@@ -11364,14 +11415,14 @@
                  *
                  *  @example
                  *    $(document).ready( function() {
-				 *      $('#example').dataTable( {
-				 *        "language": {
-				 *          "paginate": {
-				 *            "previous": "Previous page"
-				 *          }
-				 *        }
-				 *      } );
-				 *    } );
+                 *      $('#example').dataTable( {
+                 *        "language": {
+                 *          "paginate": {
+                 *            "previous": "Previous page"
+                 *          }
+                 *        }
+                 *      } );
+                 *    } );
                  */
                 "sPrevious": "Previous"
             },
@@ -11389,12 +11440,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "emptyTable": "No data available in table"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "emptyTable": "No data available in table"
+             *        }
+             *      } );
+             *    } );
              */
             "sEmptyTable": "No data available in table",
 
@@ -11421,12 +11472,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "info": "Showing page _PAGE_ of _PAGES_"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "info": "Showing page _PAGE_ of _PAGES_"
+             *        }
+             *      } );
+             *    } );
              */
             "sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
 
@@ -11442,12 +11493,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "infoEmpty": "No entries to show"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "infoEmpty": "No entries to show"
+             *        }
+             *      } );
+             *    } );
              */
             "sInfoEmpty": "Showing 0 to 0 of 0 entries",
 
@@ -11464,12 +11515,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "infoFiltered": " - filtering from _MAX_ records"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "infoFiltered": " - filtering from _MAX_ records"
+             *        }
+             *      } );
+             *    } );
              */
             "sInfoFiltered": "(filtered from _MAX_ total entries)",
 
@@ -11487,12 +11538,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "infoPostFix": "All records shown are derived from real information."
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "infoPostFix": "All records shown are derived from real information."
+             *        }
+             *      } );
+             *    } );
              */
             "sInfoPostFix": "",
 
@@ -11517,13 +11568,13 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "decimal": ","
-			 *          "thousands": "."
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "decimal": ","
+             *          "thousands": "."
+             *        }
+             *      } );
+             *    } );
              */
             "sDecimal": "",
 
@@ -11541,12 +11592,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "thousands": "'"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "thousands": "'"
+             *        }
+             *      } );
+             *    } );
              */
             "sThousands": ",",
 
@@ -11565,29 +11616,29 @@
              *  @example
              *    // Language change only
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "lengthMenu": "Display _MENU_ records"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "lengthMenu": "Display _MENU_ records"
+             *        }
+             *      } );
+             *    } );
              *
              *  @example
              *    // Language and options change
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "lengthMenu": 'Display <select>'+
-			 *            '<option value="10">10</option>'+
-			 *            '<option value="20">20</option>'+
-			 *            '<option value="30">30</option>'+
-			 *            '<option value="40">40</option>'+
-			 *            '<option value="50">50</option>'+
-			 *            '<option value="-1">All</option>'+
-			 *            '</select> records'
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "lengthMenu": 'Display <select>'+
+             *            '<option value="10">10</option>'+
+             *            '<option value="20">20</option>'+
+             *            '<option value="30">30</option>'+
+             *            '<option value="40">40</option>'+
+             *            '<option value="50">50</option>'+
+             *            '<option value="-1">All</option>'+
+             *            '</select> records'
+             *        }
+             *      } );
+             *    } );
              */
             "sLengthMenu": "Show _MENU_ entries",
 
@@ -11606,12 +11657,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "loadingRecords": "Please wait - loading..."
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "loadingRecords": "Please wait - loading..."
+             *        }
+             *      } );
+             *    } );
              */
             "sLoadingRecords": "Loading...",
 
@@ -11627,12 +11678,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "processing": "DataTables is currently busy"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "processing": "DataTables is currently busy"
+             *        }
+             *      } );
+             *    } );
              */
             "sProcessing": "Processing...",
 
@@ -11652,22 +11703,22 @@
              *  @example
              *    // Input text box will be appended at the end automatically
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "search": "Filter records:"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "search": "Filter records:"
+             *        }
+             *      } );
+             *    } );
              *
              *  @example
              *    // Specify where the filter should appear
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "search": "Apply filter _INPUT_ to table"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "search": "Apply filter _INPUT_ to table"
+             *        }
+             *      } );
+             *    } );
              */
             "sSearch": "Search:",
 
@@ -11698,12 +11749,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "url": "http://www.sprymedia.co.uk/dataTables/lang.txt"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "url": "http://www.sprymedia.co.uk/dataTables/lang.txt"
+             *        }
+             *      } );
+             *    } );
              */
             "sUrl": "",
 
@@ -11720,12 +11771,12 @@
              *
              *  @example
              *    $(document).ready( function() {
-			 *      $('#example').dataTable( {
-			 *        "language": {
-			 *          "zeroRecords": "No records to display"
-			 *        }
-			 *      } );
-			 *    } );
+             *      $('#example').dataTable( {
+             *        "language": {
+             *          "zeroRecords": "No records to display"
+             *        }
+             *      } );
+             *    } );
              */
             "sZeroRecords": "No matching records found"
         },
@@ -11747,10 +11798,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "search": {"search": "Initial search"}
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "search": {"search": "Initial search"}
+         *      } );
+         *    } )
          */
         "oSearch": $.extend( {}, DataTable.models.oSearch ),
 
@@ -11841,10 +11892,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "dom": '&lt;"top"i&gt;rt&lt;"bottom"flp&gt;&lt;"clear"&gt;'
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "dom": '&lt;"top"i&gt;rt&lt;"bottom"flp&gt;&lt;"clear"&gt;'
+         *      } );
+         *    } );
          */
         "sDom": "lfrtip",
 
@@ -11861,10 +11912,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "searchDelay": 200
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "searchDelay": 200
+         *      } );
+         *    } )
          */
         "searchDelay": null,
 
@@ -11889,10 +11940,10 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "pagingType": "full_numbers"
-		 *      } );
-		 *    } )
+         *      $('#example').dataTable( {
+         *        "pagingType": "full_numbers"
+         *      } );
+         *    } )
          */
         "sPaginationType": "simple_numbers",
 
@@ -11913,11 +11964,11 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "scrollX": true,
-		 *        "scrollCollapse": true
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "scrollX": true,
+         *        "scrollCollapse": true
+         *      } );
+         *    } );
          */
         "sScrollX": "",
 
@@ -11937,11 +11988,11 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "scrollX": "100%",
-		 *        "scrollXInner": "110%"
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "scrollX": "100%",
+         *        "scrollXInner": "110%"
+         *      } );
+         *    } );
          */
         "sScrollXInner": "",
 
@@ -11961,11 +12012,11 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "scrollY": "200px",
-		 *        "paginate": false
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "scrollY": "200px",
+         *        "paginate": false
+         *      } );
+         *    } );
          */
         "sScrollY": "",
 
@@ -12046,28 +12097,28 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "orderData": [ 0, 1 ], "targets": [ 0 ] },
-		 *          { "orderData": [ 1, 0 ], "targets": [ 1 ] },
-		 *          { "orderData": 2, "targets": [ 2 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "orderData": [ 0, 1 ], "targets": [ 0 ] },
+         *          { "orderData": [ 1, 0 ], "targets": [ 1 ] },
+         *          { "orderData": 2, "targets": [ 2 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "orderData": [ 0, 1 ] },
-		 *          { "orderData": [ 1, 0 ] },
-		 *          { "orderData": 2 },
-		 *          null,
-		 *          null
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "orderData": [ 0, 1 ] },
+         *          { "orderData": [ 1, 0 ] },
+         *          { "orderData": 2 },
+         *          null,
+         *          null
+         *        ]
+         *      } );
+         *    } );
          */
         "aDataSort": null,
         "iDataSort": -1,
@@ -12086,28 +12137,28 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "orderSequence": [ "asc" ], "targets": [ 1 ] },
-		 *          { "orderSequence": [ "desc", "asc", "asc" ], "targets": [ 2 ] },
-		 *          { "orderSequence": [ "desc" ], "targets": [ 3 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "orderSequence": [ "asc" ], "targets": [ 1 ] },
+         *          { "orderSequence": [ "desc", "asc", "asc" ], "targets": [ 2 ] },
+         *          { "orderSequence": [ "desc" ], "targets": [ 3 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          null,
-		 *          { "orderSequence": [ "asc" ] },
-		 *          { "orderSequence": [ "desc", "asc", "asc" ] },
-		 *          { "orderSequence": [ "desc" ] },
-		 *          null
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          null,
+         *          { "orderSequence": [ "asc" ] },
+         *          { "orderSequence": [ "desc", "asc", "asc" ] },
+         *          { "orderSequence": [ "desc" ] },
+         *          null
+         *        ]
+         *      } );
+         *    } );
          */
         "asSorting": [ 'asc', 'desc' ],
 
@@ -12123,24 +12174,24 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "searchable": false, "targets": [ 0 ] }
-		 *        ] } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "searchable": false, "targets": [ 0 ] }
+         *        ] } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "searchable": false },
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          null
-		 *        ] } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "searchable": false },
+         *          null,
+         *          null,
+         *          null,
+         *          null
+         *        ] } );
+         *    } );
          */
         "bSearchable": true,
 
@@ -12156,24 +12207,24 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "orderable": false, "targets": [ 0 ] }
-		 *        ] } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "orderable": false, "targets": [ 0 ] }
+         *        ] } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "orderable": false },
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          null
-		 *        ] } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "orderable": false },
+         *          null,
+         *          null,
+         *          null,
+         *          null
+         *        ] } );
+         *    } );
          */
         "bSortable": true,
 
@@ -12189,24 +12240,24 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "visible": false, "targets": [ 0 ] }
-		 *        ] } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "visible": false, "targets": [ 0 ] }
+         *        ] } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "visible": false },
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          null
-		 *        ] } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "visible": false },
+         *          null,
+         *          null,
+         *          null,
+         *          null
+         *        ] } );
+         *    } );
          */
         "bVisible": true,
 
@@ -12228,17 +12279,17 @@
          *
          *  @example
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [3],
-		 *          "createdCell": function (td, cellData, rowData, row, col) {
-		 *            if ( cellData == "1.7" ) {
-		 *              $(td).css('color', 'blue')
-		 *            }
-		 *          }
-		 *        } ]
-		 *      });
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [3],
+         *          "createdCell": function (td, cellData, rowData, row, col) {
+         *            if ( cellData == "1.7" ) {
+         *              $(td).css('color', 'blue')
+         *            }
+         *          }
+         *        } ]
+         *      });
+         *    } );
          */
         "fnCreatedCell": null,
 
@@ -12324,101 +12375,101 @@
          *    // Read table data from objects
          *    // JSON structure for each row:
          *    //   {
-		 *    //      "engine": {value},
-		 *    //      "browser": {value},
-		 *    //      "platform": {value},
-		 *    //      "version": {value},
-		 *    //      "grade": {value}
-		 *    //   }
+         *    //      "engine": {value},
+         *    //      "browser": {value},
+         *    //      "platform": {value},
+         *    //      "version": {value},
+         *    //      "grade": {value}
+         *    //   }
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "ajaxSource": "sources/objects.txt",
-		 *        "columns": [
-		 *          { "data": "engine" },
-		 *          { "data": "browser" },
-		 *          { "data": "platform" },
-		 *          { "data": "version" },
-		 *          { "data": "grade" }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "ajaxSource": "sources/objects.txt",
+         *        "columns": [
+         *          { "data": "engine" },
+         *          { "data": "browser" },
+         *          { "data": "platform" },
+         *          { "data": "version" },
+         *          { "data": "grade" }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Read information from deeply nested objects
          *    // JSON structure for each row:
          *    //   {
-		 *    //      "engine": {value},
-		 *    //      "browser": {value},
-		 *    //      "platform": {
-		 *    //         "inner": {value}
-		 *    //      },
-		 *    //      "details": [
-		 *    //         {value}, {value}
-		 *    //      ]
-		 *    //   }
+         *    //      "engine": {value},
+         *    //      "browser": {value},
+         *    //      "platform": {
+         *    //         "inner": {value}
+         *    //      },
+         *    //      "details": [
+         *    //         {value}, {value}
+         *    //      ]
+         *    //   }
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "ajaxSource": "sources/deep.txt",
-		 *        "columns": [
-		 *          { "data": "engine" },
-		 *          { "data": "browser" },
-		 *          { "data": "platform.inner" },
-		 *          { "data": "platform.details.0" },
-		 *          { "data": "platform.details.1" }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "ajaxSource": "sources/deep.txt",
+         *        "columns": [
+         *          { "data": "engine" },
+         *          { "data": "browser" },
+         *          { "data": "platform.inner" },
+         *          { "data": "details.0" },
+         *          { "data": "details.1" }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `data` as a function to provide different information for
          *    // sorting, filtering and display. In this case, currency (price)
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [ 0 ],
-		 *          "data": function ( source, type, val ) {
-		 *            if (type === 'set') {
-		 *              source.price = val;
-		 *              // Store the computed dislay and filter values for efficiency
-		 *              source.price_display = val=="" ? "" : "$"+numberFormat(val);
-		 *              source.price_filter  = val=="" ? "" : "$"+numberFormat(val)+" "+val;
-		 *              return;
-		 *            }
-		 *            else if (type === 'display') {
-		 *              return source.price_display;
-		 *            }
-		 *            else if (type === 'filter') {
-		 *              return source.price_filter;
-		 *            }
-		 *            // 'sort', 'type' and undefined all just use the integer
-		 *            return source.price;
-		 *          }
-		 *        } ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [ 0 ],
+         *          "data": function ( source, type, val ) {
+         *            if (type === 'set') {
+         *              source.price = val;
+         *              // Store the computed dislay and filter values for efficiency
+         *              source.price_display = val=="" ? "" : "$"+numberFormat(val);
+         *              source.price_filter  = val=="" ? "" : "$"+numberFormat(val)+" "+val;
+         *              return;
+         *            }
+         *            else if (type === 'display') {
+         *              return source.price_display;
+         *            }
+         *            else if (type === 'filter') {
+         *              return source.price_filter;
+         *            }
+         *            // 'sort', 'type' and undefined all just use the integer
+         *            return source.price;
+         *          }
+         *        } ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using default content
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [ 0 ],
-		 *          "data": null,
-		 *          "defaultContent": "Click to edit"
-		 *        } ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [ 0 ],
+         *          "data": null,
+         *          "defaultContent": "Click to edit"
+         *        } ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using array notation - outputting a list from an array
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [ 0 ],
-		 *          "data": "name[, ]"
-		 *        } ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [ 0 ],
+         *          "data": "name[, ]"
+         *        } ]
+         *      } );
+         *    } );
          *
          */
         "mData": null,
@@ -12483,30 +12534,30 @@
          *  @example
          *    // Create a comma separated list from an array of objects
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "ajaxSource": "sources/deep.txt",
-		 *        "columns": [
-		 *          { "data": "engine" },
-		 *          { "data": "browser" },
-		 *          {
-		 *            "data": "platform",
-		 *            "render": "[, ].name"
-		 *          }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "ajaxSource": "sources/deep.txt",
+         *        "columns": [
+         *          { "data": "engine" },
+         *          { "data": "browser" },
+         *          {
+         *            "data": "platform",
+         *            "render": "[, ].name"
+         *          }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Execute a function to obtain data
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [ 0 ],
-		 *          "data": null, // Use the full data source object for the renderer's source
-		 *          "render": "browserName()"
-		 *        } ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [ 0 ],
+         *          "data": null, // Use the full data source object for the renderer's source
+         *          "render": "browserName()"
+         *        } ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // As an object, extracting different data for the different types
@@ -12516,32 +12567,32 @@
          *    // (which has both forms) is used for filtering for if a user inputs either format, while
          *    // the formatted phone number is the one that is shown in the table.
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [ 0 ],
-		 *          "data": null, // Use the full data source object for the renderer's source
-		 *          "render": {
-		 *            "_": "phone",
-		 *            "filter": "phone_filter",
-		 *            "display": "phone_display"
-		 *          }
-		 *        } ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [ 0 ],
+         *          "data": null, // Use the full data source object for the renderer's source
+         *          "render": {
+         *            "_": "phone",
+         *            "filter": "phone_filter",
+         *            "display": "phone_display"
+         *          }
+         *        } ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Use as a function to create a link from the data source
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [ 0 ],
-		 *          "data": "download_link",
-		 *          "render": function ( data, type, full ) {
-		 *            return '<a href="'+data+'">Download</a>';
-		 *          }
-		 *        } ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [ 0 ],
+         *          "data": "download_link",
+         *          "render": function ( data, type, full ) {
+         *            return '<a href="'+data+'">Download</a>';
+         *          }
+         *        } ]
+         *      } );
+         *    } );
          */
         "mRender": null,
 
@@ -12559,13 +12610,13 @@
          *  @example
          *    // Make the first column use TH cells
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [ {
-		 *          "targets": [ 0 ],
-		 *          "cellType": "th"
-		 *        } ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [ {
+         *          "targets": [ 0 ],
+         *          "cellType": "th"
+         *        } ]
+         *      } );
+         *    } );
          */
         "sCellType": "td",
 
@@ -12581,26 +12632,26 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "class": "my_class", "targets": [ 0 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "class": "my_class", "targets": [ 0 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "class": "my_class" },
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          null
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "class": "my_class" },
+         *          null,
+         *          null,
+         *          null,
+         *          null
+         *        ]
+         *      } );
+         *    } );
          */
         "sClass": "",
 
@@ -12623,17 +12674,17 @@
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          {
-		 *            "contentPadding": "mmm"
-		 *          }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          null,
+         *          null,
+         *          null,
+         *          {
+         *            "contentPadding": "mmm"
+         *          }
+         *        ]
+         *      } );
+         *    } );
          */
         "sContentPadding": "",
 
@@ -12651,32 +12702,32 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          {
-		 *            "data": null,
-		 *            "defaultContent": "Edit",
-		 *            "targets": [ -1 ]
-		 *          }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          {
+         *            "data": null,
+         *            "defaultContent": "Edit",
+         *            "targets": [ -1 ]
+         *          }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          {
-		 *            "data": null,
-		 *            "defaultContent": "Edit"
-		 *          }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          null,
+         *          null,
+         *          null,
+         *          {
+         *            "data": null,
+         *            "defaultContent": "Edit"
+         *          }
+         *        ]
+         *      } );
+         *    } );
          */
         "sDefaultContent": null,
 
@@ -12697,30 +12748,30 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "name": "engine", "targets": [ 0 ] },
-		 *          { "name": "browser", "targets": [ 1 ] },
-		 *          { "name": "platform", "targets": [ 2 ] },
-		 *          { "name": "version", "targets": [ 3 ] },
-		 *          { "name": "grade", "targets": [ 4 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "name": "engine", "targets": [ 0 ] },
+         *          { "name": "browser", "targets": [ 1 ] },
+         *          { "name": "platform", "targets": [ 2 ] },
+         *          { "name": "version", "targets": [ 3 ] },
+         *          { "name": "grade", "targets": [ 4 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "name": "engine" },
-		 *          { "name": "browser" },
-		 *          { "name": "platform" },
-		 *          { "name": "version" },
-		 *          { "name": "grade" }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "name": "engine" },
+         *          { "name": "browser" },
+         *          { "name": "platform" },
+         *          { "name": "version" },
+         *          { "name": "grade" }
+         *        ]
+         *      } );
+         *    } );
          */
         "sName": "",
 
@@ -12739,30 +12790,30 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "orderDataType": "dom-text", "targets": [ 2, 3 ] },
-		 *          { "type": "numeric", "targets": [ 3 ] },
-		 *          { "orderDataType": "dom-select", "targets": [ 4 ] },
-		 *          { "orderDataType": "dom-checkbox", "targets": [ 5 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "orderDataType": "dom-text", "targets": [ 2, 3 ] },
+         *          { "type": "numeric", "targets": [ 3 ] },
+         *          { "orderDataType": "dom-select", "targets": [ 4 ] },
+         *          { "orderDataType": "dom-checkbox", "targets": [ 5 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          null,
-		 *          null,
-		 *          { "orderDataType": "dom-text" },
-		 *          { "orderDataType": "dom-text", "type": "numeric" },
-		 *          { "orderDataType": "dom-select" },
-		 *          { "orderDataType": "dom-checkbox" }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          null,
+         *          null,
+         *          { "orderDataType": "dom-text" },
+         *          { "orderDataType": "dom-text", "type": "numeric" },
+         *          { "orderDataType": "dom-select" },
+         *          { "orderDataType": "dom-checkbox" }
+         *        ]
+         *      } );
+         *    } );
          */
         "sSortDataType": "std",
 
@@ -12779,26 +12830,26 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "title": "My column title", "targets": [ 0 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "title": "My column title", "targets": [ 0 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "title": "My column title" },
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          null
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "title": "My column title" },
+         *          null,
+         *          null,
+         *          null,
+         *          null
+         *        ]
+         *      } );
+         *    } );
          */
         "sTitle": null,
 
@@ -12820,26 +12871,26 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "type": "html", "targets": [ 0 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "type": "html", "targets": [ 0 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "type": "html" },
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          null
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "type": "html" },
+         *          null,
+         *          null,
+         *          null,
+         *          null
+         *        ]
+         *      } );
+         *    } );
          */
         "sType": null,
 
@@ -12858,26 +12909,26 @@
          *  @example
          *    // Using `columnDefs`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columnDefs": [
-		 *          { "width": "20%", "targets": [ 0 ] }
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columnDefs": [
+         *          { "width": "20%", "targets": [ 0 ] }
+         *        ]
+         *      } );
+         *    } );
          *
          *  @example
          *    // Using `columns`
          *    $(document).ready( function() {
-		 *      $('#example').dataTable( {
-		 *        "columns": [
-		 *          { "width": "20%" },
-		 *          null,
-		 *          null,
-		 *          null,
-		 *          null
-		 *        ]
-		 *      } );
-		 *    } );
+         *      $('#example').dataTable( {
+         *        "columns": [
+         *          { "width": "20%" },
+         *          null,
+         *          null,
+         *          null,
+         *          null
+         *        ]
+         *      } );
+         *    } );
          */
         "sWidth": null
     };
@@ -13847,7 +13898,7 @@
          *
          *  @type string
          */
-        build:"dt/dt-1.10.16",
+        build:"dt/dt-1.10.18/sc-2.0.0/sl-1.3.0",
 
 
         /**
@@ -13893,11 +13944,11 @@
          *
          *  @example
          *    $.fn.dataTable.ext.features.push( {
-		 *      "fnInit": function( oSettings ) {
-		 *        return new TableTools( { "oDTSettings": oSettings } );
-		 *      },
-		 *      "cFeature": "T"
-		 *    } );
+         *      "fnInit": function( oSettings ) {
+         *        return new TableTools( { "oDTSettings": oSettings } );
+         *      },
+         *      "cFeature": "T"
+         *    } );
          */
         feature: [],
 
@@ -13940,24 +13991,24 @@
          *    // from the end-user, matching the data in a certain range.
          *    $.fn.dataTable.ext.search.push(
          *      function( settings, data, dataIndex ) {
-		 *        var min = document.getElementById('min').value * 1;
-		 *        var max = document.getElementById('max').value * 1;
-		 *        var version = data[3] == "-" ? 0 : data[3]*1;
-		 *
-		 *        if ( min == "" && max == "" ) {
-		 *          return true;
-		 *        }
-		 *        else if ( min == "" && version < max ) {
-		 *          return true;
-		 *        }
-		 *        else if ( min < version && "" == max ) {
-		 *          return true;
-		 *        }
-		 *        else if ( min < version && version < max ) {
-		 *          return true;
-		 *        }
-		 *        return false;
-		 *      }
+         *        var min = document.getElementById('min').value * 1;
+         *        var max = document.getElementById('max').value * 1;
+         *        var version = data[3] == "-" ? 0 : data[3]*1;
+         *
+         *        if ( min == "" && max == "" ) {
+         *          return true;
+         *        }
+         *        else if ( min == "" && version < max ) {
+         *          return true;
+         *        }
+         *        else if ( min < version && "" == max ) {
+         *          return true;
+         *        }
+         *        else if ( min < version && version < max ) {
+         *          return true;
+         *        }
+         *        return false;
+         *      }
          *    );
          */
         search: [],
@@ -14067,8 +14118,8 @@
          *  @example
          *    // Show previous, next and current page buttons only
          *    $.fn.dataTableExt.oPagination.current = function ( page, pages ) {
-		 *      return [ 'previous', page, 'next' ];
-		 *    };
+         *      return [ 'previous', page, 'next' ];
+         *    };
          */
         pager: {},
 
@@ -14114,10 +14165,10 @@
          *    // Ordering using `input` node values
          *    $.fn.dataTable.ext.order['dom-text'] = function  ( settings, col )
          *    {
-		 *      return this.api().column( col, {order:'index'} ).nodes().map( function ( td, i ) {
-		 *        return $('input', td).val();
-		 *      } );
-		 *    }
+         *      return this.api().column( col, {order:'index'} ).nodes().map( function ( td, i ) {
+         *        return $('input', td).val();
+         *      } );
+         *    }
          */
         order: {},
 
@@ -14160,17 +14211,17 @@
              *    // Currency type detection plug-in:
              *    $.fn.dataTable.ext.type.detect.push(
              *      function ( data, settings ) {
-			 *        // Check the numeric part
-			 *        if ( ! $.isNumeric( data.substring(1) ) ) {
-			 *          return null;
-			 *        }
-			 *
-			 *        // Check prefixed by currency
-			 *        if ( data.charAt(0) == '$' || data.charAt(0) == '&pound;' ) {
-			 *          return 'currency';
-			 *        }
-			 *        return null;
-			 *      }
+             *        // Check the numeric part
+             *        if ( ! data.substring(1).match(/[0-9]/) ) {
+             *          return null;
+             *        }
+             *
+             *        // Check prefixed by currency
+             *        if ( data.charAt(0) == '$' || data.charAt(0) == '&pound;' ) {
+             *          return 'currency';
+             *        }
+             *        return null;
+             *      }
              *    );
              */
             detect: [],
@@ -14209,8 +14260,8 @@
              *
              *  @example
              *    $.fn.dataTable.ext.type.search['title-numeric'] = function ( d ) {
-			 *      return d.replace(/\n/g," ").replace( /<.*?>/g, "" );
-			 *    }
+             *      return d.replace(/\n/g," ").replace( /<.*?>/g, "" );
+             *    }
              */
             search: {},
 
@@ -14262,22 +14313,22 @@
              *  @example
              *    // Numeric ordering of formatted numbers with a pre-formatter
              *    $.extend( $.fn.dataTable.ext.type.order, {
-			 *      "string-pre": function(x) {
-			 *        a = (a === "-" || a === "") ? 0 : a.replace( /[^\d\-\.]/g, "" );
-			 *        return parseFloat( a );
-			 *      }
-			 *    } );
+             *      "string-pre": function(x) {
+             *        a = (a === "-" || a === "") ? 0 : a.replace( /[^\d\-\.]/g, "" );
+             *        return parseFloat( a );
+             *      }
+             *    } );
              *
              *  @example
              *    // Case-sensitive string ordering, with no pre-formatting method
              *    $.extend( $.fn.dataTable.ext.order, {
-			 *      "string-case-asc": function(x,y) {
-			 *        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-			 *      },
-			 *      "string-case-desc": function(x,y) {
-			 *        return ((x < y) ? 1 : ((x > y) ? -1 : 0));
-			 *      }
-			 *    } );
+             *      "string-case-asc": function(x,y) {
+             *        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+             *      },
+             *      "string-case-desc": function(x,y) {
+             *        return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+             *      }
+             *    } );
              */
             order: {}
         },
@@ -14744,7 +14795,8 @@
     $.extend( _ext.type.order, {
         // Dates
         "date-pre": function ( d ) {
-            return Date.parse( d ) || -Infinity;
+            var ts = Date.parse( d );
+            return isNaN(ts) ? -Infinity : ts;
         },
 
         // html
@@ -14891,9 +14943,9 @@
      * @example
      *   // Column definition using the number renderer
      *   {
-	 *     data: "salary",
-	 *     render: $.fn.dataTable.render.number( '\'', '.', 0, '$' )
-	 *   }
+     *     data: "salary",
+     *     render: $.fn.dataTable.render.number( '\'', '.', 0, '$' )
+     *   }
      *
      * @namespace
      */
@@ -15060,6 +15112,7 @@
         _fnRenderer: _fnRenderer,
         _fnDataSource: _fnDataSource,
         _fnRowAttributes: _fnRowAttributes,
+        _fnExtend: _fnExtend,
         _fnCalculateEnd: function () {} // Used by a lot of plug-ins, but redundant
                                         // in 1.10, so this dead-end function is
                                         // added to prevent errors
@@ -15200,17 +15253,17 @@
      *  @example
      *     // Use a custom property returned from the server in another DOM element
      *     $('#table').dataTable().on('xhr.dt', function (e, settings, json) {
-	 *       $('#status').html( json.status );
-	 *     } );
+     *       $('#status').html( json.status );
+     *     } );
      *
      *  @example
      *     // Pre-process the data returned from the server
      *     $('#table').dataTable().on('xhr.dt', function (e, settings, json) {
-	 *       for ( var i=0, ien=json.aaData.length ; i<ien ; i++ ) {
-	 *         json.aaData[i].sum = json.aaData[i].one + json.aaData[i].two;
-	 *       }
-	 *       // Note no return - manipulate the data directly in the JSON object.
-	 *     } );
+     *       for ( var i=0, ien=json.aaData.length ; i<ien ; i++ ) {
+     *         json.aaData[i].sum = json.aaData[i].one + json.aaData[i].two;
+     *       }
+     *       // Note no return - manipulate the data directly in the JSON object.
+     *     } );
      */
 
     /**
@@ -15253,4 +15306,2494 @@
 
     return $.fn.dataTable;
 }));
+
+
+/*! Scroller 2.0.0
+ * ©2011-2018 SpryMedia Ltd - datatables.net/license
+ */
+
+/**
+ * @summary     Scroller
+ * @description Virtual rendering for DataTables
+ * @version     2.0.0
+ * @file        dataTables.scroller.js
+ * @author      SpryMedia Ltd (www.sprymedia.co.uk)
+ * @contact     www.sprymedia.co.uk/contact
+ * @copyright   Copyright 2011-2018 SpryMedia Ltd.
+ *
+ * This source file is free software, available under the following license:
+ *   MIT license - http://datatables.net/license/mit
+ *
+ * This source file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
+ *
+ * For details please refer to: http://www.datatables.net
+ */
+
+(function( factory ){
+    if ( typeof define === 'function' && define.amd ) {
+        // AMD
+        define( ['jquery', 'datatables.net'], function ( $ ) {
+            return factory( $, window, document );
+        } );
+    }
+    else if ( typeof exports === 'object' ) {
+        // CommonJS
+        module.exports = function (root, $) {
+            if ( ! root ) {
+                root = window;
+            }
+
+            if ( ! $ || ! $.fn.dataTable ) {
+                $ = require('datatables.net')(root, $).$;
+            }
+
+            return factory( $, root, root.document );
+        };
+    }
+    else {
+        // Browser
+        factory( jQuery, window, document );
+    }
+}(function( $, window, document, undefined ) {
+    'use strict';
+    var DataTable = $.fn.dataTable;
+
+
+    /**
+     * Scroller is a virtual rendering plug-in for DataTables which allows large
+     * datasets to be drawn on screen every quickly. What the virtual rendering means
+     * is that only the visible portion of the table (and a bit to either side to make
+     * the scrolling smooth) is drawn, while the scrolling container gives the
+     * visual impression that the whole table is visible. This is done by making use
+     * of the pagination abilities of DataTables and moving the table around in the
+     * scrolling container DataTables adds to the page. The scrolling container is
+     * forced to the height it would be for the full table display using an extra
+     * element.
+     *
+     * Note that rows in the table MUST all be the same height. Information in a cell
+     * which expands on to multiple lines will cause some odd behaviour in the scrolling.
+     *
+     * Scroller is initialised by simply including the letter 'S' in the sDom for the
+     * table you want to have this feature enabled on. Note that the 'S' must come
+     * AFTER the 't' parameter in `dom`.
+     *
+     * Key features include:
+     *   <ul class="limit_length">
+     *     <li>Speed! The aim of Scroller for DataTables is to make rendering large data sets fast</li>
+     *     <li>Full compatibility with deferred rendering in DataTables for maximum speed</li>
+     *     <li>Display millions of rows</li>
+     *     <li>Integration with state saving in DataTables (scrolling position is saved)</li>
+     *     <li>Easy to use</li>
+     *   </ul>
+     *
+     *  @class
+     *  @constructor
+     *  @global
+     *  @param {object} dt DataTables settings object or API instance
+     *  @param {object} [opts={}] Configuration object for FixedColumns. Options
+     *    are defined by {@link Scroller.defaults}
+     *
+     *  @requires jQuery 1.7+
+     *  @requires DataTables 1.10.0+
+     *
+     *  @example
+     *    $(document).ready(function() {
+     *        $('#example').DataTable( {
+     *            "scrollY": "200px",
+     *            "ajax": "media/dataset/large.txt",
+     *            "scroller": true,
+     *            "deferRender": true
+     *        } );
+     *    } );
+     */
+    var Scroller = function ( dt, opts ) {
+        /* Sanity check - you just know it will happen */
+        if ( ! (this instanceof Scroller) ) {
+            alert( "Scroller warning: Scroller must be initialised with the 'new' keyword." );
+            return;
+        }
+
+        if ( opts === undefined ) {
+            opts = {};
+        }
+
+        var dtApi = $.fn.dataTable.Api( dt );
+
+        /**
+         * Settings object which contains customisable information for the Scroller instance
+         * @namespace
+         * @private
+         * @extends Scroller.defaults
+         */
+        this.s = {
+            /**
+             * DataTables settings object
+             *  @type     object
+             *  @default  Passed in as first parameter to constructor
+             */
+            dt: dtApi.settings()[0],
+
+            /**
+             * DataTables API instance
+             *  @type     DataTable.Api
+             */
+            dtApi: dtApi,
+
+            /**
+             * Pixel location of the top of the drawn table in the viewport
+             *  @type     int
+             *  @default  0
+             */
+            tableTop: 0,
+
+            /**
+             * Pixel location of the bottom of the drawn table in the viewport
+             *  @type     int
+             *  @default  0
+             */
+            tableBottom: 0,
+
+            /**
+             * Pixel location of the boundary for when the next data set should be loaded and drawn
+             * when scrolling up the way.
+             *  @type     int
+             *  @default  0
+             *  @private
+             */
+            redrawTop: 0,
+
+            /**
+             * Pixel location of the boundary for when the next data set should be loaded and drawn
+             * when scrolling down the way. Note that this is actually calculated as the offset from
+             * the top.
+             *  @type     int
+             *  @default  0
+             *  @private
+             */
+            redrawBottom: 0,
+
+            /**
+             * Auto row height or not indicator
+             *  @type     bool
+             *  @default  0
+             */
+            autoHeight: true,
+
+            /**
+             * Number of rows calculated as visible in the visible viewport
+             *  @type     int
+             *  @default  0
+             */
+            viewportRows: 0,
+
+            /**
+             * setTimeout reference for state saving, used when state saving is enabled in the DataTable
+             * and when the user scrolls the viewport in order to stop the cookie set taking too much
+             * CPU!
+             *  @type     int
+             *  @default  0
+             */
+            stateTO: null,
+
+            /**
+             * setTimeout reference for the redraw, used when server-side processing is enabled in the
+             * DataTables in order to prevent DoSing the server
+             *  @type     int
+             *  @default  null
+             */
+            drawTO: null,
+
+            heights: {
+                jump: null,
+                page: null,
+                virtual: null,
+                scroll: null,
+
+                /**
+                 * Height of rows in the table
+                 *  @type     int
+                 *  @default  0
+                 */
+                row: null,
+
+                /**
+                 * Pixel height of the viewport
+                 *  @type     int
+                 *  @default  0
+                 */
+                viewport: null,
+                labelFactor: 1
+            },
+
+            topRowFloat: 0,
+            scrollDrawDiff: null,
+            loaderVisible: false,
+            forceReposition: false,
+            baseRowTop: 0,
+            baseScrollTop: 0,
+            mousedown: false,
+            lastScrollTop: 0
+        };
+
+        // @todo The defaults should extend a `c` property and the internal settings
+        // only held in the `s` property. At the moment they are mixed
+        this.s = $.extend( this.s, Scroller.oDefaults, opts );
+
+        // Workaround for row height being read from height object (see above comment)
+        this.s.heights.row = this.s.rowHeight;
+
+        /**
+         * DOM elements used by the class instance
+         * @private
+         * @namespace
+         *
+         */
+        this.dom = {
+            "force":    document.createElement('div'),
+            "label":    $('<div class="dts_label">0</div>'),
+            "scroller": null,
+            "table":    null,
+            "loader":   null
+        };
+
+        // Attach the instance to the DataTables instance so it can be accessed in
+        // future. Don't initialise Scroller twice on the same table
+        if ( this.s.dt.oScroller ) {
+            return;
+        }
+
+        this.s.dt.oScroller = this;
+
+        /* Let's do it */
+        this.construct();
+    };
+
+
+
+    $.extend( Scroller.prototype, {
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Public methods - to be exposed via the DataTables API
+	 */
+
+        /**
+         * Calculate and store information about how many rows are to be displayed
+         * in the scrolling viewport, based on current dimensions in the browser's
+         * rendering. This can be particularly useful if the table is initially
+         * drawn in a hidden element - for example in a tab.
+         *  @param {bool} [redraw=true] Redraw the table automatically after the recalculation, with
+         *    the new dimensions forming the basis for the draw.
+         *  @returns {void}
+         */
+        measure: function ( redraw )
+        {
+            if ( this.s.autoHeight )
+            {
+                this._calcRowHeight();
+            }
+
+            var heights = this.s.heights;
+
+            if ( heights.row ) {
+                heights.viewport = $.contains(document, this.dom.scroller) ?
+                    this.dom.scroller.clientHeight :
+                    this._parseHeight($(this.dom.scroller).css('height'));
+
+                // If collapsed (no height) use the max-height parameter
+                if ( ! heights.viewport ) {
+                    heights.viewport = this._parseHeight($(this.dom.scroller).css('max-height'));
+                }
+
+                this.s.viewportRows = parseInt( heights.viewport / heights.row, 10 )+1;
+                this.s.dt._iDisplayLength = this.s.viewportRows * this.s.displayBuffer;
+            }
+
+            var label = this.dom.label.outerHeight();
+            heights.labelFactor = (heights.viewport-label) / heights.scroll;
+
+            if ( redraw === undefined || redraw )
+            {
+                this.s.dt.oInstance.fnDraw( false );
+            }
+        },
+
+        /**
+         * Get information about current displayed record range. This corresponds to
+         * the information usually displayed in the "Info" block of the table.
+         *
+         * @returns {object} info as an object:
+         *  {
+         *      start: {int}, // the 0-indexed record at the top of the viewport
+         *      end:   {int}, // the 0-indexed record at the bottom of the viewport
+         *  }
+         */
+        pageInfo: function()
+        {
+            var
+                dt = this.s.dt,
+                iScrollTop = this.dom.scroller.scrollTop,
+                iTotal = dt.fnRecordsDisplay(),
+                iPossibleEnd = Math.ceil(this.pixelsToRow(iScrollTop + this.s.heights.viewport, false, this.s.ani));
+
+            return {
+                start: Math.floor(this.pixelsToRow(iScrollTop, false, this.s.ani)),
+                end: iTotal < iPossibleEnd ? iTotal-1 : iPossibleEnd-1
+            };
+        },
+
+        /**
+         * Calculate the row number that will be found at the given pixel position
+         * (y-scroll).
+         *
+         * Please note that when the height of the full table exceeds 1 million
+         * pixels, Scroller switches into a non-linear mode for the scrollbar to fit
+         * all of the records into a finite area, but this function returns a linear
+         * value (relative to the last non-linear positioning).
+         *  @param {int} pixels Offset from top to calculate the row number of
+         *  @param {int} [intParse=true] If an integer value should be returned
+         *  @param {int} [virtual=false] Perform the calculations in the virtual domain
+         *  @returns {int} Row index
+         */
+        pixelsToRow: function ( pixels, intParse, virtual )
+        {
+            var diff = pixels - this.s.baseScrollTop;
+            var row = virtual ?
+                (this._domain( 'physicalToVirtual', this.s.baseScrollTop ) + diff) / this.s.heights.row :
+                ( diff / this.s.heights.row ) + this.s.baseRowTop;
+
+            return intParse || intParse === undefined ?
+                parseInt( row, 10 ) :
+                row;
+        },
+
+        /**
+         * Calculate the pixel position from the top of the scrolling container for
+         * a given row
+         *  @param {int} iRow Row number to calculate the position of
+         *  @returns {int} Pixels
+         */
+        rowToPixels: function ( rowIdx, intParse, virtual )
+        {
+            var pixels;
+            var diff = rowIdx - this.s.baseRowTop;
+
+            if ( virtual ) {
+                pixels = this._domain( 'virtualToPhysical', this.s.baseScrollTop );
+                pixels += diff * this.s.heights.row;
+            }
+            else {
+                pixels = this.s.baseScrollTop;
+                pixels += diff * this.s.heights.row;
+            }
+
+            return intParse || intParse === undefined ?
+                parseInt( pixels, 10 ) :
+                pixels;
+        },
+
+
+        /**
+         * Calculate the row number that will be found at the given pixel position (y-scroll)
+         *  @param {int} row Row index to scroll to
+         *  @param {bool} [animate=true] Animate the transition or not
+         *  @returns {void}
+         */
+        scrollToRow: function ( row, animate )
+        {
+            var that = this;
+            var ani = false;
+            var px = this.rowToPixels( row );
+
+            // We need to know if the table will redraw or not before doing the
+            // scroll. If it will not redraw, then we need to use the currently
+            // displayed table, and scroll with the physical pixels. Otherwise, we
+            // need to calculate the table's new position from the virtual
+            // transform.
+            var preRows = ((this.s.displayBuffer-1)/2) * this.s.viewportRows;
+            var drawRow = row - preRows;
+            if ( drawRow < 0 ) {
+                drawRow = 0;
+            }
+
+            if ( (px > this.s.redrawBottom || px < this.s.redrawTop) && this.s.dt._iDisplayStart !== drawRow ) {
+                ani = true;
+                px = this._domain( 'virtualToPhysical', row * this.s.heights.row );
+
+                // If we need records outside the current draw region, but the new
+                // scrolling position is inside that (due to the non-linear nature
+                // for larger numbers of records), we need to force position update.
+                if ( this.s.redrawTop < px && px < this.s.redrawBottom ) {
+                    this.s.forceReposition = true;
+                    animate = false;
+                }
+            }
+
+            if ( typeof animate == 'undefined' || animate )
+            {
+                this.s.ani = ani;
+                $(this.dom.scroller).animate( {
+                    "scrollTop": px
+                }, function () {
+                    // This needs to happen after the animation has completed and
+                    // the final scroll event fired
+                    setTimeout( function () {
+                        that.s.ani = false;
+                    }, 25 );
+                } );
+            }
+            else
+            {
+                $(this.dom.scroller).scrollTop( px );
+            }
+        },
+
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Constructor
+	 */
+
+        /**
+         * Initialisation for Scroller
+         *  @returns {void}
+         *  @private
+         */
+        construct: function ()
+        {
+            var that = this;
+            var dt = this.s.dtApi;
+
+            /* Sanity check */
+            if ( !this.s.dt.oFeatures.bPaginate ) {
+                this.s.dt.oApi._fnLog( this.s.dt, 0, 'Pagination must be enabled for Scroller' );
+                return;
+            }
+
+            /* Insert a div element that we can use to force the DT scrolling container to
+		 * the height that would be required if the whole table was being displayed
+		 */
+            this.dom.force.style.position = "relative";
+            this.dom.force.style.top = "0px";
+            this.dom.force.style.left = "0px";
+            this.dom.force.style.width = "1px";
+
+            this.dom.scroller = $('div.'+this.s.dt.oClasses.sScrollBody, this.s.dt.nTableWrapper)[0];
+            this.dom.scroller.appendChild( this.dom.force );
+            this.dom.scroller.style.position = "relative";
+
+            this.dom.table = $('>table', this.dom.scroller)[0];
+            this.dom.table.style.position = "absolute";
+            this.dom.table.style.top = "0px";
+            this.dom.table.style.left = "0px";
+
+            // Add class to 'announce' that we are a Scroller table
+            $(dt.table().container()).addClass('dts DTS');
+
+            // Add a 'loading' indicator
+            if ( this.s.loadingIndicator )
+            {
+                this.dom.loader = $('<div class="dataTables_processing dts_loading">'+this.s.dt.oLanguage.sLoadingRecords+'</div>')
+                    .css('display', 'none');
+
+                $(this.dom.scroller.parentNode)
+                    .css('position', 'relative')
+                    .append( this.dom.loader );
+            }
+
+            this.dom.label.appendTo(this.dom.scroller);
+
+            /* Initial size calculations */
+            if ( this.s.heights.row && this.s.heights.row != 'auto' )
+            {
+                this.s.autoHeight = false;
+            }
+            this.measure( false );
+
+            // Scrolling callback to see if a page change is needed - use a throttled
+            // function for the save save callback so we aren't hitting it on every
+            // scroll
+            this.s.ingnoreScroll = true;
+            this.s.stateSaveThrottle = this.s.dt.oApi._fnThrottle( function () {
+                that.s.dtApi.state.save();
+            }, 500 );
+            $(this.dom.scroller).on( 'scroll.dt-scroller', function (e) {
+                that._scroll.call( that );
+            } );
+
+            // In iOS we catch the touchstart event in case the user tries to scroll
+            // while the display is already scrolling
+            $(this.dom.scroller).on('touchstart.dt-scroller', function () {
+                that._scroll.call( that );
+            } );
+
+            $(this.dom.scroller)
+                .on('mousedown.dt-scroller', function () {
+                    that.s.mousedown = true;
+                })
+                .on('mouseup.dt-scroller', function () {
+                    that.s.mouseup = false;
+                    that.dom.label.css('display', 'none');
+                });
+
+            // On resize, update the information element, since the number of rows shown might change
+            $(window).on( 'resize.dt-scroller', function () {
+                that.measure( false );
+                that._info();
+            } );
+
+            // Add a state saving parameter to the DT state saving so we can restore the exact
+            // position of the scrolling. Slightly surprisingly the scroll position isn't actually
+            // stored, but rather tha base units which are needed to calculate it. This allows for
+            // virtual scrolling as well.
+            var initialStateSave = true;
+            var loadedState = dt.state.loaded();
+
+            dt.on( 'stateSaveParams.scroller', function ( e, settings, data ) {
+                // Need to used the saved position on init
+                data.scroller = {
+                    topRow: initialStateSave && loadedState && loadedState.scroller ?
+                        loadedState.scroller.topRow :
+                        that.s.topRowFloat,
+                    baseScrollTop: that.s.baseScrollTop,
+                    baseRowTop: that.s.baseRowTop
+                };
+
+                initialStateSave = false;
+            } );
+
+            if ( loadedState && loadedState.scroller ) {
+                this.s.topRowFloat = loadedState.scroller.topRow;
+                this.s.baseScrollTop = loadedState.scroller.baseScrollTop;
+                this.s.baseRowTop = loadedState.scroller.baseRowTop;
+            }
+
+            dt.on( 'init.scroller', function () {
+                that.measure( false );
+
+                that._draw();
+
+                // Update the scroller when the DataTable is redrawn
+                dt.on( 'draw.scroller', function () {
+                    that._draw();
+                });
+            } );
+
+            // Set height before the draw happens, allowing everything else to update
+            // on draw complete without worry for roder.
+            dt.on( 'preDraw.dt.scroller', function () {
+                that._scrollForce();
+            } );
+
+            // Destructor
+            dt.on( 'destroy.scroller', function () {
+                $(window).off( 'resize.dt-scroller' );
+                $(that.dom.scroller).off('.dt-scroller');
+                $(that.s.dt.nTable).off( '.scroller' );
+
+                $(that.s.dt.nTableWrapper).removeClass('DTS');
+                $('div.DTS_Loading', that.dom.scroller.parentNode).remove();
+
+                that.dom.table.style.position = "";
+                that.dom.table.style.top = "";
+                that.dom.table.style.left = "";
+            } );
+        },
+
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * Private methods
+	 */
+
+        /**
+         * Automatic calculation of table row height. This is just a little tricky here as using
+         * initialisation DataTables has tale the table out of the document, so we need to create
+         * a new table and insert it into the document, calculate the row height and then whip the
+         * table out.
+         *  @returns {void}
+         *  @private
+         */
+        _calcRowHeight: function ()
+        {
+            var dt = this.s.dt;
+            var origTable = dt.nTable;
+            var nTable = origTable.cloneNode( false );
+            var tbody = $('<tbody/>').appendTo( nTable );
+            var container = $(
+                '<div class="'+dt.oClasses.sWrapper+' DTS">'+
+                '<div class="'+dt.oClasses.sScrollWrapper+'">'+
+                '<div class="'+dt.oClasses.sScrollBody+'"></div>'+
+                '</div>'+
+                '</div>'
+            );
+
+            // Want 3 rows in the sizing table so :first-child and :last-child
+            // CSS styles don't come into play - take the size of the middle row
+            $('tbody tr:lt(4)', origTable).clone().appendTo( tbody );
+            var rowsCount = $('tr', tbody).length;
+
+            if ( rowsCount === 1 ) {
+                tbody.prepend('<tr><td>&#160;</td></tr>');
+                tbody.append('<tr><td>&#160;</td></tr>');
+            }
+            else {
+                for (; rowsCount < 3; rowsCount++) {
+                    tbody.append('<tr><td>&#160;</td></tr>');
+                }
+            }
+
+            $('div.'+dt.oClasses.sScrollBody, container).append( nTable );
+
+            // If initialised using `dom`, use the holding element as the insert point
+            var insertEl = this.s.dt.nHolding || origTable.parentNode;
+
+            if ( ! $(insertEl).is(':visible') ) {
+                insertEl = 'body';
+            }
+
+            container.appendTo( insertEl );
+            this.s.heights.row = $('tr', tbody).eq(1).outerHeight();
+
+            container.remove();
+        },
+
+        /**
+         * Draw callback function which is fired when the DataTable is redrawn. The main function of
+         * this method is to position the drawn table correctly the scrolling container for the rows
+         * that is displays as a result of the scrolling position.
+         *  @returns {void}
+         *  @private
+         */
+        _draw: function ()
+        {
+            var
+                that = this,
+                heights = this.s.heights,
+                iScrollTop = this.dom.scroller.scrollTop,
+                iActualScrollTop = iScrollTop,
+                iScrollBottom = iScrollTop + heights.viewport,
+                iTableHeight = $(this.s.dt.nTable).height(),
+                displayStart = this.s.dt._iDisplayStart,
+                displayLen = this.s.dt._iDisplayLength,
+                displayEnd = this.s.dt.fnRecordsDisplay();
+
+            // Disable the scroll event listener while we are updating the DOM
+            this.s.skip = true;
+
+            // If paging is reset
+            if ( (this.s.dt.bSorted || this.s.dt.bFiltered) && displayStart === 0 && !this.s.dt._drawHold ) {
+                this.s.topRowFloat = 0;
+            }
+
+            iScrollTop = this.scrollType === 'jump' ?
+                this._domain( 'physicalToVirtual', this.s.topRowFloat * heights.row ) :
+                iScrollTop;
+
+            // This doesn't work when scrolling with the mouse wheel
+            $(that.dom.scroller).scrollTop(iScrollTop);
+
+            // Store positional information so positional calculations can be based
+            // upon the current table draw position
+            this.s.baseScrollTop = iScrollTop;
+            this.s.baseRowTop = this.s.topRowFloat;
+
+            // Position the table in the virtual scroller
+            var tableTop = iScrollTop - ((this.s.topRowFloat - displayStart) * heights.row);
+            if ( displayStart === 0 ) {
+                tableTop = 0;
+            }
+            else if ( displayStart + displayLen >= displayEnd ) {
+                tableTop = heights.scroll - iTableHeight;
+            }
+
+            this.dom.table.style.top = tableTop+'px';
+
+            /* Cache some information for the scroller */
+            this.s.tableTop = tableTop;
+            this.s.tableBottom = iTableHeight + this.s.tableTop;
+
+            // Calculate the boundaries for where a redraw will be triggered by the
+            // scroll event listener
+            var boundaryPx = (iScrollTop - this.s.tableTop) * this.s.boundaryScale;
+            this.s.redrawTop = iScrollTop - boundaryPx;
+            this.s.redrawBottom = iScrollTop + boundaryPx > heights.scroll - heights.viewport - heights.row ?
+                heights.scroll - heights.viewport - heights.row :
+                iScrollTop + boundaryPx;
+
+            this.s.skip = false;
+
+            // Restore the scrolling position that was saved by DataTable's state
+            // saving Note that this is done on the second draw when data is Ajax
+            // sourced, and the first draw when DOM soured
+            if ( this.s.dt.oFeatures.bStateSave && this.s.dt.oLoadedState !== null &&
+                typeof this.s.dt.oLoadedState.iScroller != 'undefined' )
+            {
+                // A quirk of DataTables is that the draw callback will occur on an
+                // empty set if Ajax sourced, but not if server-side processing.
+                var ajaxSourced = (this.s.dt.sAjaxSource || that.s.dt.ajax) && ! this.s.dt.oFeatures.bServerSide ?
+                    true :
+                    false;
+
+                if ( ( ajaxSourced && this.s.dt.iDraw == 2) ||
+                    (!ajaxSourced && this.s.dt.iDraw == 1) )
+                {
+                    setTimeout( function () {
+                        $(that.dom.scroller).scrollTop( that.s.dt.oLoadedState.iScroller );
+                        that.s.redrawTop = that.s.dt.oLoadedState.iScroller - (heights.viewport/2);
+
+                        // In order to prevent layout thrashing we need another
+                        // small delay
+                        setTimeout( function () {
+                            that.s.ingnoreScroll = false;
+                        }, 0 );
+                    }, 0 );
+                }
+            }
+            else {
+                that.s.ingnoreScroll = false;
+            }
+
+            // Because of the order of the DT callbacks, the info update will
+            // take precedence over the one we want here. So a 'thread' break is
+            // needed.  Only add the thread break if bInfo is set
+            if ( this.s.dt.oFeatures.bInfo ) {
+                setTimeout( function () {
+                    that._info.call( that );
+                }, 0 );
+            }
+
+            // Hide the loading indicator
+            if ( this.dom.loader && this.s.loaderVisible ) {
+                this.dom.loader.css( 'display', 'none' );
+                this.s.loaderVisible = false;
+            }
+        },
+
+        /**
+         * Convert from one domain to another. The physical domain is the actual
+         * pixel count on the screen, while the virtual is if we had browsers which
+         * had scrolling containers of infinite height (i.e. the absolute value)
+         *
+         *  @param {string} dir Domain transform direction, `virtualToPhysical` or
+         *    `physicalToVirtual`
+         *  @returns {number} Calculated transform
+         *  @private
+         */
+        _domain: function ( dir, val )
+        {
+            var heights = this.s.heights;
+            var diff;
+            var magic = 10000; // the point at which the non-linear calculations start to happen
+
+            // If the virtual and physical height match, then we use a linear
+            // transform between the two, allowing the scrollbar to be linear
+            if ( heights.virtual === heights.scroll ) {
+                return val;
+            }
+
+            // In the first 10k pixels and the last 10k pixels, we want the scrolling
+            // to be linear. After that it can be non-linear. It would be unusual for
+            // anyone to mouse wheel through that much.
+            if ( val < magic ) {
+                return val;
+            }
+            else if ( dir === 'virtualToPhysical' && val > heights.virtual - magic ) {
+                diff = heights.virtual - val;
+                return heights.scroll - diff;
+            }
+            else if ( dir === 'physicalToVirtual' && val > heights.scroll - magic ) {
+                diff = heights.scroll - val;
+                return heights.virtual - diff;
+            }
+
+            // Otherwise, we want a non-linear scrollbar to take account of the
+            // redrawing regions at the start and end of the table, otherwise these
+            // can stutter badly - on large tables 30px (for example) scroll might
+            // be hundreds of rows, so the table would be redrawing every few px at
+            // the start and end. Use a simple linear eq. to stop this, effectively
+            // causing a kink in the scrolling ratio. It does mean the scrollbar is
+            // non-linear, but with such massive data sets, the scrollbar is going
+            // to be a best guess anyway
+            var xMax = dir === 'virtualToPhysical' ?
+                heights.virtual :
+                heights.scroll;
+            var yMax = dir === 'virtualToPhysical' ?
+                heights.scroll :
+                heights.virtual;
+
+            var m = (yMax - magic) / (xMax - magic);
+            var c = magic - (m*magic);
+
+            return (m*val) + c;
+        },
+
+        /**
+         * Update any information elements that are controlled by the DataTable based on the scrolling
+         * viewport and what rows are visible in it. This function basically acts in the same way as
+         * _fnUpdateInfo in DataTables, and effectively replaces that function.
+         *  @returns {void}
+         *  @private
+         */
+        _info: function ()
+        {
+            if ( !this.s.dt.oFeatures.bInfo )
+            {
+                return;
+            }
+
+            var
+                dt = this.s.dt,
+                language = dt.oLanguage,
+                iScrollTop = this.dom.scroller.scrollTop,
+                iStart = Math.floor( this.pixelsToRow(iScrollTop, false, this.s.ani)+1 ),
+                iMax = dt.fnRecordsTotal(),
+                iTotal = dt.fnRecordsDisplay(),
+                iPossibleEnd = Math.ceil( this.pixelsToRow(iScrollTop+this.s.heights.viewport, false, this.s.ani) ),
+                iEnd = iTotal < iPossibleEnd ? iTotal : iPossibleEnd,
+                sStart = dt.fnFormatNumber( iStart ),
+                sEnd = dt.fnFormatNumber( iEnd ),
+                sMax = dt.fnFormatNumber( iMax ),
+                sTotal = dt.fnFormatNumber( iTotal ),
+                sOut;
+
+            if ( dt.fnRecordsDisplay() === 0 &&
+                dt.fnRecordsDisplay() == dt.fnRecordsTotal() )
+            {
+                /* Empty record set */
+                sOut = language.sInfoEmpty+ language.sInfoPostFix;
+            }
+            else if ( dt.fnRecordsDisplay() === 0 )
+            {
+                /* Empty record set after filtering */
+                sOut = language.sInfoEmpty +' '+
+                    language.sInfoFiltered.replace('_MAX_', sMax)+
+                    language.sInfoPostFix;
+            }
+            else if ( dt.fnRecordsDisplay() == dt.fnRecordsTotal() )
+            {
+                /* Normal record set */
+                sOut = language.sInfo.
+                    replace('_START_', sStart).
+                    replace('_END_',   sEnd).
+                    replace('_MAX_',   sMax).
+                    replace('_TOTAL_', sTotal)+
+                    language.sInfoPostFix;
+            }
+            else
+            {
+                /* Record set after filtering */
+                sOut = language.sInfo.
+                    replace('_START_', sStart).
+                    replace('_END_',   sEnd).
+                    replace('_MAX_',   sMax).
+                    replace('_TOTAL_', sTotal) +' '+
+                    language.sInfoFiltered.replace(
+                        '_MAX_',
+                        dt.fnFormatNumber(dt.fnRecordsTotal())
+                    )+
+                    language.sInfoPostFix;
+            }
+
+            var callback = language.fnInfoCallback;
+            if ( callback ) {
+                sOut = callback.call( dt.oInstance,
+                    dt, iStart, iEnd, iMax, iTotal, sOut
+                );
+            }
+
+            var n = dt.aanFeatures.i;
+            if ( typeof n != 'undefined' )
+            {
+                for ( var i=0, iLen=n.length ; i<iLen ; i++ )
+                {
+                    $(n[i]).html( sOut );
+                }
+            }
+
+            // DT doesn't actually (yet) trigger this event, but it will in future
+            $(dt.nTable).triggerHandler( 'info.dt' );
+        },
+
+        /**
+         * Parse CSS height property string as number
+         *
+         * An attempt is made to parse the string as a number. Currently supported units are 'px',
+         * 'vh', and 'rem'. 'em' is partially supported; it works as long as the parent element's
+         * font size matches the body element. Zero is returned for unrecognized strings.
+         *  @param {string} cssHeight CSS height property string
+         *  @returns {number} height
+         *  @private
+         */
+        _parseHeight: function(cssHeight) {
+            var height;
+            var matches = /^([+-]?(?:\d+(?:\.\d+)?|\.\d+))(px|em|rem|vh)$/.exec(cssHeight);
+
+            if (matches === null) {
+                return 0;
+            }
+
+            var value = parseFloat(matches[1]);
+            var unit = matches[2];
+
+            if ( unit === 'px' ) {
+                height = value;
+            }
+            else if ( unit === 'vh' ) {
+                height = ( value / 100 ) * $(window).height();
+            }
+            else if ( unit === 'rem' ) {
+                height = value * parseFloat($(':root').css('font-size'));
+            }
+            else if ( unit === 'em' ) {
+                height = value * parseFloat($('body').css('font-size'));
+            }
+
+            return height ?
+                height :
+                0;
+        },
+
+        /**
+         * Scrolling function - fired whenever the scrolling position is changed.
+         * This method needs to use the stored values to see if the table should be
+         * redrawn as we are moving towards the end of the information that is
+         * currently drawn or not. If needed, then it will redraw the table based on
+         * the new position.
+         *  @returns {void}
+         *  @private
+         */
+        _scroll: function ()
+        {
+            var
+                that = this,
+                heights = this.s.heights,
+                iScrollTop = this.dom.scroller.scrollTop,
+                iTopRow;
+
+            if ( this.s.skip ) {
+                return;
+            }
+
+            if ( this.s.ingnoreScroll ) {
+                return;
+            }
+
+            if ( iScrollTop === this.s.lastScrollTop ) {
+                return;
+            }
+
+            /* If the table has been sorted or filtered, then we use the redraw that
+		 * DataTables as done, rather than performing our own
+		 */
+            if ( this.s.dt.bFiltered || this.s.dt.bSorted ) {
+                this.s.lastScrollTop = 0;
+                return;
+            }
+
+            /* Update the table's information display for what is now in the viewport */
+            this._info();
+
+            /* We don't want to state save on every scroll event - that's heavy
+		 * handed, so use a timeout to update the state saving only when the
+		 * scrolling has finished
+		 */
+            clearTimeout( this.s.stateTO );
+            this.s.stateTO = setTimeout( function () {
+                that.s.dtApi.state.save();
+            }, 250 );
+
+            this.s.scrollType = Math.abs(iScrollTop - this.s.lastScrollTop) > heights.viewport ?
+                'jump' :
+                'cont';
+
+            this.s.topRowFloat = this.s.scrollType === 'cont' ?
+                this.pixelsToRow( iScrollTop, false, false ) :
+                this._domain( 'physicalToVirtual', iScrollTop ) / heights.row;
+
+            if ( this.s.topRowFloat < 0 ) {
+                this.s.topRowFloat = 0;
+            }
+
+            /* Check if the scroll point is outside the trigger boundary which would required
+		 * a DataTables redraw
+		 */
+            if ( this.s.forceReposition || iScrollTop < this.s.redrawTop || iScrollTop > this.s.redrawBottom ) {
+                var preRows = Math.ceil( ((this.s.displayBuffer-1)/2) * this.s.viewportRows );
+
+                iTopRow = parseInt(this.s.topRowFloat, 10) - preRows;
+                this.s.forceReposition = false;
+
+                if ( iTopRow <= 0 ) {
+                    /* At the start of the table */
+                    iTopRow = 0;
+                }
+                else if ( iTopRow + this.s.dt._iDisplayLength > this.s.dt.fnRecordsDisplay() ) {
+                    /* At the end of the table */
+                    iTopRow = this.s.dt.fnRecordsDisplay() - this.s.dt._iDisplayLength;
+                    if ( iTopRow < 0 ) {
+                        iTopRow = 0;
+                    }
+                }
+                else if ( iTopRow % 2 !== 0 ) {
+                    // For the row-striping classes (odd/even) we want only to start
+                    // on evens otherwise the stripes will change between draws and
+                    // look rubbish
+                    iTopRow++;
+                }
+
+
+                if ( iTopRow != this.s.dt._iDisplayStart ) {
+                    /* Cache the new table position for quick lookups */
+                    this.s.tableTop = $(this.s.dt.nTable).offset().top;
+                    this.s.tableBottom = $(this.s.dt.nTable).height() + this.s.tableTop;
+
+                    var draw =  function () {
+                        if ( that.s.scrollDrawReq === null ) {
+                            that.s.scrollDrawReq = iScrollTop;
+                        }
+
+                        that.s.dt._iDisplayStart = iTopRow;
+                        that.s.dt.oApi._fnDraw( that.s.dt );
+                    };
+
+                    /* Do the DataTables redraw based on the calculated start point - note that when
+				 * using server-side processing we introduce a small delay to not DoS the server...
+				 */
+                    if ( this.s.dt.oFeatures.bServerSide ) {
+                        clearTimeout( this.s.drawTO );
+                        this.s.drawTO = setTimeout( draw, this.s.serverWait );
+                    }
+                    else {
+                        draw();
+                    }
+
+                    if ( this.dom.loader && ! this.s.loaderVisible ) {
+                        this.dom.loader.css( 'display', 'block' );
+                        this.s.loaderVisible = true;
+                    }
+                }
+            }
+            else {
+                this.s.topRowFloat = this.pixelsToRow( iScrollTop, false, true );
+            }
+
+            this.s.lastScrollTop = iScrollTop;
+            this.s.stateSaveThrottle();
+
+            if ( this.s.scrollType === 'jump' && this.s.mousedown ) {
+                this.dom.label
+                    .html( this.s.dt.fnFormatNumber( parseInt( this.s.topRowFloat, 10 )+1 ) )
+                    .css( 'top', iScrollTop + (iScrollTop * heights.labelFactor ) )
+                    .css( 'display', 'block' );
+            }
+        },
+
+        /**
+         * Force the scrolling container to have height beyond that of just the
+         * table that has been drawn so the user can scroll the whole data set.
+         *
+         * Note that if the calculated required scrolling height exceeds a maximum
+         * value (1 million pixels - hard-coded) the forcing element will be set
+         * only to that maximum value and virtual / physical domain transforms will
+         * be used to allow Scroller to display tables of any number of records.
+         *  @returns {void}
+         *  @private
+         */
+        _scrollForce: function ()
+        {
+            var heights = this.s.heights;
+            var max = 1000000;
+
+            heights.virtual = heights.row * this.s.dt.fnRecordsDisplay();
+            heights.scroll = heights.virtual;
+
+            if ( heights.scroll > max ) {
+                heights.scroll = max;
+            }
+
+            // Minimum height so there is always a row visible (the 'no rows found'
+            // if reduced to zero filtering)
+            this.dom.force.style.height = heights.scroll > this.s.heights.row ?
+                heights.scroll+'px' :
+                this.s.heights.row+'px';
+        }
+    } );
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Statics
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+    /**
+     * Scroller default settings for initialisation
+     *  @namespace
+     *  @name Scroller.defaults
+     *  @static
+     */
+    Scroller.defaults = {
+        /**
+         * Scroller uses the boundary scaling factor to decide when to redraw the table - which it
+         * typically does before you reach the end of the currently loaded data set (in order to
+         * allow the data to look continuous to a user scrolling through the data). If given as 0
+         * then the table will be redrawn whenever the viewport is scrolled, while 1 would not
+         * redraw the table until the currently loaded data has all been shown. You will want
+         * something in the middle - the default factor of 0.5 is usually suitable.
+         *  @type     float
+         *  @default  0.5
+         *  @static
+         */
+        boundaryScale: 0.5,
+
+        /**
+         * The display buffer is what Scroller uses to calculate how many rows it should pre-fetch
+         * for scrolling. Scroller automatically adjusts DataTables' display length to pre-fetch
+         * rows that will be shown in "near scrolling" (i.e. just beyond the current display area).
+         * The value is based upon the number of rows that can be displayed in the viewport (i.e.
+         * a value of 1), and will apply the display range to records before before and after the
+         * current viewport - i.e. a factor of 3 will allow Scroller to pre-fetch 1 viewport's worth
+         * of rows before the current viewport, the current viewport's rows and 1 viewport's worth
+         * of rows after the current viewport. Adjusting this value can be useful for ensuring
+         * smooth scrolling based on your data set.
+         *  @type     int
+         *  @default  7
+         *  @static
+         */
+        displayBuffer: 9,
+
+        /**
+         * Show (or not) the loading element in the background of the table. Note that you should
+         * include the dataTables.scroller.css file for this to be displayed correctly.
+         *  @type     boolean
+         *  @default  false
+         *  @static
+         */
+        loadingIndicator: false,
+
+        /**
+         * Scroller will attempt to automatically calculate the height of rows for it's internal
+         * calculations. However the height that is used can be overridden using this parameter.
+         *  @type     int|string
+         *  @default  auto
+         *  @static
+         */
+        rowHeight: "auto",
+
+        /**
+         * When using server-side processing, Scroller will wait a small amount of time to allow
+         * the scrolling to finish before requesting more data from the server. This prevents
+         * you from DoSing your own server! The wait time can be configured by this parameter.
+         *  @type     int
+         *  @default  200
+         *  @static
+         */
+        serverWait: 200
+    };
+
+    Scroller.oDefaults = Scroller.defaults;
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Constants
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * Scroller version
+     *  @type      String
+     *  @default   See code
+     *  @name      Scroller.version
+     *  @static
+     */
+    Scroller.version = "2.0.0";
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Initialisation
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// Attach a listener to the document which listens for DataTables initialisation
+// events so we can automatically initialise
+    $(document).on( 'preInit.dt.dtscroller', function (e, settings) {
+        if ( e.namespace !== 'dt' ) {
+            return;
+        }
+
+        var init = settings.oInit.scroller;
+        var defaults = DataTable.defaults.scroller;
+
+        if ( init || defaults ) {
+            var opts = $.extend( {}, init, defaults );
+
+            if ( init !== false ) {
+                new Scroller( settings, opts  );
+            }
+        }
+    } );
+
+
+// Attach Scroller to DataTables so it can be accessed as an 'extra'
+    $.fn.dataTable.Scroller = Scroller;
+    $.fn.DataTable.Scroller = Scroller;
+
+
+// DataTables 1.10 API method aliases
+    var Api = $.fn.dataTable.Api;
+
+    Api.register( 'scroller()', function () {
+        return this;
+    } );
+
+// Undocumented and deprecated - is it actually useful at all?
+    Api.register( 'scroller().rowToPixels()', function ( rowIdx, intParse, virtual ) {
+        var ctx = this.context;
+
+        if ( ctx.length && ctx[0].oScroller ) {
+            return ctx[0].oScroller.rowToPixels( rowIdx, intParse, virtual );
+        }
+        // undefined
+    } );
+
+// Undocumented and deprecated - is it actually useful at all?
+    Api.register( 'scroller().pixelsToRow()', function ( pixels, intParse, virtual ) {
+        var ctx = this.context;
+
+        if ( ctx.length && ctx[0].oScroller ) {
+            return ctx[0].oScroller.pixelsToRow( pixels, intParse, virtual );
+        }
+        // undefined
+    } );
+
+// `scroller().scrollToRow()` is undocumented and deprecated. Use `scroller.toPosition()
+    Api.register( ['scroller().scrollToRow()', 'scroller.toPosition()'], function ( idx, ani ) {
+        this.iterator( 'table', function ( ctx ) {
+            if ( ctx.oScroller ) {
+                ctx.oScroller.scrollToRow( idx, ani );
+            }
+        } );
+
+        return this;
+    } );
+
+    Api.register( 'row().scrollTo()', function ( ani ) {
+        var that = this;
+
+        this.iterator( 'row', function ( ctx, rowIdx ) {
+            if ( ctx.oScroller ) {
+                var displayIdx = that
+                    .rows( { order: 'applied', search: 'applied' } )
+                    .indexes()
+                    .indexOf( rowIdx );
+
+                ctx.oScroller.scrollToRow( displayIdx, ani );
+            }
+        } );
+
+        return this;
+    } );
+
+    Api.register( 'scroller.measure()', function ( redraw ) {
+        this.iterator( 'table', function ( ctx ) {
+            if ( ctx.oScroller ) {
+                ctx.oScroller.measure( redraw );
+            }
+        } );
+
+        return this;
+    } );
+
+    Api.register( 'scroller.page()', function() {
+        var ctx = this.context;
+
+        if ( ctx.length && ctx[0].oScroller ) {
+            return ctx[0].oScroller.pageInfo();
+        }
+        // undefined
+    } );
+
+    return Scroller;
+}));
+
+
+/*! Select for DataTables 1.3.0
+ * 2015-2018 SpryMedia Ltd - datatables.net/license/mit
+ */
+
+/**
+ * @summary     Select for DataTables
+ * @description A collection of API methods, events and buttons for DataTables
+ *   that provides selection options of the items in a DataTable
+ * @version     1.3.0
+ * @file        dataTables.select.js
+ * @author      SpryMedia Ltd (www.sprymedia.co.uk)
+ * @contact     datatables.net/forums
+ * @copyright   Copyright 2015-2018 SpryMedia Ltd.
+ *
+ * This source file is free software, available under the following license:
+ *   MIT license - http://datatables.net/license/mit
+ *
+ * This source file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
+ *
+ * For details please refer to: http://www.datatables.net/extensions/select
+ */
+(function( factory ){
+    if ( typeof define === 'function' && define.amd ) {
+        // AMD
+        define( ['jquery', 'datatables.net'], function ( $ ) {
+            return factory( $, window, document );
+        } );
+    }
+    else if ( typeof exports === 'object' ) {
+        // CommonJS
+        module.exports = function (root, $) {
+            if ( ! root ) {
+                root = window;
+            }
+
+            if ( ! $ || ! $.fn.dataTable ) {
+                $ = require('datatables.net')(root, $).$;
+            }
+
+            return factory( $, root, root.document );
+        };
+    }
+    else {
+        // Browser
+        factory( jQuery, window, document );
+    }
+}(function( $, window, document, undefined ) {
+    'use strict';
+    var DataTable = $.fn.dataTable;
+
+
+// Version information for debugger
+    DataTable.select = {};
+
+    DataTable.select.version = '1.3.0';
+
+    DataTable.select.init = function ( dt ) {
+        var ctx = dt.settings()[0];
+        var init = ctx.oInit.select;
+        var defaults = DataTable.defaults.select;
+        var opts = init === undefined ?
+            defaults :
+            init;
+
+        // Set defaults
+        var items = 'row';
+        var style = 'api';
+        var blurable = false;
+        var info = true;
+        var selector = 'td, th';
+        var className = 'selected';
+        var setStyle = false;
+
+        ctx._select = {};
+
+        // Initialisation customisations
+        if ( opts === true ) {
+            style = 'os';
+            setStyle = true;
+        }
+        else if ( typeof opts === 'string' ) {
+            style = opts;
+            setStyle = true;
+        }
+        else if ( $.isPlainObject( opts ) ) {
+            if ( opts.blurable !== undefined ) {
+                blurable = opts.blurable;
+            }
+
+            if ( opts.info !== undefined ) {
+                info = opts.info;
+            }
+
+            if ( opts.items !== undefined ) {
+                items = opts.items;
+            }
+
+            if ( opts.style !== undefined ) {
+                style = opts.style;
+                setStyle = true;
+            }
+            else {
+                style = 'os';
+                setStyle = true;
+            }
+
+            if ( opts.selector !== undefined ) {
+                selector = opts.selector;
+            }
+
+            if ( opts.className !== undefined ) {
+                className = opts.className;
+            }
+        }
+
+        dt.select.selector( selector );
+        dt.select.items( items );
+        dt.select.style( style );
+        dt.select.blurable( blurable );
+        dt.select.info( info );
+        ctx._select.className = className;
+
+
+        // Sort table based on selected rows. Requires Select Datatables extension
+        $.fn.dataTable.ext.order['select-checkbox'] = function ( settings, col ) {
+            return this.api().column( col, {order: 'index'} ).nodes().map( function ( td ) {
+                if ( settings._select.items === 'row' ) {
+                    return $( td ).parent().hasClass( settings._select.className );
+                } else if ( settings._select.items === 'cell' ) {
+                    return $( td ).hasClass( settings._select.className );
+                }
+                return false;
+            });
+        };
+
+        // If the init options haven't enabled select, but there is a selectable
+        // class name, then enable
+        if ( ! setStyle && $( dt.table().node() ).hasClass( 'selectable' ) ) {
+            dt.select.style( 'os' );
+        }
+    };
+
+    /*
+
+Select is a collection of API methods, event handlers, event emitters and
+buttons (for the `Buttons` extension) for DataTables. It provides the following
+features, with an overview of how they are implemented:
+
+## Selection of rows, columns and cells. Whether an item is selected or not is
+   stored in:
+
+* rows: a `_select_selected` property which contains a boolean value of the
+  DataTables' `aoData` object for each row
+* columns: a `_select_selected` property which contains a boolean value of the
+  DataTables' `aoColumns` object for each column
+* cells: a `_selected_cells` property which contains an array of boolean values
+  of the `aoData` object for each row. The array is the same length as the
+  columns array, with each element of it representing a cell.
+
+This method of using boolean flags allows Select to operate when nodes have not
+been created for rows / cells (DataTables' defer rendering feature).
+
+## API methods
+
+A range of API methods are available for triggering selection and de-selection
+of rows. Methods are also available to configure the selection events that can
+be triggered by an end user (such as which items are to be selected). To a large
+extent, these of API methods *is* Select. It is basically a collection of helper
+functions that can be used to select items in a DataTable.
+
+Configuration of select is held in the object `_select` which is attached to the
+DataTables settings object on initialisation. Select being available on a table
+is not optional when Select is loaded, but its default is for selection only to
+be available via the API - so the end user wouldn't be able to select rows
+without additional configuration.
+
+The `_select` object contains the following properties:
+
+```
+{
+	items:string     - Can be `rows`, `columns` or `cells`. Defines what item
+	                   will be selected if the user is allowed to activate row
+	                   selection using the mouse.
+	style:string     - Can be `none`, `single`, `multi` or `os`. Defines the
+	                   interaction style when selecting items
+	blurable:boolean - If row selection can be cleared by clicking outside of
+	                   the table
+	info:boolean     - If the selection summary should be shown in the table
+	                   information elements
+}
+```
+
+In addition to the API methods, Select also extends the DataTables selector
+options for rows, columns and cells adding a `selected` option to the selector
+options object, allowing the developer to select only selected items or
+unselected items.
+
+## Mouse selection of items
+
+Clicking on items can be used to select items. This is done by a simple event
+handler that will select the items using the API methods.
+
+ */
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Local functions
+ */
+
+    /**
+     * Add one or more cells to the selection when shift clicking in OS selection
+     * style cell selection.
+     *
+     * Cell range is more complicated than row and column as we want to select
+     * in the visible grid rather than by index in sequence. For example, if you
+     * click first in cell 1-1 and then shift click in 2-2 - cells 1-2 and 2-1
+     * should also be selected (and not 1-3, 1-4. etc)
+     *
+     * @param  {DataTable.Api} dt   DataTable
+     * @param  {object}        idx  Cell index to select to
+     * @param  {object}        last Cell index to select from
+     * @private
+     */
+    function cellRange( dt, idx, last )
+    {
+        var indexes;
+        var columnIndexes;
+        var rowIndexes;
+        var selectColumns = function ( start, end ) {
+            if ( start > end ) {
+                var tmp = end;
+                end = start;
+                start = tmp;
+            }
+
+            var record = false;
+            return dt.columns( ':visible' ).indexes().filter( function (i) {
+                if ( i === start ) {
+                    record = true;
+                }
+
+                if ( i === end ) { // not else if, as start might === end
+                    record = false;
+                    return true;
+                }
+
+                return record;
+            } );
+        };
+
+        var selectRows = function ( start, end ) {
+            var indexes = dt.rows( { search: 'applied' } ).indexes();
+
+            // Which comes first - might need to swap
+            if ( indexes.indexOf( start ) > indexes.indexOf( end ) ) {
+                var tmp = end;
+                end = start;
+                start = tmp;
+            }
+
+            var record = false;
+            return indexes.filter( function (i) {
+                if ( i === start ) {
+                    record = true;
+                }
+
+                if ( i === end ) {
+                    record = false;
+                    return true;
+                }
+
+                return record;
+            } );
+        };
+
+        if ( ! dt.cells( { selected: true } ).any() && ! last ) {
+            // select from the top left cell to this one
+            columnIndexes = selectColumns( 0, idx.column );
+            rowIndexes = selectRows( 0 , idx.row );
+        }
+        else {
+            // Get column indexes between old and new
+            columnIndexes = selectColumns( last.column, idx.column );
+            rowIndexes = selectRows( last.row , idx.row );
+        }
+
+        indexes = dt.cells( rowIndexes, columnIndexes ).flatten();
+
+        if ( ! dt.cells( idx, { selected: true } ).any() ) {
+            // Select range
+            dt.cells( indexes ).select();
+        }
+        else {
+            // Deselect range
+            dt.cells( indexes ).deselect();
+        }
+    }
+
+    /**
+     * Disable mouse selection by removing the selectors
+     *
+     * @param {DataTable.Api} dt DataTable to remove events from
+     * @private
+     */
+    function disableMouseSelection( dt )
+    {
+        var ctx = dt.settings()[0];
+        var selector = ctx._select.selector;
+
+        $( dt.table().container() )
+            .off( 'mousedown.dtSelect', selector )
+            .off( 'mouseup.dtSelect', selector )
+            .off( 'click.dtSelect', selector );
+
+        $('body').off( 'click.dtSelect' + dt.table().node().id );
+    }
+
+    /**
+     * Attach mouse listeners to the table to allow mouse selection of items
+     *
+     * @param {DataTable.Api} dt DataTable to remove events from
+     * @private
+     */
+    function enableMouseSelection ( dt )
+    {
+        var container = $( dt.table().container() );
+        var ctx = dt.settings()[0];
+        var selector = ctx._select.selector;
+        var matchSelection;
+
+        container
+            .on( 'mousedown.dtSelect', selector, function(e) {
+                // Disallow text selection for shift clicking on the table so multi
+                // element selection doesn't look terrible!
+                if ( e.shiftKey || e.metaKey || e.ctrlKey ) {
+                    container
+                        .css( '-moz-user-select', 'none' )
+                        .one('selectstart.dtSelect', selector, function () {
+                            return false;
+                        } );
+                }
+
+                if ( window.getSelection ) {
+                    matchSelection = window.getSelection();
+                }
+            } )
+            .on( 'mouseup.dtSelect', selector, function() {
+                // Allow text selection to occur again, Mozilla style (tested in FF
+                // 35.0.1 - still required)
+                container.css( '-moz-user-select', '' );
+            } )
+            .on( 'click.dtSelect', selector, function ( e ) {
+                var items = dt.select.items();
+                var idx;
+
+                // If text was selected (click and drag), then we shouldn't change
+                // the row's selected state
+                if ( matchSelection ) {
+                    var selection = window.getSelection();
+
+                    // If the element that contains the selection is not in the table, we can ignore it
+                    // This can happen if the developer selects text from the click event
+                    if ( ! selection.anchorNode || $(selection.anchorNode).closest('table')[0] === dt.table().node() ) {
+                        if ( selection !== matchSelection ) {
+                            return;
+                        }
+                    }
+                }
+
+                var ctx = dt.settings()[0];
+                var wrapperClass = $.trim(dt.settings()[0].oClasses.sWrapper).replace(/ +/g, '.');
+
+                // Ignore clicks inside a sub-table
+                if ( $(e.target).closest('div.'+wrapperClass)[0] != dt.table().container() ) {
+                    return;
+                }
+
+                var cell = dt.cell( $(e.target).closest('td, th') );
+
+                // Check the cell actually belongs to the host DataTable (so child
+                // rows, etc, are ignored)
+                if ( ! cell.any() ) {
+                    return;
+                }
+
+                var event = $.Event('user-select.dt');
+                eventTrigger( dt, event, [ items, cell, e ] );
+
+                if ( event.isDefaultPrevented() ) {
+                    return;
+                }
+
+                var cellIndex = cell.index();
+                if ( items === 'row' ) {
+                    idx = cellIndex.row;
+                    typeSelect( e, dt, ctx, 'row', idx );
+                }
+                else if ( items === 'column' ) {
+                    idx = cell.index().column;
+                    typeSelect( e, dt, ctx, 'column', idx );
+                }
+                else if ( items === 'cell' ) {
+                    idx = cell.index();
+                    typeSelect( e, dt, ctx, 'cell', idx );
+                }
+
+                ctx._select_lastCell = cellIndex;
+            } );
+
+        // Blurable
+        $('body').on( 'click.dtSelect' + dt.table().node().id, function ( e ) {
+            if ( ctx._select.blurable ) {
+                // If the click was inside the DataTables container, don't blur
+                if ( $(e.target).parents().filter( dt.table().container() ).length ) {
+                    return;
+                }
+
+                // Ignore elements which have been removed from the DOM (i.e. paging
+                // buttons)
+                if ( $(e.target).parents('html').length === 0 ) {
+                    return;
+                }
+
+                // Don't blur in Editor form
+                if ( $(e.target).parents('div.DTE').length ) {
+                    return;
+                }
+
+                clear( ctx, true );
+            }
+        } );
+    }
+
+    /**
+     * Trigger an event on a DataTable
+     *
+     * @param {DataTable.Api} api      DataTable to trigger events on
+     * @param  {boolean}      selected true if selected, false if deselected
+     * @param  {string}       type     Item type acting on
+     * @param  {boolean}      any      Require that there are values before
+     *     triggering
+     * @private
+     */
+    function eventTrigger ( api, type, args, any )
+    {
+        if ( any && ! api.flatten().length ) {
+            return;
+        }
+
+        if ( typeof type === 'string' ) {
+            type = type +'.dt';
+        }
+
+        args.unshift( api );
+
+        $(api.table().node()).trigger( type, args );
+    }
+
+    /**
+     * Update the information element of the DataTable showing information about the
+     * items selected. This is done by adding tags to the existing text
+     *
+     * @param {DataTable.Api} api DataTable to update
+     * @private
+     */
+    function info ( api )
+    {
+        var ctx = api.settings()[0];
+
+        if ( ! ctx._select.info || ! ctx.aanFeatures.i ) {
+            return;
+        }
+
+        if ( api.select.style() === 'api' ) {
+            return;
+        }
+
+        var rows    = api.rows( { selected: true } ).flatten().length;
+        var columns = api.columns( { selected: true } ).flatten().length;
+        var cells   = api.cells( { selected: true } ).flatten().length;
+
+        var add = function ( el, name, num ) {
+            el.append( $('<span class="select-item"/>').append( api.i18n(
+                'select.'+name+'s',
+                { _: '%d '+name+'s selected', 0: '', 1: '1 '+name+' selected' },
+                num
+            ) ) );
+        };
+
+        // Internal knowledge of DataTables to loop over all information elements
+        $.each( ctx.aanFeatures.i, function ( i, el ) {
+            el = $(el);
+
+            var output  = $('<span class="select-info"/>');
+            add( output, 'row', rows );
+            add( output, 'column', columns );
+            add( output, 'cell', cells  );
+
+            var exisiting = el.children('span.select-info');
+            if ( exisiting.length ) {
+                exisiting.remove();
+            }
+
+            if ( output.text() !== '' ) {
+                el.append( output );
+            }
+        } );
+    }
+
+    /**
+     * Initialisation of a new table. Attach event handlers and callbacks to allow
+     * Select to operate correctly.
+     *
+     * This will occur _after_ the initial DataTables initialisation, although
+     * before Ajax data is rendered, if there is ajax data
+     *
+     * @param  {DataTable.settings} ctx Settings object to operate on
+     * @private
+     */
+    function init ( ctx ) {
+        var api = new DataTable.Api( ctx );
+
+        // Row callback so that classes can be added to rows and cells if the item
+        // was selected before the element was created. This will happen with the
+        // `deferRender` option enabled.
+        //
+        // This method of attaching to `aoRowCreatedCallback` is a hack until
+        // DataTables has proper events for row manipulation If you are reviewing
+        // this code to create your own plug-ins, please do not do this!
+        ctx.aoRowCreatedCallback.push( {
+            fn: function ( row, data, index ) {
+                var i, ien;
+                var d = ctx.aoData[ index ];
+
+                // Row
+                if ( d._select_selected ) {
+                    $( row ).addClass( ctx._select.className );
+                }
+
+                // Cells and columns - if separated out, we would need to do two
+                // loops, so it makes sense to combine them into a single one
+                for ( i=0, ien=ctx.aoColumns.length ; i<ien ; i++ ) {
+                    if ( ctx.aoColumns[i]._select_selected || (d._selected_cells && d._selected_cells[i]) ) {
+                        $(d.anCells[i]).addClass( ctx._select.className );
+                    }
+                }
+            },
+            sName: 'select-deferRender'
+        } );
+
+        // On Ajax reload we want to reselect all rows which are currently selected,
+        // if there is an rowId (i.e. a unique value to identify each row with)
+        api.on( 'preXhr.dt.dtSelect', function () {
+            // note that column selection doesn't need to be cached and then
+            // reselected, as they are already selected
+            var rows = api.rows( { selected: true } ).ids( true ).filter( function ( d ) {
+                return d !== undefined;
+            } );
+
+            var cells = api.cells( { selected: true } ).eq(0).map( function ( cellIdx ) {
+                var id = api.row( cellIdx.row ).id( true );
+                return id ?
+                    { row: id, column: cellIdx.column } :
+                    undefined;
+            } ).filter( function ( d ) {
+                return d !== undefined;
+            } );
+
+            // On the next draw, reselect the currently selected items
+            api.one( 'draw.dt.dtSelect', function () {
+                api.rows( rows ).select();
+
+                // `cells` is not a cell index selector, so it needs a loop
+                if ( cells.any() ) {
+                    cells.each( function ( id ) {
+                        api.cells( id.row, id.column ).select();
+                    } );
+                }
+            } );
+        } );
+
+        // Update the table information element with selected item summary
+        api.on( 'draw.dtSelect.dt select.dtSelect.dt deselect.dtSelect.dt info.dt', function () {
+            info( api );
+        } );
+
+        // Clean up and release
+        api.on( 'destroy.dtSelect', function () {
+            disableMouseSelection( api );
+            api.off( '.dtSelect' );
+        } );
+    }
+
+    /**
+     * Add one or more items (rows or columns) to the selection when shift clicking
+     * in OS selection style
+     *
+     * @param  {DataTable.Api} dt   DataTable
+     * @param  {string}        type Row or column range selector
+     * @param  {object}        idx  Item index to select to
+     * @param  {object}        last Item index to select from
+     * @private
+     */
+    function rowColumnRange( dt, type, idx, last )
+    {
+        // Add a range of rows from the last selected row to this one
+        var indexes = dt[type+'s']( { search: 'applied' } ).indexes();
+        var idx1 = $.inArray( last, indexes );
+        var idx2 = $.inArray( idx, indexes );
+
+        if ( ! dt[type+'s']( { selected: true } ).any() && idx1 === -1 ) {
+            // select from top to here - slightly odd, but both Windows and Mac OS
+            // do this
+            indexes.splice( $.inArray( idx, indexes )+1, indexes.length );
+        }
+        else {
+            // reverse so we can shift click 'up' as well as down
+            if ( idx1 > idx2 ) {
+                var tmp = idx2;
+                idx2 = idx1;
+                idx1 = tmp;
+            }
+
+            indexes.splice( idx2+1, indexes.length );
+            indexes.splice( 0, idx1 );
+        }
+
+        if ( ! dt[type]( idx, { selected: true } ).any() ) {
+            // Select range
+            dt[type+'s']( indexes ).select();
+        }
+        else {
+            // Deselect range - need to keep the clicked on row selected
+            indexes.splice( $.inArray( idx, indexes ), 1 );
+            dt[type+'s']( indexes ).deselect();
+        }
+    }
+
+    /**
+     * Clear all selected items
+     *
+     * @param  {DataTable.settings} ctx Settings object of the host DataTable
+     * @param  {boolean} [force=false] Force the de-selection to happen, regardless
+     *     of selection style
+     * @private
+     */
+    function clear( ctx, force )
+    {
+        if ( force || ctx._select.style === 'single' ) {
+            var api = new DataTable.Api( ctx );
+
+            api.rows( { selected: true } ).deselect();
+            api.columns( { selected: true } ).deselect();
+            api.cells( { selected: true } ).deselect();
+        }
+    }
+
+    /**
+     * Select items based on the current configuration for style and items.
+     *
+     * @param  {object}             e    Mouse event object
+     * @param  {DataTables.Api}     dt   DataTable
+     * @param  {DataTable.settings} ctx  Settings object of the host DataTable
+     * @param  {string}             type Items to select
+     * @param  {int|object}         idx  Index of the item to select
+     * @private
+     */
+    function typeSelect ( e, dt, ctx, type, idx )
+    {
+        var style = dt.select.style();
+        var isSelected = dt[type]( idx, { selected: true } ).any();
+
+        if ( style === 'os' ) {
+            if ( e.ctrlKey || e.metaKey ) {
+                // Add or remove from the selection
+                dt[type]( idx ).select( ! isSelected );
+            }
+            else if ( e.shiftKey ) {
+                if ( type === 'cell' ) {
+                    cellRange( dt, idx, ctx._select_lastCell || null );
+                }
+                else {
+                    rowColumnRange( dt, type, idx, ctx._select_lastCell ?
+                        ctx._select_lastCell[type] :
+                        null
+                    );
+                }
+            }
+            else {
+                // No cmd or shift click - deselect if selected, or select
+                // this row only
+                var selected = dt[type+'s']( { selected: true } );
+
+                if ( isSelected && selected.flatten().length === 1 ) {
+                    dt[type]( idx ).deselect();
+                }
+                else {
+                    selected.deselect();
+                    dt[type]( idx ).select();
+                }
+            }
+        } else if ( style == 'multi+shift' ) {
+            if ( e.shiftKey ) {
+                if ( type === 'cell' ) {
+                    cellRange( dt, idx, ctx._select_lastCell || null );
+                }
+                else {
+                    rowColumnRange( dt, type, idx, ctx._select_lastCell ?
+                        ctx._select_lastCell[type] :
+                        null
+                    );
+                }
+            }
+            else {
+                dt[ type ]( idx ).select( ! isSelected );
+            }
+        }
+        else {
+            dt[ type ]( idx ).select( ! isSelected );
+        }
+    }
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * DataTables selectors
+ */
+
+// row and column are basically identical just assigned to different properties
+// and checking a different array, so we can dynamically create the functions to
+// reduce the code size
+    $.each( [
+        { type: 'row', prop: 'aoData' },
+        { type: 'column', prop: 'aoColumns' }
+    ], function ( i, o ) {
+        DataTable.ext.selector[ o.type ].push( function ( settings, opts, indexes ) {
+            var selected = opts.selected;
+            var data;
+            var out = [];
+
+            if ( selected !== true && selected !== false ) {
+                return indexes;
+            }
+
+            for ( var i=0, ien=indexes.length ; i<ien ; i++ ) {
+                data = settings[ o.prop ][ indexes[i] ];
+
+                if ( (selected === true && data._select_selected === true) ||
+                    (selected === false && ! data._select_selected )
+                ) {
+                    out.push( indexes[i] );
+                }
+            }
+
+            return out;
+        } );
+    } );
+
+    DataTable.ext.selector.cell.push( function ( settings, opts, cells ) {
+        var selected = opts.selected;
+        var rowData;
+        var out = [];
+
+        if ( selected === undefined ) {
+            return cells;
+        }
+
+        for ( var i=0, ien=cells.length ; i<ien ; i++ ) {
+            rowData = settings.aoData[ cells[i].row ];
+
+            if ( (selected === true && rowData._selected_cells && rowData._selected_cells[ cells[i].column ] === true) ||
+                (selected === false && ( ! rowData._selected_cells || ! rowData._selected_cells[ cells[i].column ] ) )
+            ) {
+                out.push( cells[i] );
+            }
+        }
+
+        return out;
+    } );
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * DataTables API
+ *
+ * For complete documentation, please refer to the docs/api directory or the
+ * DataTables site
+ */
+
+// Local variables to improve compression
+    var apiRegister = DataTable.Api.register;
+    var apiRegisterPlural = DataTable.Api.registerPlural;
+
+    apiRegister( 'select()', function () {
+        return this.iterator( 'table', function ( ctx ) {
+            DataTable.select.init( new DataTable.Api( ctx ) );
+        } );
+    } );
+
+    apiRegister( 'select.blurable()', function ( flag ) {
+        if ( flag === undefined ) {
+            return this.context[0]._select.blurable;
+        }
+
+        return this.iterator( 'table', function ( ctx ) {
+            ctx._select.blurable = flag;
+        } );
+    } );
+
+    apiRegister( 'select.info()', function ( flag ) {
+        if ( info === undefined ) {
+            return this.context[0]._select.info;
+        }
+
+        return this.iterator( 'table', function ( ctx ) {
+            ctx._select.info = flag;
+        } );
+    } );
+
+    apiRegister( 'select.items()', function ( items ) {
+        if ( items === undefined ) {
+            return this.context[0]._select.items;
+        }
+
+        return this.iterator( 'table', function ( ctx ) {
+            ctx._select.items = items;
+
+            eventTrigger( new DataTable.Api( ctx ), 'selectItems', [ items ] );
+        } );
+    } );
+
+// Takes effect from the _next_ selection. None disables future selection, but
+// does not clear the current selection. Use the `deselect` methods for that
+    apiRegister( 'select.style()', function ( style ) {
+        if ( style === undefined ) {
+            return this.context[0]._select.style;
+        }
+
+        return this.iterator( 'table', function ( ctx ) {
+            ctx._select.style = style;
+
+            if ( ! ctx._select_init ) {
+                init( ctx );
+            }
+
+            // Add / remove mouse event handlers. They aren't required when only
+            // API selection is available
+            var dt = new DataTable.Api( ctx );
+            disableMouseSelection( dt );
+
+            if ( style !== 'api' ) {
+                enableMouseSelection( dt );
+            }
+
+            eventTrigger( new DataTable.Api( ctx ), 'selectStyle', [ style ] );
+        } );
+    } );
+
+    apiRegister( 'select.selector()', function ( selector ) {
+        if ( selector === undefined ) {
+            return this.context[0]._select.selector;
+        }
+
+        return this.iterator( 'table', function ( ctx ) {
+            disableMouseSelection( new DataTable.Api( ctx ) );
+
+            ctx._select.selector = selector;
+
+            if ( ctx._select.style !== 'api' ) {
+                enableMouseSelection( new DataTable.Api( ctx ) );
+            }
+        } );
+    } );
+
+
+
+    apiRegisterPlural( 'rows().select()', 'row().select()', function ( select ) {
+        var api = this;
+
+        if ( select === false ) {
+            return this.deselect();
+        }
+
+        this.iterator( 'row', function ( ctx, idx ) {
+            clear( ctx );
+
+            ctx.aoData[ idx ]._select_selected = true;
+            $( ctx.aoData[ idx ].nTr ).addClass( ctx._select.className );
+        } );
+
+        this.iterator( 'table', function ( ctx, i ) {
+            eventTrigger( api, 'select', [ 'row', api[i] ], true );
+        } );
+
+        return this;
+    } );
+
+    apiRegisterPlural( 'columns().select()', 'column().select()', function ( select ) {
+        var api = this;
+
+        if ( select === false ) {
+            return this.deselect();
+        }
+
+        this.iterator( 'column', function ( ctx, idx ) {
+            clear( ctx );
+
+            ctx.aoColumns[ idx ]._select_selected = true;
+
+            var column = new DataTable.Api( ctx ).column( idx );
+
+            $( column.header() ).addClass( ctx._select.className );
+            $( column.footer() ).addClass( ctx._select.className );
+
+            column.nodes().to$().addClass( ctx._select.className );
+        } );
+
+        this.iterator( 'table', function ( ctx, i ) {
+            eventTrigger( api, 'select', [ 'column', api[i] ], true );
+        } );
+
+        return this;
+    } );
+
+    apiRegisterPlural( 'cells().select()', 'cell().select()', function ( select ) {
+        var api = this;
+
+        if ( select === false ) {
+            return this.deselect();
+        }
+
+        this.iterator( 'cell', function ( ctx, rowIdx, colIdx ) {
+            clear( ctx );
+
+            var data = ctx.aoData[ rowIdx ];
+
+            if ( data._selected_cells === undefined ) {
+                data._selected_cells = [];
+            }
+
+            data._selected_cells[ colIdx ] = true;
+
+            if ( data.anCells ) {
+                $( data.anCells[ colIdx ] ).addClass( ctx._select.className );
+            }
+        } );
+
+        this.iterator( 'table', function ( ctx, i ) {
+            eventTrigger( api, 'select', [ 'cell', api[i] ], true );
+        } );
+
+        return this;
+    } );
+
+
+    apiRegisterPlural( 'rows().deselect()', 'row().deselect()', function () {
+        var api = this;
+
+        this.iterator( 'row', function ( ctx, idx ) {
+            ctx.aoData[ idx ]._select_selected = false;
+            $( ctx.aoData[ idx ].nTr ).removeClass( ctx._select.className );
+        } );
+
+        this.iterator( 'table', function ( ctx, i ) {
+            eventTrigger( api, 'deselect', [ 'row', api[i] ], true );
+        } );
+
+        return this;
+    } );
+
+    apiRegisterPlural( 'columns().deselect()', 'column().deselect()', function () {
+        var api = this;
+
+        this.iterator( 'column', function ( ctx, idx ) {
+            ctx.aoColumns[ idx ]._select_selected = false;
+
+            var api = new DataTable.Api( ctx );
+            var column = api.column( idx );
+
+            $( column.header() ).removeClass( ctx._select.className );
+            $( column.footer() ).removeClass( ctx._select.className );
+
+            // Need to loop over each cell, rather than just using
+            // `column().nodes()` as cells which are individually selected should
+            // not have the `selected` class removed from them
+            api.cells( null, idx ).indexes().each( function (cellIdx) {
+                var data = ctx.aoData[ cellIdx.row ];
+                var cellSelected = data._selected_cells;
+
+                if ( data.anCells && (! cellSelected || ! cellSelected[ cellIdx.column ]) ) {
+                    $( data.anCells[ cellIdx.column  ] ).removeClass( ctx._select.className );
+                }
+            } );
+        } );
+
+        this.iterator( 'table', function ( ctx, i ) {
+            eventTrigger( api, 'deselect', [ 'column', api[i] ], true );
+        } );
+
+        return this;
+    } );
+
+    apiRegisterPlural( 'cells().deselect()', 'cell().deselect()', function () {
+        var api = this;
+
+        this.iterator( 'cell', function ( ctx, rowIdx, colIdx ) {
+            var data = ctx.aoData[ rowIdx ];
+
+            data._selected_cells[ colIdx ] = false;
+
+            // Remove class only if the cells exist, and the cell is not column
+            // selected, in which case the class should remain (since it is selected
+            // in the column)
+            if ( data.anCells && ! ctx.aoColumns[ colIdx ]._select_selected ) {
+                $( data.anCells[ colIdx ] ).removeClass( ctx._select.className );
+            }
+        } );
+
+        this.iterator( 'table', function ( ctx, i ) {
+            eventTrigger( api, 'deselect', [ 'cell', api[i] ], true );
+        } );
+
+        return this;
+    } );
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Buttons
+ */
+    function i18n( label, def ) {
+        return function (dt) {
+            return dt.i18n( 'buttons.'+label, def );
+        };
+    }
+
+// Common events with suitable namespaces
+    function namespacedEvents ( config ) {
+        var unique = config._eventNamespace;
+
+        return 'draw.dt.DT'+unique+' select.dt.DT'+unique+' deselect.dt.DT'+unique;
+    }
+
+    function enabled ( dt, config ) {
+        if ( $.inArray( 'rows', config.limitTo ) !== -1 && dt.rows( { selected: true } ).any() ) {
+            return true;
+        }
+
+        if ( $.inArray( 'columns', config.limitTo ) !== -1 && dt.columns( { selected: true } ).any() ) {
+            return true;
+        }
+
+        if ( $.inArray( 'cells', config.limitTo ) !== -1 && dt.cells( { selected: true } ).any() ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    var _buttonNamespace = 0;
+
+    $.extend( DataTable.ext.buttons, {
+        selected: {
+            text: i18n( 'selected', 'Selected' ),
+            className: 'buttons-selected',
+            limitTo: [ 'rows', 'columns', 'cells' ],
+            init: function ( dt, node, config ) {
+                var that = this;
+                config._eventNamespace = '.select'+(_buttonNamespace++);
+
+                // .DT namespace listeners are removed by DataTables automatically
+                // on table destroy
+                dt.on( namespacedEvents(config), function () {
+                    that.enable( enabled(dt, config) );
+                } );
+
+                this.disable();
+            },
+            destroy: function ( dt, node, config ) {
+                dt.off( config._eventNamespace );
+            }
+        },
+        selectedSingle: {
+            text: i18n( 'selectedSingle', 'Selected single' ),
+            className: 'buttons-selected-single',
+            init: function ( dt, node, config ) {
+                var that = this;
+                config._eventNamespace = '.select'+(_buttonNamespace++);
+
+                dt.on( namespacedEvents(config), function () {
+                    var count = dt.rows( { selected: true } ).flatten().length +
+                        dt.columns( { selected: true } ).flatten().length +
+                        dt.cells( { selected: true } ).flatten().length;
+
+                    that.enable( count === 1 );
+                } );
+
+                this.disable();
+            },
+            destroy: function ( dt, node, config ) {
+                dt.off( config._eventNamespace );
+            }
+        },
+        selectAll: {
+            text: i18n( 'selectAll', 'Select all' ),
+            className: 'buttons-select-all',
+            action: function () {
+                var items = this.select.items();
+                this[ items+'s' ]().select();
+            }
+        },
+        selectNone: {
+            text: i18n( 'selectNone', 'Deselect all' ),
+            className: 'buttons-select-none',
+            action: function () {
+                clear( this.settings()[0], true );
+            },
+            init: function ( dt, node, config ) {
+                var that = this;
+                config._eventNamespace = '.select'+(_buttonNamespace++);
+
+                dt.on( namespacedEvents(config), function () {
+                    var count = dt.rows( { selected: true } ).flatten().length +
+                        dt.columns( { selected: true } ).flatten().length +
+                        dt.cells( { selected: true } ).flatten().length;
+
+                    that.enable( count > 0 );
+                } );
+
+                this.disable();
+            },
+            destroy: function ( dt, node, config ) {
+                dt.off( config._eventNamespace );
+            }
+        }
+    } );
+
+    $.each( [ 'Row', 'Column', 'Cell' ], function ( i, item ) {
+        var lc = item.toLowerCase();
+
+        DataTable.ext.buttons[ 'select'+item+'s' ] = {
+            text: i18n( 'select'+item+'s', 'Select '+lc+'s' ),
+            className: 'buttons-select-'+lc+'s',
+            action: function () {
+                this.select.items( lc );
+            },
+            init: function ( dt ) {
+                var that = this;
+
+                dt.on( 'selectItems.dt.DT', function ( e, ctx, items ) {
+                    that.active( items === lc );
+                } );
+            }
+        };
+    } );
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Initialisation
+ */
+
+// DataTables creation - check if select has been defined in the options. Note
+// this required that the table be in the document! If it isn't then something
+// needs to trigger this method unfortunately. The next major release of
+// DataTables will rework the events and address this.
+    $(document).on( 'preInit.dt.dtSelect', function (e, ctx) {
+        if ( e.namespace !== 'dt' ) {
+            return;
+        }
+
+        DataTable.select.init( new DataTable.Api( ctx ) );
+    } );
+
+
+    return DataTable.select;
+}));
+
 

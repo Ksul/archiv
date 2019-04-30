@@ -414,7 +414,7 @@ function startDocumentDialog(data, modus, modal) {
                                 if (modus === "web-edit") {
                                     // Konvertierung
                                     if (input.amountDisplay && typeof input.amountDisplay === "string")
-                                        input.amount = parseFloat(input.amountDisplay.replace(/\./g, '').replace(/,/g, "."));
+                                        input.amount = parseFloat(input.amountDisplay);
                                     if (input.documentDateDisplay && typeof input.documentDateDisplay === "string")
                                         input.documentDate = $.datepicker.parseDate("dd.mm.yy", input.documentDateDisplay).getTime();
                                     // Wurde was geändert?
@@ -429,7 +429,12 @@ function startDocumentDialog(data, modus, modal) {
                                 } else if (modus === "web-display") {
                                     deleteDocument(origData);
                                 } else if (modus === "web-create") {
-                                    createDocument(alpaca.getValue(), alpaca.data.file);
+                                    // Konvertierung
+                                    if (input.amountDisplay && typeof input.amountDisplay === "string")
+                                        input.amount = parseFloat(input.amountDisplay);
+                                    if (input.documentDateDisplay && typeof input.documentDateDisplay === "string")
+                                        input.documentDate = $.datepicker.parseDate("dd.mm.yy", input.documentDateDisplay).getTime();
+                                    createDocument(input, alpaca.data.file);
                                 }
                                 closeDialog();
                             } catch (e) {

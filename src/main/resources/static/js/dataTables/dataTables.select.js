@@ -1,4 +1,4 @@
-/*! Select for DataTables 1.2.5
+/*! Select for DataTables 1.3.0
  * 2015-2018 SpryMedia Ltd - datatables.net/license/mit
  */
 
@@ -6,7 +6,7 @@
  * @summary     Select for DataTables
  * @description A collection of API methods, events and buttons for DataTables
  *   that provides selection options of the items in a DataTable
- * @version     1.2.5
+ * @version     1.3.0
  * @file        dataTables.select.js
  * @author      SpryMedia Ltd (www.sprymedia.co.uk)
  * @contact     datatables.net/forums
@@ -54,7 +54,7 @@
 // Version information for debugger
     DataTable.select = {};
 
-    DataTable.select.version = '1.2.5';
+    DataTable.select.version = '1.3.0';
 
     DataTable.select.init = function ( dt ) {
         var ctx = dt.settings()[0];
@@ -99,6 +99,10 @@
 
             if ( opts.style !== undefined ) {
                 style = opts.style;
+                setStyle = true;
+            }
+            else {
+                style = 'os';
                 setStyle = true;
             }
 
@@ -324,6 +328,7 @@
         var container = $( dt.table().container() );
         var ctx = dt.settings()[0];
         var selector = ctx._select.selector;
+        var matchSelection;
 
         container
             .on( 'mousedown.dtSelect', selector, function(e) {
@@ -335,6 +340,10 @@
                         .one('selectstart.dtSelect', selector, function () {
                             return false;
                         } );
+                }
+
+                if ( window.getSelection ) {
+                    matchSelection = window.getSelection();
                 }
             } )
             .on( 'mouseup.dtSelect', selector, function() {
@@ -348,22 +357,23 @@
 
                 // If text was selected (click and drag), then we shouldn't change
                 // the row's selected state
-                if ( window.getSelection ) {
+                if ( matchSelection ) {
                     var selection = window.getSelection();
 
                     // If the element that contains the selection is not in the table, we can ignore it
                     // This can happen if the developer selects text from the click event
                     if ( ! selection.anchorNode || $(selection.anchorNode).closest('table')[0] === dt.table().node() ) {
-                        if ( $.trim(selection.toString()) !== '' ) {
+                        if ( selection !== matchSelection ) {
                             return;
                         }
                     }
                 }
 
                 var ctx = dt.settings()[0];
+                var wrapperClass = $.trim(dt.settings()[0].oClasses.sWrapper).replace(/ +/g, '.');
 
                 // Ignore clicks inside a sub-table
-                if ( $(e.target).closest('div.dataTables_wrapper')[0] != dt.table().container() ) {
+                if ( $(e.target).closest('div.'+wrapperClass)[0] != dt.table().container() ) {
                     return;
                 }
 

@@ -703,12 +703,24 @@ public class ArchivController {
         CmisObject cmisObject = con.getNodeById(model.getDocumentId());
         if (cmisObject != null) {
 
+            OperationContext operationContext = con.getSession().createOperationContext();
+
             outMap = buildProperties(model.getExtraProperties());
 
             cmisObject = con.updateProperties(cmisObject, outMap);
 
+            Map<String, Object> props = convertCmisObjectToJSON(cmisObject, true);
+            // Versionen suchen
+            if (cmisObject instanceof Document) {
+                TreeMap<String, Object> versions = new TreeMap<>(Collections.reverseOrder());
+                for (Document document : ((Document) cmisObject).getAllVersions(operationContext)) {
+                    versions.put(document.getVersionLabel(), convertCmisObjectToJSON(document, false));
+                }
+                props.put("versions", versions);
+            }
+
             obj.setSuccess(true);
-            obj.setData(convertCmisObjectToJSON(cmisObject, true));
+            obj.setData(props);
         } else {
             throw new ArchivException("Ein Document mit der Id " + model.getDocumentId() + " ist nicht vorhanden!");
         }
@@ -1334,7 +1346,6 @@ public class ArchivController {
                                                         boolean searchParents) {
 
         Map<String, Object> props = convProperties(cmisObject.getProperties());
-
         // Parents suchen
         if (searchParents) {
             List<Folder> parents = ((FileableCmisObject) cmisObject).getParents();

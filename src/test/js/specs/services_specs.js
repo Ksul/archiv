@@ -128,13 +128,43 @@ describe("Test für die Rest Services", function () {
     });
 
 
-    it("createDocument", function () {
+    fit("createDocument", function () {
 
         var json = buildTestFolder("TestFolder", "Ordner für Tests", "/");
 
         var folderId = json.data.objectID;
 
-        json = buildDocument("Test.txt", "Test", "", folderId);
+        var extraProperties = {
+            'P:cm:titled': {
+                'cm:title': "Test",
+                'cm:description': ""
+            },
+            'D:my:archivContent': {
+                'my:documentDate': "",
+                'my:person': "Klaus"
+            },
+            'P:my:amountable': {'my:amount': "123.95", "my:tax": ""},
+            'P:my:idable': {'my:idvalue': "123"}
+        };
+
+        json = executeService({
+            "name": "createDocument",
+            "errorMessage": "Dokument konnte nicht erstellt werden!",
+            "ignoreError": true
+        }, [
+            {"name": "documentId", "value": folderId},
+            {"name": "fileName", "value": "Test.txt"},
+            {"name": "content", "value": "abcde", "type": "byte"},
+            {"name": "extraProperties", "value": extraProperties},
+            {"name": "mimeType", "value": "text/plain"},
+            {"name": "versionState", "value": "major"}
+        ]);
+
+        expect(json.success).toBe(true);
+        expect(json.data.name).toBe("Test.txt");
+        expect(json.data.amount).toBe(123.95);
+        expect(json.data.idvalue).toBe("123");
+        expect(json.data.versionLabel).toBe("1.0");
 
         var ids = [];
         ids.push(folderId);

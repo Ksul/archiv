@@ -635,9 +635,7 @@ function loadAlfrescoTable() {
                     orderable: false,
                     title: "Version",
                     name: "d.cm:versionLabel",
-                    defaultContent: '',
                     width: "25px",
-                    type: "string",
                     class: "alignCenter"
                 },
                 {
