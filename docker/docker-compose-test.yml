@@ -31,22 +31,6 @@ services:
     networks:
       - internal
 
-  share:
-    build: ./share
-    container_name: share
-    hostname: share
-    depends_on:
-      - alfresco
-    environment:
-      - REPO_HOST=alfresco
-      - REPO_PORT=8080
-      - "CATALINA_OPTS=-XX:+UseG1GC -XX:+UseStringDeduplication -Xms${SHARE_XMS} -Xmx${SHARE_XMX}"
-    volumes:
-      - ./volumes/logs/share:/usr/local/tomcat/logs
-      - ./volumes/config/ext-share-config-custom.xml:/usr/local/tomcat/shared/classes/alfresco/web-extension/ext-share-config-custom.xml
-    networks:
-      - internal
-
   solr6:
     image: alfresco/alfresco-search-services:1.2.0
     container_name: solr6
@@ -64,14 +48,6 @@ services:
     volumes:
       - ./volumes/data/solr-data:/opt/alfresco-search-services/data
       # Logs directory cannot be exposed as volume as it includes also configuration inside (log4j.properties)
-    networks:
-      - internal
-
-  content-app:
-    image: alfresco/alfresco-content-app:master-latest
-    container_name: content-app
-    depends_on:
-      - alfresco
     networks:
       - internal
 
@@ -110,16 +86,15 @@ services:
     image: nginx:stable-alpine
     container_name: proxy
     depends_on:
-      - content-app
-      - share
+      - alfresco
     volumes:
-      - ./volumes/config/nginx:/etc/nginx/conf.d
+      - ./volumes/config/nginx-test:/etc/nginx/conf.d
       - ./volumes/logs/nginx:/var/log/nginx
     networks:
       - internal
     ports:
       - 80:80
-
+      
 volumes:
   postgres_database:
     external: false
