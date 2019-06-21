@@ -1,8 +1,8 @@
 # Properties zum Testen
 ksul:
   archiv:
-    server: http://localhost:80/alfresco/
-    binding: http://localhost:80/alfresco/api/-default-/public/cmis/versions/1.1/atom
+    server: http://localhost:8089/alfresco/
+    binding: http://localhost:8089/alfresco/api/-default-/public/cmis/versions/1.1/atom
     user: admin
     password: admin
     company-home-name: Company Home

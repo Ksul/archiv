@@ -1,10 +1,10 @@
-version: "3"
+version: "2"
 
 
 services:
   alfresco:
     build: ./alfresco
-    container_name: alfresco
+    container_name: alfrescoTest
     depends_on:
       - alfresco-db
     hostname: alfresco
@@ -53,6 +53,7 @@ services:
 
   alfresco-db:
     image: postgres:latest
+    hostname: alfresco-db
     container_name: postgres
     environment:
       - POSTGRES_USER=alfresco

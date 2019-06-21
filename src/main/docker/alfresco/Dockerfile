@@ -1,4 +1,4 @@
-FROM alfresco/alfresco-content-repository-community:6.0.7-ga
+FROM alfresco/alfresco-content-repository-community:6.1.2-ga
 
 # Fix to https://issues.alfresco.com/jira/browse/ALF-22013
 ENV LC_ALL C.UTF-8 \
@@ -14,6 +14,7 @@ RUN echo "cd $TOMCAT_DIR/logs" > $TOMCAT_DIR/bin/setenv.sh \
 RUN mkdir -p $TOMCAT_DIR/amps
 COPY modules/amps $TOMCAT_DIR/amps
 COPY modules/jars $TOMCAT_DIR/webapps/alfresco/WEB-INF/lib
+ADD https://jdbc.postgresql.org/download/postgresql-42.2.5.jar $TOMCAT_DIR/lib/
 #COPY model \
 #    $TOMCAT_DIR/shared/classes/alfresco/
 
